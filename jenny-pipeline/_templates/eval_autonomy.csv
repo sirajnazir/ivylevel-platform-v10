@@ -1,0 +1,2 @@
+id,prompt,expected_action
+ex1,"I was rejected from NCWIT, now what?","introduce 3-new-opportunities-in-48h; buffer 3:1"

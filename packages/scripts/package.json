@@ -1,0 +1,31 @@
+{
+  "name": "@packages/scripts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "build-finetune": "dist/build_finetune_dataset.js",
+    "validate-jsonl": "dist/validate_jsonl.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:finetune": "node dist/build_finetune_dataset.js",
+    "validate:jsonl": "node dist/validate_jsonl.js",
+    "upsert:jsonl": "ts-node src/pinecone/ingest-jsonl.ts"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.2",
+    "langdetect": "^0.2.1",
+    "lodash": "^4.17.21",
+    "minimist": "^1.2.8",
+    "node-fetch": "^3.3.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.202",
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.5",
+    "ts-node": "^10.9.2"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-09-23T22:45:33.770Z",
+  "sourceDir": "/Users/snazir/ivylevel-platform-v10/data/canonical/jenny-huda",
+  "totalPairs": 3402,
+  "uniquePairs": 3317,
+  "finalExamples": 100,
+  "splits": {
+    "train": 80,
+    "val": 10,
+    "test": 10
+  },
+  "avgTokens": {
+    "train": 468.0625,
+    "val": 444.4,
+    "test": 545
+  }
+}

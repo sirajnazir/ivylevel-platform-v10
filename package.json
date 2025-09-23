@@ -1,0 +1,21 @@
+{
+  "name": "ivylevel-monorepo",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev:api": "pnpm --filter @apps/api dev",
+    "dev:agent": "pnpm --filter @services/agent dev",
+    "dev:retriever": "pnpm --filter @services/retriever dev"
+  },
+  "dependencies": {
+    "@pinecone-database/pinecone": "^4.0.0",
+    "openai": "^4.56.0",
+    "p-limit": "^7.1.1"
+  }
+}

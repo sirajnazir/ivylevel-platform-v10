@@ -1,0 +1,13 @@
+variable "region" { default = "us-west-2" }
+variable "profile" { default = "default" }
+variable "project" { default = "ivylevel" }
+variable "env" { default = "prod2u" }
+variable "domain" { default = "" }
+variable "hosted_zone_id" { default = "" }
+variable "enable_rds" { default = true }
+variable "db_password" { sensitive = true }
+variable "openai_key" { sensitive = true }
+variable "pinecone_key" { sensitive = true }
+variable "pinecone_index" { default = "jenny-v1" }
+variable "pinecone_namespace" { default = "jenny_v1" }
+variable "cognito_email_ses_identity" { default = "" }
