@@ -2,6 +2,8 @@ import type { AgentState } from "../../../packages/types/src/index";
 import { runNode } from "./graph";
 import { MODEL_CURRENT, RETRIEVER_URL, DEFAULT_TEMPERATURE, MAX_TOKENS } from "./config";
 import { child } from "../../../packages/logger/src/index";
+import { SYSTEM_PROMPT } from "./prompts/system";
+import { finalizeFactReply, isFactualQuestion } from "./fact_synthesizer";
 
 const log = child({ svc: "agent-orchestrator" });
 
@@ -22,24 +24,41 @@ export async function respond({ message, state, coachId='jenny', studentId, nowW
   };
   
   try {
-    // Get evidence from retriever
-    const evidence = await ensureEvidence(message);
+    // Get evidence from retriever (increase topK for factual questions)
+    const isFact = isFactualQuestion(message);
+    const topK = isFact ? (process.env.FACT_TOPK ? parseInt(process.env.FACT_TOPK) : 8) : 3;
+    const evidence = await ensureEvidence(message, topK);
     
     // Call OpenAI with Jenny's system prompt
     const openai = await getOpenAIClient();
     const systemPrompt = getSystemPrompt(agentState);
     
+    // Build context with evidence if factual
+    const contextMessages = [
+      { role: "system", content: systemPrompt }
+    ];
+    
+    if (isFact && evidence.length > 0) {
+      const evidenceContext = "Evidence from your records:\n" + 
+        evidence.map((e, i) => `${i+1}. Week ${e.week}: ${e.title}`).join('\n');
+      contextMessages.push({ role: "system", content: evidenceContext });
+    }
+    
+    contextMessages.push({ role: "user", content: message });
+    
     const completion = await openai.chat.completions.create({
       model: MODEL_CURRENT,
-      temperature: DEFAULT_TEMPERATURE,
+      temperature: isFact ? 0.3 : DEFAULT_TEMPERATURE,
       max_tokens: MAX_TOKENS,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: message }
-      ]
+      messages: contextMessages
     });
     
-    const reply = completion.choices[0]?.message?.content || "I'm here to help with your college journey.";
+    let reply = completion.choices[0]?.message?.content || "I'm here to help with your college journey.";
+    
+    // Apply fact synthesizer for factual questions
+    if (isFact || process.env.NEVER_BLANK_MODE === "1") {
+      reply = finalizeFactReply(reply, evidence.length > 0);
+    }
     
     return {
       reply,
@@ -53,12 +72,12 @@ export async function respond({ message, state, coachId='jenny', studentId, nowW
   }
 }
 
-async function ensureEvidence(query: string) {
+async function ensureEvidence(query: string, topK: number = 3) {
   try {
     const response = await fetch(`${RETRIEVER_URL}/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: query, k: 3 })
+      body: JSON.stringify({ q: query, k: topK })
     });
     
     if (!response.ok) {
@@ -89,19 +108,8 @@ async function getOpenAIClient() {
 }
 
 function getSystemPrompt(state: AgentState) {
-  return `You are Jenny, an expert college admissions coach with deep experience helping students navigate the complex college application process. You provide strategic guidance, emotional support, and practical advice to help students achieve their academic goals.
-
-Your coaching style is:
-- Strategic and outcome-focused  
-- Empathetic and supportive
-- Detail-oriented with actionable steps
-- Evidence-based with clear reasoning
-- Encouraging while maintaining high standards
-
-Current context:
-- Student: ${state.studentId}
-- Week: ${state.nowWeek}
-- Phase: ${state.phase === 1 ? "Assessment" : state.phase === 2 ? "Prep Execution" : "Applications"}
-
-Always cite evidence from prior sessions when relevant. Use the 168-hour framework for time management. Maintain Jenny's authentic voice from the corpus.`;
+  return SYSTEM_PROMPT
+    .replace('{studentId}', state.studentId || 'student')
+    .replace('{nowWeek}', state.nowWeek.toString())
+    .replace('{phase}', state.phase === 1 ? "Assessment" : state.phase === 2 ? "Prep Execution" : "Applications");
 }
