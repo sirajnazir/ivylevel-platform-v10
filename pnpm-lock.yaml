@@ -13,7 +13,7 @@ importers:
         version: 4.1.0
       openai:
         specifier: ^4.56.0
-        version: 4.104.0
+        version: 4.104.0(zod@3.25.76)
       p-limit:
         specifier: ^7.1.1
         version: 7.1.1
@@ -71,6 +71,9 @@ importers:
 
   packages/scripts:
     dependencies:
+      csv-parse:
+        specifier: ^6.1.0
+        version: 6.1.0
       fast-glob:
         specifier: ^3.3.2
         version: 3.3.3
@@ -86,6 +89,9 @@ importers:
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
+      openai:
+        specifier: ^4.56.0
+        version: 4.104.0(zod@3.25.76)
       uuid:
         specifier: ^9.0.1
         version: 9.0.1
@@ -126,6 +132,9 @@ importers:
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
+      openai:
+        specifier: ^4.56.0
+        version: 4.104.0(zod@3.25.76)
     devDependencies:
       '@types/express':
         specifier: ^4.17.21
@@ -153,7 +162,10 @@ importers:
         version: 4.21.2
       openai:
         specifier: ^4.56.0
-        version: 4.104.0
+        version: 4.104.0(zod@3.25.76)
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
     devDependencies:
       '@types/express':
         specifier: ^4.17.21
@@ -929,6 +941,9 @@ packages:
 
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
+
+  csv-parse@6.1.0:
+    resolution: {integrity: sha512-CEE+jwpgLn+MmtCpVcPtiCZpVtB6Z2OKPTr34pycYYoL7sxdOkXDdQ4lRiw6ioC0q6BLqhc6cKweCVvral8yhw==}
 
   data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
@@ -1753,6 +1768,9 @@ packages:
   yocto-queue@1.2.1:
     resolution: {integrity: sha512-AyeEbWOu/TAXdxlV9wmGcR0+yh2j3vYPGOECcIj2S7MkrLyC7ne+oye2BKTItt0ii2PHk4cDy+95+LshzbXnGg==}
     engines: {node: '>=12.20'}
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
 snapshots:
 
@@ -2971,6 +2989,8 @@ snapshots:
 
   create-require@1.1.1: {}
 
+  csv-parse@6.1.0: {}
+
   data-uri-to-buffer@4.0.1: {}
 
   dateformat@4.6.3: {}
@@ -3374,7 +3394,7 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openai@4.104.0:
+  openai@4.104.0(zod@3.25.76):
     dependencies:
       '@types/node': 18.19.127
       '@types/node-fetch': 2.6.13
@@ -3383,6 +3403,8 @@ snapshots:
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
       node-fetch: 2.7.0
+    optionalDependencies:
+      zod: 3.25.76
     transitivePeerDependencies:
       - encoding
 
@@ -3821,3 +3843,5 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@1.2.1: {}
+
+  zod@3.25.76: {}

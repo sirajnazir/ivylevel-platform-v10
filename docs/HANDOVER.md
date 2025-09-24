@@ -20,6 +20,7 @@ Follow MANUAL_STEPS_CHECKLIST.md (sections A–E).
 ## 5. Logging & Debug
 - Use `@packages/logger` child loggers (service, reqId, studentId).
 - Evidence problems? Check agent logs for `ensureEvidence()` fallback.
+- Retriever API enforces strict param validation (q, k, filters). Bad keys = 400 error. No mock fallback.
 
 ## 6. Release
 - Weekly tag `v1.0.x`. Update CHANGELOG (if added) and Implementation Tracker status deltas.

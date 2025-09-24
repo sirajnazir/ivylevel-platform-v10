@@ -135,8 +135,9 @@ phase = f(nowWeek): 1→Foundation, 2→Building, 3→Junior, 4→Summer, 5→Se
     "logs_path": string
   }`
 - `POST /search`  
-  **Req:** `{ "q": string, "k"?: number, "filters"?: object }`  
-  **Res:** `{ "hits":[{"text":string,"score":number,"metadata":object}] }`
+  **Req:** `{ "q": string (required), "k"?: number (optional, default: 6), "filters"?: object (optional) }`  
+  **Res:** `{ "hits":[{"text":string,"score":number,"metadata":object}] }`  
+  **Error:** 400 `{ "error": "Missing required parameter: q (string)" }` if q is missing or not a string
 
 ### 5.2 services/agent
 - `POST /respond`  
@@ -145,8 +146,9 @@ phase = f(nowWeek): 1→Foundation, 2→Building, 3→Junior, 4→Summer, 5→Se
 
 ### 5.3 services/retriever
 - `POST /search`  
-  **Req:** `{ "q": string, "k"?: number, "namespace"?: string, "filter"?: object }`  
-  **Res:** `{ "hits":[{"text":string,"score":number,"metadata":object}] }`
+  **Req:** `{ "q": string (required), "k"?: number (optional, default: 6), "namespace"?: string (optional), "filter"?: object (optional) }`  
+  **Res:** `{ "hits":[{"text":string,"score":number,"metadata":object}] }`  
+  **Error:** 400 `{ "error": "Missing required parameter: q (string)" }` if q is missing or not a string
 - `POST /upsert`  
   **Req:** `{ "records": RagRecord[] }`  
   **Res:** `{ "ok": true, "count": number }`

@@ -1,0 +1,50 @@
+# API Keys
+OPENAI_API_KEY=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
+PINECONE_API_KEY=pcsk_51ak8z_LfcFSYgegDY4CzhriwetyHXMY5e5FRzyDc1MaQQMkNSUsDU8H2EDm2XNdPr6Gcq
+CLAUDE_API_KEY=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
+
+# Pinecone Configuration (Serverless / v2 SDK)
+PINECONE_INDEX=jenny-v1
+PINECONE_NAMESPACE=jenny_v1
+PINECONE_REGION=us-east-1      # optional; we'll auto-detect via SDK, but keep for logs
+
+# Google Drive Configuration
+GOOGLE_DRIVE_CREDENTIALS=/Users/snazir/ivylevel-coaching-platform/credentials.json
+JENNY_DRIVE_FOLDER_ID=1ARWeIUPKGOSnmNCatLMdnPqdbxxTrPUQ
+INTELLIGENCE_DRIVE_FOLDER_ID=1qM0DELhtx0ReINbWvExsEIkF_XnPkUTx
+
+# API Configuration
+API_URL=http://localhost:8000
+
+# Agent defaults
+JENNY_MODEL_ID=ft:gpt-4o-mini-2024-07-18:personal:jenny-v1:CJ6wyeDy   # Fine-tuned model (Status: Succeeded)
+
+# Jenny Model Configuration - from production config  
+JENNY_MODEL=ft:gpt-4o-mini-2024-07-18:personal:jenny-v5-clean-final:CDqGnjQg
+JENNY_FALLBACK_MODEL=gpt-4o-mini
+JENNY_MAX_TOKENS=150
+JENNY_TEMPERATURE=0.8
+
+# Service URLs and Ports (for local development)
+RETRIEVER_URL=http://localhost:4102
+AGENT_URL=http://localhost:4101
+RETRIEVER_PORT=4102
+API_PORT=4000
+
+# Logging
+LOG_LEVEL=INFO
+LOG_FORMAT=json
+
+# Additional URLs for manual steps
+RETRIEVER_UPSERT_URL=http://localhost:4102/upsert
+
+# Eval Configuration
+EVAL_BASE_MODEL=gpt-4o-mini-2024-07-18
+EVAL_FT_MODEL=ft:gpt-4o-mini-2024-07-18:personal:jenny-v1:CJ6wyeDy
+
+# Services
+AGENT_PORT=4101
+
+# Database Configuration
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ivylevel
+REDIS_URL=redis://localhost:6379
