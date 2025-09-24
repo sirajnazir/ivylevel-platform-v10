@@ -17,3 +17,5 @@ export type AgentState = {
   phase?: number;
   memory?: Record<string, any>;
 };
+
+export * from '../opportunity';

@@ -35,6 +35,7 @@ export const db = {
     value: any;
     source: string;
     at?: Date;
+    idempotency_key?: string;
   }) {
     const result = await pool.query(
       `INSERT INTO observations (student_id, kind, subtype, value, source, at) 
@@ -50,6 +51,14 @@ export const db = {
       ]
     );
     return result.rows[0].id;
+  },
+  
+  async checkObservationExists(idempotency_key: string) {
+    const result = await pool.query(
+      'SELECT id FROM observations WHERE value->>\'idempotency_key\' = $1 LIMIT 1',
+      [idempotency_key]
+    );
+    return result.rows[0] || null;
   },
   
   async getObservations(studentId: string) {

@@ -173,6 +173,96 @@ importers:
         specifier: ^5.4.0
         version: 5.9.2
 
+  services/opportunity-catalog:
+    dependencies:
+      '@packages/logger':
+        specifier: file:../../packages/logger
+        version: link:../../packages/logger
+      '@types/ivylevel':
+        specifier: file:../../packages/types
+        version: link:../../packages/types
+      express:
+        specifier: ^4.19.2
+        version: 4.21.2
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.23
+      '@types/pg':
+        specifier: ^8.15.5
+        version: 8.15.5
+      ts-node-dev:
+        specifier: ^2.0.0
+        version: 2.0.0(@types/node@24.5.2)(typescript@5.9.2)
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.2
+
+  services/opportunity-recommender:
+    dependencies:
+      '@packages/logger':
+        specifier: file:../../packages/logger
+        version: link:../../packages/logger
+      '@types/ivylevel':
+        specifier: file:../../packages/types
+        version: link:../../packages/types
+      express:
+        specifier: ^4.19.2
+        version: 4.21.2
+      node-fetch:
+        specifier: ^3.3.2
+        version: 3.3.2
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.23
+      '@types/pg':
+        specifier: ^8.15.5
+        version: 8.15.5
+      ts-node-dev:
+        specifier: ^2.0.0
+        version: 2.0.0(@types/node@24.5.2)(typescript@5.9.2)
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.2
+
+  services/opportunity-scorer:
+    dependencies:
+      '@packages/logger':
+        specifier: file:../../packages/logger
+        version: link:../../packages/logger
+      '@types/ivylevel':
+        specifier: file:../../packages/types
+        version: link:../../packages/types
+      express:
+        specifier: ^4.19.2
+        version: 4.21.2
+      node-fetch:
+        specifier: ^3.3.2
+        version: 3.3.2
+      pg:
+        specifier: ^8.16.3
+        version: 8.16.3
+    devDependencies:
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.23
+      '@types/pg':
+        specifier: ^8.15.5
+        version: 8.15.5
+      ts-node-dev:
+        specifier: ^2.0.0
+        version: 2.0.0(@types/node@24.5.2)(typescript@5.9.2)
+      typescript:
+        specifier: ^5.4.0
+        version: 5.9.2
+
   services/retriever:
     dependencies:
       '@packages/logger':
@@ -225,6 +315,9 @@ importers:
 
   tools/ingest:
     dependencies:
+      '@types/ivylevel':
+        specifier: file:../../packages/types
+        version: link:../../packages/types
       ajv:
         specifier: ^8.17.1
         version: 8.17.1
@@ -246,6 +339,9 @@ importers:
       mammoth:
         specifier: ^1.6.0
         version: 1.11.0
+      node-fetch:
+        specifier: ^3.3.2
+        version: 3.3.2
       pdf-parse:
         specifier: ^1.1.1
         version: 1.1.1

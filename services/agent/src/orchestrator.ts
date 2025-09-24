@@ -132,9 +132,15 @@ export async function respond({ message, state, coachId='jenny', studentId, nowW
     // Get student vitals if studentId is available
     const vitals = studentId ? await getStudentVitals(studentId) : {};
     
+    // Check for opportunity-related questions
+    let opportunityData = null;
+    if (isOpportunityQuestion(message) && studentId) {
+      opportunityData = await fetchOpportunityData(message, studentId);
+    }
+    
     // Call OpenAI with Jenny's system prompt
     const openai = await getOpenAIClient();
-    const systemPrompt = getSystemPrompt(agentState, vitals);
+    const systemPrompt = getSystemPrompt(agentState, vitals, opportunityData);
     
     // Build context with evidence if factual
     const contextMessages = [
@@ -213,7 +219,7 @@ async function getOpenAIClient() {
   });
 }
 
-function getSystemPrompt(state: AgentState, vitals?: any) {
+function getSystemPrompt(state: AgentState, vitals?: any, opportunityData?: any) {
   let prompt = SYSTEM_PROMPT
     .replace('{studentId}', state.studentId || 'student')
     .replace('{nowWeek}', state.nowWeek.toString())
@@ -224,5 +230,65 @@ function getSystemPrompt(state: AgentState, vitals?: any) {
     prompt += '\n\nIMPORTANT: When asked about factual information (SAT scores, GPA, activities, etc.), always check the STUDENT VITALS first. If the information is there, use it directly and cite it as "from your vitals/records."';
   }
   
+  if (opportunityData) {
+    prompt += '\n\nOPPORTUNITY RECOMMENDATIONS:\n' + JSON.stringify(opportunityData, null, 2);
+    prompt += '\n\nWhen discussing opportunities, mention deadlines, time commitment, and why each is a good fit for this student.';
+  }
+  
   return prompt;
+}
+
+function isOpportunityQuestion(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+  return /opportunity|opportunities|bombardment|summer program|research|scholarship|award|competition|what should i apply|recommendations/i.test(lowerMessage);
+}
+
+async function fetchOpportunityData(message: string, studentId: string) {
+  try {
+    const lowerMessage = message.toLowerCase();
+    const API_URL = process.env.API_URL || 'http://localhost:4000';
+    
+    // Bombardment request
+    if (lowerMessage.includes('bombardment') || lowerMessage.includes('burst')) {
+      const response = await fetch(`${API_URL}/students/${studentId}/opportunities/bombardment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trigger: { type: 'coach_directive' }, size: 5 })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          type: 'bombardment',
+          opportunities: data.opportunities,
+          strategy: data.strategy
+        };
+      }
+    }
+    
+    // General recommendations
+    const params = new URLSearchParams({ limit: '10', refresh: 'false' });
+    
+    // Filter by type if specified
+    if (lowerMessage.includes('summer')) params.append('kinds', 'summer');
+    if (lowerMessage.includes('research')) params.append('kinds', 'research');
+    if (lowerMessage.includes('scholarship')) params.append('kinds', 'scholarship');
+    if (lowerMessage.includes('award') || lowerMessage.includes('competition')) params.append('kinds', 'award');
+    
+    const response = await fetch(`${API_URL}/students/${studentId}/opportunities/recommendations?${params}`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        type: 'recommendations',
+        total: data.total_recommendations,
+        by_bucket: data.recommendations_by_bucket,
+        summary: data.summary
+      };
+    }
+  } catch (error) {
+    log.error(error, "Failed to fetch opportunity data");
+  }
+  
+  return null;
 }

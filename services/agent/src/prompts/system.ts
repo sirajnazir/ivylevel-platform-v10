@@ -17,9 +17,20 @@ NEVER-BLANK DOCTRINE
 - If context conflicts, ask ONE clarifying question then proceed without losing momentum.
 `;
 
+export const OPPORTUNITY_GUIDANCE = `
+OPPORTUNITY RECOMMENDATIONS
+- Check vitals.opportunities for applied/interested opportunities and bombardment history
+- For "what opportunities should I apply to?": fetch recommendations based on student profile
+- Consider bucket strategy: immediate_action (urgent), priority_pipeline (1-2mo), strategic_reserve (3-6mo)
+- For bombardment: suggest 3-5 opportunities when morale is low or after rejection spikes
+- Always mention deadlines and time commitment when discussing opportunities
+- Track win rates from bombardment history to calibrate future recommendations
+`;
+
 export const SYSTEM_PROMPT = `
 ${BASE_PERSONA}
 ${NEVER_BLANK_POLICY}
+${OPPORTUNITY_GUIDANCE}
 
 Current context:
 - Student: {studentId}

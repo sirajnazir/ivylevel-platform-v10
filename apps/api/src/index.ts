@@ -152,6 +152,130 @@ function applyObservationToVitals(v: any, o: any): any {
       }
       break;
     }
+    case "OPPORTUNITY": {
+      out.opportunities ??= {};
+      out.opportunities.pipeline ??= { active: [], applied: [], decisions: {}, yield: {} };
+      
+      // Handle mined opportunity observations
+      if (o.opportunity) {
+        const oppName = o.opportunity.name;
+        
+        if (o.subtype === "proposal") {
+          // Track proposed/mentioned opportunities
+          out.opportunities.pipeline.active ??= [];
+          const existing = out.opportunities.pipeline.active.find((a: any) => a.name === oppName);
+          if (!existing) {
+            out.opportunities.pipeline.active.push({
+              name: oppName,
+              category: o.opportunity.category,
+              tags: o.opportunity.tags || [],
+              deadline: o.opportunity.deadline,
+              first_seen: o.ts || o.at,
+              source: o.source
+            });
+          }
+        }
+        // Existing logic for APPLIED, RESULT, INTERESTED continues...
+      }
+      
+      if (o.subtype === "APPLIED") {
+        // Track applied opportunities
+        out.opportunities.applied ??= [];
+        const app = {
+          id: o.value?.opportunity_id || o.opportunity?.name,
+          applied_date: o.at || new Date().toISOString(),
+          status: "pending"
+        };
+        // Check if already exists
+        const idx = out.opportunities.applied.findIndex((a: any) => a.id === app.id);
+        if (idx >= 0) {
+          out.opportunities.applied[idx] = app;
+        } else {
+          out.opportunities.applied.push(app);
+        }
+      } else if (o.subtype === "RESULT") {
+        // Update result for an applied opportunity
+        out.opportunities.applied ??= [];
+        const idx = out.opportunities.applied.findIndex((a: any) => a.id === o.value.opportunity_id);
+        if (idx >= 0) {
+          out.opportunities.applied[idx].status = o.value.result; // won|rejected|waitlisted
+          out.opportunities.applied[idx].result_date = o.at || new Date().toISOString();
+          if (o.value.notes) {
+            out.opportunities.applied[idx].notes = o.value.notes;
+          }
+        }
+      } else if (o.subtype === "INTERESTED") {
+        // Track opportunities marked as interested
+        out.opportunities.interested ??= [];
+        if (!out.opportunities.interested.includes(o.value.opportunity_id)) {
+          out.opportunities.interested.push(o.value.opportunity_id);
+        }
+      }
+      break;
+    }
+    case "APPLICATION": {
+      out.opportunities ??= {};
+      out.opportunities.pipeline ??= { active: [], applied: [], decisions: {}, yield: {} };
+      
+      // Handle both formats: o.opportunity (from miner) and o.value (from manual)
+      const opportunity = o.opportunity || o.value;
+      if (opportunity) {
+        const oppName = opportunity.name;
+        
+        if (o.subtype === "applied") {
+          // Track applied
+          out.opportunities.pipeline.applied ??= [];
+          if (!out.opportunities.pipeline.applied.includes(oppName)) {
+            out.opportunities.pipeline.applied.push(oppName);
+          }
+        } else if (o.subtype === "accepted" || o.subtype === "rejected" || o.subtype === "waitlisted") {
+          // Track decisions with precedence
+          out.opportunities.pipeline.decisions ??= {};
+          const currentDecision = out.opportunities.pipeline.decisions[oppName];
+          const PRECEDENCE = { accepted: 3, waitlisted: 2, rejected: 1 };
+          
+          if (!currentDecision || PRECEDENCE[o.subtype] > PRECEDENCE[currentDecision]) {
+            out.opportunities.pipeline.decisions[oppName] = o.subtype;
+          }
+          
+          // Update yield stats
+          out.opportunities.pipeline.yield ??= { total_applied: 0, accepted: 0, rejected: 0, waitlisted: 0 };
+          const applied = Object.keys(out.opportunities.pipeline.decisions).length;
+          const accepted = Object.values(out.opportunities.pipeline.decisions).filter((d: any) => d === 'accepted').length;
+          const rejected = Object.values(out.opportunities.pipeline.decisions).filter((d: any) => d === 'rejected').length;
+          const waitlisted = Object.values(out.opportunities.pipeline.decisions).filter((d: any) => d === 'waitlisted').length;
+          
+          out.opportunities.pipeline.yield = {
+            total_applied: applied,
+            accepted,
+            rejected,
+            waitlisted,
+            win_rate: applied > 0 ? accepted / applied : 0
+          };
+        }
+      }
+      break;
+    }
+    case "BOMBARDMENT": {
+      out.opportunities ??= {};
+      if (o.subtype === "OUTCOME") {
+        // Track bombardment episode outcomes
+        out.opportunities.bombardment_history ??= [];
+        out.opportunities.bombardment_history.push({
+          episode_id: o.value.episode_id,
+          date: o.at || new Date().toISOString(),
+          size: o.value.size,
+          wins: o.value.wins || 0,
+          total: o.value.total || o.value.size
+        });
+        
+        // Update win rate
+        const totalWins = out.opportunities.bombardment_history.reduce((sum: number, b: any) => sum + (b.wins || 0), 0);
+        const totalAttempts = out.opportunities.bombardment_history.reduce((sum: number, b: any) => sum + (b.total || 0), 0);
+        out.opportunities.bombardment_win_rate = totalAttempts > 0 ? totalWins / totalAttempts : 0;
+      }
+      break;
+    }
     default:
       break;
   }
@@ -277,10 +401,30 @@ app.post("/observe", async (req: any, res) => {
   log.info({ path: req.path, method: req.method }, "request.start");
   
   try {
-    const { studentId, kind, subtype, value, source, at } = req.body;
+    // Handle both formats: standard and miner
+    let { studentId, student_id, kind, type, subtype, value, source, at, ts, opportunity, idempotency_key } = req.body;
+    
+    // Normalize field names
+    studentId = studentId || student_id;
+    kind = kind || type;
+    at = at || ts;
+    
+    // Handle miner format
+    if (opportunity && !value) {
+      value = opportunity;
+    }
     
     if (!studentId || !kind || !value || !source) {
       return res.status(400).json({ error: "Missing required fields: studentId, kind, value, source" });
+    }
+    
+    // Check idempotency
+    if (idempotency_key) {
+      const existing = await db.checkObservationExists(idempotency_key);
+      if (existing) {
+        log.info({ route: "/observe", idempotency_key, status: "duplicate" });
+        return res.json({ ok: true, id: existing.id, duplicate: true });
+      }
     }
     
     const id = await db.createObservation({
@@ -288,8 +432,9 @@ app.post("/observe", async (req: any, res) => {
       kind,
       subtype,
       value,
-      source,
-      at: at ? new Date(at) : undefined
+      source: typeof source === 'object' ? JSON.stringify(source) : source,
+      at: at ? new Date(at) : undefined,
+      idempotency_key
     });
     
     // Recompute vitals after adding observation
@@ -370,6 +515,114 @@ app.post("/admin/recompute-all", async (req: any, res) => {
     res.json({ ok: true, results });
   } catch (error) {
     log.error({ error }, "Failed to recompute all");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// v1.2 Opportunity endpoints (proxy to microservices)
+const CATALOG_URL = process.env.CATALOG_URL || "http://localhost:4202";
+const SCORER_URL = process.env.SCORER_URL || "http://localhost:4203";
+const RECOMMENDER_URL = process.env.RECOMMENDER_URL || "http://localhost:4204";
+
+// Proxy to catalog service
+app.get("/opportunities", async (req: any, res) => {
+  const log = req.log;
+  try {
+    const query = new URLSearchParams(req.query).toString();
+    const r = await fetch(`${CATALOG_URL}/opportunities?${query}`);
+    const data = await r.json();
+    log.debug({ route: "/opportunities", query });
+    res.json(data);
+  } catch (error) {
+    log.error({ error }, "Failed to fetch opportunities");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/opportunities/:id", async (req: any, res) => {
+  const log = req.log;
+  try {
+    const { id } = req.params;
+    const r = await fetch(`${CATALOG_URL}/opportunities/${id}`);
+    if (!r.ok) {
+      return res.status(r.status).json({ error: "Opportunity not found" });
+    }
+    const data = await r.json();
+    log.debug({ route: "/opportunities/:id", id });
+    res.json(data);
+  } catch (error) {
+    log.error({ error }, "Failed to fetch opportunity");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Get recommendations for a student
+app.get("/students/:id/opportunities/recommendations", async (req: any, res) => {
+  const log = req.log;
+  try {
+    const { id } = req.params;
+    const query = new URLSearchParams(req.query).toString();
+    const r = await fetch(`${RECOMMENDER_URL}/recommendations/${id}?${query}`);
+    const data = await r.json();
+    log.debug({ route: "/students/:id/opportunities/recommendations", studentId: id });
+    res.json(data);
+  } catch (error) {
+    log.error({ error }, "Failed to fetch recommendations");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Get bombardment opportunities
+app.post("/students/:id/opportunities/bombardment", async (req: any, res) => {
+  const log = req.log;
+  try {
+    const { id } = req.params;
+    const r = await fetch(`${RECOMMENDER_URL}/bombardment/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body)
+    });
+    const data = await r.json();
+    log.info({ route: "/students/:id/opportunities/bombardment", studentId: id, size: data.opportunities?.length });
+    res.json(data);
+  } catch (error) {
+    log.error({ error }, "Failed to create bombardment");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Discover new opportunities
+app.get("/students/:id/opportunities/discover", async (req: any, res) => {
+  const log = req.log;
+  try {
+    const { id } = req.params;
+    const query = new URLSearchParams(req.query).toString();
+    const r = await fetch(`${RECOMMENDER_URL}/discover/${id}?${query}`);
+    const data = await r.json();
+    log.debug({ route: "/students/:id/opportunities/discover", studentId: id, newCount: data.new_opportunities?.length });
+    res.json(data);
+  } catch (error) {
+    log.error({ error }, "Failed to discover opportunities");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Score an opportunity
+app.post("/students/:id/opportunities/score", async (req: any, res) => {
+  const log = req.log;
+  try {
+    const { id } = req.params;
+    const { opportunity_id } = req.body;
+    const r = await fetch(`${SCORER_URL}/score`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ student_id: id, opportunity_id })
+    });
+    const data = await r.json();
+    log.debug({ route: "/students/:id/opportunities/score", studentId: id, opportunityId: opportunity_id });
+    res.json(data);
+  } catch (error) {
+    log.error({ error }, "Failed to score opportunity");
     res.status(500).json({ error: "Internal server error" });
   }
 });

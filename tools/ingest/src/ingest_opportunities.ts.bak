@@ -1,0 +1,289 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import fetch from 'node-fetch';
+import { parse } from 'csv-parse/sync';
+import * as XLSX from 'xlsx';
+import type { 
+  Opportunity, 
+  OpportunityKind, 
+  OpportunityTier,
+  OpportunityCategory,
+  RecognitionLevel,
+  OpportunityRequirements,
+  OpportunityCommitment,
+  OpportunityDeadline
+} from '../../../packages/types/opportunity.js';
+
+const CATALOG_URL = process.env.CATALOG_URL || 'http://localhost:4202';
+
+// Main ingestion function
+async function ingestOpportunities(filePath: string, source: string) {
+  console.log(`🚀 Starting opportunity ingestion from: ${filePath}`);
+  
+  const ext = path.extname(filePath).toLowerCase();
+  let data: any[];
+  
+  if (ext === '.json') {
+    data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } else if (ext === '.csv') {
+    const content = fs.readFileSync(filePath, 'utf8');
+    data = parse(content, {
+      columns: true,
+      skip_empty_lines: true
+    });
+  } else if (ext === '.xlsx' || ext === '.xls') {
+    const workbook = XLSX.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    data = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+  } else {
+    throw new Error(`Unsupported file format: ${ext}`);
+  }
+  
+  console.log(`📊 Found ${data.length} opportunities to process`);
+  
+  // Transform and validate opportunities
+  const opportunities: Opportunity[] = data.map(row => transformToOpportunity(row, source));
+  
+  // Batch upload to catalog service
+  console.log('📤 Uploading to catalog service...');
+  const response = await fetch(`${CATALOG_URL}/opportunities/batch`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ opportunities })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Failed to upload: ${response.statusText}`);
+  }
+  
+  const result = await response.json();
+  console.log(`✅ Upload complete: ${result.success}/${result.total} succeeded`);
+  
+  if (result.failed > 0) {
+    console.log('❌ Failed opportunities:', result.results.filter((r: any) => !r.success));
+  }
+  
+  return result;
+}
+
+// Transform raw data to opportunity format
+function transformToOpportunity(row: any, source: string): Opportunity {
+  return {
+    id: row.id || undefined, // Let DB generate if not provided
+    name: row.name || row.title || row.opportunity_name,
+    kind: mapKind(row.kind || row.type || row.category),
+    tier: mapTier(row.tier || row.level),
+    category: mapCategory(row.category || row.type),
+    mission: row.mission || row.description || row.summary || '',
+    requirements: parseRequirements(row),
+    recognition_level: mapRecognitionLevel(row.recognition_level || row.scope || row.level),
+    commitment: parseCommitment(row),
+    deadlines: parseDeadlines(row),
+    source: source,
+    meta: {
+      original_row: row,
+      ingested_at: new Date().toISOString()
+    },
+    created_at: new Date().toISOString()
+  };
+}
+
+// Helper mapping functions
+function mapKind(input: string): OpportunityKind {
+  const normalized = input?.toLowerCase() || '';
+  if (normalized.includes('award') || normalized.includes('competition')) return 'award';
+  if (normalized.includes('summer') || normalized.includes('camp')) return 'summer';
+  if (normalized.includes('research') || normalized.includes('lab')) return 'research';
+  if (normalized.includes('scholarship') || normalized.includes('grant')) return 'scholarship';
+  if (normalized.includes('network') || normalized.includes('mentor')) return 'network';
+  return 'award'; // Default
+}
+
+function mapTier(input: string): OpportunityTier | undefined {
+  if (!input) return undefined;
+  const normalized = input.toLowerCase();
+  if (normalized.includes('1') || normalized.includes('top') || normalized.includes('elite')) return 'tier_1';
+  if (normalized.includes('2') || normalized.includes('mid')) return 'tier_2';
+  if (normalized.includes('3') || normalized.includes('entry')) return 'tier_3';
+  return undefined;
+}
+
+function mapCategory(input: string): OpportunityCategory | undefined {
+  if (!input) return undefined;
+  const normalized = input.toLowerCase();
+  
+  if (normalized.includes('research')) return 'research_programs';
+  if (normalized.includes('summer')) return 'summer_programs';
+  if (normalized.includes('competition') || normalized.includes('award')) return 'competitions_awards';
+  if (normalized.includes('scholarship')) return 'scholarships';
+  if (normalized.includes('leadership')) return 'leadership_programs';
+  if (normalized.includes('stem') || normalized.includes('science') || normalized.includes('tech')) return 'stem_programs';
+  if (normalized.includes('humanities') || normalized.includes('liberal')) return 'humanities_programs';
+  if (normalized.includes('business') || normalized.includes('entrepreneur')) return 'business_programs';
+  if (normalized.includes('art') || normalized.includes('creative')) return 'arts_programs';
+  if (normalized.includes('community') || normalized.includes('service')) return 'community_service';
+  if (normalized.includes('pre-college') || normalized.includes('precollege')) return 'pre_college_programs';
+  
+  return undefined;
+}
+
+function mapRecognitionLevel(input: string): RecognitionLevel | undefined {
+  if (!input) return undefined;
+  const normalized = input.toLowerCase();
+  
+  if (normalized.includes('global') || normalized.includes('international')) return 'global';
+  if (normalized.includes('national')) return 'national';
+  if (normalized.includes('regional') || normalized.includes('state')) return 'regional';
+  if (normalized.includes('local') || normalized.includes('school')) return 'local';
+  
+  return undefined;
+}
+
+function parseRequirements(row: any): OpportunityRequirements {
+  const req: OpportunityRequirements = {
+    grade_levels: []
+  };
+  
+  // GPA
+  if (row.gpa_min || row.min_gpa) {
+    req.gpa_min = parseFloat(row.gpa_min || row.min_gpa);
+  }
+  
+  // Test scores
+  if (row.sat_min || row.min_sat) {
+    req.sat_min = parseInt(row.sat_min || row.min_sat);
+  }
+  if (row.act_min || row.min_act) {
+    req.act_min = parseInt(row.act_min || row.min_act);
+  }
+  
+  // Grade levels
+  const grades = row.grade_levels || row.grades || row.eligible_grades || '';
+  if (grades) {
+    const gradeStr = grades.toString();
+    const gradeList: string[] = [];
+    if (gradeStr.includes('9') || gradeStr.includes('freshman')) gradeList.push('9');
+    if (gradeStr.includes('10') || gradeStr.includes('sophomore')) gradeList.push('10');
+    if (gradeStr.includes('11') || gradeStr.includes('junior')) gradeList.push('11');
+    if (gradeStr.includes('12') || gradeStr.includes('senior')) gradeList.push('12');
+    req.grade_levels = gradeList.length > 0 ? gradeList : ['9', '10', '11', '12'];
+  } else {
+    req.grade_levels = ['9', '10', '11', '12']; // Default to all
+  }
+  
+  // Other requirements
+  if (row.region) req.region = row.region;
+  if (row.citizenship) {
+    req.citizenship = Array.isArray(row.citizenship) ? row.citizenship : [row.citizenship];
+  }
+  if (row.skills || row.skill_match) {
+    const skills = row.skills || row.skill_match;
+    req.skill_match = Array.isArray(skills) ? skills : skills.split(/[,;]/).map((s: string) => s.trim());
+  }
+  
+  return req;
+}
+
+function parseCommitment(row: any): OpportunityCommitment {
+  return {
+    time_cost: parseFloat(row.time_cost || row.hours_per_week || '10'),
+    financial_cost: parseFloat(row.financial_cost || row.cost || row.fee || '0'),
+    duration_weeks: parseInt(row.duration_weeks || row.duration || row.weeks || '4')
+  };
+}
+
+function parseDeadlines(row: any): OpportunityDeadline[] {
+  const deadlines: OpportunityDeadline[] = [];
+  
+  // Single deadline
+  if (row.deadline || row.due_date) {
+    deadlines.push({
+      name: 'Application',
+      date: normalizeDate(row.deadline || row.due_date)
+    });
+  }
+  
+  // Multiple deadlines
+  if (row.deadlines && typeof row.deadlines === 'string') {
+    try {
+      const parsed = JSON.parse(row.deadlines);
+      return parsed;
+    } catch {
+      // Not JSON, try to parse as text
+    }
+  }
+  
+  // Early deadline
+  if (row.early_deadline) {
+    deadlines.push({
+      name: 'Early',
+      date: normalizeDate(row.early_deadline)
+    });
+  }
+  
+  // Regular deadline
+  if (row.regular_deadline) {
+    deadlines.push({
+      name: 'Regular',
+      date: normalizeDate(row.regular_deadline)
+    });
+  }
+  
+  return deadlines;
+}
+
+function normalizeDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    return date.toISOString().split('T')[0];
+  } catch {
+    // Try to extract year
+    const currentYear = new Date().getFullYear();
+    const nextYear = currentYear + 1;
+    
+    // Common patterns
+    if (dateStr.includes('Jan')) return `${nextYear}-01-15`;
+    if (dateStr.includes('Feb')) return `${nextYear}-02-15`;
+    if (dateStr.includes('Mar')) return `${nextYear}-03-15`;
+    if (dateStr.includes('Apr')) return `${nextYear}-04-15`;
+    if (dateStr.includes('May')) return `${nextYear}-05-15`;
+    if (dateStr.includes('Jun')) return `${nextYear}-06-15`;
+    if (dateStr.includes('Jul')) return `${nextYear}-07-15`;
+    if (dateStr.includes('Aug')) return `${nextYear}-08-15`;
+    if (dateStr.includes('Sep')) return `${nextYear}-09-15`;
+    if (dateStr.includes('Oct')) return `${nextYear}-10-15`;
+    if (dateStr.includes('Nov')) return `${nextYear}-11-15`;
+    if (dateStr.includes('Dec')) return `${currentYear}-12-15`;
+    
+    // Default to 3 months from now
+    const future = new Date();
+    future.setMonth(future.getMonth() + 3);
+    return future.toISOString().split('T')[0];
+  }
+}
+
+// CLI interface
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  
+  if (args.length < 1) {
+    console.log('Usage: pnpm ingest-opportunities <file> [source]');
+    console.log('Example: pnpm ingest-opportunities opportunities.csv "manual-upload"');
+    process.exit(1);
+  }
+  
+  const filePath = args[0];
+  const source = args[1] || 'ingestion-tool';
+  
+  ingestOpportunities(filePath, source)
+    .then(() => {
+      console.log('✨ Ingestion complete!');
+      process.exit(0);
+    })
+    .catch(error => {
+      console.error('❌ Ingestion failed:', error);
+      process.exit(1);
+    });
+}
+
+export { ingestOpportunities };
