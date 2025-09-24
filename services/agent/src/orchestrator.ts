@@ -138,9 +138,15 @@ export async function respond({ message, state, coachId='jenny', studentId, nowW
       opportunityData = await fetchOpportunityData(message, studentId);
     }
     
+    // Check for report-related questions
+    let reportData = null;
+    if (isReportQuestion(message) && studentId) {
+      reportData = await fetchReportData(message, studentId);
+    }
+    
     // Call OpenAI with Jenny's system prompt
     const openai = await getOpenAIClient();
-    const systemPrompt = getSystemPrompt(agentState, vitals, opportunityData);
+    const systemPrompt = getSystemPrompt(agentState, vitals, opportunityData, reportData);
     
     // Build context with evidence if factual
     const contextMessages = [
@@ -219,7 +225,7 @@ async function getOpenAIClient() {
   });
 }
 
-function getSystemPrompt(state: AgentState, vitals?: any, opportunityData?: any) {
+function getSystemPrompt(state: AgentState, vitals?: any, opportunityData?: any, reportData?: any) {
   let prompt = SYSTEM_PROMPT
     .replace('{studentId}', state.studentId || 'student')
     .replace('{nowWeek}', state.nowWeek.toString())
@@ -235,12 +241,26 @@ function getSystemPrompt(state: AgentState, vitals?: any, opportunityData?: any)
     prompt += '\n\nWhen discussing opportunities, mention deadlines, time commitment, and why each is a good fit for this student.';
   }
   
+  if (reportData) {
+    if (reportData && reportData.formattedResponse) {
+      prompt += '\n\nREPORT DATA (use this formatted response):\n' + reportData.formattedResponse;
+    } else if (reportData) {
+      prompt += '\n\nREPORT DATA:\n' + JSON.stringify(reportData, null, 2);
+    }
+    prompt += '\n\nIMPORTANT: When asked about reports or success rates, use the formatted response above directly. Include the markdown table and insights as provided.';
+  }
+  
   return prompt;
 }
 
 function isOpportunityQuestion(message: string): boolean {
   const lowerMessage = message.toLowerCase();
   return /opportunity|opportunities|bombardment|summer program|research|scholarship|award|competition|what should i apply|recommendations/i.test(lowerMessage);
+}
+
+function isReportQuestion(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+  return /success rate|win rate|acceptance rate|rejection rate|temporal pattern|weekly pattern|bombardment result|yield|category performance|how many.*accepted|how many.*rejected|show.*report/i.test(lowerMessage);
 }
 
 async function fetchOpportunityData(message: string, studentId: string) {
@@ -288,6 +308,73 @@ async function fetchOpportunityData(message: string, studentId: string) {
     }
   } catch (error) {
     log.error(error, "Failed to fetch opportunity data");
+  }
+  
+  return null;
+}
+
+async function fetchReportData(message: string, studentId: string) {
+  try {
+    const lowerMessage = message.toLowerCase();
+    const API_URL = process.env.API_URL || 'http://localhost:4000';
+    
+    // Determine report type
+    let reportType = 'yield'; // default
+    if (lowerMessage.includes('temporal') || lowerMessage.includes('weekly') || lowerMessage.includes('bombardment result') || lowerMessage.includes('rebound')) {
+      reportType = 'temporal';
+    }
+    
+    const response = await fetch(`${API_URL}/reports/${studentId}?type=${reportType}`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Format for agent consumption with markdown
+      if (reportType === 'yield') {
+        // Create markdown table
+        let markdownTable = `Overall win rate: ${data.summary.overallWinRate}% across ${data.summary.totalApplications} applications\n\n`;
+        markdownTable += '| Category | Applications | Accepted | Win Rate |\n';
+        markdownTable += '|----------|--------------|----------|----------|\n';
+        
+        data.categories.forEach((c: any) => {
+          markdownTable += `| ${c.category} | ${c.total} | ${c.accepted} | ${c.win_rate_pct}% |\n`;
+        });
+        
+        if (data.insights.highYield.length > 0) {
+          markdownTable += `\n**High-yield categories (80%+)**: ${data.insights.highYield.map((c: any) => c.category).join(', ')}`;
+        }
+        if (data.insights.challenging.length > 0) {
+          markdownTable += `\n**Challenging categories (<50%)**: ${data.insights.challenging.map((c: any) => c.category).join(', ')} (needs 3x buffer strategy)`;
+        }
+        
+        return {
+          type: 'yield_report',
+          formattedResponse: markdownTable,
+          raw: data
+        };
+      } else {
+        // Format temporal report
+        let temporalSummary = `**Temporal Analysis**\n\n`;
+        temporalSummary += `- **Bombardment weeks**: ${data.summary.bombardmentWeeks} (5+ applications)\n`;
+        temporalSummary += `- **Rejection rebounds**: ${data.summary.rejectionRebounds}\n`;
+        if (data.summary.avgReboundDays) {
+          temporalSummary += `- **Average rebound time**: ${data.summary.avgReboundDays} days\n`;
+        }
+        temporalSummary += `\n${data.patterns.bombardment.count} bombardment weeks with ${data.patterns.bombardment.avgWinRate}% average win rate.\n`;
+        
+        if (data.patterns.resilience.rebounds > 0) {
+          temporalSummary += `\n**Resilience**: ${data.patterns.resilience.rebounds} successful rebounds from rejection to acceptance.`;
+        }
+        
+        return {
+          type: 'temporal_report',
+          formattedResponse: temporalSummary,
+          raw: data
+        };
+      }
+    }
+  } catch (error) {
+    log.error(error, "Failed to fetch report data");
   }
   
   return null;

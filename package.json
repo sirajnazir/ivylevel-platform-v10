@@ -12,7 +12,8 @@
     "build": "pnpm -r build",
     "dev:api": "pnpm --filter @apps/api dev",
     "dev:agent": "pnpm --filter @services/agent dev",
-    "dev:retriever": "pnpm --filter @services/retriever dev"
+    "dev:retriever": "pnpm --filter @services/retriever dev",
+    "cron:recompute": "cd cron && npx ts-node recompute.ts"
   },
   "dependencies": {
     "@pinecone-database/pinecone": "^4.0.0",

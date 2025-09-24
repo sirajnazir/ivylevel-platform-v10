@@ -627,6 +627,238 @@ app.post("/students/:id/opportunities/score", async (req: any, res) => {
   }
 });
 
+// v1.2.4 Report endpoints
+app.get("/reports/:studentId", async (req: any, res) => {
+  const log = req.log;
+  log.info({ path: req.path, method: req.method }, "request.start");
+  
+  try {
+    const { studentId } = req.params;
+    const { type = "yield" } = req.query; // yield | temporal
+    
+    // Check cache first
+    const cacheDir = `./data/reports/${studentId}/v1.2.4`;
+    const cacheFile = `${cacheDir}/${type}.json`;
+    
+    let reportData;
+    
+    // Try to load from cache
+    try {
+      const fs = await import("fs");
+      
+      // Ensure cache directory exists
+      if (!fs.existsSync(cacheDir)) {
+        fs.mkdirSync(cacheDir, { recursive: true });
+        log.info({ route: "/reports/:studentId", action: "created_cache_dir", path: cacheDir });
+      }
+      
+      if (fs.existsSync(cacheFile)) {
+        const cached = fs.readFileSync(cacheFile, "utf-8");
+        reportData = JSON.parse(cached);
+        log.debug({ route: "/reports/:studentId", studentId, type, source: "cache" });
+      }
+    } catch (err) {
+      // Cache miss, generate on demand
+    }
+    
+    if (!reportData) {
+      // Generate on demand
+      if (type === "yield") {
+        reportData = await generateYieldReport(studentId, log);
+      } else if (type === "temporal") {
+        reportData = await generateTemporalReport(studentId, log);
+      } else {
+        return res.status(400).json({ error: "Invalid report type. Use 'yield' or 'temporal'" });
+      }
+      log.debug({ route: "/reports/:studentId", studentId, type, source: "generated" });
+      
+      // Save to cache for future requests
+      try {
+        const fs = await import("fs");
+        fs.writeFileSync(cacheFile, JSON.stringify(reportData, null, 2));
+        log.info({ route: "/reports/:studentId", action: "cached_report", path: cacheFile });
+      } catch (cacheErr) {
+        log.warn({ error: cacheErr }, "Failed to cache report");
+      }
+    }
+    
+    res.json(reportData);
+  } catch (error) {
+    log.error({ error }, "Failed to get report");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Helper functions for report generation
+async function generateYieldReport(studentId: string, log: any) {
+  const result = await db.query(`
+    WITH base AS (
+      SELECT
+        COALESCE(
+          o.value->>'category',
+          CASE 
+            WHEN o.value->>'name' ILIKE '%summer%' THEN 'Summer Programs'
+            WHEN o.value->>'name' ILIKE '%research%' THEN 'Research'
+            WHEN o.value->>'name' ILIKE '%scholarship%' THEN 'Scholarships'
+            WHEN o.value->>'name' ILIKE '%honor%' THEN 'Honor Societies'
+            WHEN o.value->>'name' ILIKE '%award%' OR o.value->>'name' ILIKE '%competition%' THEN 'Awards & Competitions'
+            WHEN o.value->>'name' ILIKE '%intern%' THEN 'Internships'
+            ELSE 'Other'
+          END
+        ) AS category,
+        o.subtype AS status
+      FROM observations o
+      WHERE o.student_id = $1
+        AND o.kind = 'APPLICATION'
+        AND o.subtype IN ('accepted','rejected','waitlisted')
+        AND o.value->>'name' IS NOT NULL
+    ),
+    stats AS (
+      SELECT 
+        category,
+        COUNT(*) AS total,
+        SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) AS accepted,
+        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) AS rejected,
+        SUM(CASE WHEN status = 'waitlisted' THEN 1 ELSE 0 END) AS waitlisted
+      FROM base
+      WHERE category IS NOT NULL
+      GROUP BY category
+    )
+    SELECT 
+      category,
+      total::int,
+      accepted::int,
+      rejected::int,
+      waitlisted::int,
+      ROUND(100.0 * accepted / NULLIF(total, 0), 1)::float AS win_rate_pct
+    FROM stats
+    WHERE total > 0
+    ORDER BY win_rate_pct DESC NULLS LAST
+  `, [studentId]);
+  
+  const categories = result.rows;
+  const totalApps = categories.reduce((sum: number, cat: any) => sum + cat.total, 0);
+  const totalAccepted = categories.reduce((sum: number, cat: any) => sum + cat.accepted, 0);
+  const overallWinRate = totalApps > 0 ? ((totalAccepted / totalApps) * 100).toFixed(1) : "0";
+  
+  return {
+    type: "yield",
+    studentId,
+    generatedAt: new Date().toISOString(),
+    summary: {
+      totalApplications: totalApps,
+      totalAccepted,
+      overallWinRate: parseFloat(overallWinRate),
+      categoriesAnalyzed: categories.length
+    },
+    categories,
+    insights: {
+      highYield: categories.filter((c: any) => c.win_rate_pct >= 80),
+      challenging: categories.filter((c: any) => c.win_rate_pct < 50),
+      recommended: categories.filter((c: any) => c.win_rate_pct >= 80).map((c: any) => c.category)
+    }
+  };
+}
+
+async function generateTemporalReport(studentId: string, log: any) {
+  // Get weekly activity - with proper date handling
+  const weeklyResult = await db.query(`
+    WITH weekly_activity AS (
+      SELECT 
+        DATE_TRUNC('week', COALESCE(o.at, o.created_at))::DATE AS week,
+        COUNT(*) AS applications,
+        SUM(CASE WHEN o.subtype = 'accepted' THEN 1 ELSE 0 END) AS wins,
+        SUM(CASE WHEN o.subtype = 'rejected' THEN 1 ELSE 0 END) AS losses,
+        SUM(CASE WHEN o.subtype = 'waitlisted' THEN 1 ELSE 0 END) AS waitlisted
+      FROM observations o
+      WHERE o.student_id = $1
+        AND o.kind = 'APPLICATION'
+        AND o.subtype IN ('accepted', 'rejected', 'waitlisted')
+        AND (o.at IS NOT NULL OR o.created_at IS NOT NULL)
+      GROUP BY DATE_TRUNC('week', COALESCE(o.at, o.created_at))::DATE
+    )
+    SELECT 
+      TO_CHAR(week, 'YYYY-MM-DD') AS week_start,
+      applications::int,
+      wins::int,
+      losses::int,
+      waitlisted::int,
+      COALESCE(ROUND(100.0 * wins / NULLIF(applications, 0), 1), 0)::float AS win_rate_pct
+    FROM weekly_activity
+    WHERE applications > 0
+    ORDER BY week
+  `, [studentId]);
+  
+  // Get rebound metrics - with proper date handling
+  const reboundResult = await db.query(`
+    WITH timeline AS (
+      SELECT 
+        o.value->>'name' AS opportunity_name,
+        o.subtype AS status,
+        COALESCE(o.at, o.created_at)::date AS decision_date,
+        LAG(o.subtype) OVER (PARTITION BY o.value->>'name' ORDER BY COALESCE(o.at, o.created_at)) AS prev_status,
+        LAG(COALESCE(o.at, o.created_at)::date) OVER (PARTITION BY o.value->>'name' ORDER BY COALESCE(o.at, o.created_at)) AS prev_date
+      FROM observations o
+      WHERE o.student_id = $1
+        AND o.kind = 'APPLICATION'
+        AND o.subtype IN ('accepted', 'rejected', 'waitlisted')
+        AND o.value->>'name' IS NOT NULL
+    ),
+    rebounds_calc AS (
+      SELECT 
+        opportunity_name,
+        status,
+        prev_status,
+        decision_date,
+        prev_date,
+        CASE 
+          WHEN prev_status = 'rejected' AND status = 'accepted' AND prev_date IS NOT NULL
+          THEN decision_date - prev_date
+          ELSE NULL
+        END AS rebound_days
+      FROM timeline
+    )
+    SELECT 
+      COUNT(*) FILTER (WHERE prev_status = 'rejected' AND status = 'accepted') AS rebounds,
+      AVG(rebound_days)::float AS avg_rebound_days
+    FROM rebounds_calc
+  `, [studentId]);
+  
+  const weeks = weeklyResult.rows;
+  const bombardmentWeeks = weeks.filter((w: any) => w.applications >= 5);
+  const rebounds = reboundResult.rows[0]?.rebounds || 0;
+  const avgReboundDays = reboundResult.rows[0]?.avg_rebound_days || null;
+  
+  return {
+    type: "temporal",
+    studentId,
+    generatedAt: new Date().toISOString(),
+    summary: {
+      totalWeeks: weeks.length,
+      bombardmentWeeks: bombardmentWeeks.length,
+      rejectionRebounds: rebounds,
+      avgReboundDays: avgReboundDays ? Math.round(avgReboundDays) : null
+    },
+    weeklyActivity: weeks,
+    patterns: {
+      bombardment: {
+        count: bombardmentWeeks.length,
+        avgApplications: bombardmentWeeks.length > 0 
+          ? (bombardmentWeeks.reduce((sum: number, w: any) => sum + w.applications, 0) / bombardmentWeeks.length).toFixed(1)
+          : "0",
+        avgWinRate: bombardmentWeeks.length > 0
+          ? (bombardmentWeeks.reduce((sum: number, w: any) => sum + (w.win_rate_pct || 0), 0) / bombardmentWeeks.length).toFixed(1)
+          : "0"
+      },
+      resilience: {
+        rebounds,
+        avgReboundDays: avgReboundDays ? Math.round(avgReboundDays) : null,
+        reboundSuccess: rebounds > 0
+      }
+    }
+  };
+}
+
 const port = process.env.API_PORT || 4000;
 app.listen(port, () => {
   const log = child({ svc: "api" });
