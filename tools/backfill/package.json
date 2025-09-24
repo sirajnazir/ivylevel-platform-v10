@@ -1,0 +1,20 @@
+{
+  "name": "backfill-tools",
+  "version": "1.1.0",
+  "private": true,
+  "scripts": {
+    "emit-huda": "ts-node emit_huda_observations.ts",
+    "emit-colleges": "ts-node emit_college_list.ts",
+    "emit-awards": "ts-node emit_award_targets.ts",
+    "emit-college-decisions": "ts-node emit_college_decisions_sheet.ts",
+    "emit-all": "npm run emit-huda && npm run emit-colleges && npm run emit-awards"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.4.0"
+  }
+}

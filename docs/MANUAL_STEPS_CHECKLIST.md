@@ -45,7 +45,45 @@ python jenny-pipeline/eval_runner.py --suite jenny-pipeline/_templates/eval_evid
 python jenny-pipeline/eval_runner.py --suite jenny-pipeline/_templates/eval_indistinguishability.csv --model <FINE_TUNED_MODEL_ID>
 ```
 
-## F) Logs / Debug
+## F) Database Setup & Vitals
+```bash
+# Start PostgreSQL (if not running)
+docker-compose up -d db
+
+# Run migrations
+cd apps/api && node db/run-migrations.js
+
+# Seed initial observations for Huda
+curl -X POST http://localhost:4000/observe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "studentId": "huda",
+    "kind": "SAT",
+    "subtype": "SAT.final",
+    "value": {"score": 1530, "note": "final"},
+    "source": "iMessage 2025-02-11",
+    "at": "2025-02-11"
+  }'
+
+curl -X POST http://localhost:4000/observe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "studentId": "huda",
+    "kind": "ACTIVITY",
+    "subtype": "Synthoria.studentsReached",
+    "value": {"studentsReached": 6400},
+    "source": "ExecDoc Wk26",
+    "at": "2024-12-15"
+  }'
+
+# Check vitals
+curl http://localhost:4000/students/huda/state
+
+# Or run the complete setup script
+./scripts/setup-vitals-demo.sh
+```
+
+## G) Logs / Debug
 - Console + file logs in `./logs/<service>/app.log`.
 - Attach logs when filing a bug; mask PII.
 

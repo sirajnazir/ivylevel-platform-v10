@@ -337,3 +337,140 @@ phase = f(nowWeek): 1→Foundation, 2→Building, 3→Junior, 4→Summer, 5→Se
 - `packages/scripts/src/finetune/validate_jsonl.ts` - Validator utility
 
 **Spec IDs:** FT-010..019 (dataset generation), FT-020..029 (validation)
+
+---
+
+## 12. v1.1.0 Updates - Vitals & Observations System
+
+### 12.1 Overview
+**Purpose:** Implement a clean DSM (Definitive Student Model) with Vitals, Observations, and Outcomes tracking
+
+**Key Components:**
+- **StudentState** - Stores current vitals (computed state) as JSON
+- **Observations** - Event stream of student activities/metrics
+- **Outcomes** - Transformation metrics and achievements
+- **Reducer** - Idempotent function to compute vitals from observations
+
+### 12.2 Database Schema
+**New Tables (PostgreSQL):**
+```sql
+-- Student state to store vitals JSON
+CREATE TABLE student_state (
+  student_id TEXT PRIMARY KEY,
+  vitals JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Observations table for tracking student events
+CREATE TABLE observations (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  student_id TEXT NOT NULL,
+  kind TEXT NOT NULL, -- "SAT" | "GPA" | "ACTIVITY" | "AWARD" | "SUMMER" | "WELLNESS" | "ESSAY" | "APP"
+  subtype TEXT, -- e.g., "SAT.final", "Synthoria.studentsReached"
+  value JSONB NOT NULL, -- payload
+  source TEXT NOT NULL, -- file/link or "coach_note"
+  at TIMESTAMP NOT NULL, -- event time
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Outcomes table for tracking transformation metrics
+CREATE TABLE outcomes (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+  student_id TEXT NOT NULL,
+  category TEXT NOT NULL, -- "ACADEMICS" | "ACTIVITIES" | "AWARDS" | "SUMMER" | "TRANSFORMATION"
+  name TEXT NOT NULL,
+  metrics JSONB NOT NULL,
+  period TEXT, -- "Wk-26", "Q3-2024"
+  evidence TEXT[] DEFAULT '{}', -- KB links/ids for auditability
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+```
+
+### 12.3 Vitals JSON Structure
+```json
+{
+  "academics": {
+    "gpa": { "weighted": 3.93, "unweighted": 3.71, "trend": "up" },
+    "courseRigorPercentile": 95,
+    "apsCompleted": 11,
+    "sat": {
+      "current": 1530,
+      "superscore": 1530,
+      "timeline": [
+        {"date":"2023-08-05","score":1360,"note":"baseline"},
+        {"date":"2025-02-11","score":1530,"note":"final"}
+      ]
+    }
+  },
+  "activities": {
+    "empoweringAI": {
+      "founded":"2023-08-22",
+      "components":["national team","curriculum","bootcamp","hackathon"],
+      "impact":{"classrooms":200,"cities":44,"fundsRaised":23000}
+    },
+    "synthoria": {
+      "timeline":[{"date":"2024-12-15","studentsReached":6400}]
+    }
+  },
+  "awards": {
+    "ncwit": {"status":"WIN","date":"2024-01-12"},
+    "pipeline":{"active":5,"successRateTarget":0.33}
+  },
+  "summer": {
+    "applied":10,
+    "accepted":["JCamp","NYU Precollege","Kode with Klossy","Girls Who Code SIP"]
+  },
+  "wellness": {
+    "sleepHoursPerNight":8,
+    "stressLevel":3,
+    "availableHoursPerWeek":168
+  }
+}
+```
+
+### 12.4 API Endpoints
+**New Endpoints:**
+- `GET /students/:id/state` - Returns current vitals JSON
+- `POST /observe` - Create observation and recompute vitals
+  ```json
+  {
+    "studentId": "huda",
+    "kind": "SAT",
+    "subtype": "SAT.final",
+    "value": {"score": 1530, "note": "final"},
+    "source": "iMessage 2025-02-11",
+    "at": "2025-02-11"
+  }
+  ```
+- `POST /plans/:id/outcomes` - Record outcome metrics
+
+### 12.5 Agent Integration
+**Enhanced Chat Handler:**
+- Injects student vitals into system prompt
+- Factual questions check vitals first, then evidence chips
+- Never-blank doctrine: If missing, offer to check PDFs or add to records
+- Temperature adjustment: 0.3 for factual, 0.7 for conversational
+
+**System Prompt Enhancement:**
+```
+STUDENT VITALS (from your records):
+{vitals JSON}
+
+IMPORTANT: When asked about factual information (SAT scores, GPA, activities, etc.), 
+always check the STUDENT VITALS first. If the information is there, use it directly 
+and cite it as "from your vitals/records."
+```
+
+### 12.6 Implementation Files
+- `apps/api/src/db.ts` - Database connection and queries
+- `apps/api/db/migrations/2025-09-24-vitals-observations-outcomes.sql` - Schema
+- `services/agent/src/vitals/reducer.ts` - Observations → Vitals reducer
+- `services/agent/src/vitals/recompute.ts` - Vitals recomputation service
+- `services/agent/src/orchestrator.ts` - Enhanced with vitals injection
+
+### 12.7 Tests
+- **Reducer Test:** SAT observations fold into sorted timeline; current = latest; superscore = max
+- **Agent Factual Test:** Ask "what's my final SAT?" → must output "1530" with citation
+- **Plan Fit Test:** 168-hour plan totals ≤168 with wellness constraints
+
+**Spec IDs:** DSM-001..009 (vitals system), OBS-001..005 (observations), OUT-001..003 (outcomes)

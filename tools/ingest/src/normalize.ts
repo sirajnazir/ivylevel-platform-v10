@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist/legacy/build/pdf.mjs";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { normalizeCollegeDecisions } from "./normalize_college_decisions.js";
 
 const execAsync = promisify(exec);
 
@@ -275,8 +276,28 @@ async function normalizeFile(absIn: string, baseDir: string, outRoot: string){
 
   let raw = "";
   
+  // Check file extension
+  const ext = path.extname(absIn).toLowerCase();
+  
+  // Handle Excel/CSV files for college decisions
+  if ([".xlsx", ".xls", ".csv"].includes(ext)) {
+    // Only process files that look like college lists/decisions
+    if (/college|decision|status|common[_-]?app/i.test(name)) {
+      try {
+        const outPath = await normalizeCollegeDecisions(absIn, outRoot, "huda");
+        console.log(`[normalize] college decisions → ${outPath}`);
+        return; // Skip regular processing
+      } catch (e: any) {
+        console.warn(`[normalize] failed college decisions: ${name}: ${e.message}`);
+      }
+    }
+    // For other Excel/CSV files, skip processing
+    console.log(`[normalize] Skipping non-college Excel/CSV file: ${name}`);
+    return;
+  }
+  
   // Check if PDF and extract text
-  if (absIn.toLowerCase().endsWith('.pdf')) {
+  if (ext === '.pdf') {
     raw = await extractPdfText(absIn);
     if (!raw) {
       console.error(`[normalize] Failed to extract text from PDF: ${name}`);
@@ -340,7 +361,7 @@ function chunk(s: string, size: number): string[] {
 
 // -------------------- MAIN: normalize a folder --------------------
 export async function normalizeFolder(inRoot: string, outRoot: string) {
-  const files = fg.sync("**/*.{vtt,txt,md,json,pdf,docx}", { cwd: inRoot, absolute: true, dot: false });
+  const files = fg.sync("**/*.{vtt,txt,md,json,pdf,docx,xlsx,xls,csv}", { cwd: inRoot, absolute: true, dot: false });
   if (!files.length) {
     console.warn(`[normalize] no files under ${inRoot}`);
     return { count: 0, outputs: [] as string[] };

@@ -1,6 +1,6 @@
 {
   "name": "@tools/ingest",
-  "version": "1.2.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
@@ -15,19 +15,22 @@
     "ingest-all": "node dist/normalize.js && node dist/update_turns.js && node dist/imessage_turns.js && node dist/speaker_cleanup.js && node dist/build_finetune_dataset.js && node dist/validate_jsonl.js"
   },
   "dependencies": {
-    "fast-glob": "^3.3.2",
-    "pdfjs-dist": "^4.7.76",
-    "mammoth": "^1.6.0",
-    "yargs": "^17.7.2",
-    "iconv-lite": "^0.6.3",
-    "strip-json-comments": "^5.0.1",
-    "uuid": "^9.0.1",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "chokidar": "^3.6.0",
+    "csv-parse": "^6.1.0",
+    "fast-glob": "^3.3.2",
+    "iconv-lite": "^0.6.3",
+    "mammoth": "^1.6.0",
     "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^4.7.76",
+    "strip-json-comments": "^5.0.1",
     "strip-markdown": "^6.0.0",
-    "unified": "^11.0.5"
+    "unified": "^11.0.5",
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5",
+    "yargs": "^17.7.2",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",

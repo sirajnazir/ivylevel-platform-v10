@@ -3,6 +3,7 @@ import { respond } from "./orchestrator";
 import { runNode } from "./graph";
 import { child } from "../../../packages/logger/src/index";
 import { PORT } from "./config";
+import { startVitalsCron } from "./cron/recompute";
 
 const app = express();
 app.use(express.json());
@@ -56,4 +57,7 @@ app.post("/graph", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => log.info(`agent listening :${PORT}`));
+app.listen(PORT, () => {
+  log.info(`agent listening :${PORT}`);
+  startVitalsCron();
+});
