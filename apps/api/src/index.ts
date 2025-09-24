@@ -85,6 +85,70 @@ function applyObservationToVitals(v: any, o: any): any {
             });
           }
         }
+      } else if (o.subtype === "submitted_subset") {
+        out.apps.submitted_subset = o.value;
+      }
+      break;
+    }
+    case "GAMEPLAN": {
+      if (o.subtype === "TARGETS_SET") {
+        out.gameplan ??= {};
+        out.gameplan.targets = o.value;
+      }
+      break;
+    }
+    case "EC": {
+      if (o.subtype === "UPSERT") {
+        out.ecs ??= [];
+        const ecId = o.value?.id;
+        if (ecId) {
+          const existingIndex = out.ecs.findIndex((e: any) => e.id === ecId);
+          if (existingIndex >= 0) {
+            // Merge with existing
+            const existing = out.ecs[existingIndex];
+            out.ecs[existingIndex] = {
+              ...existing,
+              ...o.value,
+              impact: {
+                ...(existing.impact || {}),
+                ...(o.value.impact_delta || {})
+              }
+            };
+          } else {
+            // Add new
+            out.ecs.push({
+              ...o.value,
+              impact: o.value.impact_delta || {}
+            });
+          }
+        }
+      }
+      break;
+    }
+    case "AWARD": {
+      if (o.subtype === "UPSERT") {
+        out.awards ??= [];
+        const awardId = o.value?.id;
+        if (awardId) {
+          const existingIndex = out.awards.findIndex((a: any) => a.id === awardId);
+          if (existingIndex >= 0) {
+            // Update existing
+            out.awards[existingIndex] = {
+              ...out.awards[existingIndex],
+              ...o.value
+            };
+          } else {
+            // Add new
+            out.awards.push(o.value);
+          }
+        }
+      }
+      break;
+    }
+    case "TRAIT": {
+      if (o.subtype === "SET") {
+        out.traits ??= {};
+        Object.assign(out.traits, o.value);
       }
       break;
     }
@@ -168,6 +232,8 @@ app.get("/students/:id/state", async (req: any, res) => {
   
   try {
     const { id } = req.params;
+    const { view = "default" } = req.query; // default | application
+    
     const state = await db.getStudentState(id);
     const latestObsAt = await db.getLatestObservationAt(id);
     
@@ -179,8 +245,27 @@ app.get("/students/:id/state", async (req: any, res) => {
     }
     
     const fresh = await db.getStudentState(id);
-    log.debug({ route: "/students/:id/state", studentId: id, hasVitals: !!fresh, stale });
-    res.json(fresh);
+    
+    // Apply view lens if requested
+    if (view === "application" && fresh) {
+      // Return narrative + submitted subset (10 EC + 5 Awards)
+      const appView = {
+        ...fresh,
+        apps: {
+          ...fresh.apps,
+          submitted: fresh.apps?.submitted_subset || {
+            ecs: fresh.ecs?.slice(0, 10) || [],
+            awards: fresh.awards?.slice(0, 5) || []
+          }
+        }
+      };
+      log.debug({ route: "/students/:id/state", studentId: id, view: "application", stale });
+      res.json(appView);
+    } else {
+      // Default: full pipeline view
+      log.debug({ route: "/students/:id/state", studentId: id, view: "default", hasVitals: !!fresh, stale });
+      res.json(fresh);
+    }
   } catch (error) {
     log.error({ error }, "Failed to get student state");
     res.status(500).json({ error: "Internal server error" });
@@ -263,6 +348,28 @@ app.post("/admin/recompute", async (req: any, res) => {
     res.json({ ok: true, vitals });
   } catch (error) {
     log.error({ error }, "Failed to recompute");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/admin/recompute-all", async (req: any, res) => {
+  const log = req.log;
+  log.info({ path: req.path, method: req.method }, "request.start");
+  
+  try {
+    // For now, just recompute known students
+    const students = ["huda"]; // Can be expanded to query all student_ids
+    const results: any[] = [];
+    
+    for (const studentId of students) {
+      const vitals = await recomputeStudent(studentId, log);
+      results.push({ studentId, success: true, vitalsKeys: Object.keys(vitals || {}) });
+    }
+    
+    log.info({ route: "/admin/recompute-all", count: results.length });
+    res.json({ ok: true, results });
+  } catch (error) {
+    log.error({ error }, "Failed to recompute all");
     res.status(500).json({ error: "Internal server error" });
   }
 });

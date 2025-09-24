@@ -206,12 +206,15 @@ importers:
 
   tools/backfill:
     dependencies:
+      fast-glob:
+        specifier: ^3.3.2
+        version: 3.3.3
       node-fetch:
         specifier: ^3.3.2
         version: 3.3.2
     devDependencies:
       '@types/node':
-        specifier: ^20.0.0
+        specifier: ^20.19.17
         version: 20.19.17
       ts-node:
         specifier: ^10.9.0

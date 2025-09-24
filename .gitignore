@@ -155,3 +155,5 @@ celerybeat-schedule
 
 # Exclude everything in tools/ingest/data/ (test data)
 tools/ingest/data/
+# Backups
+backups/
