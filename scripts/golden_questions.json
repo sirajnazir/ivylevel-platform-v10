@@ -1,0 +1,279 @@
+{
+  "questions": [
+    {
+      "id": "sat_final",
+      "phase": "P5",
+      "category": "factual",
+      "query": "What is my final SAT score?",
+      "expected": {
+        "contains": ["1530"],
+        "chip_kinds": ["APP-DOC", "EXEC-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "sat_timeline",
+      "phase": "P5",
+      "category": "factual",
+      "query": "Show my SAT score progression",
+      "expected": {
+        "contains": ["1420", "1470", "1530"],
+        "chip_kinds": ["APP-DOC", "TRANS-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "awards_initial",
+      "phase": "P1",
+      "category": "planning",
+      "query": "What awards did we target in week 1?",
+      "expected": {
+        "contains": ["NCWIT", "AP Scholar"],
+        "chip_kinds": ["GAMEPLAN"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "awards_final",
+      "phase": "P5",
+      "category": "factual",
+      "query": "List all awards I actually won",
+      "expected": {
+        "contains": ["NCWIT", "Regional Winner"],
+        "chip_kinds": ["APP-DOC"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "awards_compare",
+      "phase": "P5",
+      "category": "analysis",
+      "query": "Compare my initial award targets vs actual wins",
+      "expected": {
+        "contains": ["initial", "actual", "NCWIT"],
+        "chip_kinds": ["APP-DOC", "GAMEPLAN"],
+        "min_chips": 2
+      }
+    },
+    {
+      "id": "ec_list",
+      "phase": "P5",
+      "category": "factual",
+      "query": "What are my main extracurricular activities?",
+      "expected": {
+        "contains": ["Synthoria", "Debate"],
+        "chip_kinds": ["APP-DOC"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "week_6_plan",
+      "phase": "P2",
+      "category": "planning",
+      "query": "What were my Week 6 168-hour anchors?",
+      "expected": {
+        "contains": ["168", "hour", "anchor"],
+        "chip_kinds": ["EXEC-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "week_12_tasks",
+      "phase": "P2",
+      "category": "planning",
+      "query": "Remind me of Week 12 key tasks",
+      "expected": {
+        "contains": ["task", "week 12"],
+        "chip_kinds": ["EXEC-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "synthoria_impact",
+      "phase": "P5",
+      "category": "factual",
+      "query": "How many students did Synthoria reach?",
+      "expected": {
+        "contains": ["2500", "students"],
+        "chip_kinds": ["APP-DOC", "TRANS-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "college_list",
+      "phase": "P5",
+      "category": "factual",
+      "query": "What colleges did I apply to?",
+      "expected": {
+        "contains": ["MIT", "Stanford"],
+        "chip_kinds": ["APP-DOC"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "college_decisions",
+      "phase": "P5",
+      "category": "factual",
+      "query": "What are my college acceptance decisions?",
+      "expected": {
+        "contains": ["accepted", "waitlist"],
+        "chip_kinds": ["APP-DOC"],
+        "min_chips": 0
+      }
+    },
+    {
+      "id": "gpa_current",
+      "phase": "P5",
+      "category": "factual",
+      "query": "What is my current GPA?",
+      "expected": {
+        "contains": ["4.", "GPA"],
+        "chip_kinds": ["APP-DOC", "TRANS-INTEL"],
+        "min_chips": 0
+      }
+    },
+    {
+      "id": "summer_programs",
+      "phase": "P2",
+      "category": "planning",
+      "query": "What summer programs did I apply to?",
+      "expected": {
+        "contains": ["summer", "program"],
+        "chip_kinds": ["EXEC-INTEL", "APP-DOC"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "essay_topics",
+      "phase": "P3",
+      "category": "planning",
+      "query": "What were my main essay topics?",
+      "expected": {
+        "contains": ["essay", "topic"],
+        "chip_kinds": ["TRANS-INTEL", "APP-DOC"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "ncwit_status",
+      "phase": "P5",
+      "category": "factual",
+      "query": "What's my NCWIT award status?",
+      "expected": {
+        "contains": ["NCWIT", "Regional Winner"],
+        "chip_kinds": ["APP-DOC"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "ap_scores",
+      "phase": "P2",
+      "category": "factual",
+      "query": "What are my AP test scores?",
+      "expected": {
+        "contains": ["AP", "5"],
+        "chip_kinds": ["APP-DOC", "TRANS-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "research_projects",
+      "phase": "P3",
+      "category": "factual",
+      "query": "What research projects did I complete?",
+      "expected": {
+        "contains": ["research"],
+        "chip_kinds": ["APP-DOC", "TRANS-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "leadership_roles",
+      "phase": "P5",
+      "category": "factual",
+      "query": "What leadership positions do I hold?",
+      "expected": {
+        "contains": ["president", "captain", "founder"],
+        "chip_kinds": ["APP-DOC"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "deadlines_upcoming",
+      "phase": "P4",
+      "category": "planning",
+      "query": "What are my upcoming application deadlines?",
+      "expected": {
+        "contains": ["deadline", "January", "December"],
+        "chip_kinds": ["EXEC-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "strategy_pivot",
+      "phase": "P3",
+      "category": "planning",
+      "query": "When did we pivot our college strategy?",
+      "expected": {
+        "contains": ["pivot", "strategy"],
+        "chip_kinds": ["TRANS-INTEL", "EXEC-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "rec_letters",
+      "phase": "P4",
+      "category": "factual",
+      "query": "Who wrote my recommendation letters?",
+      "expected": {
+        "contains": ["recommendation", "teacher"],
+        "chip_kinds": ["APP-DOC", "TRANS-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "test_optional",
+      "phase": "P4",
+      "category": "planning",
+      "query": "Which schools did we apply test-optional to?",
+      "expected": {
+        "contains": ["test-optional"],
+        "chip_kinds": ["APP-DOC", "EXEC-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "financial_aid",
+      "phase": "P5",
+      "category": "factual",
+      "query": "Did I apply for financial aid?",
+      "expected": {
+        "contains": ["financial aid", "FAFSA", "CSS"],
+        "chip_kinds": ["APP-DOC"],
+        "min_chips": 0
+      }
+    },
+    {
+      "id": "interview_prep",
+      "phase": "P4",
+      "category": "planning",
+      "query": "How did we prepare for college interviews?",
+      "expected": {
+        "contains": ["interview", "prepare"],
+        "chip_kinds": ["EXEC-INTEL", "TRANS-INTEL"],
+        "min_chips": 1
+      }
+    },
+    {
+      "id": "final_reflection",
+      "phase": "P5",
+      "category": "analysis",
+      "query": "What were the key factors in my college success?",
+      "expected": {
+        "contains": ["success", "factor"],
+        "chip_kinds": ["TRANS-INTEL"],
+        "min_chips": 1
+      }
+    }
+  ]
+}

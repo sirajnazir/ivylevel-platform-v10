@@ -13,7 +13,14 @@
     "dev:api": "pnpm --filter @apps/api dev",
     "dev:agent": "pnpm --filter @services/agent dev",
     "dev:retriever": "pnpm --filter @services/retriever dev",
-    "cron:recompute": "cd cron && npx ts-node recompute.ts"
+    "cron:recompute": "cd cron && npx ts-node recompute.ts",
+    "test:ci": "./scripts/ci_evidence_gate.sh",
+    "test:smoke": "./scripts/smoke_test.sh",
+    "test:golden": "./scripts/run_golden_questions.sh",
+    "test:validate": "./scripts/validate_v3.sh",
+    "snapshot": "./scripts/golden_snapshot.sh",
+    "validate:new-data": "./scripts/validate_new_data.sh",
+    "monitor:canary": "./scripts/canary_monitor.sh"
   },
   "dependencies": {
     "@pinecone-database/pinecone": "^4.0.0",

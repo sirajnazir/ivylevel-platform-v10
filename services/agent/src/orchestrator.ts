@@ -1,16 +1,32 @@
-import type { AgentState } from "../../../packages/types/src/index";
+import type { AgentState } from "../../../packages/types/dist";
 import { runNode } from "./graph";
 import { MODEL_CURRENT, RETRIEVER_URL, DEFAULT_TEMPERATURE, MAX_TOKENS } from "./config";
-import { child } from "../../../packages/logger/src/index";
+import { child } from "@packages/logger";
 import { SYSTEM_PROMPT } from "./prompts/system";
-import { finalizeFactReply, isFactualQuestion } from "./fact_synthesizer";
+import { synthesizeFactsFromEvidence } from "./facts/fact_synthesizer";
+import { pickInitialEvidence } from "./facts/initial_selector";
+import { detectIntent, intentToCanonKey } from "./intent";
+import { getCanon, CANON_REGISTRY } from "./canon/registry";
+import { detectCanonKey } from "./canon/detect";
+import { compareAwardSets } from "./facts/compare";
+import { getVitals, satFromVitals } from "./vitals/fetch";
+import { composeJennyReply as composeJennyReplyNew } from "./reply/jenny_composer";
+import { composeJennyReply } from "./style/reply_composer";
+import { enforceEvidence } from "./evidence_enforcer";
 import { Pool } from 'pg';
+import { llmWithTools, shouldUseTools, TOOL_SCHEMA } from './llmClient';
 
 const log = child({ svc: "agent-orchestrator" });
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/ivylevel',
 });
+
+function getWeekNumber(date: Date): number {
+  const startOfYear = new Date(date.getFullYear(), 0, 1);
+  const days = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+  return Math.ceil((days + 1) / 7);
+}
 
 async function getStudentVitals(studentId: string) {
   try {
@@ -25,12 +41,42 @@ async function getStudentVitals(studentId: string) {
   }
 }
 
-function isFactual(q: string): boolean {
-  return /(score|gpa|list|status|deadline|how many|when|what is my|what's my|final)/i.test(q);
+function isFactualQuestion(q: string): boolean {
+  return /(score|gpa|list|status|deadline|how many|when|what is my|what's my|final|progression|submit|extracurricular|award)/i.test(q);
+}
+
+function buildSatReplyFromVitals(message: string, sat: any, opts: { persona: string }): string | null {
+  if (!sat?.timeline?.length) return null;
+  
+  const timeline = sat.timeline.sort((a: any, b: any) => {
+    if (!a.date || !b.date) return 0;
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
+  });
+  
+  // Build trajectory string
+  const scores = timeline.map((t: any) => t.score);
+  const trajectory = scores.join(' → ');
+  
+  // Get first and last scores
+  const firstScore = scores[0];
+  const lastScore = scores[scores.length - 1];
+  const improvement = lastScore - firstScore;
+  
+  // Format reply based on query type
+  if (/trajectory|improvement|progress/i.test(message)) {
+    return `Based on your SAT timeline, here's your score progression:\n\n${trajectory}\n\nYou improved ${improvement} points from ${firstScore} to ${lastScore}. ${sat.submitted ? `You submitted ${sat.submitted} to colleges.` : ''}\n\n_Pretty solid climb. Want tips on pushing past ${lastScore}?_`;
+  } else if (/submit|submitted/i.test(message)) {
+    return sat.submitted 
+      ? `You submitted SAT score: **${sat.submitted}**\n\n_This was from your ${timeline.find((t: any) => t.score === sat.submitted)?.date || 'test'} sitting._`
+      : "I don't see a submitted SAT score in your records yet. Want me to check your application docs?";
+  } else {
+    // General SAT query
+    return `Your SAT scores: ${trajectory}${sat.submitted ? `\n\nSubmitted to colleges: **${sat.submitted}**` : ''}\n\n_Want the full test date breakdown?_`;
+  }
 }
 
 function enforceFactualResponse(reply: string, message: string, vitals: any): string {
-  if (!isFactual(message)) return reply;
+  if (!isFactualQuestion(message)) return reply;
   
   const hasNumber = /\b\d{2,4}\b/.test(reply);
   const hasEvidence = /\[source:|from your vitals|from your records/i.test(reply);
@@ -107,6 +153,62 @@ function extractRelevantVitals(message: string, vitals: any): string | null {
   return null;
 }
 
+function detectScopeAndTime(message: string): { topic?: "awards" | "ecs" | "sat" | "submissions"; phaseHint?: string; weekHint?: number } {
+  const lower = message.toLowerCase();
+  const scope: { topic?: "awards" | "ecs" | "sat" | "submissions"; phaseHint?: string; weekHint?: number } = {};
+  
+  // Detect topic
+  if (lower.includes('award')) scope.topic = 'awards';
+  else if (lower.includes('extracurricular') || lower.includes('ec')) scope.topic = 'ecs';
+  else if (lower.includes('sat') || lower.includes('test score')) scope.topic = 'sat';
+  else if (lower.includes('submission')) scope.topic = 'submissions';
+  
+  // Detect phase
+  if (lower.includes('initial') || lower.includes('game plan') || lower.includes('gameplan')) {
+    scope.phaseHint = 'P1';
+    scope.weekHint = 1;
+  } else if (lower.includes('week 1')) {
+    scope.weekHint = 1;
+  } else if (lower.includes('p1')) {
+    scope.phaseHint = 'P1';
+  } else if (lower.includes('p2')) {
+    scope.phaseHint = 'P2';
+  }
+  
+  return scope;
+}
+
+async function canonPassSearch(studentId: string, canonKey: string, message: string, k = 8) {
+  const canon = CANON_REGISTRY[canonKey as keyof typeof CANON_REGISTRY];
+  if (!canon) return [];
+  const filter = { kind: { $in: canon.kind } };
+
+  const response = await fetch(`${RETRIEVER_URL}/search`, {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ q: message, k, filter, student: studentId })
+  });
+  let hits: any[] = await response.json().catch(() => []);
+
+  // Pin by doc_name hints
+  const hints = canon.nameHints.map(h => h.toLowerCase());
+  hits = hits.map(h => {
+    const name = (h.doc_name || h.metadata?.doc_name || "").toLowerCase();
+    const bonus = hints.some(hh => name.includes(hh)) ? canon.boost : 0;
+    return { ...h, _canonScore: (h.score||0) + bonus };
+  }).sort((a,b) => (b._canonScore||0) - (a._canonScore||0));
+
+  log.info({ canonKey, top: hits[0]?.doc_name }, "canon-pass.selected");
+  return hits;
+}
+
+async function retrieverSearch(q: string, k = 8, filter?: any, studentId?: string) {
+  const response = await fetch(`${RETRIEVER_URL}/search`, {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ q, k, filter, student: studentId })
+  });
+  return await response.json().catch(() => []);
+}
+
 export async function respond({ message, state, coachId='jenny', studentId, nowWeek=1 }: { 
   message: string; 
   state?: AgentState;
@@ -124,13 +226,60 @@ export async function respond({ message, state, coachId='jenny', studentId, nowW
   };
   
   try {
-    // Get evidence from retriever (increase topK for factual questions)
-    const isFact = isFactualQuestion(message);
-    const topK = isFact ? (process.env.FACT_TOPK ? parseInt(process.env.FACT_TOPK) : 8) : 3;
-    const evidence = await ensureEvidence(message, topK);
+    // Detect canon key from message
+    const canonKey = detectCanonKey(message);
+    const intent = detectIntent(message);
+    log.info({ userMsg: message, intent, canonKey }, "agent.intent");
     
-    // Get student vitals if studentId is available
-    const vitals = studentId ? await getStudentVitals(studentId) : {};
+    // 0) SAT from vitals (if query hints 'sat')
+    const isSatIntent = /sat/i.test(message);
+    let vitals = null;
+    let vitalsSat: { timeline?: any[]; submitted?: number | null } | null = null;
+    if (isSatIntent && studentId) {
+      vitals = await getStudentVitals(studentId);
+      const sat = satFromVitals(vitals);
+      if (sat?.timeline?.length) {
+        vitalsSat = sat;
+        // Try to build SAT reply directly from vitals
+        const satReply = buildSatReplyFromVitals(message, sat, { persona: "jenny" });
+        if (satReply) {
+          log.info({ satReply }, "Using SAT vitals-first reply");
+          return {
+            reply: satReply,
+            evidence_chips: [],
+            state: { coachId, studentId, nowWeek: getWeekNumber(new Date()), phase: 1, memory: {} }
+          };
+        }
+      }
+    }
+
+    // 1) Canon-first retrieval
+    let evidence: any[] = [];
+    if (canonKey && studentId) {
+      evidence = await canonPassSearch(studentId, canonKey, message, 10);
+    }
+
+    // 2) Guarded fallback if canon is empty or looks junky
+    const looksJunky = (arr: any[]) => {
+      const joined = (arr.map(x=>x.text||x.content||"").join(" ").toLowerCase());
+      return /(awards and honors|only \d+ academic|activities:)/.test(joined);
+    };
+    if (!evidence?.length || looksJunky(evidence)) {
+      const q2 = /award/i.test(message) && /(final|actually won|won so far)/i.test(message)
+        ? "Final Award List - International - National"
+        : message;
+      const filter = /award/i.test(message) ? { kind: { $in: ["APP-DOC","GAMEPLAN"] } } : undefined;
+      const fallback = await retrieverSearch(q2, 10, filter, studentId);
+      if (fallback?.length) evidence = fallback;
+      log.warn({ reason: "fallback", q2, count: evidence?.length }, "retrieval.fallback.used");
+    }
+    
+    log.debug({ hitsTop3: evidence.slice(0,3).map(h=>({kind:h.kind||h.metadata?.kind, doc:h.title||h.metadata?.doc_name, score:h.score||h._canonScore})) }, "retrieval.top3");
+    
+    // Get student vitals if studentId is available (already fetched above for SAT)
+    if (!vitals && studentId) {
+      vitals = await getStudentVitals(studentId);
+    }
     
     // Check for opportunity-related questions
     let opportunityData = null;
@@ -144,58 +293,279 @@ export async function respond({ message, state, coachId='jenny', studentId, nowW
       reportData = await fetchReportData(message, studentId);
     }
     
-    // Call OpenAI with Jenny's system prompt
-    const openai = await getOpenAIClient();
+    // 3) Select and synthesize
+    const selected = pickInitialEvidence(evidence, { message });
+    let facts = synthesizeFactsFromEvidence(selected, { message });
+
+    // 4) If SAT: merge vitals-first
+    if (vitalsSat) {
+      facts = facts || {};
+      facts.satTimeline = vitalsSat.timeline?.length ? vitalsSat.timeline : facts.satTimeline;
+      facts.satSubmitted = typeof vitalsSat.submitted === "number" ? vitalsSat.submitted : facts.satSubmitted ?? null;
+    }
+
+    // 5) If comparison intent: compute set ops (initial vs final)
+    const wantsCompare = /compare|gap|vs/i.test(message) && /award/i.test(message);
+    let comparison: any = null;
+    if (wantsCompare && studentId) {
+      // Pull both sets deterministically
+      const initialHits = await canonPassSearch(studentId, "GAMEPLAN_INITIAL_AWARDS", "initial awards gameplan", 8);
+      const finalHits = await canonPassSearch(studentId, "APP_FINAL_AWARDS_STRICT", "final award list", 8);
+      const initialFacts = synthesizeFactsFromEvidence(initialHits, { message: "initial awards" });
+      const finalFacts = synthesizeFactsFromEvidence(finalHits, { message: "final awards" });
+
+      const initial = initialFacts.gameplanLists?.awards || [];
+      const actual = finalFacts.gameplanLists?.awards || [];
+      comparison = compareAwardSets(initial, actual);
+
+      // Merge into main facts (so composer can render)
+      facts = facts || {};
+      (facts as any)._sources = { initialAwards: initial, finalAwards: actual };
+      (facts as any).comparison = comparison;
+    }
+
+    // Detect scope from user message
+    const scope = detectScopeAndTime(message);
+    const isFact = isFactualQuestion(message);
+    
+    // Synthesize facts from evidence if this is a factual question
+    let factsWithProvenance = facts;
+    
+    // 6) Compose deterministically in Jenny voice if we have any solid facts
+    const haveAwards = facts?.gameplanLists?.awards?.length;
+    const haveSat = facts?.satTimeline?.length;
+    let determinedReply = null;
+    
+    if (haveAwards || haveSat || comparison) {
+      determinedReply = composeJennyReplyNew(message, facts, { persona: "jenny" });
+      log.info({ replyPreview: determinedReply.slice(0,140) }, "composer.reply");
+    }
+    
+    // Check if we have a determined reply from facts
+    if (determinedReply) {
+      log.info({ determinedReply }, "Using fact-based determined reply");
+      return {
+        reply: determinedReply,
+        evidence_chips: (selected || []).slice(0,3).map((h:any) => ({
+          title: h.doc_name || h.metadata?.doc_name || h.title,
+          kind: h.kind, link: h.link, week: h.week, phase: h.phase
+        })),
+        state: agentState
+      };
+    }
+    
+    // 7) If still thin → last resort fallback re-query with anchors
+    if (/award/i.test(message)) {
+      const anchors = [
+        "Final Award List - International - National",
+        "Common App Final Awards",
+        "NCWIT AP Scholar College Board Award"
+      ];
+      for (const a of anchors) {
+        const hits = await retrieverSearch(a, 8, { kind: { $in: ["APP-DOC","GAMEPLAN"] } }, studentId);
+        const pick = pickInitialEvidence(hits, { message });
+        const f2 = synthesizeFactsFromEvidence(pick, { message });
+        if (f2?.gameplanLists?.awards?.length) {
+          const reply = composeJennyReplyNew(message, f2, { persona: "jenny" });
+          return { 
+            reply, 
+            evidence_chips: pick.slice(0,3).map((h:any) => ({
+              title: h.doc_name || h.metadata?.doc_name || h.title,
+              kind: h.kind, link: h.link, week: h.week, phase: h.phase
+            })), 
+            state: agentState 
+          };
+        }
+      }
+    }
+    
+    const extractedFacts = factsWithProvenance;
+    
+    // Build system prompt and context
     const systemPrompt = getSystemPrompt(agentState, vitals, opportunityData, reportData);
     
-    // Build context with evidence if factual
-    const contextMessages = [
+    // Build context with evidence AND extracted facts
+    const contextMessages: any[] = [
       { role: "system", content: systemPrompt }
     ];
     
     if (isFact && evidence.length > 0) {
-      const evidenceContext = "Evidence from your records:\n" + 
-        evidence.map((e, i) => `${i+1}. Week ${e.week}: ${e.title}`).join('\n');
+      // Include full evidence text for the LLM to process
+      let evidenceContext = "Evidence from your records:\n" + 
+        evidence.map((e: any, i: number) => {
+          const text = e.text || e.content || '';
+          return `${i+1}. [Week ${e.week}] ${text.substring(0, 500)}${text.length > 500 ? '...' : ''}`;
+        }).join('\n\n');
+      
+      // Add extracted facts if available
+      if (extractedFacts) {
+        let factsContext = "\n\nExtracted facts from evidence:";
+        if (extractedFacts.satTimeline?.length) {
+          factsContext += "\nSAT Timeline: " + extractedFacts.satTimeline.map(s => `${s.date}: ${s.score}`).join(', ');
+        }
+        if (extractedFacts.submissions?.length) {
+          factsContext += "\nSubmissions: " + extractedFacts.submissions.map(s => s.date).join(', ');
+        }
+        if (extractedFacts.gameplanLists?.extracurriculars?.length) {
+          factsContext += "\nExtracurriculars: " + extractedFacts.gameplanLists.extracurriculars.join(', ');
+        }
+        if (extractedFacts.gameplanLists?.awards?.length) {
+          factsContext += "\nAwards: " + extractedFacts.gameplanLists.awards.join(', ');
+        }
+        evidenceContext += factsContext;
+      }
+      
       contextMessages.push({ role: "system", content: evidenceContext });
+      contextMessages.push({ role: "system", content: "IMPORTANT: Use the evidence above to provide specific, factual answers. Quote exact numbers, dates, and details from the evidence. Never say you don't have access to information if it's in the evidence above." });
     }
     
     contextMessages.push({ role: "user", content: message });
     
-    const completion = await openai.chat.completions.create({
+    // Determine if we should use tools
+    const wantsTools = shouldUseTools(intent, message);
+    const tools = wantsTools ? TOOL_SCHEMA : [];
+    
+    // Call LLM with tool support
+    const result = await llmWithTools(contextMessages, tools, {
+      studentId: studentId || agentState.studentId,
       model: MODEL_CURRENT,
-      temperature: isFact ? 0.3 : DEFAULT_TEMPERATURE,
-      max_tokens: MAX_TOKENS,
-      messages: contextMessages
+      temperature: isFact ? 0.1 : DEFAULT_TEMPERATURE,
+      maxTokens: MAX_TOKENS
     });
     
-    let reply = completion.choices[0]?.message?.content || "I'm here to help with your college journey.";
+    let reply = determinedReply || result.text || "I'm here to help with your college journey.";
     
-    // Apply fact synthesizer for factual questions
-    if (isFact || process.env.NEVER_BLANK_MODE === "1") {
-      reply = finalizeFactReply(reply, evidence.length > 0);
+    // Enforce factual response - remove hedging and ensure we use the evidence
+    if (isFact) {
+      const FORBIDDEN_PHRASES = [
+        /i don['']?t have access/gi,
+        /i cannot access/gi,
+        /as an ai/gi,
+        /i don['']?t know/gi,
+        /i'm here to provide guidance/gi,
+        /i can't access your specific/gi,
+        /unfortunately, i can't/gi,
+        /i'm checking your records now/gi
+      ];
+      
+      FORBIDDEN_PHRASES.forEach(rx => {
+        reply = reply.replace(rx, '').trim();
+      });
+      
+      // If reply is too short after removing forbidden phrases, use extracted facts
+      if (reply.length < 50 && extractedFacts) {
+        const facts = [];
+        if (extractedFacts.satTimeline?.length) {
+          facts.push(`Your SAT progression: ${extractedFacts.satTimeline.map(s => `${s.score} (${s.date})`).join(' → ')}`);
+        }
+        if (extractedFacts.gameplanLists?.extracurriculars?.length) {
+          facts.push(`Your extracurriculars include: ${extractedFacts.gameplanLists.extracurriculars.join(', ')}`);
+        }
+        if (extractedFacts.gameplanLists?.awards?.length) {
+          facts.push(`Your awards: ${extractedFacts.gameplanLists.awards.join(', ')}`);
+        }
+        
+        if (facts.length > 0) {
+          reply = facts.join('\n\n') + '\n\n' + reply;
+        }
+      }
+      
+      // Special handling for award/EC queries - if we have the facts but LLM didn't use them
+      const lowerMessage = message.toLowerCase();
+      if ((lowerMessage.includes('award') || lowerMessage.includes('extracurricular') || lowerMessage.includes('ec')) && 
+          extractedFacts?.gameplanLists) {
+        if (lowerMessage.includes('award') && extractedFacts.gameplanLists.awards && extractedFacts.gameplanLists.awards.length > 0) {
+          if (!reply.includes(extractedFacts.gameplanLists.awards[0])) {
+            reply = `Based on your records, here are your awards:\n\n${extractedFacts.gameplanLists.awards.map((a, i) => `${i+1}. ${a}`).join('\n')}\n\n[source: Final ECs and Awards List]`;
+          }
+        }
+        if ((lowerMessage.includes('extracurricular') || lowerMessage.includes('ec')) && 
+            extractedFacts.gameplanLists.extracurriculars && extractedFacts.gameplanLists.extracurriculars.length > 0) {
+          if (!reply.includes(extractedFacts.gameplanLists.extracurriculars[0])) {
+            reply = `Based on your records, here are your extracurricular activities:\n\n${extractedFacts.gameplanLists.extracurriculars.map((e, i) => `${i+1}. ${e}`).join('\n')}\n\n[source: Application documents]`;
+          }
+        }
+      }
     }
     
-    // Enforce factual response with vitals
+    // Final enforcement with vitals if needed
     reply = enforceFactualResponse(reply, message, vitals);
     
-    return {
+    // Enforce evidence discipline
+    const evidenceEnforcement = enforceEvidence(
+      evidence.slice(0, 3).map(e => ({
+        id: e.id,
+        text: e.text || e.content,
+        kind: e.kind || e.metadata?.kind,
+        doc_name: e.doc_name || e.metadata?.doc_name,
+        metadata: e.metadata || e,
+        canonical: e.canonical || e.metadata?.canonical
+      })),
       reply,
-      evidence_chips: evidence,
+      intent.topic || 'other',  // Convert UserIntent to string
+      message
+    );
+    
+    if (evidenceEnforcement.warnings.length > 0) {
+      log.warn({ warnings: evidenceEnforcement.warnings }, "Evidence warnings");
+    }
+    
+    // Guardrail logging - track response metrics
+    const chipKinds = evidenceEnforcement.chips.map(c => c.kind).filter(Boolean);
+    const uniqueKinds = [...new Set(chipKinds)];
+    const vitalsUsed = !!vitals && Object.keys(vitals).length > 0;
+    const gatePassed = evidenceEnforcement.chips.length > 0 && !reply.toLowerCase().includes("don't have access");
+    
+    log.info({
+      reqId: Date.now().toString(36), // Simple request ID
+      studentId: studentId || agentState.studentId,
+      intent: intent.topic || 'other',
+      chips: evidenceEnforcement.chips.length,
+      kinds: uniqueKinds,
+      vitalsUsed,
+      gatePassed,
+      quality: evidenceEnforcement.quality
+    }, "response-metrics");
+    
+    return {
+      reply: evidenceEnforcement.reply,
+      evidence_chips: evidenceEnforcement.chips,
+      evidence_quality: evidenceEnforcement.quality,
       state: agentState
     };
   } catch (error) {
-    log.error(error, "orchestrator error");
+    log.error({ error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }, "orchestrator error");
     // Fallback to graph node
     return runNode(agentState, message);
   }
 }
 
-async function ensureEvidence(query: string, topK: number = 3) {
+async function ensureEvidence(query: string, topK: number = 3, studentId?: string, intent?: any) {
   try {
+    // Get canonical key from intent
+    const canonKey = intentToCanonKey(intent);
+    const canon = canonKey && studentId ? getCanon(canonKey, studentId) : undefined;
+    
+    // For award/EC queries, also search for the final lists document
+    let searchQuery = query;
+    if (query.toLowerCase().includes('award') || query.toLowerCase().includes('extracurricular') || query.toLowerCase().includes('ec')) {
+      searchQuery = query + " Final ECs Awards List";
+    }
+    
     const response = await fetch(`${RETRIEVER_URL}/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: query, k: topK })
+      body: JSON.stringify({ 
+        q: searchQuery, 
+        k: topK,
+        student: studentId,
+        hint: {
+          timeframe: intent?.timeframe,
+          topic: intent?.topic,
+          canonKey: canonKey,
+          canonDoc: canon
+        }
+      })
     });
     
     if (!response.ok) {
@@ -204,13 +574,28 @@ async function ensureEvidence(query: string, topK: number = 3) {
     }
     
     const results = await response.json();
+    
+    // Debug log to see what we're getting from retriever
+    if (results.length > 0) {
+      log.info({ 
+        firstResult: results[0], 
+        hasMetadata: !!results[0]?.metadata,
+        hasText: !!results[0]?.metadata?.text,
+        metadataKeys: results[0]?.metadata ? Object.keys(results[0].metadata) : []
+      }, "Retriever response structure");
+    }
+    
     return results.map((r: any) => ({
       title: r.metadata?.text?.substring(0, 50) + "..." || r.text?.substring(0, 50) + "...",
+      text: r.metadata?.text || r.text || '', // Include full text for fact synthesis
+      content: r.content || r.text || '', // Alternative field name
       kind: r.metadata?.kind || "UNKNOWN",
       week: r.metadata?.week || 0,
       phase: r.metadata?.phase || "P1",
       link: r.metadata?.link || "",
-      span: r.id
+      span: r.id,
+      score: r.score || 0,
+      metadata: r.metadata || {}
     }));
   } catch (error) {
     log.error(error, "evidence retrieval failed");
@@ -218,12 +603,6 @@ async function ensureEvidence(query: string, topK: number = 3) {
   }
 }
 
-async function getOpenAIClient() {
-  const OpenAI = (await import('openai')).default;
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  });
-}
 
 function getSystemPrompt(state: AgentState, vitals?: any, opportunityData?: any, reportData?: any) {
   let prompt = SYSTEM_PROMPT

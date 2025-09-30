@@ -1,4 +1,4 @@
-import type { AgentState } from "../../../packages/types/src/index";
+import type { AgentState } from "../../../packages/types/dist";
 
 export async function runNode(state: AgentState, message: string) {
   // Placeholder for real LangGraph integration.

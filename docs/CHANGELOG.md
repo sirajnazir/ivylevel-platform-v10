@@ -1,5 +1,48 @@
 # Changelog
 
+## v1.2.5 (2025-09-24) - Enhanced Fact Synthesis
+
+### Added
+- **Metadata-Weighted Fact Synthesis**
+  - Disambiguates INITIAL (Week 0 GamePlan) vs FINAL (APP-DOC) lists
+  - Uses metadata.kind/phase/week to score evidence relevance
+  - Separate tracking of gameplan vs final ECs/awards
+  
+- **Evidence Provenance Tracking**
+  - `extractFactsWithProvenance()` returns indices of source evidence
+  - Enables precise chip-to-fact mapping
+  - Supports audit trail for factual claims
+
+- **Deterministic Fact Composition**
+  - `composeAnswerFromFacts()` generates consistent replies
+  - Prefers deterministic extraction over LLM hallucination
+  - Falls back to LLM only when facts insufficient
+
+### Fixed
+- **Initial vs Final List Confusion**: Agent now correctly identifies "initial awards" from GamePlan
+- **SAT Timeline Extraction**: Improved date parsing and score deduplication
+- **Generic Response Elimination**: Removes "I'm checking your records" when facts available
+
+### Technical Changes
+- Complete rewrite of `fact_synthesizer.ts` with TypeScript interfaces
+- Updated `orchestrator.ts` to use new fact synthesis API
+- Added query hint pass-through for better context awareness
+- Lower temperature (0.1) for factual questions
+
+## v1.2.4.1 (2025-09-24) - Hotfix: Report Integration
+
+### Fixed
+- **Temporal Report SQL**: Added COALESCE for null date handling, preventing internal server errors
+- **Agent Markdown Formatting**: Reports now return pre-formatted markdown tables for inline display
+- **Cron Script Execution**: Changed shebang to use `npx ts-node` for better compatibility
+- **Cache Directory Creation**: Auto-creates report cache directories with recursive mkdir
+
+### Technical Changes
+- Updated `generateTemporalReport()` to handle null dates gracefully
+- Modified `fetchReportData()` to return `formattedResponse` field with markdown
+- Added cache directory creation before file operations
+- Added npm script `cron:recompute` for easier execution
+
 ## v1.2.4 (2025-09-24) - Inline Report Delivery
 
 ### Added

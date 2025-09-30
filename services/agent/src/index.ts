@@ -1,7 +1,7 @@
 import express from "express";
 import { respond } from "./orchestrator";
 import { runNode } from "./graph";
-import { child } from "../../../packages/logger/src/index";
+import { child } from "@packages/logger";
 import { PORT } from "./config";
 import { startVitalsCron } from "./cron/recompute";
 

@@ -39,3 +39,7 @@ _Update this table in every PR. DoD must be checked before merge._
 | REP-003 | Nightly cron for report generation            | CTO   | ✅     | ✅  | —     | cron script    |
 | REP-004 | UI card spec for Reports tab                 | CTO   | ✅     | ✅  | —     | spec document  |
 | REP-005 | Report unit and smoke tests                   | CTO   | ✅     | ✅  | —     | test suite     |
+| FSY-001 | Enhanced fact synthesizer v2                  | CTO   | ✅     | ✅  | —     | initial/final disambiguation |
+| FSY-002 | Metadata-weighted evidence scoring            | CTO   | ✅     | ✅  | —     | wInitial/wFinal scores |
+| FSY-003 | Provenance tracking for facts                 | CTO   | ✅     | ✅  | —     | _provenance indices |
+| FSY-004 | Deterministic fact-based replies              | CTO   | ✅     | ✅  | —     | composeAnswerFromFacts |

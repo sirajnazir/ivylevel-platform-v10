@@ -1,0 +1,17 @@
+# IvyLevel v3.1 Monitoring Crontab
+# Add these entries to your crontab with: crontab -e
+
+# Hourly canary monitor (runs at :05 past every hour)
+5 * * * * cd /path/to/ivylevel-platform-v10 && ./scripts/canary_monitor.sh >> logs/cron.log 2>&1
+
+# Daily golden questions test (runs at 2:00 AM)
+0 2 * * * cd /path/to/ivylevel-platform-v10 && ./scripts/run_golden_questions.sh >> logs/golden_daily.log 2>&1
+
+# Weekly snapshot (runs Sundays at 3:00 AM)
+0 3 * * 0 cd /path/to/ivylevel-platform-v10 && ./scripts/golden_snapshot.sh >> logs/snapshot.log 2>&1
+
+# Daily evidence compliance check (runs at 6:00 AM)
+0 6 * * * cd /path/to/ivylevel-platform-v10 && ./scripts/ci_evidence_gate.sh >> logs/evidence_gate.log 2>&1
+
+# Vitals recomputation (runs every 6 hours)
+0 */6 * * * cd /path/to/ivylevel-platform-v10 && pnpm cron:recompute >> logs/recompute.log 2>&1
