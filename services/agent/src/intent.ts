@@ -18,8 +18,15 @@ export type UserIntent = {
   wantNames?: boolean;  // user wants names vs counts
 };
 
-export function detectIntent(message: string): UserIntent {
+export function detectIntent(message: string): UserIntent & { route?: string } {
   const m = message.toLowerCase();
+
+  // Check for awards comparison first
+  if (/\b(award|awards|honors?|prizes?|recognitions?)\b/i.test(message)) {
+    if (/\b(plan(ned)?|target|compare|vs|versus|diff(erence)?)\b/i.test(message)) {
+      return { topic: "awards", timeframe: "actual", wantNames: true, route: "awards.compare" };
+    }
+  }
 
   const topic: UserIntent["topic"] =
     /award|honor/.test(m) ? "awards" :

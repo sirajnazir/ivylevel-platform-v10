@@ -1,0 +1,144 @@
+source_id,student_id,source_type,title,date_range,drive_link,local_name,notes,created_ts
+SRC-huda-2025-assessment-call,huda-2025,TRANS-RAW,Assessment Call,2023-06-21,,2023-06-21_W001_P1-FOUNDATION_TRANS-RAW_HudaJennyGamePlanGmt20230728.pdf,,2025-09-28T23:02:44.474096+00:00
+SRC-huda-2025-gameplan-report,huda-2025,GAMEPLAN,GamePlan Report,2025-06-22,,Huda_Assessment_Gameplan_Report_2025-06-22_Jenny_v1.pdf,,2025-09-28T23:02:47.730787+00:00
+SRC-huda-2025-final-ecs-awards-prefinal,huda-2025,APP-DOC,Final ECs & Awards (PreFinal),2024-12-15,,Huda - Internal - PreFinal - EC and Award list Submitted .pdf,,2025-09-29T03:54:45.678587+00:00
+SRC-huda-2025-final-ecs-awards-prefinal,huda-2025,APP-DOC,Final ECs & Awards (PreFinal),2024-12-15,,Huda - Internal - PreFinal - EC and Award list Submitted .pdf,,2025-09-29T03:54:47.657385+00:00
+SRC-huda-2025-final-college-list-decisions,huda-2025,ADMISSIONS,Final College List & Decisions,,,huda-final-college-list-and-decisions - huda-college-list.csv,,2025-09-29T19:07:51.717782+00:00
+SRC-huda-2025-common-app-unc-final-submitted,huda-2025,APP-DOC,Common App - UNC (Final Submitted),2024-11-01,,Huda - Common App - UNC College Application Final Submitted .docx,,2025-09-29T19:07:53.716748+00:00
+SRC-huda-2025-w001-transcript-execution-slice,huda-2025,TRANS-RAW,W001 Transcript (execution slice),,,2023-06-21_W001_P1-FOUNDATION_TRANS-RAW_HudaJennyGamePlanGmt20230728.pdf,,2025-09-29T20:29:04.490486+00:00
+SRC-huda-2025-w002-transcript,huda-2025,TRANS-RAW,W002 Transcript,,,2023-06-26_W002_P1-FOUNDATION_TRANS-RAW_168hourCoachingFrameworkIntroduction.pdf,,2025-09-29T20:29:07.202129+00:00
+SRC-huda-2025-w003-transcript,huda-2025,TRANS-RAW,W003 Transcript,,,2023-06-26_W003_P1-FOUNDATION_TRANS-RAW_168hourFrameworkImplementationandgoalSet.pdf,,2025-09-29T20:29:09.666498+00:00
+SRC-huda-2025-w004-transcript-janice,huda-2025,TRANS-RAW,W004 Transcript (Janice),,,2023-06-26_W004_P1-FOUNDATION_TRANS-RAW_StrategicProfileAssessmentandessayDevelo-janice.pdf,,2025-09-29T20:29:12.092410+00:00
+SRC-huda-2025-w004-5-transcript-jenny,huda-2025,TRANS-RAW,W004.5 Transcript (Jenny),,,2023-06-26_W004.5_P1-FOUNDATION_TRANS-RAW_StrategicProfileAssessmentandessayDevelo-jenny.pdf,,2025-09-29T20:29:14.758154+00:00
+SRC-huda-2025-execution-doc-part-1-slice,huda-2025,EXEC-DOC,Execution Doc Part 1 (slice),,,Part1_Jenny _ Huda Weekly Planning_Execution Doc_08_02_2023_08_30_2024.docx,,2025-09-29T20:29:17.433029+00:00
+SRC-huda-2025-imessage-part-1-slice,huda-2025,IMSG-RAW,iMessage Part 1 (slice),,,Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf,,2025-09-29T20:29:19.677222+00:00
+SRC-huda-2025-w005-transcript,huda-2025,TRANS-RAW,W005 Transcript,,,2023-07-07_W005_P1-FOUNDATION_TRANS-RAW_NavianceSchoolDataAnalysisandmultiProjec.pdf,,2025-09-29T20:31:47.854745+00:00
+SRC-huda-2025-w001-transcript-execution-slice,huda-2025,TRANS-RAW,W001 Transcript (execution slice),2023-06-21,,2023-06-21_W001_P1-FOUNDATION_TRANS-RAW_HudaJennyGamePlanGmt20230728.pdf,,2025-09-29T20:58:00.794942+00:00
+SRC-huda-2025-w002-transcript,huda-2025,TRANS-RAW,W002 Transcript,2023-06-26,,2023-06-26_W002_P1-FOUNDATION_TRANS-RAW_168hourCoachingFrameworkIntroduction.pdf,,2025-09-29T20:58:04.570594+00:00
+SRC-huda-2025-w003-transcript,huda-2025,TRANS-RAW,W003 Transcript,2023-06-26,,2023-06-26_W003_P1-FOUNDATION_TRANS-RAW_168hourFrameworkImplementationandgoalSet.pdf,,2025-09-29T20:58:07.064262+00:00
+SRC-huda-2025-w004-transcript-janice,huda-2025,TRANS-RAW,W004 Transcript (Janice),2023-06-26,,2023-06-26_W004_P1-FOUNDATION_TRANS-RAW_StrategicProfileAssessmentandessayDevelo-janice.pdf,,2025-09-29T20:58:09.727850+00:00
+SRC-huda-2025-w004-5-transcript-jenny,huda-2025,TRANS-RAW,W004.5 Transcript (Jenny),2023-06-26,,2023-06-26_W004.5_P1-FOUNDATION_TRANS-RAW_StrategicProfileAssessmentandessayDevelo-jenny.pdf,,2025-09-29T20:58:12.032861+00:00
+SRC-huda-2025-w005-transcript,huda-2025,TRANS-RAW,W005 Transcript,2023-07-07,,2023-07-07_W005_P1-FOUNDATION_TRANS-RAW_NavianceSchoolDataAnalysisandmultiProjec.pdf,,2025-09-29T20:58:14.403968+00:00
+SRC-huda-2025-execution-doc-part-1,huda-2025,EXEC-DOC,Execution Doc (Part 1),2023-08-02–2024-08-30,,Part1_Jenny _ Huda Weekly Planning_Execution Doc_08_02_2023_08_30_2024.docx,,2025-09-29T20:58:16.747048+00:00
+SRC-huda-2025-imessage-part-1-slice,huda-2025,IMSG-RAW,iMessage Part 1 (slice),2023-06–2024-??,,Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf,,2025-09-29T20:58:18.870835+00:00
+SRC-huda-2025-w006-transcript,huda-2025,TRANS-RAW,W006 Transcript,2023-08-05,,2023-08-05_W006_P1-FOUNDATION_TRANS-RAW_FirstWeekReviewGoalSettingandsat.pdf,,2025-09-29T23:45:04.749836+00:00
+SRC-huda-2025-w008-transcript,huda-2025,TRANS-RAW,W008 Transcript,2023-08-08,,2023-08-08_W008_P1-FOUNDATION_TRANS-RAW_SummerProgramStrategyandncwitAppStorytel.pdf,,2025-09-29T23:45:08.534931+00:00
+SRC-huda-2025-w011-transcript,huda-2025,TRANS-RAW,W011 Transcript,2023-09-06,,2023-09-06_W011_P1-FOUNDATION_TRANS-RAW_NcwitAppDevelopmentandmotherInspiringJou.pdf,,2025-09-29T23:45:10.791263+00:00
+SRC-huda-2025-w009-transcript,huda-2025,TRANS-RAW,W009 Transcript,2023-09-09,,2023-09-09_W009_P1-FOUNDATION_TRANS-RAW_ProjectManagement.pdf,,2025-09-29T23:45:13.216988+00:00
+SRC-huda-2025-w010-transcript,huda-2025,TRANS-RAW,W010 Transcript,2023-09-23,,2023-09-23_W010_P1-FOUNDATION_TRANS-RAW_MsaCrisisNcwitEssayBreakthroughandmit.pdf,,2025-09-29T23:45:15.727311+00:00
+SRC-huda-2025-execution-doc-part-1-slice-b2,huda-2025,EXEC-DOC,Execution Doc Part 1 (slice B2),2023-08-02..2024-08-30,,Part1_Jenny _ Huda Weekly Planning_Execution Doc_08_02_2023_08_30_2024.docx,,2025-09-29T23:45:17.945757+00:00
+SRC-huda-2025-imessage-part-1-slice-b2,huda-2025,IMSG-RAW,iMessage Part 1 (slice B2),2023-06-30..2024-03-01,,Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf,,2025-09-29T23:45:20.626805+00:00
+SRC-huda-2025-w013-transcript,huda-2025,TRANS-RAW,W013 Transcript,2023-10-01,,2023-10-01_W013_P2-BUILDING_TRANS-RAW_WeekSatMathIntensiveSession.pdf,,2025-09-30T00:37:27.776174+00:00
+SRC-huda-2025-w014-transcript,huda-2025,TRANS-RAW,W014 Transcript,2023-10-13,,2023-10-13_W014_P2-BUILDING_TRANS-RAW_PalestineCrisisAcknowledgmentNcwitEssays.pdf,,2025-09-30T00:37:31.953796+00:00
+SRC-huda-2025-w015-transcript,huda-2025,TRANS-RAW,W015 Transcript,2023-10-23,,2023-10-23_W015_P2-BUILDING_TRANS-RAW_SatScoreCrisisNcwitEssay.pdf,,2025-09-30T00:37:34.434543+00:00
+SRC-huda-2025-w016-transcript,huda-2025,TRANS-RAW,W016 Transcript,2023-10-15,,2023-10-15_W016_P2-BUILDING_TRANS-RAW_SatReadingStrategyDeepDive.pdf,,2025-09-30T00:37:36.767868+00:00
+SRC-huda-2025-w017-transcript,huda-2025,TRANS-RAW,W017 Transcript,2023-11-06,,2023-11-06_W017_P2-BUILDING_TRANS-RAW_PsatScoreAnalysisandintensiveSatMath.pdf,,2025-09-30T00:37:39.326362+00:00
+SRC-huda-2025-execution-doc-part-1-slice-b3,huda-2025,EXEC-DOC,Execution Doc Part 1 (slice B3),2023-08-02..2023-11-10,,Part1_Jenny _ Huda Weekly Planning_Execution Doc_08_02_2023_08_30_2024.docx,,2025-09-30T00:37:42.109802+00:00
+SRC-huda-2025-imessage-part-1-slice-b3,huda-2025,IMSG-RAW,iMessage Part 1 (slice B3),2023-10-01..2023-11-10,,Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf,,2025-09-30T00:37:44.512038+00:00
+SRC-huda-2025-w018-transcript,huda-2025,TRANS-RAW,W018 Transcript,2023-11-16,,2023-11-16_W018_P2-BUILDING_TRANS-RAW_BrutallyHonestAssessmentCrisisandadmissi.pdf,,2025-09-30T01:01:45.284377+00:00
+SRC-huda-2025-w019-transcript,huda-2025,TRANS-RAW,W019 Transcript,2023-11-09,,2023-11-09_W019_P2-BUILDING_TRANS-RAW_SatMathDeepDiveandscholarshipStrategy.pdf,,2025-09-30T01:01:48.518474+00:00
+SRC-huda-2025-w020-transcript,huda-2025,TRANS-RAW,W020 Transcript,2023-11-10,,2023-11-10_W020_P2-BUILDING_TRANS-RAW_BankAmericaStudentLeadersApp.pdf,,2025-09-30T01:01:50.921029+00:00
+SRC-huda-2025-w021-transcript,huda-2025,TRANS-RAW,W021 Transcript,2023-12-10,,2023-12-10_W021_P2-BUILDING_TRANS-RAW_BankAmericaEssayRefinementandfinalsWeek.pdf,,2025-09-30T01:01:53.347446+00:00
+SRC-huda-2025-w022-transcript,huda-2025,TRANS-RAW,W022 Transcript,2023-12-11,,2023-12-11_W022_P2-BUILDING_TRANS-RAW_BankAmericaEssayRefinementandacademicVic.pdf,,2025-09-30T01:01:55.804913+00:00
+SRC-huda-2025-w023-transcript,huda-2025,TRANS-RAW,W023 Transcript,2023-12-17,,2023-12-17_W023_P2-BUILDING_TRANS-RAW_ApushPerfectScoreandbankAmericaEssay.pdf,,2025-09-30T01:01:58.162164+00:00
+SRC-huda-2025-execution-doc-part-1-2-slice-b4,huda-2025,EXEC-DOC,Execution Doc Part 1+2 (slice B4),2023-11-01..2023-12-31,,Part1/Part2 Execution Docs,,2025-09-30T01:02:00.483168+00:00
+SRC-huda-2025-imessage-part-1-2-slice-b4,huda-2025,IMSG-RAW,iMessage Part 1+2 (slice B4),2023-11-01..2024-03-01,,Jenny-Huda iMessage Parts 1–2,,2025-09-30T01:02:02.882145+00:00
+SRC-huda-2025-w024-transcript-part-2,huda-2025,TRANS-RAW,W024 Transcript (Part 2),2024-01-06,,2024-01-06_W024_P2-BUILDING_TRANS-RAW_StrategicCollegeandmajorSelectionSession-Part2.pdf,,2025-09-30T01:54:18.979486+00:00
+SRC-huda-2025-w024-5-transcript,huda-2025,TRANS-RAW,W024.5 Transcript,2024-01-07,,2024-01-07_W024.5_P2-BUILDING_TRANS-RAW_StrategicCollegeandmajorSelectionSession.pdf,,2025-09-30T01:54:21.620642+00:00
+SRC-huda-2025-w025-transcript,huda-2025,TRANS-RAW,W025 Transcript,2024-01-09,,2024-01-09_W025_P2-BUILDING_TRANS-RAW_BankAmericaStudentLeadersApp.pdf,,2025-09-30T01:54:24.055001+00:00
+SRC-huda-2025-w026-transcript,huda-2025,TRANS-RAW,W026 Transcript,2024-01-13,,2024-01-13_W026_P2-BUILDING_TRANS-RAW_PostNcwitCelebrationandseniorYearStrateg-correct.pdf,,2025-09-30T01:54:26.877870+00:00
+SRC-huda-2025-w027-transcript,huda-2025,TRANS-RAW,W027 Transcript,2024-01-16,,2024-01-16_W027_P2-BUILDING_TRANS-RAW_NotreDameLeadershipSeminarAppandstrategi.pdf,,2025-09-30T01:54:29.332574+00:00
+SRC-huda-2025-w028-transcript,huda-2025,TRANS-RAW,W028 Transcript,2024-01-20,,2024-01-20_W028_P2-BUILDING_TRANS-RAW_NotreDameAppFinalPush.pdf,,2025-09-30T01:54:31.563979+00:00
+SRC-huda-2025-w030-transcript,huda-2025,TRANS-RAW,W030 Transcript,2024-01-30,,2024-01-30_W030_P2-BUILDING_TRANS-RAW_FolkliftPlatformEvolutionandmultipleAppM.pdf,,2025-09-30T01:54:33.859644+00:00
+SRC-huda-2025-execution-doc-part-1-slice-b5,huda-2025,EXEC-DOC,Execution Doc Part 1 (slice B5),2024-01-06..2024-01-30,,Part1_Jenny _ Huda Weekly Planning_Execution Doc_08_02_2023_08_30_2024.docx,,2025-09-30T01:54:36.191852+00:00
+SRC-huda-2025-imessage-part-1-slice-b5,huda-2025,IMSG-RAW,iMessage Part 1 (slice B5),2024-01-06..2024-01-30,,Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf,,2025-09-30T01:54:38.473694+00:00
+SRC-huda-2025-w031-transcript,huda-2025,TRANS-RAW,W031 Transcript,2024-02-28,,2024-02-28_W031_P2-BUILDING_TRANS-RAW_JcampAppandstrategicRelationshipBuilding.pdf,,2025-09-30T02:13:16.553173+00:00
+SRC-huda-2025-w032-transcript,huda-2025,TRANS-RAW,W032 Transcript,2024-02-03,,2024-02-03_W032_P2-BUILDING_TRANS-RAW_CmuPreCollegeProgramEssay.pdf,,2025-09-30T02:13:19.001342+00:00
+SRC-huda-2025-w033-transcript,huda-2025,TRANS-RAW,W033 Transcript,2024-02-10,,2024-02-10_W033_P2-BUILDING_TRANS-RAW_CmuPreCollegeEssaysandncwitBay.pdf,,2025-09-30T02:13:21.260661+00:00
+SRC-huda-2025-w034-transcript,huda-2025,TRANS-RAW,W034 Transcript,2024-02-21,,2024-02-21_W034_P2-BUILDING_TRANS-RAW_CmuEssaysFinalizationandnationalLeadersh.pdf,,2025-09-30T02:13:23.646850+00:00
+SRC-huda-2025-w035-transcript,huda-2025,TRANS-RAW,W035 Transcript,2024-02-26,,2024-02-26_W035_P2-BUILDING_TRANS-RAW_InitiativeUpdatesNcwitPublicityandfinanc.pdf,,2025-09-30T02:13:26.022645+00:00
+SRC-huda-2025-execution-doc-part-1-slice-b6,huda-2025,EXEC-DOC,Execution Doc Part 1 (slice B6),2023-08-02..2024-08-30,,Part1_Jenny _ Huda Weekly Planning_Execution Doc_08_02_2023_08_30_2024.docx,,2025-09-30T02:13:28.348301+00:00
+SRC-huda-2025-execution-doc-part-2-slice-b6,huda-2025,EXEC-DOC,Execution Doc Part 2 (slice B6),2024-07-25..2025-01-02,,Part2_Jenny_ Marissa_Erin _Huda Weekly Planning_Execution Doc_07_25_2024+01_02_2025.docx,,2025-09-30T02:13:30.681894+00:00
+SRC-huda-2025-imessage-part-1-slice-b6,huda-2025,IMSG-RAW,iMessage Part 1 (slice B6),2023-06-30..2024-03-01,,Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf,,2025-09-30T02:13:33.099258+00:00
+SRC-huda-2025-imessage-part-2-slice-b6,huda-2025,IMSG-RAW,iMessage Part 2 (slice B6),2024-03-01..2024-03-10,,Jenny-Huda Private iMessage Texts-Part-2_ImportedDoc.pdf,,2025-09-30T02:13:35.574529+00:00
+SRC-huda-2025-w036-transcript,huda-2025,TRANS-RAW,W036 Transcript,2024-03-02,,2024-03-02_W036_P2-BUILDING_TRANS-RAW_TeacherRecommendationCrisisandschoolRela.pdf,,2025-09-30T02:33:24.375397+00:00
+SRC-huda-2025-w037-transcript,huda-2025,TRANS-RAW,W037 Transcript,2024-03-05,,2024-03-05_W037_P2-BUILDING_TRANS-RAW_PostGiftTeacherRelationsandreaganAward.pdf,,2025-09-30T02:33:26.763321+00:00
+SRC-huda-2025-w038-transcript,huda-2025,TRANS-RAW,W038 Transcript,2024-03-10,,2024-03-10_W038_P2-BUILDING_TRANS-RAW_EssayDevelopmentandappSprint.pdf,,2025-09-30T02:33:29.080396+00:00
+SRC-huda-2025-w039-transcript,huda-2025,TRANS-RAW,W039 Transcript,2024-03-20,,2024-03-20_W039_P2-BUILDING_TRANS-RAW_PostKwkCelebrationandcommonappPlanning.pdf,,2025-09-30T02:33:31.486369+00:00
+SRC-huda-2025-w040-transcript,huda-2025,TRANS-RAW,W040 Transcript,2024-03-15,,2024-03-15_W040_P3-JUNIOR_TRANS-RAW_SpringBreakStrategicPlanningandawardPipe.pdf,,2025-09-30T02:33:33.869901+00:00
+SRC-huda-2025-execution-doc-part-1-2-slice-b7,huda-2025,EXEC-DOC,Execution Doc Part 1 & 2 (slice B7),2023-08-02..2025-01-02,,Part1/Part2 Execution Docs,,2025-09-30T02:33:36.156812+00:00
+SRC-huda-2025-imessage-parts-1-3-slice-b7,huda-2025,IMSG-RAW,iMessage Parts 1–3 (slice B7),2023-06-30..2025-01-02,,iMessage Texts Part 1–3,,2025-09-30T02:33:38.520879+00:00
+SRC-huda-2025-w041-transcript,huda-2025,TRANS-RAW,W041 Transcript,2024-04-05,,2024-04-05_W041_P3-JUNIOR_TRANS-RAW_CameronImpactEssaysandsynthoriaDistribut.pdf,,2025-09-30T03:55:35.992234+00:00
+SRC-huda-2025-w042-transcript,huda-2025,TRANS-RAW,W042 Transcript,2024-04-11,,2024-04-11_W042_P3-JUNIOR_TRANS-RAW_JcampAcceptanceCelebrationandstrategicEx.pdf,,2025-09-30T03:55:38.579389+00:00
+SRC-huda-2025-w043-transcript,huda-2025,TRANS-RAW,W043 Transcript,2024-04-14,,2024-04-14_W043_P3-JUNIOR_TRANS-RAW_BreakthroughChallengeandtoolkitDistribut.pdf,,2025-09-30T03:55:41.429001+00:00
+SRC-huda-2025-w044-transcript,huda-2025,TRANS-RAW,W044 Transcript,2024-04-17,,2024-04-17_W044_P3-JUNIOR_TRANS-RAW_SatVictoryCelebrationandstrategicConsoli.pdf,,2025-09-30T03:55:44.291424+00:00
+SRC-huda-2025-w045-transcript,huda-2025,TRANS-RAW,W045 Transcript,2024-05-14,,2024-05-14_W045_P3-JUNIOR_TRANS-RAW_SummerArchitectureand10SpotStrategyDevel.pdf,,2025-09-30T03:55:46.532875+00:00
+SRC-huda-2025-execution-doc-part-1-slice-b8,huda-2025,EXEC-DOC,Execution Doc Part 1 (slice B8),2024-04-01..2024-05-31,,Part1_Jenny _ Huda Weekly Planning_Execution Doc_08_02_2023_08_30_2024.docx,,2025-09-30T03:55:48.984620+00:00
+SRC-huda-2025-imessage-slices-near-apr-may-24,huda-2025,IMSG-RAW,iMessage (slices near Apr–May ’24),2024-04-01..2024-05-31,,Jenny-Huda Private iMessage Texts (Parts 1–3),,2025-09-30T03:55:51.450757+00:00
+SRC-huda-2025-w046-transcript,huda-2025,TRANS-RAW,W046 Transcript,2024-05-03,,2024-05-03_W046_P3-JUNIOR_TRANS-RAW_GamesChangeFinalistCelebrationandpalesti.pdf,,2025-09-30T05:03:42.725838+00:00
+SRC-huda-2025-w047-transcript,huda-2025,TRANS-RAW,W047 Transcript,2024-06-02,,2024-06-02_W047_P3-JUNIOR_TRANS-RAW_CollegeAppFormalKickoffandmajorSelection.pdf,,2025-09-30T05:03:45.771095+00:00
+SRC-huda-2025-w048-transcript,huda-2025,TRANS-RAW,W048 Transcript,2024-06-06,,2024-06-06_W048_P3-JUNIOR_TRANS-RAW_ScalingImpactThroughMarketingandteamMana.pdf,,2025-09-30T05:03:48.561663+00:00
+SRC-huda-2025-w049-transcript,huda-2025,TRANS-RAW,W049 Transcript,2024-06-08,,2024-06-08_W049_P3-JUNIOR_TRANS-RAW_UcsystemMajorMappingandscholarshipDataba.pdf,,2025-09-30T05:03:51.306277+00:00
+SRC-huda-2025-w050-transcript,huda-2025,TRANS-RAW,W050 Transcript,2024-06-12,,2024-06-12_W050_P3-JUNIOR_TRANS-RAW_UscCampusVisitDebriefandmajorPivot.pdf,,2025-09-30T05:03:54.166595+00:00
+SRC-huda-2025-execution-doc-part-2-slice-b9,huda-2025,EXEC-DOC,Execution Doc Part 2 (slice B9),2024-05-03..2024-06-13,,Part2_Jenny_ Marissa_Erin _Huda Weekly Planning_Execution Doc_07_25_2024+01_02_2025.docx,,2025-09-30T05:03:56.683830+00:00
+SRC-huda-2025-imessage-parts-1-3-slice-b9,huda-2025,IMSG-RAW,iMessage Parts 1–3 (slice B9),2024-05-03..2024-06-13,,Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf,,2025-09-30T05:03:59.389368+00:00
+SRC-huda-2025-w051-transcript,huda-2025,TRANS-RAW,W051 Transcript,2024-06-14,,2024-06-14_W051_P3-JUNIOR_TRANS-RAW_RecommendationLetterStrategyandescapeRoo.pdf,,2025-09-30T05:22:13.503106+00:00
+SRC-huda-2025-w052-transcript,huda-2025,TRANS-RAW,W052 Transcript,2024-06-18,,2024-06-18_W052_P3-JUNIOR_TRANS-RAW_AppTimelineArchitectureandfreelanceDevel.pdf,,2025-09-30T05:22:18.122770+00:00
+SRC-huda-2025-w053-transcript,huda-2025,TRANS-RAW,W053 Transcript,2024-06-21,,2024-06-21_W053_P3-JUNIOR_TRANS-RAW_AwardsCrisisManagementandgovernmentInter.pdf,,2025-09-30T05:22:20.678569+00:00
+SRC-huda-2025-w054-transcript,huda-2025,TRANS-RAW,W054 Transcript,2024-06-24,,2024-06-24_W054_P3-JUNIOR_TRANS-RAW_TeenVoguePitchDevelopmentandextracurricu.pdf,,2025-09-30T05:22:23.144745+00:00
+SRC-huda-2025-w055-transcript,huda-2025,TRANS-RAW,W055 Transcript,2024-06-27,,2024-06-27_W055_P3-JUNIOR_TRANS-RAW_HackathonSponsorshipVictoryandpreLondonP.pdf,,2025-09-30T05:22:25.902896+00:00
+SRC-huda-2025-execution-doc-part-2-slice,huda-2025,EXEC-DOC,Execution Doc (Part 2 slice),2024-06-14,,Part2_Jenny_ Marissa_Erin _Huda Weekly Planning_Execution Doc_07_25_2024+01_02_2025.docx,,2025-09-30T05:29:21.566865+00:00
+SRC-huda-2025-imessage-parts-b10-slice,huda-2025,IMSG-RAW,iMessage Parts (B10 slice),2024-06-14..2024-06-27,,Jenny-Huda Private iMessage Texts-Part-2_ImportedDoc.pdf,,2025-09-30T05:29:26.754604+00:00
+SRC-huda-2025-weekly-planning-personal-brand-development,huda-2025,TRANS-RAW,Weekly Planning + Personal Brand Development,2024-07-07,,2024-07-07_W060_P3-JUNIOR_TRANS-RAW_WeekStrategicPlanningandpersonalBrandDev.pdf,,2025-09-30T05:58:00.679807+00:00
+SRC-huda-2025-execution-doc-summer-24-slice,huda-2025,EXEC-DOC,Execution Doc (summer ’24 slice),2024-06-29..2024-07-31,,Part1/Part2 Execution Docs (slice),,2025-09-30T05:58:03.337987+00:00
+SRC-huda-2025-imessage-part-1-2-summer-24-slice,huda-2025,IMSG-RAW,iMessage Part 1–2 (summer ’24 slice),2024-06-29..2024-07-31,,iMessage Parts 1–2 (slice),,2025-09-30T05:58:05.906083+00:00
+SRC-huda-2025-pre-london-strategic-outreach-platform-distribution,huda-2025,TRANS-RAW,Pre-London Strategic Outreach & Platform Distribution,2024-06-29,,2024-06-29_W056_P3-JUNIOR_TRANS-RAW_PreLondonStrategicOutreachandplatformDis.pdf,,2025-09-30T06:00:50.577787+00:00
+SRC-huda-2025-essay-work-session,huda-2025,TRANS-RAW,Essay Work Session,2024-07-24,,2024-07-24_W057_P3-JUNIOR_TRANS-RAW_essays_transcript.pdf,,2025-09-30T06:00:53.075144+00:00
+SRC-huda-2025-senior-strategy-essay-pivot,huda-2025,TRANS-RAW,Senior Strategy + Essay Pivot,2024-07-27,,2024-07-27_W058_P3-JUNIOR_TRANS-RAW_SeniorYearStrategyandcommonappEssayPivot.pdf,,2025-09-30T06:00:55.623381+00:00
+SRC-huda-2025-common-app-essay-from-gaming-guilt-to-pride,huda-2025,TRANS-RAW,Common App Essay—From Gaming Guilt to Pride,2024-07-31,,2024-07-31_W059_P3-JUNIOR_TRANS-RAW_CommonappEssayRevolutionfromGamingGuilt.pdf,,2025-09-30T06:00:58.091737+00:00
+SRC-huda-2025-w061-transcript,huda-2025,TRANS-RAW,W061 Transcript,2024-07-15,,2024-07-15_W061_P3-JUNIOR_TRANS-RAW_EmpowherHacksVictoryandpostLondonDebrief.pdf,,2025-09-30T06:32:11.267892+00:00
+SRC-huda-2025-w062-transcript,huda-2025,TRANS-RAW,W062 Transcript,2024-08-21,,2024-08-21_W062_P3-JUNIOR_TRANS-RAW_PostJcampIdentityCrystallizationandneura.pdf,,2025-09-30T06:32:13.874382+00:00
+SRC-huda-2025-w063-transcript,huda-2025,TRANS-RAW,W063 Transcript,2024-08-23,,2024-08-23_W063_P3-JUNIOR_TRANS-RAW_TeacherRecommenderFormsandadvancedEssayD.pdf,,2025-09-30T06:32:16.394305+00:00
+SRC-huda-2025-w065-transcript,huda-2025,TRANS-RAW,W065 Transcript,2024-09-02,,2024-09-02_W065_P3-JUNIOR_TRANS-RAW_EarlyDecisionStrategicPivotanddisneyDrea.pdf,,2025-09-30T06:32:18.800301+00:00
+SRC-huda-2025-w066-transcript,huda-2025,TRANS-RAW,W066 Transcript,2024-09-09,,2024-09-09_W066_P4-SUMMER_TRANS-RAW_PeachFuzzCommonappEssayandactivitiesList.pdf,,2025-09-30T06:32:21.515651+00:00
+SRC-huda-2025-execution-docs-parts-1-2-slices,huda-2025,EXEC-DOC,Execution Docs (Parts 1–2 slices),2024-07-15..2024-09-12,,Part1/Part2 execution docs (slices),,2025-09-30T06:32:26.096025+00:00
+SRC-huda-2025-imessage-parts-1-2-slices,huda-2025,IMSG-RAW,iMessage (Parts 1–2 slices),2024-07-15..2024-09-12,,iMessage Part 1/2 (slices),,2025-09-30T06:32:28.676231+00:00
+SRC-huda-2025-w067-transcript,huda-2025,TRANS-RAW,W067 Transcript,2024-09-16,,2024-09-16_W067_P4-SUMMER_TRANS-RAW_StanfordAppEssaysDeepDive.pdf,,2025-09-30T07:13:26.210752+00:00
+SRC-huda-2025-w068-transcript,huda-2025,TRANS-RAW,W068 Transcript,2024-09-30,,2024-09-30_W068_P4-SUMMER_TRANS-RAW_MajorCommonappEssayPivotandgamingIdentit.pdf,,2025-09-30T07:13:29.594911+00:00
+SRC-huda-2025-w069-transcript,huda-2025,TRANS-RAW,W069 Transcript,2024-10-02,,2024-10-02_W069_P4-SUMMER_TRANS-RAW_UscEssaysandappStrategy.pdf,,2025-09-30T07:13:32.652289+00:00
+SRC-huda-2025-w070-transcript,huda-2025,TRANS-RAW,W070 Transcript,2024-10-05,,2024-10-05_W070_P4-SUMMER_TRANS-RAW_UcessaysReviewandstrategicConsolidation.pdf,,2025-09-30T07:13:35.172003+00:00
+SRC-huda-2025-w071-transcript,huda-2025,TRANS-RAW,W071 Transcript,2024-10-06,,2024-10-06_W071_P4-SUMMER_TRANS-RAW_StanfordSupplementalEssaysDeepRefinement.pdf,,2025-09-30T07:13:38.063758+00:00
+SRC-huda-2025-execution-docs-part1-2,huda-2025,EXEC-DOC,Execution Docs (Part1+2),2024-09-16..2024-10-06,,Part1/Part2 Execution Docs,,2025-09-30T07:13:41.272646+00:00
+SRC-huda-2025-imessage-docs-part1-3,huda-2025,IMSG-RAW,iMessage Docs (Part1-3),2024-09-16..2024-10-06,,Jenny-Huda iMessage Parts 1-3,,2025-09-30T07:13:43.796689+00:00
+SRC-huda-2025-w072-transcript,huda-2025,TRANS-RAW,W072 Transcript,2024-10-06,,2024-10-06_W072_P4-SUMMER_TRANS-RAW_StanfordEssaysRefinementParentFeedback.pdf,,2025-09-30T07:33:54.404102+00:00
+SRC-huda-2025-w073-transcript,huda-2025,TRANS-RAW,W073 Transcript,2024-10-07,,2024-10-07_W073_P4-SUMMER_TRANS-RAW_CommonappPersonalstmtFinalization.pdf,,2025-09-30T07:33:57.616288+00:00
+SRC-huda-2025-w074-transcript,huda-2025,TRANS-RAW,W074 Transcript,2024-10-09,,2024-10-09_W074_P4-SUMMER_TRANS-RAW_CommonappPersonalstmtanduncEssaysRefinem.pdf,,2025-09-30T07:34:01.386433+00:00
+SRC-huda-2025-w075-transcript,huda-2025,TRANS-RAW,W075 Transcript,2024-10-12,,2024-10-12_W075_P4-SUMMER_TRANS-RAW_CommonappEssayFinalizationParentandaiFee.pdf,,2025-09-30T07:34:05.457888+00:00
+SRC-huda-2025-w077-transcript,huda-2025,TRANS-RAW,W077 Transcript,2024-10-15,,2024-10-15_W077_P4-SUMMER_TRANS-RAW_UscSupplementalShortanswersMastery.pdf,,2025-09-30T07:34:08.855840+00:00
+SRC-huda-2025-execution-doc-part-2-slice-b14,huda-2025,EXEC-DOC,Execution Doc Part 2 (slice B14),2024-10-06..2024-10-15,,Part2_Jenny_ Marissa_Erin _Huda Weekly Planning_Execution Doc_07_25_2024+01_02_2025.docx,,2025-09-30T07:34:12.838830+00:00
+SRC-huda-2025-imessage-part-2-slice-b14,huda-2025,IMSG-RAW,iMessage Part 2 (slice B14),2024-10-06..2024-10-15,,Jenny-Huda Private iMessage Texts-Part-2_ImportedDoc.pdf,,2025-09-30T07:34:16.118169+00:00
+SRC-huda-2025-w078-transcript,huda-2025,TRANS-RAW,W078 Transcript,2024-10-17,,2024-10-17_W078_P4-SUMMER_TRANS-RAW_UscEssayDifferentiationandnarrativeDevel.pdf,,2025-09-30T07:53:28.772568+00:00
+SRC-huda-2025-w079-transcript,huda-2025,TRANS-RAW,W079 Transcript,2024-10-22,,2024-10-22_W079_P5-SENIOR_TRANS-RAW_StanfordReaFinalReviewanduscEssay.pdf,,2025-09-30T07:53:31.730424+00:00
+SRC-huda-2025-w080-transcript,huda-2025,TRANS-RAW,W080 Transcript,2024-10-27,,2024-10-27_W080_P5-SENIOR_TRANS-RAW_StanfordReaSubmissionanduscFinalPolish.pdf,,2025-09-30T07:53:35.416707+00:00
+SRC-huda-2025-w081-transcript,huda-2025,TRANS-RAW,W081 Transcript,2024-10-29,,2024-10-29_W081_P5-SENIOR_TRANS-RAW_UiucessaysandstrategicScholarshipApps.pdf,,2025-09-30T07:53:38.844099+00:00
+SRC-huda-2025-w082-transcript,huda-2025,TRANS-RAW,W082 Transcript,2024-11-11,,2024-11-11_W082_P5-SENIOR_TRANS-RAW_CssProfileCompletionandfinancialAidStrat.pdf,,2025-09-30T07:53:42.711488+00:00
+SRC-huda-2025-imessage-part-2-3-slices,huda-2025,IMSG-RAW,iMessage Part 2/3 slices,2024-10-17..2024-11-12,,Jenny-Huda Private iMessage Texts-Part-2_ImportedDoc.pdf,,2025-09-30T07:53:45.905067+00:00
+SRC-huda-2025-imessage-part-2-3-slices,huda-2025,IMSG-RAW,iMessage Part 2/3 slices,2024-10-17..2024-11-12,,Jenny-Huda Private iMessage Texts-Part-2_ImportedDoc.pdf,,2025-09-30T07:53:49.590263+00:00
+SRC-huda-2025-w083-transcript,huda-2025,TRANS-RAW,W083 Transcript,2024-11-16,,2024-11-16_W083_P5-SENIOR_TRANS-RAW_UcessaysnostalgicFuturistandeducationalB.pdf,,2025-09-30T08:13:25.305007+00:00
+SRC-huda-2025-w084-transcript,huda-2025,TRANS-RAW,W084 Transcript,2024-11-20,,2024-11-20_W084_P5-SENIOR_TRANS-RAW_UcessaysglitterPensMetaphorandeducationa.pdf,,2025-09-30T08:13:29.294796+00:00
+SRC-huda-2025-w085-transcript,huda-2025,TRANS-RAW,W085 Transcript,2024-11-21,,2024-11-21_W085_P5-SENIOR_TRANS-RAW_UccreativeEssayAustinSubmissionandmitBra.pdf,,2025-09-30T08:13:32.460031+00:00
+SRC-huda-2025-w086-transcript,huda-2025,TRANS-RAW,W086 Transcript,2024-11-27,,2024-11-27_W086_P5-SENIOR_TRANS-RAW_MitEssaysandupennDigitalMediaDesign.pdf,,2025-09-30T08:13:35.266210+00:00
+SRC-huda-2025-w087-transcript,huda-2025,TRANS-RAW,W087 Transcript,2024-11-20,,2024-11-20_W087_P5-SENIOR_TRANS-RAW_UcessayRefinementandcollegeListFinalizat.pdf,,2025-09-30T08:13:38.313257+00:00
+SRC-huda-2025-execution-doc-part-2-batch-16-slice,huda-2025,EXEC-DOC,Execution Doc (Part 2) — Batch 16 slice,2024-11-16..2024-11-27,,Part2_Jenny_ Marissa_Erin _Huda Weekly Planning_Execution Doc_07_25_2024+01_02_2025.docx,,2025-09-30T08:13:41.322316+00:00
+SRC-huda-2025-imessage-part-2-batch-16-slice,huda-2025,IMSG-RAW,iMessage (Part 2) — Batch 16 slice,2024-11-16..2024-11-27,,Jenny-Huda Private iMessage Texts-Part-2_ImportedDoc.pdf,,2025-09-30T08:13:44.396275+00:00
+SRC-huda-2025-w088-transcript,huda-2025,TRANS-RAW,W088 Transcript,2024-11-25,,2024-11-25_W088_P5-SENIOR_TRANS-RAW_UcessayFinalPolishandmitSupplementalFram.pdf,,2025-09-30T08:41:08.693799+00:00
+SRC-huda-2025-w089-transcript,huda-2025,TRANS-RAW,W089 Transcript,2024-11-29,,2024-11-29_W089_P5-SENIOR_TRANS-RAW_MitFinalPolishandupennDmdStrategy.pdf,,2025-09-30T08:41:12.258800+00:00
+SRC-huda-2025-w090-transcript,huda-2025,TRANS-RAW,W090 Transcript,2024-12-31,,2024-12-31_W090_P5-SENIOR_TRANS-RAW_MitMockInterviewPreparation.pdf,,2025-09-30T08:41:16.237808+00:00
+SRC-huda-2025-w091-transcript,huda-2025,TRANS-RAW,W091 Transcript,2024-12-03,,2024-12-03_W091_P5-SENIOR_TRANS-RAW_UpennThankYouNoteandcmuStrategy.pdf,,2025-09-30T08:41:25.843940+00:00
+SRC-huda-2025-w092-transcript,huda-2025,TRANS-RAW,W092 Transcript,2024-12-05,,2024-12-05_W092_P5-SENIOR_TRANS-RAW_JcampThankYouTransformationanddmdGraphic.pdf,,2025-09-30T08:41:28.789599+00:00
+SRC-huda-2025-w093-transcript,huda-2025,TRANS-RAW,W093 Transcript,2025-01-01,,2025-01-01_W093_P5-SENIOR_TRANS-RAW_AppSprintnwDukeFinalEdits.pdf,,2025-09-30T08:41:32.122771+00:00
+SRC-huda-2025-execution-doc-part-1-slice-b17,huda-2025,EXEC-DOC,Execution Doc Part 1 (slice B17),2024-11-25..2025-01-01,,Part1_Jenny _ Huda Weekly Planning_Execution Doc_08_02_2023_08_30_2024.docx,,2025-09-30T08:41:36.908594+00:00
+SRC-huda-2025-execution-doc-part-2-slice-b17,huda-2025,EXEC-DOC,Execution Doc Part 2 (slice B17),2024-11-25..2025-01-01,,Part2_Jenny_ Marissa_Erin _Huda Weekly Planning_Execution Doc_07_25_2024+01_02_2025.docx,,2025-09-30T08:41:40.429699+00:00
+SRC-huda-2025-imessage-part-1-b17-window,huda-2025,IMSG-RAW,iMessage Part 1 (B17 window),2024-11-25..2025-01-01,,Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf,,2025-09-30T08:41:43.791806+00:00
+SRC-huda-2025-imessage-part-2-b17-window,huda-2025,IMSG-RAW,iMessage Part 2 (B17 window),2024-11-25..2025-01-01,,Jenny-Huda Private iMessage Texts-Part-2_ImportedDoc.pdf,,2025-09-30T08:41:46.587003+00:00
+SRC-huda-2025-imessage-part-3-b17-window,huda-2025,IMSG-RAW,iMessage Part 3 (B17 window),2024-12-31..2025-01-02,,Jenny-Huda Private iMessage Texts-Part-3_ImportedDoc.pdf,,2025-09-30T08:41:49.759586+00:00

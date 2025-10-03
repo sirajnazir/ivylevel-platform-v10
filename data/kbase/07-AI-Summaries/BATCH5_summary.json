@@ -1,0 +1,16 @@
+{
+  "batch": "BATCH5_W024_W030",
+  "created_ts": "2025-09-30T01:39:11.826106+00:00",
+  "files": [
+    "/mnt/data/JTBD-W024-COLLEGE-STRAT_HYBRID.jsonl",
+    "/mnt/data/JTBD-W0245-COLLEGE-REFINE_HYBRID.jsonl",
+    "/mnt/data/JTBD-W025-BOA-APP_HYBRID.jsonl",
+    "/mnt/data/JTBD-W026-NCWIT-POST-SR_HYBRID.jsonl",
+    "/mnt/data/JTBD-W027-ND-LEADERSHIP_HYBRID.jsonl",
+    "/mnt/data/JTBD-W028-ND-FINAL_HYBRID.jsonl",
+    "/mnt/data/JTBD-W030-FOLKLIFT-PLAT_HYBRID.jsonl",
+    "/mnt/data/JTBD-EXEC-PART1-B5_HYBRID.jsonl",
+    "/mnt/data/JTBD-IMSG-PART1-B5_HYBRID.jsonl"
+  ],
+  "notes": "Hybrid extraction; if any session spilled beyond Part 1 docs, would create PART2 slices — not needed for Jan 2024."
+}

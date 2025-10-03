@@ -1,7 +1,7 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 import OpenAI from "openai";
-import type { RagRecord } from "../../../packages/types/src/index";
-import { child } from "../../../packages/logger/src/index";
+import type { RagRecord } from "../../../packages/types/dist";
+import { child } from "@packages/logger";
 
 const log = child({ svc: "retriever" });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -27,10 +27,53 @@ export async function pineconeUpsert(records: RagRecord[], ns: string) {
   for (const batch of chunks) {
     const embs = await embed(batch.map(b => b.text));
     const vectors = batch.map((b, i) => ({
-      id: b.id, values: embs[i],
-      metadata: { ...b, text: b.text }
+      id: b.id, 
+      values: embs[i],
+      metadata: { 
+        text: b.text,
+        ...(b.metadata ? Object.fromEntries(
+          Object.entries(b.metadata).filter(([k, v]) => 
+            typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean'
+          )
+        ) : {})
+      }
     }));
     log.debug({ upserting: vectors.length });
     await idx.namespace(ns).upsert(vectors);
   }
+}
+
+// Kind-locked query that ensures single kind retrieval
+export async function queryKindLocked({ 
+  q, 
+  k, 
+  kind, 
+  namespace, 
+  additionalFilter 
+}: { 
+  q: string; 
+  k: number; 
+  kind: string; 
+  namespace?: string; 
+  additionalFilter?: any; 
+}) {
+  const filter = {
+    kind,
+    ...(additionalFilter || {})
+  };
+  
+  // Map kind to namespace for v2 index
+  const nsMapping: Record<string, string> = {
+    'TRANS-INTEL': 'transcript',
+    'EXEC-INTEL': 'exec',
+    'IMSG-INTEL': 'imessage',
+    'APP-DOC': 'appdoc',
+    'GAMEPLAN': 'gameplan'
+  };
+  
+  const effectiveNamespace = namespace || nsMapping[kind] || process.env.PINECONE_NAMESPACE || 'default';
+  
+  log.debug({ kind, namespace: effectiveNamespace, filter }, "retriever.kind_locked_query");
+  
+  return pineconeQuery({ q, k, namespace: effectiveNamespace, filter });
 }

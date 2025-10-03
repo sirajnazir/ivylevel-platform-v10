@@ -1,0 +1,15 @@
+
+Batch B3 generated at 2025-09-30T00:25:27.949350+00:00
+
+Files:
+- JTBD-W013-MATH-INTENSIVE_HYBRID.jsonl
+- JTBD-W014-CRISIS-NCWIT_HYBRID.jsonl
+- JTBD-W015-SAT-CRISIS_HYBRID.jsonl
+- JTBD-W016-READING-DEEPDIVE_HYBRID.jsonl
+- JTBD-W017-PSAT-ANALYSIS_HYBRID.jsonl
+- JTBD-EXEC-PART1-B3_HYBRID.jsonl
+- JTBD-IMSG-PART1-B3_HYBRID.jsonl
+
+Notes:
+- This batch covers Transcripts W013–W017 and Part 1 slices for Execution & iMessage.
+- If your ingest code is set to Outcomes‑only mode for v2 passes, these files will primarily add Outcomes; otherwise they will populate all tabs by design.

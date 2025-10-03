@@ -1,21 +1,11 @@
-export type RagRecord = {
-  id: string;
-  text: string;
-  type: 'quote'|'script'|'fact';
-  week?: number;
-  phase?: number;
-  layers?: string[];
-  kind?: 'TRANS-INTEL'|'EXEC-INTEL'|'IMSG-INTEL'|'OTHER';
-  doc_name?: string;
-  link?: string;
-  score?: number;
-};
-export type AgentState = {
-  coachId: string;
-  studentId?: string;
-  nowWeek?: number;
-  phase?: number;
-  memory?: Record<string, any>;
-};
-
-export * from '../opportunity';
+/**
+ * Central barrel for @types/ivylevel
+ * Keep exports ONLY from within ./src to avoid rootDir collisions.
+ */
+export * from "./opportunity";
+export * from "./agent";
+export * from "./rag";
+/* add other local type modules here as you create them, e.g.:
+export * from "./vitals";
+export * from "./student";
+*/

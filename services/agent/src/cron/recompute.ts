@@ -1,7 +1,7 @@
 import cron from "node-cron";
 import { Pool } from "pg";
 import { recomputeVitals } from "../vitals/recompute";
-import { child } from "../../../../packages/logger/src/index";
+import { child } from "@packages/logger";
 
 const log = child({ svc: "agent-cron" });
 

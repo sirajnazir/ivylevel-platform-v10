@@ -1,17 +1,18 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "dist",
     "rootDir": "src",
-    "module": "ES2022",
-    "target": "ES2022",
-    "moduleResolution": "Node",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "noImplicitAny": false,
-    "allowSyntheticDefaultImports": true
+    "outDir": "dist",
+    "declaration": true,
+    "composite": false,
+    "emitDeclarationOnly": false,
+    "baseUrl": ".",
+    "paths": {
+      "@packages/*": ["../*/dist"]
+    },
+    "module": "esnext",
+    "moduleResolution": "node"
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/pinecone/**", "src/pinecone_stats.ts", "src/upsert_direct.ts"]
+  "exclude": ["dist", "node_modules"]
 }

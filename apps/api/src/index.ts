@@ -4,8 +4,27 @@ import { child } from "@packages/logger";
 import crypto from "crypto";
 import db from "./db";
 
+// Strong typing for decisions and precedence
+type Decision = 'accepted' | 'waitlisted' | 'rejected';
+const PRECEDENCE: Record<Decision, number> = {
+  accepted: 3,
+  waitlisted: 2,
+  rejected: 1,
+};
+
 const app = express();
 app.use(express.json());
+
+// Enable CORS for the frontend
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Inline reducer logic
 function applyObservationToVitals(v: any, o: any): any {
@@ -232,10 +251,11 @@ function applyObservationToVitals(v: any, o: any): any {
           // Track decisions with precedence
           out.opportunities.pipeline.decisions ??= {};
           const currentDecision = out.opportunities.pipeline.decisions[oppName];
-          const PRECEDENCE = { accepted: 3, waitlisted: 2, rejected: 1 };
+          const subtype = String(o.subtype || '').toLowerCase() as Decision;
+          const current = String(currentDecision || '').toLowerCase() as Decision;
           
-          if (!currentDecision || PRECEDENCE[o.subtype] > PRECEDENCE[currentDecision]) {
-            out.opportunities.pipeline.decisions[oppName] = o.subtype;
+          if (!currentDecision || PRECEDENCE[subtype] > PRECEDENCE[current]) {
+            out.opportunities.pipeline.decisions[oppName] = subtype;
           }
           
           // Update yield stats
@@ -305,7 +325,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const AGENT_URL = process.env.AGENT_URL || "http://localhost:4101/respond";
+const AGENT_URL = process.env.AGENT_URL || "http://localhost:4101/chat";
 const RETRIEVER_URL = process.env.RETRIEVER_URL || "http://localhost:4102/search";
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
@@ -314,23 +334,43 @@ app.post("/agent/chat", async (req: any, res) => {
   const log = req.log;
   log.info({ path: req.path, method: req.method }, "request.start");
   
-  const payload = { 
-    message: req.body?.message || "", 
-    coachId: req.body?.coachId || "jenny", 
-    nowWeek: req.body?.nowWeek || 1,
-    studentId: req.body?.studentId || "huda"
-  };
-  const r = await fetch(AGENT_URL, { 
-    method: "POST", 
-    headers: { 
-      "content-type": "application/json",
-      "x-trace-id": req.traceId 
-    }, 
-    body: JSON.stringify(payload) 
-  });
-  const out = await r.json();
-  log.debug({ route: "/agent/chat", in: payload, out });
-  res.json(out);
+  try {
+    const payload = { 
+      message: req.body?.message || "", 
+      coachId: req.body?.coachId || "jenny", 
+      nowWeek: req.body?.nowWeek || 1,
+      studentId: req.body?.studentId || "huda"
+    };
+    const r = await fetch(AGENT_URL, { 
+      method: "POST", 
+      headers: { 
+        "content-type": "application/json",
+        "x-trace-id": req.traceId 
+      }, 
+      body: JSON.stringify(payload) 
+    });
+    
+    // Check if response is ok
+    if (!r.ok) {
+      log.error({ status: r.status, statusText: r.statusText }, "Agent request failed");
+      return res.status(r.status).json({ error: `Agent request failed: ${r.statusText}` });
+    }
+    
+    // Check content type
+    const contentType = r.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await r.text();
+      log.error({ contentType, text: text.substring(0, 200) }, "Invalid response type from agent");
+      return res.status(500).json({ error: "Invalid response from agent service" });
+    }
+    
+    const out = await r.json();
+    log.debug({ route: "/agent/chat", in: payload, out });
+    res.json(out);
+  } catch (error: any) {
+    log.error({ error: error.message, stack: error.stack }, "Error in /agent/chat");
+    res.status(500).json({ error: error.message || "Internal server error" });
+  }
 });
 
 app.post("/search", async (req: any, res) => {
@@ -582,8 +622,8 @@ app.post("/students/:id/opportunities/bombardment", async (req: any, res) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req.body)
     });
-    const data = await r.json();
-    log.info({ route: "/students/:id/opportunities/bombardment", studentId: id, size: data.opportunities?.length });
+    const data = (await r.json()) as any;
+    log.info({ route: "/students/:id/opportunities/bombardment", studentId: id, size: data?.opportunities?.length });
     res.json(data);
   } catch (error) {
     log.error({ error }, "Failed to create bombardment");
@@ -598,8 +638,8 @@ app.get("/students/:id/opportunities/discover", async (req: any, res) => {
     const { id } = req.params;
     const query = new URLSearchParams(req.query).toString();
     const r = await fetch(`${RECOMMENDER_URL}/discover/${id}?${query}`);
-    const data = await r.json();
-    log.debug({ route: "/students/:id/opportunities/discover", studentId: id, newCount: data.new_opportunities?.length });
+    const data = (await r.json()) as any;
+    log.debug({ route: "/students/:id/opportunities/discover", studentId: id, newCount: data?.new_opportunities?.length });
     res.json(data);
   } catch (error) {
     log.error({ error }, "Failed to discover opportunities");

@@ -1,0 +1,17 @@
+Batch 10 Hybrid (W051–W055)
+Created at: 2025-09-30T05:22:09.861933+00:00
+
+Files:
+ - JTBD-EXEC-PART2-B10_TIMELINE_HYBRID.jsonl
+ - JTBD-IMSG-PART2-B10_MICRO_HYBRID.jsonl
+
+Highlights:
+ - LOR strategy locked; recommender kits + tracker v1.
+ - App timeline swimlanes with ship-small cadence and weekly shippables.
+ - Awards pipeline triaged; off-theme items pruned; evidence links defined.
+ - Teen Vogue pitch: 150 words + 3 clips; 5 editors targeted; follow-ups set.
+ - Sponsorship outreach wave 1 (4 companies); 2 meetings booked.
+ - iMessage micro-support: LOR nudges, pitch sharpening, email subject lines.
+
+Import:
+ - Upload both JSONLs to /content and run your Colab ingestion with MANUAL_FILES overrides below.

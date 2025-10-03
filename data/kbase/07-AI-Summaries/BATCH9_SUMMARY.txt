@@ -1,0 +1,17 @@
+# Batch 9 (W046–W050) — Hybrid Pass Summary
+
+## Files created
+- JTBD-W046_HYBRID.jsonl
+- JTBD-W047_HYBRID.jsonl
+- JTBD-W048_HYBRID.jsonl
+- JTBD-W049_HYBRID.jsonl
+- JTBD-W050_HYBRID.jsonl
+- JTBD-EXEC-PART2-B9_HYBRID.jsonl
+- JTBD-IMSG-PART1-3-B9_HYBRID.jsonl
+
+## Highlights
+- Turn G4C finalist into portfolio + press assets (reel, blurb, testimonial).
+- Kick off college apps with umbrella major (HCI/Computational Media) and evidence-per-school matrix.
+- Scale initiative via 2-post weekly cadence and single-lane roles; track only behavior-changing metrics.
+- Map UC majors and scholarship shortlist to narrative; set post-visit pivot after USC.
+- Exec & iMessage slices register concrete tasks and send micro-templates for fast momentum.

@@ -11,6 +11,38 @@ export interface Observation {
   createdAt: Date;
 }
 
+export interface VitalsAwards {
+  planned?: string[];
+  submitted?: string[];
+  won?: string[];
+  final?: any;
+  targets?: any;
+  [key: string]: any;
+}
+
+export function reduceAwards(obs: Observation[], prev: VitalsAwards): VitalsAwards {
+  const planned   = new Set(prev?.planned   ?? []);
+  const submitted = new Set(prev?.submitted ?? []);
+  const won       = new Set(prev?.won       ?? []);
+
+  for (const o of obs) {
+    if (o.kind !== 'AWARD') continue;
+    const nm = (o.value?.name ?? '').trim();
+    if (!nm) continue;
+
+    if (o.subtype === 'planned')   planned.add(nm);
+    if (o.subtype === 'submitted') submitted.add(nm);
+    if (o.subtype === 'accepted' || o.subtype === 'won') won.add(nm);
+  }
+
+  return {
+    ...prev,
+    planned:   Array.from(planned).sort(),
+    submitted: Array.from(submitted).sort(),
+    won:       Array.from(won).sort(),
+  };
+}
+
 export function applyObservationToVitals(v: Vitals, o: Observation): Vitals {
   const out = JSON.parse(JSON.stringify(v || {}));
 
@@ -74,36 +106,8 @@ export function applyObservationToVitals(v: Vitals, o: Observation): Vitals {
       break;
     }
     case "AWARD": {
-      out.awards ??= {};
-      
-      // Handle final awards list
-      if (o.subtype === "AWARD.final" || o.subtype === "final") {
-        out.awards.final = o.value;
-      } else if (o.subtype === "targets") {
-        out.awards.targets = o.value;
-      } else {
-        const key = (o.subtype || "award").split(".")[0];
-        out.awards[key] ??= {};
-        
-        // Award status precedence: WIN > FINALIST > NOMINATED > APPLIED > PLANNED
-        const AWARD_RANK: Record<string, number> = {
-          WIN: 5,
-          FINALIST: 4,
-          NOMINATED: 3,
-          APPLIED: 2,
-          PLANNED: 1,
-          UNKNOWN: 0
-        };
-        
-        const currentStatus = out.awards[key].status || "UNKNOWN";
-        const newStatus = o.value?.status || "UNKNOWN";
-        
-        if (AWARD_RANK[newStatus] >= AWARD_RANK[currentStatus]) {
-          out.awards[key].status = newStatus;
-          out.awards[key].date = typeof o.at === 'string' ? o.at : o.at?.toISOString?.();
-          if (o.value?.details) out.awards[key].details = o.value.details;
-        }
-      }
+      // Use the new reduceAwards function for proper tracking
+      out.awards = reduceAwards([o], out.awards || {});
       break;
     }
     case "SUMMER": {

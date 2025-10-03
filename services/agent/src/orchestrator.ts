@@ -16,6 +16,11 @@ import { enforceEvidence } from "./evidence_enforcer";
 import { Pool } from 'pg';
 import { llmWithTools, shouldUseTools, TOOL_SCHEMA } from './llmClient';
 
+// New imports for structured-first flow
+import { readVitals, pickSat } from "./vitals/read";
+import { readCanon, canonToChip } from "./canon/read";
+import { pineconeQueryKindLocked } from "./retriever/kindLocked";
+
 const log = child({ svc: "agent-orchestrator" });
 
 const pool = new Pool({
@@ -204,9 +209,10 @@ async function canonPassSearch(studentId: string, canonKey: string, message: str
 async function retrieverSearch(q: string, k = 8, filter?: any, studentId?: string) {
   const response = await fetch(`${RETRIEVER_URL}/search`, {
     method: "POST", headers: { "content-type": "application/json" },
-    body: JSON.stringify({ q, k, filter, student: studentId })
+    body: JSON.stringify({ q, k, filter, student_id: studentId })
   });
-  return await response.json().catch(() => []);
+  const result = await response.json().catch(() => []);
+  return Array.isArray(result) ? result : [];
 }
 
 export async function respond({ message, state, coachId='jenny', studentId, nowWeek=1 }: { 
@@ -231,7 +237,125 @@ export async function respond({ message, state, coachId='jenny', studentId, nowW
     const intent = detectIntent(message);
     log.info({ userMsg: message, intent, canonKey }, "agent.intent");
     
-    // 0) SAT from vitals (if query hints 'sat')
+    // Determine query plan: structured-first vs rag-first
+    const isSat = /\bsat\b/i.test(message);
+    const plan = (isSat || isFactualQuestion(message)) ? "structured_first" : "rag_first";
+    
+    // Structured-First Awards Handler
+    const isAwards = /award|prize|honor|win|won|plan.*vs/i.test(message);
+    if (plan === "structured_first" && isAwards) {
+      const vitals = await getStudentVitals(agentState.studentId || "unknown");
+      const awards = vitals?.awards;
+      
+      if (!awards) {
+        const reply = "I don't see your awards tracked yet. Want me to help log them?";
+        return { reply, evidence_chips: [], state: agentState };
+      }
+      
+      // Force canon-first only for awards
+      const canonPlanned = await readCanon("APP_PLANNED_AWARDS", agentState.studentId || "unknown");
+      const canonFinal = await readCanon("APP_FINAL_AWARDS", agentState.studentId || "unknown");
+      const chips = [];
+      
+      if (canonPlanned) chips.push(canonToChip(canonPlanned));
+      if (canonFinal) chips.push(canonToChip(canonFinal));
+      
+      // Optional: Add at most 1 color chip from APP-DOC namespace
+      const colorChips = await pineconeQueryKindLocked({ 
+        q: "awards honors achievements", 
+        kind: "APP-DOC", 
+        studentId: agentState.studentId || "unknown", 
+        k: 1 
+      });
+      if (colorChips.length > 0 && colorChips[0].kind === "APP-DOC") {
+        chips.push(colorChips[0]);
+      }
+      
+      const planned = awards.planned || [];
+      const won = awards.won || [];
+      
+      // Find differences
+      const wonButNotPlanned = won.filter((w: string) => !planned.some((p: string) => p.toLowerCase().includes(w.toLowerCase().split(' ')[0])));
+      const plannedButNotWon = planned.filter((p: string) => !won.some((w: string) => w.toLowerCase().includes(p.toLowerCase().split(' ')[0])));
+      
+      let reply = `**Awards Analysis:**\n\n`;
+      reply += `✓ **Won (${won.length})**: ${won.join(", ")}\n\n`;
+      reply += `📋 **Originally Planned (${planned.length})**: ${planned.join(", ")}\n\n`;
+      
+      if (wonButNotPlanned.length > 0) {
+        reply += `🎉 **Exceeded expectations**: ${wonButNotPlanned.join(", ")}\n`;
+      }
+      if (plannedButNotWon.length > 0) {
+        reply += `📌 **Still pursuing**: ${plannedButNotWon.join(", ")}`;
+      }
+      
+      return { reply, evidence_chips: chips, state: agentState };
+    }
+    
+    // Structured-First SAT Handler
+    if (plan === "structured_first" && (isSat || intent.topic === "sat")) {
+      const vitals = await readVitals(agentState.studentId || "unknown");
+      const { current, timeline } = pickSat(vitals);
+
+      if (!current) {
+        // Never-blank doctrine: offer to log an observation, no guessing
+        const reply = "I don't see your SAT in records yet. Want me to log it so I can use it going forward?";
+        return { reply, evidence_chips: [], state: agentState };
+      }
+
+      // Canon-first chip (prefer APP-DOC, fall back to EXEC-INTEL if available)
+      const canon = await readCanon("APP_FINAL_SCORES", agentState.studentId || "unknown");
+      const chips = canon ? [canonToChip(canon)] : await pineconeQueryKindLocked({ 
+        q: "SAT score", 
+        kind: "APP-DOC", 
+        studentId: agentState.studentId, 
+        k: 1 
+      });
+
+      // Ensure evidence quality
+      const evidenceCheck = enforceEvidence(
+        chips.map((c: any) => ({ 
+          id: c.span, 
+          text: c.title, 
+          kind: c.kind, 
+          metadata: c 
+        })),
+        `Your current SAT is **${current}**.`,
+        "sat",
+        message
+      );
+
+      // Handle timeline queries
+      const isTimelineQuery = /progress|timeline|improve|over time|history/i.test(message);
+      
+      let reply: string;
+      if (isTimelineQuery && timeline && timeline.length > 0) {
+        const scores = timeline.map((t: any) => t.score).join(" → ");
+        const firstScore = timeline[0].score;
+        const improvement = current - firstScore;
+        reply = `Your SAT progression: **${scores}**\n\nYou improved ${improvement} points from your first attempt. Current score: **${current}**.`;
+      } else {
+        reply = `Your current SAT is **${current}**.${timeline && timeline.length > 1 ? " I'm tracking your progression and can break it down on request." : ""}`;
+      }
+      
+      // Optional: Add color from transcripts
+      const colorChips = await pineconeQueryKindLocked({ 
+        q: "SAT improvement narrative", 
+        kind: "TRANS-INTEL", 
+        studentId: agentState.studentId, 
+        k: 2 
+      });
+      chips.push(...colorChips.slice(0, 1)); // Add one narrative chip for context
+
+      return { 
+        reply, 
+        evidence_chips: chips, 
+        evidence_quality: evidenceCheck.quality,
+        state: agentState 
+      };
+    }
+    
+    // 0) Original SAT from vitals (if query hints 'sat') - keep for backward compatibility
     const isSatIntent = /sat/i.test(message);
     let vitals = null;
     let vitalsSat: { timeline?: any[]; submitted?: number | null } | null = null;
@@ -534,7 +658,13 @@ export async function respond({ message, state, coachId='jenny', studentId, nowW
       state: agentState
     };
   } catch (error) {
-    log.error({ error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }, "orchestrator error");
+    log.error({ 
+      error: error instanceof Error ? error.message : String(error), 
+      stack: error instanceof Error ? error.stack : undefined,
+      studentId: agentState.studentId,
+      message
+    }, "orchestrator error - falling back to runNode");
+    console.error("Orchestrator error:", error);
     // Fallback to graph node
     return runNode(agentState, message);
   }

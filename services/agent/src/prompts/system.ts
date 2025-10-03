@@ -27,9 +27,20 @@ OPPORTUNITY RECOMMENDATIONS
 - Track win rates from bombardment history to calibrate future recommendations
 `;
 
+export const VITALS_GROUND_TRUTH = `
+VITALS AS GROUND TRUTH
+- Use vitals JSON as the authoritative source for all factual data (SAT scores, GPA, activities, awards)
+- Do not invent numbers or facts - only use what's recorded in vitals
+- If vitals show a current SAT score, that is THE score to report (not historical or intermediate scores)
+- Always include evidence chips with your responses to show data provenance
+
+Factual contract: "When the user asks about scores, GPA, awards, apps, deadlines or lists, read the provided VITALS JSON first and state the fact exactly. Do not infer or average. Always include evidence chips."
+`;
+
 export const SYSTEM_PROMPT = `
 ${BASE_PERSONA}
 ${NEVER_BLANK_POLICY}
+${VITALS_GROUND_TRUTH}
 ${OPPORTUNITY_GUIDANCE}
 
 Current context:

@@ -6,7 +6,7 @@ import {
   OpportunityScore,
   OpportunityScoreComponents,
   OpportunityBucket
-} from '@types/ivylevel';
+} from '../../../packages/types/dist';
 import { logger } from '@packages/logger';
 
 const app = express();
@@ -41,14 +41,14 @@ app.post('/score', async (req, res) => {
     if (!vitalsResponse.ok) {
       return res.status(404).json({ error: 'Student not found' });
     }
-    const vitals = await vitalsResponse.json();
+    const vitals = await vitalsResponse.json() as any;
 
     // Fetch opportunity details
     const oppResponse = await fetch(`${CATALOG_URL}/opportunities/${opportunity_id}`);
     if (!oppResponse.ok) {
       return res.status(404).json({ error: 'Opportunity not found' });
     }
-    const opportunity: Opportunity = await oppResponse.json();
+    const opportunity = await oppResponse.json() as Opportunity;
 
     // Calculate score components
     const components = calculateScoreComponents(vitals, opportunity);
@@ -81,7 +81,7 @@ app.post('/score', async (req, res) => {
     logger.info(`Scored opportunity ${opportunity.name} for student ${student_id}: ${total_score}`);
     res.json(result.rows[0]);
   } catch (error) {
-    logger.error('Error scoring opportunity:', error);
+    logger.error(error, 'Error scoring opportunity');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -102,7 +102,7 @@ app.post('/score/batch', async (req, res) => {
     if (!vitalsResponse.ok) {
       return res.status(404).json({ error: 'Student not found' });
     }
-    const vitals = await vitalsResponse.json();
+    const vitals = await vitalsResponse.json() as any;
 
     const results = [];
     for (const opportunity_id of opportunity_ids) {
@@ -117,7 +117,7 @@ app.post('/score/batch', async (req, res) => {
           });
           continue;
         }
-        const opportunity: Opportunity = await oppResponse.json();
+        const opportunity = await oppResponse.json() as Opportunity;
 
         // Calculate score
         const components = calculateScoreComponents(vitals, opportunity);
@@ -155,7 +155,7 @@ app.post('/score/batch', async (req, res) => {
         results.push({ 
           success: false, 
           opportunity_id, 
-          error: error.message 
+          error: (error as Error).message 
         });
       }
     }
@@ -171,7 +171,7 @@ app.post('/score/batch', async (req, res) => {
       results
     });
   } catch (error) {
-    logger.error('Error in batch scoring:', error);
+    logger.error(error, 'Error in batch scoring');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -209,7 +209,7 @@ app.get('/scores/student/:student_id', async (req, res) => {
       total: result.rowCount
     });
   } catch (error) {
-    logger.error('Error fetching student scores:', error);
+    logger.error(error, 'Error fetching student scores');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -224,7 +224,7 @@ app.post('/scores/recalculate/:student_id', async (req, res) => {
     if (!vitalsResponse.ok) {
       return res.status(404).json({ error: 'Student not found' });
     }
-    const vitals = await vitalsResponse.json();
+    const vitals = await vitalsResponse.json() as any;
     
     // Get all existing scores for this student
     const existingScores = await pool.query(
@@ -239,7 +239,7 @@ app.post('/scores/recalculate/:student_id', async (req, res) => {
         const oppResponse = await fetch(`${CATALOG_URL}/opportunities/${row.opportunity_id}`);
         if (!oppResponse.ok) continue;
         
-        const opportunity: Opportunity = await oppResponse.json();
+        const opportunity = await oppResponse.json() as Opportunity;
         
         // Recalculate score
         const components = calculateScoreComponents(vitals, opportunity);
@@ -268,7 +268,7 @@ app.post('/scores/recalculate/:student_id', async (req, res) => {
         
         updated.push(row.opportunity_id);
       } catch (error) {
-        logger.error(`Error recalculating score for opportunity ${row.opportunity_id}:`, error);
+        logger.error(error, `Error recalculating score for opportunity ${row.opportunity_id}`);
       }
     }
     
@@ -279,7 +279,7 @@ app.post('/scores/recalculate/:student_id', async (req, res) => {
       opportunity_ids: updated
     });
   } catch (error) {
-    logger.error('Error recalculating scores:', error);
+    logger.error(error, 'Error recalculating scores');
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-09-30T14:01:57Z",
+  "git_commit": "28dd5f487041e0fb52a3660ac526da9dacbda0f2",
+  "branch": "release/v1.1.0",
+  "services": {
+    "agent": "offline",
+    "retriever": "offline",
+    "api": "null"
+  }
+}

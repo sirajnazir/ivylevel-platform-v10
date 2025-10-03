@@ -1,0 +1,7 @@
+student_id,term_code,course_title,subject_area,level,source_id,confidence
+huda-2025,2024-SENIOR,AP Computer Science A,Computer Science,AP,SRC-COMMONAPP-UNC,high
+huda-2025,2024-SENIOR,AP Calculus BC,Math,AP,SRC-COMMONAPP-UNC,high
+huda-2025,2024-SENIOR,AP English Language,English,AP,SRC-COMMONAPP-UNC,high
+huda-2025,2024-SENIOR,AP US History,History,AP,SRC-COMMONAPP-UNC,high
+huda-2025,2024-SENIOR,AP Physics 1,Science,AP,SRC-COMMONAPP-UNC,high
+huda-2025,2024-SENIOR,Spanish 3 Honors,Language,Honors,SRC-COMMONAPP-UNC,high

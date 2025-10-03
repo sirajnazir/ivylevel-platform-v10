@@ -1,0 +1,192 @@
+openapi: 3.0.0
+info:
+  title: Jenny v3 API
+  version: 3.0.0
+  description: Evidence-based AI with vitals-first architecture
+
+servers:
+  - url: http://localhost:8787
+    description: Local development
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+
+  /health/details:
+    get:
+      summary: Detailed health check with metrics
+      responses:
+        '200':
+          description: Detailed health status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  index_name:
+                    type: string
+                    example: jenny-v3-3072-20250930
+                  db_ping_ms:
+                    type: number
+                    example: 5
+                  uptime_s:
+                    type: number
+                    example: 3600
+
+  /students/{student_id}/vitals:
+    get:
+      summary: Get student vitals (facts from PostgreSQL)
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: huda-2025
+      responses:
+        '200':
+          description: Student vitals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  student_id:
+                    type: string
+                  facts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        kind:
+                          type: string
+                          example: sat_total_score
+                        value:
+                          type: string
+                          example: "1530"
+                        fact_date:
+                          type: string
+                          format: date
+                        confidence:
+                          type: string
+                          enum: [high, medium, low]
+                        source_id:
+                          type: string
+
+  /students/{student_id}/lifecycle:
+    get:
+      summary: Get student lifecycle items
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lifecycle items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    item_id:
+                      type: string
+                    domain:
+                      type: string
+                      enum: [application, award, test, essay, recommender, ec_portfolio, aid_css_fafsa, ops_policy]
+                    status:
+                      type: string
+                      enum: [planned, in_progress, submitted, outcome, archived]
+                    school:
+                      type: string
+                      nullable: true
+                    submitted_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    outcome_date:
+                      type: string
+                      format: date-time
+                      nullable: true
+
+  /search:
+    post:
+      summary: Orchestrated search (facts + narrative)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - q
+                - student_id
+              properties:
+                q:
+                  type: string
+                  description: Search query
+                  example: "how did we fix SAT slips?"
+                student_id:
+                  type: string
+                  example: huda-2025
+      responses:
+        '200':
+          description: Search results with facts and narrative hits
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  hits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        namespace:
+                          type: string
+                          enum: [jtbd, interactions]
+                        score:
+                          type: number
+                        text:
+                          type: string
+                  chips:
+                    type: array
+                    items:
+                      type: object
+                  vitals:
+                    type: object
+                    properties:
+                      facts:
+                        type: array
+                        items:
+                          type: object
+        '412':
+          description: No source-backed facts (evidence missing)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "no_source_backed_facts"

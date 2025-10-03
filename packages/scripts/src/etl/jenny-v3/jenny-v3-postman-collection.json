@@ -1,0 +1,78 @@
+{
+  "info": {
+    "name": "Jenny v3 API",
+    "_postman_id": "d3c8d7e6-0f7f-4cc8-9a3f-jen-postman",
+    "description": "Golden 20 + vitals-first checks for Jenny v3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8787" },
+    { "key": "apiKey", "value": "" },
+    { "key": "studentId", "value": "huda-2025" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}", "disabled": true }],
+        "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+      }
+    },
+    {
+      "name": "Vitals (Facts)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}", "disabled": true }],
+        "url": { "raw": "{{baseUrl}}/students/{{studentId}}/vitals", "host": ["{{baseUrl}}"], "path": ["students", "{{studentId}}", "vitals"] }
+      }
+    },
+    {
+      "name": "Lifecycle",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}", "disabled": true }],
+        "url": { "raw": "{{baseUrl}}/students/{{studentId}}/lifecycle", "host": ["{{baseUrl}}"], "path": ["students", "{{studentId}}", "lifecycle"] }
+      }
+    },
+    {
+      "name": "Search (orchestrated)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-API-Key", "value": "{{apiKey}}", "disabled": true }
+        ],
+        "url": { "raw": "{{baseUrl}}/search", "host": ["{{baseUrl}}"], "path": ["search"] },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"q\": \"how did we fix SAT slips?\",\n  \"student_id\": \"{{studentId}}\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Analytics: tactic → outcomes",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}", "disabled": true }],
+        "url": {
+          "raw": "{{baseUrl}}/analytics/tactic-outcomes?student_id={{studentId}}",
+          "host": ["{{baseUrl}}"], "path": ["analytics","tactic-outcomes"],
+          "query": [{ "key": "student_id", "value": "{{studentId}}" }]
+        }
+      }
+    },
+    {
+      "name": "Evidence (resolve chips)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "X-API-Key", "value": "{{apiKey}}", "disabled": true }],
+        "url": {
+          "raw": "{{baseUrl}}/evidence?ids=SAMPLE_EVID_ID_1,SAMPLE_EVID_ID_2",
+          "host": ["{{baseUrl}}"], "path": ["evidence"],
+          "query": [{ "key": "ids", "value": "SAMPLE_EVID_ID_1,SAMPLE_EVID_ID_2" }]
+        }
+      }
+    }
+  ]
+}

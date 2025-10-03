@@ -6,7 +6,7 @@ import {
   OpportunityTier, 
   OpportunityCategory,
   RecognitionLevel 
-} from '@types/ivylevel';
+} from '../../../packages/types/dist';
 import { logger } from '@packages/logger';
 
 const app = express();
@@ -84,7 +84,7 @@ app.get('/opportunities', async (req, res) => {
       offset: Number(offset)
     });
   } catch (error) {
-    logger.error('Error fetching opportunities:', error);
+    logger.error(error, 'Error fetching opportunities');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -104,7 +104,7 @@ app.get('/opportunities/:id', async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    logger.error('Error fetching opportunity:', error);
+    logger.error(error, 'Error fetching opportunity');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -137,7 +137,7 @@ app.post('/opportunities', async (req, res) => {
     logger.info(`Created opportunity: ${opportunity.name}`);
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    logger.error('Error creating opportunity:', error);
+    logger.error(error, 'Error creating opportunity');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -181,7 +181,7 @@ app.put('/opportunities/:id', async (req, res) => {
     logger.info(`Updated opportunity: ${id}`);
     res.json(result.rows[0]);
   } catch (error) {
-    logger.error('Error updating opportunity:', error);
+    logger.error(error, 'Error updating opportunity');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -203,7 +203,7 @@ app.delete('/opportunities/:id', async (req, res) => {
     logger.info(`Deleted opportunity: ${result.rows[0].name}`);
     res.json({ message: 'Opportunity deleted', id });
   } catch (error) {
-    logger.error('Error deleting opportunity:', error);
+    logger.error(error, 'Error deleting opportunity');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -241,7 +241,7 @@ app.post('/opportunities/batch', async (req, res) => {
         ]);
         results.push({ success: true, opportunity: result.rows[0] });
       } catch (error) {
-        results.push({ success: false, name: opp.name, error: error.message });
+        results.push({ success: false, name: opp.name, error: (error as Error).message });
       }
     }
 
@@ -255,7 +255,7 @@ app.post('/opportunities/batch', async (req, res) => {
       results
     });
   } catch (error) {
-    logger.error('Error in batch import:', error);
+    logger.error(error, 'Error in batch import');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -283,7 +283,7 @@ app.get('/opportunities/by-deadline', async (req, res) => {
       days_ahead: Number(days)
     });
   } catch (error) {
-    logger.error('Error fetching opportunities by deadline:', error);
+    logger.error(error, 'Error fetching opportunities by deadline');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -325,7 +325,7 @@ app.get('/opportunities/stats', async (req, res) => {
       by_category: byCategory.rows
     });
   } catch (error) {
-    logger.error('Error fetching opportunity stats:', error);
+    logger.error(error, 'Error fetching opportunity stats');
     res.status(500).json({ error: 'Internal server error' });
   }
 });

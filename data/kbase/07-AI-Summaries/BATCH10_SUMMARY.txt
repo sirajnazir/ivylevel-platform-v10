@@ -1,0 +1,5 @@
+JTBD-W051-REC-STRAT_HYBRID.jsonl — Recommendation letter strategy & relationship planning
+JTBD-W052-TIMELINE-ARCH_HYBRID.jsonl — Application timeline architecture & workstream setup
+JTBD-W053-AWARDS-CRISIS_HYBRID.jsonl — Awards pipeline triage & government internship alignment
+JTBD-W054-TEENVOGUE-PITCH_HYBRID.jsonl — Teen Vogue pitch development & EC consolidation
+JTBD-W055-HACK-SPONSOR_HYBRID.jsonl — Hackathon sponsorships secured & pre‑London (JCamp) ops

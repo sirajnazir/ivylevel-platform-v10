@@ -1,0 +1,21 @@
+{
+  "name": "@ivylevel/observability",
+  "version": "1.0.0",
+  "description": "Unified logging and tracing for Jenny v3",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.4",
+    "typescript": "^5.3.3"
+  }
+}

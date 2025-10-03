@@ -7,7 +7,7 @@ import {
   OpportunityBucket,
   BombardmentTrigger,
   BombardmentEpisode
-} from '@types/ivylevel';
+} from '../../../packages/types/dist';
 import { logger } from '@packages/logger';
 
 const app = express();
@@ -123,7 +123,7 @@ app.get('/recommendations/:student_id', async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('Error getting recommendations:', error);
+    logger.error(error, 'Error getting recommendations');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -143,7 +143,7 @@ app.post('/bombardment/:student_id', async (req, res) => {
     if (!vitalsResponse.ok) {
       return res.status(404).json({ error: 'Student not found' });
     }
-    const vitals = await vitalsResponse.json();
+    const vitals = await vitalsResponse.json() as any;
     
     // Determine bombardment strategy based on trigger
     const strategy = determineBombardmentStrategy(trigger, vitals);
@@ -234,7 +234,7 @@ app.post('/bombardment/:student_id', async (req, res) => {
       strategy
     });
   } catch (error) {
-    logger.error('Error creating bombardment:', error);
+    logger.error(error, 'Error creating bombardment');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -265,7 +265,7 @@ app.put('/bombardment/:episode_id/outcomes', async (req, res) => {
     logger.info(`Updated bombardment episode ${episode_id} outcomes`);
     res.json(result.rows[0]);
   } catch (error) {
-    logger.error('Error updating bombardment outcomes:', error);
+    logger.error(error, 'Error updating bombardment outcomes');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -287,7 +287,7 @@ app.get('/bombardment/history/:student_id', async (req, res) => {
       total: result.rowCount
     });
   } catch (error) {
-    logger.error('Error fetching bombardment history:', error);
+    logger.error(error, 'Error fetching bombardment history');
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -303,7 +303,7 @@ app.get('/discover/:student_id', async (req, res) => {
     if (!vitalsResponse.ok) {
       return res.status(404).json({ error: 'Student not found' });
     }
-    const vitals = await vitalsResponse.json();
+    const vitals = await vitalsResponse.json() as any;
     
     // Find opportunities not yet scored
     const unscored = await pool.query(`
@@ -344,7 +344,7 @@ app.get('/discover/:student_id', async (req, res) => {
     });
     
     if (!scoreResponse.ok) {
-      logger.error('Failed to score discovered opportunities');
+      logger.error({}, 'Failed to score discovered opportunities');
       return res.status(500).json({ error: 'Failed to score opportunities' });
     }
     
@@ -379,7 +379,7 @@ app.get('/discover/:student_id', async (req, res) => {
       scoring_summary: scoreData
     });
   } catch (error) {
-    logger.error('Error in opportunity discovery:', error);
+    logger.error(error, 'Error in opportunity discovery');
     res.status(500).json({ error: 'Internal server error' });
   }
 });

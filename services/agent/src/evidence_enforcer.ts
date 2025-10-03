@@ -154,6 +154,29 @@ export function scoreEvidenceQuality(chips: EvidenceChip[]): number {
   return score;
 }
 
+// Enforce allowed kinds for specific intents
+export function enforceAllowedKinds(
+  intent: string, 
+  chips: EvidenceChip[], 
+  allowedKinds: string[]
+): void {
+  // Check if this is an awards-related intent
+  if (!intent.includes('awards')) {
+    return; // Only enforce for awards intents
+  }
+
+  // Find any chips that are not in the allowed list
+  const disallowedChips = chips.filter(chip => chip.kind && !allowedKinds.includes(chip.kind));
+  
+  if (disallowedChips.length > 0) {
+    const disallowedKinds = [...new Set(disallowedChips.map(c => c.kind))].join(', ');
+    throw new Error(
+      `EvidenceEnforcer: Awards intent '${intent}' includes disallowed kinds: ${disallowedKinds}. ` +
+      `Only ${allowedKinds.join(', ')} are allowed for awards queries.`
+    );
+  }
+}
+
 // Main evidence enforcement
 export function enforceEvidence(
   chips: EvidenceChip[],
@@ -166,6 +189,17 @@ export function enforceEvidence(
   quality: number;
   warnings: string[];
 } {
+  // For awards intents, enforce strict kind restrictions
+  if (intent.includes('awards')) {
+    try {
+      enforceAllowedKinds(intent, chips, ['GAMEPLAN', 'APP-DOC']);
+    } catch (error) {
+      log.error({ error: error instanceof Error ? error.message : String(error), intent, chips }, "Awards evidence enforcement failed");
+      // Filter out disallowed chips instead of throwing
+      chips = chips.filter(c => !c.kind || ['GAMEPLAN', 'APP-DOC'].includes(c.kind));
+    }
+  }
+  
   // Validate evidence
   const validation = validateEvidence(chips, intent, message);
   

@@ -177,7 +177,7 @@ export async function llmWithTools(
     log.info({ messageCount: messages.length, hasTools: tools.length > 0 }, 'Calling LLM');
     
     const response = await openai.chat.completions.create({
-      model: context.model || process.env.FINETUNED_JENNY_MODEL || 'gpt-4o-mini',
+      model: context.model || process.env.JENNY_MODEL_ID || 'gpt-4o-mini-2024-07-18',
       messages: messages as any,
       tools: tools.length > 0 ? tools : undefined,
       tool_choice: tools.length > 0 ? 'auto' : undefined,
