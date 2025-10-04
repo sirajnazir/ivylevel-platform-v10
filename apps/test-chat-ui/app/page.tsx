@@ -43,7 +43,7 @@ export default function Page() {
         vitals: res.vitals || {},
         trace_id: res.trace_id,
         trace: res.trace || {},
-        model: res.model || 'unknown'
+        model: res.model || 'gpt5-intent'
       }]);
     } catch (e: any) {
       setHistory(h => [...h, { role: 'assistant', text: `Error: ${e.message}` }]);

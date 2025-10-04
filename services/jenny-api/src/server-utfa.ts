@@ -19,8 +19,12 @@ import { getInitialAwardTargets, getAwardTargetsByPhase, getAwardTargetsAsOf } f
 import { EnumerationResolver, FactsResolver } from './resolvers/kb-items.js';
 import { pool } from './db/pool.js';
 import { enumsRouter } from './routes/enums.js';
+import { routePrompt } from './router/intentRouter.js';
 
 const app = express();
+
+// In-memory trace storage for GPT-5 Intent Router
+const traceStore = new Map<string, any>();
 
 // Initialize resolvers
 const enumResolver = new EnumerationResolver(pool);
@@ -148,19 +152,58 @@ app.get('/students/:id/lifecycle', async (req, res) => {
 // Agent chat route with UTFA
 app.post('/agent/chat', async (req, res) => {
   try {
-    console.log('[UTFA] Chat request:', { 
-      message: req.body.message, 
+    console.log('[UTFA] Chat request:', {
+      message: req.body.message,
       student_id: req.body.student_id,
-      temporal: 'UTFA' 
+      temporal: 'UTFA'
     });
-    
+
     const result = await agentChat(req.body, res);
-    
+
     if (!req.body?.stream) {
       res.json(result);
     }
   } catch (error: any) {
     console.error('Chat error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GPT-5 Intent Router (v3.2 experimental)
+app.post('/agent/chat/gpt5', async (req, res) => {
+  try {
+    const { message, student_id } = req.body;
+    console.log('[GPT5-Intent] Chat request:', { message: message?.slice(0, 50), student_id });
+
+    const result = await routePrompt({
+      studentId: student_id,
+      message,
+      pg: pool
+    });
+
+    // Store trace in memory for UI viewing
+    if (result.traceId) {
+      traceStore.set(result.traceId, {
+        id: result.traceId,
+        student_id,
+        message,
+        intent: result.intent,
+        answer: result.answer,
+        chips: result.chips,
+        hits: result.hits,
+        timestamp: new Date().toISOString()
+      });
+
+      // Keep only last 100 traces
+      if (traceStore.size > 100) {
+        const firstKey = traceStore.keys().next().value;
+        traceStore.delete(firstKey);
+      }
+    }
+
+    res.json({ ...result, trace_id: result.traceId });
+  } catch (error: any) {
+    console.error('[GPT5-Intent] Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -227,6 +270,58 @@ app.get('/students/:id/testing/sat/all', async (req, res) => {
     res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Trace viewing endpoints (for GPT-5 Intent Router)
+app.get('/traces/:id', async (req, res) => {
+  try {
+    const trace = traceStore.get(req.params.id);
+    if (!trace) {
+      return res.status(404).json({ error: 'Trace not found' });
+    }
+    res.json(trace);
+  } catch (error: any) {
+    console.error('Trace error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/traces/:id/events', async (req, res) => {
+  try {
+    const trace = traceStore.get(req.params.id);
+    if (!trace) {
+      return res.status(404).json({ error: 'Trace not found', events: [] });
+    }
+
+    // Build event list from trace data
+    const events = [
+      {
+        event: 'router.route_start',
+        timestamp: trace.timestamp,
+        data: { student_id: trace.student_id, query_preview: trace.message?.slice(0, 80) }
+      },
+      {
+        event: 'intent.classify',
+        timestamp: trace.timestamp,
+        data: {
+          intent: trace.intent?.intent,
+          entity: trace.intent?.entity,
+          phase: trace.intent?.phase,
+          confidence: trace.intent?.confidence
+        }
+      },
+      {
+        event: 'router.route_complete',
+        timestamp: trace.timestamp,
+        data: { answer_length: trace.answer?.length || 0, hit_count: trace.hits?.length || 0 }
+      }
+    ];
+
+    res.json({ events });
+  } catch (error: any) {
+    console.error('Trace events error:', error);
+    res.status(500).json({ error: error.message, events: [] });
   }
 });
 

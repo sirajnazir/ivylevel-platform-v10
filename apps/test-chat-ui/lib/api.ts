@@ -5,7 +5,10 @@ export async function agentChat(
   studentId: string,
   opts?: { week?: number; llm_model?: string; session_id?: string }
 ) {
-  const r = await fetch(`${BASE}/agent/chat`, {
+  // Always use GPT-5 intent router (v3.3+)
+  const endpoint = '/agent/chat/gpt5';
+
+  const r = await fetch(`${BASE}${endpoint}`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
@@ -17,7 +20,7 @@ export async function agentChat(
     }),
   });
   if (!r.ok) throw new Error(`agentChat failed: ${r.status}`);
-  // Expecting: { answer, hits, chips, vitals, model, trace_id }
+  // Expecting: { answer, hits, chips, vitals, model, trace_id, intent }
   return r.json();
 }
 
