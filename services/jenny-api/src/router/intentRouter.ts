@@ -4,6 +4,9 @@ import { z } from "zod";
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 import * as resolvers from '../services/resolvers.js';
 import type { Pool } from 'pg';
+import { extractUAPX } from '../intent/extractors/uapx.js';
+import type { Domain } from '../intent/schema.js';
+import { extractCollegeFiltersGuardrail, extractScholarshipFiltersGuardrail } from '../intent/extractors/guardrails.js';
 
 const log = createLogger('intent-router');
 const ROUTE_THRESHOLD = Number(process.env.INTENT_ROUTE_THRESHOLD ?? "0.62"); // Route if confidence >= 0.62
@@ -23,6 +26,31 @@ type Intent =
   | "narrative.summary"
   | "progression.timeline"
   | "sat.ordinal"
+  | "gameplan.initial"
+  | "gameplan.vs_progress"
+  | "application.final"
+  | "ivyready.score"
+  | "ivyready.initial"
+  | "ivyready.final"
+  | "ivyready.compare"
+  | "ivyready.factors"
+  | "readiness.now"
+  | "readiness.progress"
+  | "readiness.drivers"
+  | "readiness.whatif.sat"
+  | "readiness.whatif.award"
+  | "readiness.whatif.ec"
+  | "readiness.whatif.gpa"
+  | "readiness.whatif.program"
+  | "readiness.next_moves"
+  | "readiness.weakspots.now"
+  | "readiness.boost.max"
+  | "readiness.boost.plan"
+  | "readiness.progression"
+  | "college.list"
+  | "college.compare.readiness"
+  | "scholarship.list"
+  | "scholarship.total"
   | "kb.search"
   | "unknown";
 
@@ -124,29 +152,198 @@ const FEW_SHOT = [
   {input:"what was my second SAT score?", output:{intent:"sat.ordinal", phase:null, object:"sat", filters:{nth:"second"}, confidence:0.96}},
   {input:"what's my latest SAT?", output:{intent:"sat.ordinal", phase:null, object:"sat", filters:{nth:"latest"}, confidence:0.96}},
   {input:"SAT progression", output:{intent:"progression.timeline", phase:null, object:"sat", filters:{}, confidence:0.95}},
+
+  // GamePlan - Initial (4 examples)
+  {input:"show my gameplan", output:{intent:"gameplan.initial", phase:"initial", object:"gameplan", filters:{}, confidence:0.95}},
+  {input:"what was in my game plan?", output:{intent:"gameplan.initial", phase:"initial", object:"gameplan", filters:{}, confidence:0.94}},
+  {input:"initial targets from the assessment", output:{intent:"gameplan.initial", phase:"initial", object:"gameplan", filters:{}, confidence:0.93}},
+  {input:"targets after assessment", output:{intent:"gameplan.initial", phase:"initial", object:"gameplan", filters:{}, confidence:0.92}},
+
+  // GamePlan - Progress (4 examples)
+  {input:"gameplan vs execution", output:{intent:"gameplan.vs_progress", phase:null, object:"gameplan", filters:{}, confidence:0.96}},
+  {input:"show progress from targets to outcomes", output:{intent:"gameplan.vs_progress", phase:null, object:"gameplan", filters:{}, confidence:0.95}},
+  {input:"compare my plan vs what actually happened", output:{intent:"gameplan.vs_progress", phase:null, object:"gameplan", filters:{}, confidence:0.94}},
+  {input:"how did my gameplan evolve?", output:{intent:"gameplan.vs_progress", phase:null, object:"gameplan", filters:{}, confidence:0.93}},
+
+  // Application - Final (4 examples)
+  {input:"show my Common App submission", output:{intent:"application.final", phase:"final", object:"application", filters:{}, confidence:0.96}},
+  {input:"what did I submit on the application?", output:{intent:"application.final", phase:"final", object:"application", filters:{}, confidence:0.95}},
+  {input:"final Common App template", output:{intent:"application.final", phase:"final", object:"application", filters:{}, confidence:0.94}},
+  {input:"what was on my submitted app?", output:{intent:"application.final", phase:"final", object:"application", filters:{}, confidence:0.93}},
+
+  // IvyReady Score (8 examples - added phase detection)
+  {input:"what's my IvyReady score?", output:{intent:"ivyready.score", phase:null, object:"rubric", filters:{}, confidence:0.96}},
+  {input:"show rubric score", output:{intent:"ivyready.score", phase:null, object:"rubric", filters:{}, confidence:0.95}},
+  {input:"admissions rubric scores", output:{intent:"ivyready.score", phase:null, object:"rubric", filters:{}, confidence:0.94}},
+  {input:"my current IvyReady rating", output:{intent:"ivyready.score", phase:null, object:"rubric", filters:{}, confidence:0.95}},
+  {input:"what was my initial IvyReady score?", output:{intent:"ivyready.score", phase:"initial", object:"rubric", filters:{}, confidence:0.96}},
+  {input:"initial ivy ready score", output:{intent:"ivyready.score", phase:"initial", object:"rubric", filters:{}, confidence:0.95}},
+  {input:"what's my final IvyReady score?", output:{intent:"ivyready.score", phase:"final", object:"rubric", filters:{}, confidence:0.96}},
+  {input:"rubric score at submission", output:{intent:"ivyready.score", phase:"final", object:"rubric", filters:{}, confidence:0.94}},
+
+  // IvyReady Snapshots - Initial (3 examples)
+  {input:"initial ivy score", output:{intent:"ivyready.initial", phase:"initial", object:"rubric", filters:{}, confidence:0.96}},
+  {input:"my ivy score at assessment", output:{intent:"ivyready.initial", phase:"initial", object:"rubric", filters:{}, confidence:0.95}},
+  {input:"first ivyready score", output:{intent:"ivyready.initial", phase:"initial", object:"rubric", filters:{}, confidence:0.94}},
+
+  // IvyReady Snapshots - Final (3 examples)
+  {input:"final ivy score", output:{intent:"ivyready.final", phase:"final", object:"rubric", filters:{}, confidence:0.96}},
+  {input:"ivy score at submit", output:{intent:"ivyready.final", phase:"final", object:"rubric", filters:{}, confidence:0.95}},
+  {input:"ivyready when I submitted", output:{intent:"ivyready.final", phase:"final", object:"rubric", filters:{}, confidence:0.94}},
+
+  // IvyReady Snapshots - Compare (4 examples)
+  {input:"compare initial and final ivy score", output:{intent:"ivyready.compare", phase:null, object:"rubric", filters:{}, confidence:0.97}},
+  {input:"how did my ivy score change", output:{intent:"ivyready.compare", phase:null, object:"rubric", filters:{}, confidence:0.96}},
+  {input:"progress ivy score", output:{intent:"ivyready.compare", phase:null, object:"rubric", filters:{}, confidence:0.94}},
+  {input:"delta ivy", output:{intent:"ivyready.compare", phase:null, object:"rubric", filters:{}, confidence:0.93}},
+
+  // IvyReady Snapshots - Factors (4 examples)
+  {input:"factor breakdown", output:{intent:"ivyready.factors", phase:null, object:"rubric", filters:{}, confidence:0.95}},
+  {input:"what drove my ivy score", output:{intent:"ivyready.factors", phase:null, object:"rubric", filters:{}, confidence:0.96}},
+  {input:"which factors improved", output:{intent:"ivyready.factors", phase:null, object:"rubric", filters:{}, confidence:0.95}},
+  {input:"why did ivy change", output:{intent:"ivyready.factors", phase:null, object:"rubric", filters:{}, confidence:0.94}},
+
+  // Readiness - Current Score (4 examples)
+  {input:"what's my readiness score?", output:{intent:"readiness.now", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"am I ivy ready?", output:{intent:"readiness.now", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"current readiness", output:{intent:"readiness.now", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"how ready am I for Ivies?", output:{intent:"readiness.now", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+
+  // Readiness - Progress (4 examples)
+  {input:"how has my readiness changed?", output:{intent:"readiness.progress", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"readiness timeline", output:{intent:"readiness.progress", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"show readiness progression", output:{intent:"readiness.progress", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"track my readiness growth", output:{intent:"readiness.progress", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+
+  // Readiness - Drivers (4 examples)
+  {input:"what's driving my readiness score?", output:{intent:"readiness.drivers", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"why is my readiness score what it is?", output:{intent:"readiness.drivers", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"readiness factor breakdown", output:{intent:"readiness.drivers", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"which factors are affecting my readiness?", output:{intent:"readiness.drivers", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+
+  // Readiness - What-If SAT (4 examples)
+  {input:"what if I raise my SAT to 1500?", output:{intent:"readiness.whatif.sat", phase:null, object:"readiness", filters:{action_param:1500}, confidence:0.97}},
+  {input:"how would a 1550 SAT affect my readiness?", output:{intent:"readiness.whatif.sat", phase:null, object:"readiness", filters:{action_param:1550}, confidence:0.96}},
+  {input:"simulate SAT 1480", output:{intent:"readiness.whatif.sat", phase:null, object:"readiness", filters:{action_param:1480}, confidence:0.94}},
+  {input:"if my SAT was 1600, what would happen?", output:{intent:"readiness.whatif.sat", phase:null, object:"readiness", filters:{action_param:1600}, confidence:0.96}},
+
+  // Readiness - What-If Award (4 examples)
+  {input:"what if I win a national award?", output:{intent:"readiness.whatif.award", phase:null, object:"readiness", filters:{action_param:"National"}, confidence:0.96}},
+  {input:"how would winning an international award help?", output:{intent:"readiness.whatif.award", phase:null, object:"readiness", filters:{action_param:"International"}, confidence:0.96}},
+  {input:"simulate regional award win", output:{intent:"readiness.whatif.award", phase:null, object:"readiness", filters:{action_param:"Regional"}, confidence:0.94}},
+  {input:"what if I got a national level distinction?", output:{intent:"readiness.whatif.award", phase:null, object:"readiness", filters:{action_param:"National"}, confidence:0.95}},
+
+  // Readiness - Weakspots (v3.9.1 - 6 examples)
+  {input:"what's my top weak spot?", output:{intent:"readiness.weakspots.now", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"what's dragging my IvyReady score down?", output:{intent:"readiness.weakspots.now", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"where am I lagging?", output:{intent:"readiness.weakspots.now", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"which areas are hurting me most?", output:{intent:"readiness.weakspots.now", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+  {input:"what's my biggest weakness?", output:{intent:"readiness.weakspots.now", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"show me where I'm falling behind", output:{intent:"readiness.weakspots.now", phase:null, object:"readiness", filters:{}, confidence:0.92}},
+
+  // Readiness - Boost Max (v3.9.1 - 8 examples with stronger patterns)
+  {input:"which one thing can give me the biggest boost?", output:{intent:"readiness.boost.max", phase:null, object:"readiness", filters:{}, confidence:0.98}},
+  {input:"which one thing would boost me most?", output:{intent:"readiness.boost.max", phase:null, object:"readiness", filters:{}, confidence:0.98}},
+  {input:"what's the highest impact improvement?", output:{intent:"readiness.boost.max", phase:null, object:"readiness", filters:{}, confidence:0.97}},
+  {input:"biggest boost I can get?", output:{intent:"readiness.boost.max", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"where should I focus to maximize my score?", output:{intent:"readiness.boost.max", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"best way to boost my readiness quickly?", output:{intent:"readiness.boost.max", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"which area gives the most ROI?", output:{intent:"readiness.boost.max", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+  {input:"what single thing can I do to improve most?", output:{intent:"readiness.boost.max", phase:null, object:"readiness", filters:{}, confidence:0.97}},
+
+  // Readiness - Boost Plan (v3.9.1 - 6 examples)
+  {input:"how do I fix my weak spots?", output:{intent:"readiness.boost.plan", phase:null, object:"readiness", filters:{}, confidence:0.97}},
+  {input:"what should I prioritize this month?", output:{intent:"readiness.boost.plan", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"give me an action plan to improve", output:{intent:"readiness.boost.plan", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"how can I improve fastest?", output:{intent:"readiness.boost.plan", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+  {input:"what's my strategic improvement plan?", output:{intent:"readiness.boost.plan", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"how do I increase readiness by 10 points?", output:{intent:"readiness.boost.plan", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+
+  // Readiness - Progression (v3.9.1 - 6 examples with trend/trajectory)
+  {input:"how has my readiness improved?", output:{intent:"readiness.progression", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"how has my readiness changed?", output:{intent:"readiness.progression", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"track my growth over time", output:{intent:"readiness.progression", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"show my readiness history", output:{intent:"readiness.progression", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"how much did I improve this semester?", output:{intent:"readiness.progression", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+  {input:"what's my readiness trajectory?", output:{intent:"readiness.progression", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+
+  // Readiness - What-If EC (8 examples with activity-aware patterns)
+  {input:"what if I grow Empowering AI to 10,000 users?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"what if I only scaled the empowering AI to 100 users?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"what if I double users on Synthoria?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"how would raising $25k for Folklift help?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"what if I increase hours per week to 12 on Filmmaker's Club?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"scale Synthoria to 5000 users impact?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"reach 10k users on Empowering AI?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"2x users for my main EC?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+
+  // Readiness - What-If GPA (4 examples)
+  {input:"what if I raise my GPA to 3.95?", output:{intent:"readiness.whatif.gpa", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"how would a 4.0 GPA affect my readiness?", output:{intent:"readiness.whatif.gpa", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"simulate GPA of 3.8", output:{intent:"readiness.whatif.gpa", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"what if my GPA was 3.9?", output:{intent:"readiness.whatif.gpa", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+
+  // Readiness - What-If Program (4 examples)
+  {input:"what if I get into RSI?", output:{intent:"readiness.whatif.program", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"how would getting into YYGS help my readiness?", output:{intent:"readiness.whatif.program", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"simulate admission to LaunchX", output:{intent:"readiness.whatif.program", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"what if I got into TASP?", output:{intent:"readiness.whatif.program", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+
+  // Readiness - Next Moves (3 examples - narrower focus on general recommendations)
+  {input:"what should I do to improve my readiness?", output:{intent:"readiness.next_moves", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"recommended actions for my profile", output:{intent:"readiness.next_moves", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"general recommendations for improving", output:{intent:"readiness.next_moves", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+
+  // College List (12 examples - v4.6.2b balanced)
+  {input:"which colleges did I get into?", output:{intent:"college.list", phase:null, object:"college", filters:{decision_result:"Accepted"}, confidence:0.98}},
+  {input:"which colleges did I actually get into?", output:{intent:"college.list", phase:null, object:"college", filters:{decision_result:"Accepted"}, confidence:0.98}},
+  {input:"which college am I attending?", output:{intent:"college.list", phase:null, object:"college", filters:{attending:true}, confidence:0.98}},
+  {input:"where am I going to college?", output:{intent:"college.list", phase:null, object:"college", filters:{attending:true}, confidence:0.97}},
+  {input:"show my college acceptances", output:{intent:"college.list", phase:null, object:"college", filters:{decision_result:"Accepted"}, confidence:0.96}},
+  {input:"which of my match schools accepted me?", output:{intent:"college.list", phase:null, object:"college", filters:{category:"Match",decision_result:"Accepted"}, confidence:0.95}},
+  {input:"which reach schools waitlisted me?", output:{intent:"college.list", phase:null, object:"college", filters:{category:"Reach",decision_result:"Waitlisted"}, confidence:0.96}},
+  {input:"which schools rejected me?", output:{intent:"college.list", phase:null, object:"college", filters:{decision_result:"Rejected"}, confidence:0.95}},
+  {input:"where was I deferred?", output:{intent:"college.list", phase:null, object:"college", filters:{decision_result:"Deferred"}, confidence:0.94}},
+  {input:"show me all my reach school outcomes", output:{intent:"college.list", phase:null, object:"college", filters:{category:"Reach"}, confidence:0.94}},
+  {input:"which safety schools did I get into?", output:{intent:"college.list", phase:null, object:"college", filters:{category:"Safety",decision_result:"Accepted"}, confidence:0.96}},
+  {input:"list all colleges I applied to", output:{intent:"college.list", phase:null, object:"college", filters:{}, confidence:0.93}},
+
+  // Scholarship (6 examples - v4.6.2b)
+  {input:"which scholarships did I receive?", output:{intent:"scholarship.list", phase:null, object:"scholarship", filters:{application_status:"Accepted"}, confidence:0.97}},
+  {input:"show me scholarships I won", output:{intent:"scholarship.list", phase:null, object:"scholarship", filters:{application_status:"Accepted"}, confidence:0.97}},
+  {input:"which scholarships are pending?", output:{intent:"scholarship.list", phase:null, object:"scholarship", filters:{application_status:"Applied"}, confidence:0.96}},
+  {input:"what scholarships am I waiting to hear back from?", output:{intent:"scholarship.list", phase:null, object:"scholarship", filters:{application_status:"Applied"}, confidence:0.96}},
+  {input:"how much scholarship money did I receive?", output:{intent:"scholarship.total", phase:null, object:"scholarship", filters:{application_status:"Accepted"}, confidence:0.97}},
+  {input:"total scholarship amount", output:{intent:"scholarship.total", phase:null, object:"scholarship", filters:{application_status:"Accepted"}, confidence:0.94}},
+
+  // College Readiness Comparison (2 examples - v4.6.1)
+  {input:"compare my readiness with schools that accepted me", output:{intent:"college.compare.readiness", phase:null, object:"college", filters:{}, confidence:0.96}},
+  {input:"how does my readiness compare to my acceptances?", output:{intent:"college.compare.readiness", phase:null, object:"college", filters:{}, confidence:0.95}},
 ];
 
 const SYS = `You are an intent classifier for a college admissions coaching agent.
 Output ONLY valid JSON matching this schema:
 {
-  "intent": "ecs.list|awards.list|programs.list|academics.summary|narrative.summary|progression.timeline|sat.ordinal|kb.search|unknown",
+  "intent": "ecs.list|awards.list|programs.list|academics.summary|narrative.summary|progression.timeline|sat.ordinal|gameplan.initial|gameplan.vs_progress|application.final|ivyready.score|ivyready.initial|ivyready.final|ivyready.compare|ivyready.factors|readiness.now|readiness.progress|readiness.drivers|readiness.whatif.sat|readiness.whatif.award|readiness.whatif.ec|readiness.whatif.gpa|readiness.whatif.program|readiness.next_moves|kb.search|unknown",
   "phase": "initial|final|null",
-  "object": "ec|award|program|academics|narrative|sat",
+  "object": "ec|award|program|academics|narrative|sat|gameplan|application|rubric|readiness",
   "filters": {
     "as_of"?: string|null,
     "school"?: string|null,
     "scope"?: string|null,
     "nth"?: string|number|null,
-    "components"?: string[]|null
+    "components"?: string[]|null,
+    "action_param"?: any
   },
   "confidence": number[0..1]
 }
 
 PHASE MAPPING:
-- "initial", "gameplan", "game plan", "planned", "at the start", "kickoff", "early", "baseline" -> phase:"initial"
+- "initial", "gameplan", "game plan", "planned", "at the start", "kickoff", "early", "baseline", "assessment" -> phase:"initial"
 - "final", "submitted", "application", "college app", "CommonApp", "as submitted", "made it", "ended up" -> phase:"final"
 - For progression/timeline queries -> phase:null
 - For ordinal queries (first/second/latest SAT) -> phase:null
+- For IvyReady rubric: "initial" maps to snapshot_phase='assessment', "final" maps to snapshot_phase='final_submit'
 
 OBJECT SYNONYMS:
 - ECs: "ECs", "activities", "extracurriculars", "clubs", "involvements" -> object:"ec"
@@ -162,6 +359,12 @@ INTENT ROUTING RULES:
 - "show progress from plan to outcome" -> intent:"progression.timeline", phase:null
 - "initial [object] list" -> intent:"[object].list", phase:"initial"
 - "final [object] list" -> intent:"[object].list", phase:"final"
+- "show my gameplan/game plan/initial targets" -> intent:"gameplan.initial", phase:"initial", object:"gameplan"
+- "gameplan vs execution/progress from targets to outcomes" -> intent:"gameplan.vs_progress", phase:null, object:"gameplan"
+- "Common App submission/what did I submit" -> intent:"application.final", phase:"final", object:"application"
+- "IvyReady score/rubric score/admissions rating" -> intent:"ivyready.score", phase:null, object:"rubric"
+- "initial IvyReady score/baseline rubric" -> intent:"ivyready.score", phase:"initial", object:"rubric"
+- "final IvyReady score/rubric at submission" -> intent:"ivyready.score", phase:"final", object:"rubric"
 
 ACADEMICS HANDLING:
 - Extract components from query: "grades", "gpa", "sat", "act", "ap", "transcript"
@@ -189,7 +392,10 @@ const OBJECT_SYNONYMS = {
   award: ["awards", "honors", "prizes", "distinctions"],
   program: ["summer programs", "summer camps", "summer plan programs", "selective programs"],
   academics: ["academics", "grades and tests", "transcript and scores", "GPA and SAT", "academic stats"],
-  narrative: ["narrative", "USP", "story", "identity", "passion", "aptitude", "cause", "why-statement"]
+  narrative: ["narrative", "USP", "story", "identity", "passion", "aptitude", "cause", "why-statement"],
+  gameplan: ["gameplan", "game plan", "targets", "initial targets", "targets after assessment", "planned list"],
+  application: ["Common App", "common app", "application", "submitted app", "what I submitted", "final submission"],
+  rubric: ["IvyReady score", "rubric score", "rubric", "admissions rating", "ivyready", "admissions score", "ivy ready", "ivy-ready", "ivy-level", "ivy level", "ivylevel score", "ivy+ score", "overall readiness score"]
 };
 
 const ACCEPTANCE_VERBS = ["got in", "get in", "got into", "accepted to", "admitted to", "made it into"];
@@ -283,7 +489,7 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
   log.event('router.route_start', { student_id: studentId, query_preview: message.slice(0, 80), trace_id: traceId });
 
   try {
-    const intent = await classifyIntent(message);
+    let intent = await classifyIntent(message);
 
     log.event('intent.classify', {
       trace_id: traceId,
@@ -294,6 +500,78 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       detector: intent.detector,
       took_ms: Date.now() - t0
     });
+
+    // ========================================
+    // v4.6.2b Filter Guardrails (Entity-Specific)
+    // ========================================
+    if (intent.intent === 'college.list') {
+      const originalFilters = intent.filters || {};
+      intent.filters = extractCollegeFiltersGuardrail(message, originalFilters);
+      log.event('guardrails.college_filters', {
+        trace_id: traceId,
+        original: originalFilters,
+        enhanced: intent.filters
+      });
+    } else if (intent.intent === 'scholarship.list' || intent.intent === 'scholarship.total') {
+      const originalFilters = intent.filters || {};
+      intent.filters = extractScholarshipFiltersGuardrail(message, originalFilters);
+      log.event('guardrails.scholarship_filters', {
+        trace_id: traceId,
+        original: originalFilters,
+        enhanced: intent.filters
+      });
+    }
+
+    // ========================================
+    // v3.7.2 UAPX Parameter Extraction (What-If)
+    // ========================================
+    const WHATIF_ROUTES = new Set([
+      "readiness.whatif.sat",
+      "readiness.whatif.award",
+      "readiness.whatif.ec",
+      "readiness.whatif.gpa",
+      "readiness.whatif.program",
+    ]);
+
+    const DOMAIN_HINT: Record<string, Domain> = {
+      "readiness.whatif.sat": "testing",
+      "readiness.whatif.award": "awards",
+      "readiness.whatif.ec": "ecs",
+      "readiness.whatif.gpa": "academics",
+      "readiness.whatif.program": "programs",
+    };
+
+    if (WHATIF_ROUTES.has(intent.intent)) {
+      log.event('uapx.extract_start', { trace_id: traceId, intent: intent.intent });
+
+      const domain = DOMAIN_HINT[intent.intent];
+      const uapx = await extractUAPX(message, domain);
+
+      if (!uapx) {
+        log.event('uapx.extract_failed', { trace_id: traceId });
+        return {
+          answer: `I understand you want to run a what-if scenario, but I couldn't extract the parameter.\n\nTry being more specific, like:\n• "what if I raise my SAT to 1500?"\n• "what if I win a national award?"\n• "what if I grow my EC to 10,000 users?"\n• "what if I raise my GPA to 3.95?"\n• "what if I get into RSI?"`,
+          chips: [{ kind: "notice", text: "uapx_extraction_failed" }],
+          traceId,
+          intent,
+        };
+      }
+
+      // Attach UAPX to intent filters
+      intent = {
+        ...intent,
+        filters: {
+          ...intent.filters,
+          uapx
+        }
+      };
+
+      log.event('uapx.extract_success', {
+        trace_id: traceId,
+        intent: intent.intent,
+        uapx
+      });
+    }
 
     // Confidence-based routing with tiered responses
     if (intent.confidence < CLARIFY_THRESHOLD) {
@@ -377,6 +655,81 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
         else if (typeof nth === "number" || nth === "second" || nth === "third") satPhase = "nth";
 
         data = await resolvers.academicsSAT(pg, studentId, satPhase, intent.filters);
+        break;
+      case "gameplan.initial":
+        data = await resolvers.gamePlanInitial(pg, studentId);
+        break;
+      case "gameplan.vs_progress":
+        data = await resolvers.gamePlanVsExecution(pg, studentId);
+        break;
+      case "application.final":
+        data = await resolvers.commonAppSubmitted(pg, studentId);
+        break;
+      case "ivyready.score":
+        data = await resolvers.ivyReadyScore(pg, studentId, intent.phase);
+        break;
+      case "ivyready.initial":
+        data = await resolvers.ivyReadyInitial(pg, studentId);
+        break;
+      case "ivyready.final":
+        data = await resolvers.ivyReadyFinal(pg, studentId);
+        break;
+      case "ivyready.compare":
+        data = await resolvers.ivyReadyCompare(pg, studentId);
+        break;
+      case "ivyready.factors":
+        data = await resolvers.ivyReadyFactors(pg, studentId);
+        break;
+      case "readiness.now":
+        data = await resolvers.readinessNow(pg, studentId);
+        break;
+      case "readiness.progress":
+        data = await resolvers.readinessProgress(pg, studentId);
+        break;
+      case "readiness.drivers":
+        data = await resolvers.readinessDrivers(pg, studentId);
+        break;
+      case "readiness.whatif.sat":
+        data = await resolvers.readinessWhatIfSAT(pg, studentId, intent.filters?.uapx || intent.filters?.action_param);
+        break;
+      case "readiness.whatif.award":
+        data = await resolvers.readinessWhatIfAward(pg, studentId, intent.filters?.uapx || intent.filters?.action_param);
+        break;
+      case "readiness.whatif.ec":
+        data = await resolvers.readinessWhatIfEC(pg, studentId, intent.filters?.uapx);
+        break;
+      case "readiness.whatif.gpa":
+        data = await resolvers.readinessWhatIfGPA(pg, studentId, intent.filters?.uapx);
+        break;
+      case "readiness.whatif.program":
+        data = await resolvers.readinessWhatIfProgram(pg, studentId, intent.filters?.uapx);
+        break;
+      case "readiness.next_moves":
+        data = await resolvers.readinessNextMoves(pg, studentId);
+        break;
+      case "readiness.weakspots.now":
+        data = await resolvers.readinessWeakspots(pg, studentId, 3);
+        break;
+      case "readiness.boost.max":
+        data = await resolvers.readinessBoostMax(pg, studentId);
+        break;
+      case "readiness.boost.plan":
+        data = await resolvers.readinessBoostPlan(pg, studentId, 5);
+        break;
+      case "readiness.progression":
+        data = await resolvers.readinessProgression(pg, studentId, 5);
+        break;
+      case "college.list":
+        data = await resolvers.collegeList(pg, studentId, intent.filters || {}, message);
+        break;
+      case "college.compare.readiness":
+        data = await resolvers.collegeCompareReadiness(pg, studentId);
+        break;
+      case "scholarship.list":
+        data = await resolvers.scholarshipList(pg, studentId, intent.filters || {});
+        break;
+      case "scholarship.total":
+        data = await resolvers.scholarshipTotal(pg, studentId, intent.filters || {});
         break;
       default:
         data = await resolvers.kbSearch(pg, studentId, message);

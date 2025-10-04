@@ -1,0 +1,82 @@
+[
+  {
+    "query": "Which of my colleges accepted me?",
+    "intent": "college.list",
+    "filters": { "decision_result": "Accepted" }
+  },
+  {
+    "query": "Which of my match schools accepted me?",
+    "intent": "college.list",
+    "filters": { "category": "Match", "decision_result": "Accepted" }
+  },
+  {
+    "query": "Which reach schools waitlisted me?",
+    "intent": "college.list",
+    "filters": { "category": "Reach", "decision_result": "Waitlisted" }
+  },
+  {
+    "query": "Which college am I attending?",
+    "intent": "college.list",
+    "filters": { "attending": true }
+  },
+  {
+    "query": "Which college did I finally decide to go?",
+    "intent": "college.list",
+    "filters": { "attending": true }
+  },
+  {
+    "query": "Which school did I choose to attend?",
+    "intent": "college.list",
+    "filters": { "attending": true }
+  },
+  {
+    "query": "Where am I going to college?",
+    "intent": "college.list",
+    "filters": { "attending": true }
+  },
+  {
+    "query": "Show my final college choice",
+    "intent": "college.list",
+    "filters": { "attending": true }
+  },
+  {
+    "query": "What college did I enroll at?",
+    "intent": "college.list",
+    "filters": { "attending": true }
+  },
+  {
+    "query": "Show me scholarships I received.",
+    "intent": "scholarship.list",
+    "filters": { "application_status": "Accepted" }
+  },
+  {
+    "query": "Compare my readiness with schools that accepted me.",
+    "intent": "college.compare.readiness",
+    "filters": {}
+  },
+  {
+    "query": "Which safety schools did I get into?",
+    "intent": "college.list",
+    "filters": { "category": "Safety", "decision_result": "Accepted" }
+  },
+  {
+    "query": "What scholarships am I still waiting to hear back from?",
+    "intent": "scholarship.list",
+    "filters": { "application_status": "Applied" }
+  },
+  {
+    "query": "Show me all my reach school outcomes.",
+    "intent": "college.list",
+    "filters": { "category": "Reach" }
+  },
+  {
+    "query": "How much scholarship money did I receive?",
+    "intent": "scholarship.total",
+    "filters": { "application_status": "Accepted" }
+  },
+  {
+    "query": "Which schools rejected me?",
+    "intent": "college.list",
+    "filters": { "decision_result": "Rejected" }
+  }
+]

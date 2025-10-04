@@ -1,0 +1,11 @@
+item_id,student_id,item_type,subtype,title_name,tier1_state,tier2_substate,status_detail,key_metric_type,key_metric_value,key_metric_unit,deadline_date,event_date,submit_date,outcome_date,owner,cadence,evidence_links,source_ref,confidence
+EC-HUDA-FINAL-01,huda-2025,ec,AI/Tech,Empowering AI,Submitted,,Founder,hours_per_week,15,hrs/week,,2023-01-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-03,huda-2025,ec,Media/Film,Filmmaker's Club,Submitted,,President,hours_per_week,5,hrs/week,,2023-09-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-06,huda-2025,ec,Cultural/Tech,Folklift,Submitted,,Founder,hours_per_week,10,hrs/week,,2023-01-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-04,huda-2025,ec,summer_program,JCamp (AAJA),Submitted,,Student Leader,hours_per_week,40,hrs/week,,2024-07-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-07,huda-2025,ec,summer_program,Kode With Klossy,Submitted,,Scholar,hours_per_week,40,hrs/week,,2023-07-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-05,huda-2025,ec,Community Service,MH Muslim Association,Submitted,,Sunday School Teacher,hours_per_week,3,hrs/week,,2022-09-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-09,huda-2025,ec,Media/Journalism,Mustang Studios Podcast Club,Submitted,,Vice President,hours_per_week,4,hrs/week,,2023-09-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-02,huda-2025,ec,Game Development,Synthoria,Submitted,,Founder/Solo Developer,hours_per_week,20,hrs/week,,2023-01-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-10,huda-2025,ec,Entrepreneurship,Tech Influencer & Freelancer,Submitted,,Tech Influencer & Freelancer,hours_per_week,8,hrs/week,,2022-06-01,,,,,,SRC-COMMONAPP-UNC,medium
+EC-HUDA-FINAL-08,huda-2025,ec,Advocacy,Women in Games,Submitted,,Ambassador,hours_per_week,3,hrs/week,,2023-09-01,,,,,,SRC-COMMONAPP-UNC,medium

@@ -1,0 +1,7 @@
+item_id,student_id,item_type,subtype,title_name,tier1_state,tier2_substate,status_detail,key_metric_type,key_metric_value,key_metric_unit,deadline_date,event_date,submit_date,outcome_date,owner,cadence,evidence_links,source_ref,confidence
+AW-FINAL-001,huda-2025,award,,NCWIT — National Awardee,Outcome,final,,,,,,,2024-03-15,,,{},SRC-INT-NCWIT-NAT,high
+AW-FINAL-002,huda-2025,award,,NCWIT — NorCal Regional Winner,Outcome,final,,,,,,,2024-03-15,,,{},SRC-INT-NCWIT-REG,high
+AW-FINAL-003,huda-2025,award,,Mountain House HS Computer Science CTE Award,Outcome,final,,,,,,,2024-06-01,,,{},SRC-INT-CTE,high
+AW-FINAL-004,huda-2025,award,,AP Scholar with Distinction,Outcome,final,,,,,,,2024-07-01,,,{},SRC-INT-APSD,high
+AW-FINAL-005,huda-2025,award,,Games for Change — Writing Impact Award,Outcome,final,,,,,,,2024-07-20,,,{},SRC-INT-G4C,high
+AW-FINAL-006,huda-2025,award,,College Board National Rural & Small Town Award,Outcome,final,,,,,,,2024-09-01,,,{},SRC-INT-CB-NRSTA,high

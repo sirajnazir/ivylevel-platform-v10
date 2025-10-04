@@ -287,3 +287,1479 @@ export async function kbSearch(_pg: Pool, _studentId: string, _q: string) {
     hits:[]
   };
 }
+
+// ============================================================================
+// V3.4 RESOLVERS: GamePlan, Common App, IvyReady
+// ============================================================================
+
+export async function gamePlanInitial(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'gamePlanInitial', student_id: studentId });
+
+  const { rows } = await pg.query(`SELECT * FROM v_gameplan_summary_initial WHERE student_id=$1`, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'gamePlanInitial', view: 'v_gameplan_summary_initial', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: "No initial GamePlan data found.", chips:[{kind:"evidence", text:"v_gameplan_summary_initial"}], hits:[] };
+  }
+
+  const gp = rows[0];
+  const parts: string[] = [];
+  const chips: any[] = [{kind:"evidence", text:"v_gameplan_summary_initial"}];
+
+  // Parse JSONB arrays
+  const narrativeItems = gp.narrative_items || [];
+  const awardTargets = gp.award_targets || [];
+  const ecTargets = gp.ec_targets || [];
+  const programTargets = gp.program_targets || [];
+
+  if (narrativeItems.length > 0) {
+    parts.push(`**Narrative (${narrativeItems.length})**:`);
+    narrativeItems.forEach((n: any, i: number) => {
+      parts.push(`  ${i+1}. ${n.category}: ${n.content}${n.chip ? ` [${n.chip}]` : ''}`);
+    });
+  }
+
+  if (awardTargets.length > 0) {
+    parts.push(`\n**Award Targets (${awardTargets.length})**:`);
+    awardTargets.forEach((a: any, i: number) => {
+      parts.push(`  ${i+1}. ${a.label}${a.as_of ? ` — ${a.as_of}` : ''}`);
+    });
+  }
+
+  if (ecTargets.length > 0) {
+    parts.push(`\n**EC Targets (${ecTargets.length})**:`);
+    ecTargets.forEach((e: any, i: number) => {
+      parts.push(`  ${i+1}. ${e.label}${e.as_of ? ` — ${e.as_of}` : ''}`);
+    });
+  }
+
+  if (programTargets.length > 0) {
+    parts.push(`\n**Program Targets (${programTargets.length})**:`);
+    programTargets.forEach((p: any, i: number) => {
+      parts.push(`  ${i+1}. ${p.program}${p.provider ? ` (${p.provider})` : ''}${p.chip ? ` [${p.chip}]` : ''}`);
+    });
+  }
+
+  if (parts.length === 0) {
+    return { answer: "No initial GamePlan targets found.", chips, hits:rows };
+  }
+
+  return { answer: parts.join('\n'), chips, hits: rows };
+}
+
+export async function gamePlanVsExecution(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'gamePlanVsExecution', student_id: studentId });
+
+  const { rows } = await pg.query(`SELECT * FROM v_gameplan_vs_execution WHERE student_id=$1 ORDER BY domain, item, as_of NULLS LAST`, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'gamePlanVsExecution', view: 'v_gameplan_vs_execution', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: "No GamePlan progression data found.", chips:[{kind:"evidence", text:"v_gameplan_vs_execution"}], hits:[] };
+  }
+
+  // Group by domain
+  const byDomain: any = {};
+  rows.forEach((r: any) => {
+    if (!byDomain[r.domain]) byDomain[r.domain] = [];
+    byDomain[r.domain].push(r);
+  });
+
+  const parts: string[] = [];
+
+  Object.keys(byDomain).sort().forEach((domain: string) => {
+    const items = byDomain[domain];
+    parts.push(`\n**${domain.toUpperCase()} Progression (${items.length})**:`);
+
+    // Group by item to show progression
+    const byItem: any = {};
+    items.forEach((item: any) => {
+      if (!byItem[item.item]) byItem[item.item] = [];
+      byItem[item.item].push(item);
+    });
+
+    Object.keys(byItem).forEach((itemName: string, idx: number) => {
+      const progression = byItem[itemName];
+      const phases = progression.map((p: any) => p.phase).join(' → ');
+      parts.push(`  ${idx+1}. ${itemName}: ${phases}`);
+    });
+  });
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_gameplan_vs_execution"}], hits: rows };
+}
+
+export async function commonAppSubmitted(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'commonAppSubmitted', student_id: studentId });
+
+  const { rows } = await pg.query(`SELECT * FROM v_commonapp_submitted WHERE student_id=$1`, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'commonAppSubmitted', view: 'v_commonapp_submitted', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: "No Common App submission data found.", chips:[{kind:"evidence", text:"v_commonapp_submitted"}], hits:[] };
+  }
+
+  const app = rows[0];
+  const parts: string[] = [];
+  const chips: any[] = [{kind:"evidence", text:"v_commonapp_submitted"}];
+
+  // Parse JSONB arrays
+  const activities = app.activities || [];
+  const honors = app.honors || [];
+  const academics = app.academics || [];
+
+  if (activities.length > 0) {
+    parts.push(`**Activities (${activities.length})**:`);
+    activities.slice(0, 10).forEach((a: any, i: number) => {
+      parts.push(`  ${i+1}. ${a.activity_name}${a.subcategory ? ` — ${a.subcategory}` : ''}`);
+    });
+  }
+
+  if (honors.length > 0) {
+    parts.push(`\n**Honors/Awards (${honors.length})**:`);
+    honors.slice(0, 5).forEach((h: any, i: number) => {
+      parts.push(`  ${i+1}. ${h.honor_name}${h.level ? ` — ${h.level}` : ''}`);
+    });
+  }
+
+  if (academics.length > 0) {
+    parts.push(`\n**Academics**:`);
+    academics.forEach((a: any) => {
+      parts.push(`  • ${a.kind}: ${a.value || a.numeric_value}`);
+    });
+  }
+
+  if (parts.length === 0) {
+    return { answer: "No Common App submission data found.", chips, hits:rows };
+  }
+
+  return { answer: parts.join('\n'), chips, hits: rows };
+}
+
+export async function ivyReadyScore(pg: Pool, studentId: string, phase?: string | null) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'ivyReadyScore', student_id: studentId, phase });
+
+  // Map phase to snapshot_phase: initial -> assessment, final -> final_submit
+  const snapshotPhase = phase === 'initial' ? 'assessment' : phase === 'final' ? 'final_submit' : null;
+
+  let query: string;
+  let params: any[];
+
+  if (snapshotPhase) {
+    // Specific phase requested
+    query = `SELECT * FROM v_rubric_scores_phase_latest WHERE student_id=$1 AND snapshot_phase=$2`;
+    params = [studentId, snapshotPhase];
+  } else {
+    // All phases
+    query = `SELECT * FROM v_rubric_scores_phase_latest WHERE student_id=$1 ORDER BY as_of DESC`;
+    params = [studentId];
+  }
+
+  const { rows } = await pg.query(query, params);
+  log.event('resolver.sql_complete', { resolver: 'ivyReadyScore', view: 'v_rubric_scores_phase_latest', snapshot_phase: snapshotPhase, row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    const phaseMsg = snapshotPhase ? ` for ${snapshotPhase} phase` : '';
+    return { answer: `No IvyReady rubric scores found${phaseMsg}.`, chips:[{kind:"evidence", text:"v_rubric_scores_phase_latest"}], hits:[] };
+  }
+
+  const parts: string[] = [];
+  const chips: any[] = [{kind:"evidence", text:"v_rubric_scores_phase_latest"}];
+
+  rows.forEach((r: any) => {
+    const phaseLabel = r.snapshot_phase || 'unknown';
+    const score = r.ivyready_score ? Math.round(r.ivyready_score * 10) / 10 : 'N/A';
+    const factorScores = r.factor_scores || {};
+
+    parts.push(`\n**${phaseLabel.toUpperCase()} (${r.as_of})**`);
+    parts.push(`  IvyReady Score: ${score}/100`);
+    parts.push(`  Factor Breakdown:`);
+
+    Object.keys(factorScores).forEach((factor: string) => {
+      parts.push(`    • ${factor}: ${factorScores[factor]}/100`);
+    });
+  });
+
+  return { answer: parts.join('\n'), chips, hits: rows };
+}
+
+// ============================================================================
+// v3.5: IvyReady Snapshots (Credit-Score Layer)
+// ============================================================================
+
+export async function ivyReadyInitial(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'ivyReadyInitial', student_id: studentId });
+
+  const query = `SELECT * FROM ivyready_snapshots WHERE student_id=$1 AND rubric_id='ivyplus_v1' AND snapshot_phase='assessment' ORDER BY as_of DESC LIMIT 1`;
+  const { rows } = await pg.query(query, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'ivyReadyInitial', view: 'ivyready_snapshots', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: 'No initial IvyReady snapshot found (assessment phase).', chips:[{kind:"evidence", text:"ivyready_snapshots"}], hits:[] };
+  }
+
+  const r = rows[0];
+  const score = r.overall_score ? Math.round(r.overall_score * 10) / 10 : 'N/A';
+
+  const parts: string[] = [];
+  parts.push(`**Initial IvyReady Score (Assessment)**`);
+  parts.push(`Date: ${r.as_of}`);
+  parts.push(`Score: ${score}/100`);
+  parts.push(`Engine: ${r.engine || 'sql'}`);
+  if (r.notes) parts.push(`Notes: ${r.notes}`);
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"ivyready_snapshots"}], hits: rows };
+}
+
+export async function ivyReadyFinal(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'ivyReadyFinal', student_id: studentId });
+
+  const query = `SELECT * FROM ivyready_snapshots WHERE student_id=$1 AND rubric_id='ivyplus_v1' AND snapshot_phase='final_submit' ORDER BY as_of DESC LIMIT 1`;
+  const { rows } = await pg.query(query, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'ivyReadyFinal', view: 'ivyready_snapshots', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: 'No final IvyReady snapshot found (final_submit phase).', chips:[{kind:"evidence", text:"ivyready_snapshots"}], hits:[] };
+  }
+
+  const r = rows[0];
+  const score = r.overall_score ? Math.round(r.overall_score * 10) / 10 : 'N/A';
+
+  const parts: string[] = [];
+  parts.push(`**Final IvyReady Score (Submit)**`);
+  parts.push(`Date: ${r.as_of}`);
+  parts.push(`Score: ${score}/100`);
+  parts.push(`Engine: ${r.engine || 'sql'}`);
+  if (r.notes) parts.push(`Notes: ${r.notes}`);
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"ivyready_snapshots"}], hits: rows };
+}
+
+export async function ivyReadyCompare(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'ivyReadyCompare', student_id: studentId });
+
+  const query = `SELECT * FROM v_ivyready_assessment_vs_final WHERE student_id=$1`;
+  const { rows } = await pg.query(query, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'ivyReadyCompare', view: 'v_ivyready_assessment_vs_final', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: 'No assessment vs final comparison available. Need both snapshots.', chips:[{kind:"evidence", text:"v_ivyready_assessment_vs_final"}], hits:[] };
+  }
+
+  const r = rows[0];
+  const assessmentScore = r.assessment_score ? Math.round(r.assessment_score * 10) / 10 : 'N/A';
+  const finalScore = r.final_score ? Math.round(r.final_score * 10) / 10 : 'N/A';
+  const delta = r.delta ? Math.round(r.delta * 10) / 10 : 0;
+  const deltaSign = delta >= 0 ? '+' : '';
+
+  const parts: string[] = [];
+  parts.push(`**IvyReady Score Comparison**\n`);
+  parts.push(`**Assessment** (${r.assessment_as_of}): ${assessmentScore}/100`);
+  parts.push(`**Final Submit** (${r.final_as_of}): ${finalScore}/100`);
+  parts.push(`**Delta**: ${deltaSign}${delta} points`);
+
+  if (delta > 0) {
+    parts.push(`\nYour IvyReady score improved by ${delta} points from assessment to submission.`);
+  } else if (delta < 0) {
+    parts.push(`\nYour IvyReady score decreased by ${Math.abs(delta)} points from assessment to submission.`);
+  } else {
+    parts.push(`\nYour IvyReady score remained unchanged from assessment to submission.`);
+  }
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_ivyready_assessment_vs_final"}], hits: rows };
+}
+
+export async function ivyReadyFactors(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'ivyReadyFactors', student_id: studentId });
+
+  const query = `SELECT * FROM v_ivyready_factor_deltas WHERE student_id=$1 ORDER BY factor_id`;
+  const { rows } = await pg.query(query, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'ivyReadyFactors', view: 'v_ivyready_factor_deltas', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: 'No factor-level deltas available. Need both assessment and final snapshots.', chips:[{kind:"evidence", text:"v_ivyready_factor_deltas"}], hits:[] };
+  }
+
+  const parts: string[] = [];
+  parts.push(`**IvyReady Factor Deltas (Assessment → Final)**\n`);
+
+  rows.forEach((r: any) => {
+    const assessmentFactor = r.assessment_factor ? Math.round(r.assessment_factor * 10) / 10 : 0;
+    const finalFactor = r.final_factor ? Math.round(r.final_factor * 10) / 10 : 0;
+    const delta = r.delta ? Math.round(r.delta * 10) / 10 : 0;
+    const deltaSign = delta >= 0 ? '+' : '';
+
+    parts.push(`**${r.factor_id}**: ${assessmentFactor} → ${finalFactor} (${deltaSign}${delta})`);
+  });
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_ivyready_factor_deltas"}], hits: rows };
+}
+
+// ============================================================================
+// v3.7: Universal Readiness Scoring (Feature-Based Layer)
+// ============================================================================
+
+export async function readinessNow(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessNow', student_id: studentId });
+
+  const query = `SELECT * FROM v_features_all WHERE student_id=$1 ORDER BY domain, feature_key`;
+  const { rows } = await pg.query(query, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'readinessNow', view: 'v_features_all', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: 'No feature data available for readiness calculation.', chips:[{kind:"evidence", text:"v_features_all"}], hits:[] };
+  }
+
+  // Group features by domain
+  const byDomain: Record<string, any[]> = {};
+  rows.forEach(r => {
+    if (!byDomain[r.domain]) byDomain[r.domain] = [];
+    byDomain[r.domain].push(r);
+  });
+
+  const parts: string[] = [];
+  parts.push(`**Current Readiness Profile** (${rows.length} features tracked)\n`);
+
+  Object.keys(byDomain).sort().forEach(domain => {
+    parts.push(`\n**${domain.toUpperCase()}**:`);
+    byDomain[domain].forEach(f => {
+      parts.push(`  • ${f.feature_key.replace(/_/g, ' ')}: ${f.feature_value}`);
+    });
+  });
+
+  parts.push(`\n*Measured at: ${rows[0].measured_at}*`);
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_features_all"}], hits: rows };
+}
+
+export async function readinessProgress(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessProgress', student_id: studentId });
+
+  const query = `SELECT snapshot_id, snapshot_name, ivy_ready_score, created_at FROM readiness_snapshots WHERE student_id=$1 ORDER BY created_at`;
+  const { rows } = await pg.query(query, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'readinessProgress', view: 'readiness_snapshots', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: 'No historical readiness snapshots captured yet. Create snapshots via POST /students/:id/snapshots to track progress.', chips:[{kind:"evidence", text:"readiness_snapshots"}], hits:[] };
+  }
+
+  const parts: string[] = [];
+  parts.push(`**Readiness Progress Timeline**\n`);
+
+  rows.forEach((r: any, i: number) => {
+    const date = new Date(r.created_at).toLocaleDateString();
+    const score = r.ivy_ready_score ? r.ivy_ready_score.toFixed(2) : 'N/A';
+    parts.push(`${i+1}. **${r.snapshot_name}** (${date}): IvyReady ${score}`);
+  });
+
+  // Calculate growth if we have at least 2 snapshots
+  if (rows.length >= 2) {
+    const first = rows[0].ivy_ready_score || 0;
+    const last = rows[rows.length - 1].ivy_ready_score || 0;
+    const growth = last - first;
+    parts.push(`\n**Total Growth**: ${growth >= 0 ? '+' : ''}${growth.toFixed(2)} points (${first.toFixed(2)} → ${last.toFixed(2)})`);
+  }
+
+  parts.push(`\n*${rows.length} snapshot${rows.length > 1 ? 's' : ''} captured. Use snapshots to track readiness over time.*`);
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"readiness_snapshots"}], hits: rows };
+}
+
+export async function readinessDrivers(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessDrivers', student_id: studentId });
+
+  const query = `SELECT domain, COUNT(*) as feature_count, JSONB_AGG(JSONB_BUILD_OBJECT('key', feature_key, 'value', feature_value)) as features FROM v_features_all WHERE student_id=$1 GROUP BY domain ORDER BY domain`;
+  const { rows } = await pg.query(query, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'readinessDrivers', view: 'v_features_all', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: 'No feature data available to analyze drivers.', chips:[{kind:"evidence", text:"v_features_all"}], hits:[] };
+  }
+
+  const parts: string[] = [];
+  parts.push(`**Readiness Drivers** (by domain)\n`);
+
+  rows.forEach((r: any) => {
+    parts.push(`\n**${r.domain.toUpperCase()}** (${r.feature_count} features):`);
+    const features = r.features || [];
+    features.slice(0, 5).forEach((f: any) => {
+      parts.push(`  • ${f.key.replace(/_/g, ' ')}: ${f.value}`);
+    });
+  });
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_features_all"}], hits: rows };
+}
+
+export async function readinessWhatIfSAT(pg: Pool, studentId: string, uapxOrLegacy: any) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessWhatIfSAT', student_id: studentId, uapx: uapxOrLegacy });
+
+  // v3.7.2 UAPX support with legacy fallback
+  let targetScore: number;
+  if (typeof uapxOrLegacy === 'object' && uapxOrLegacy.target?.name === 'sat_total') {
+    targetScore = uapxOrLegacy.target.value;
+  } else if (typeof uapxOrLegacy === 'object' && uapxOrLegacy.action === 'increase' && uapxOrLegacy.delta?.name === 'sat_total') {
+    // Get current SAT and apply delta
+    const currentQuery = `SELECT feature_value FROM v_features_all WHERE student_id=$1 AND feature_key='sat_composite'`;
+    const { rows: currentRows } = await pg.query(currentQuery, [studentId]);
+    const currentSAT = currentRows.length > 0 ? Number(currentRows[0].feature_value) : 0;
+    targetScore = currentSAT + uapxOrLegacy.delta.value;
+  } else {
+    // Legacy number param
+    targetScore = Number(uapxOrLegacy);
+  }
+
+  if (!targetScore || targetScore < 400 || targetScore > 1600) {
+    return { answer: 'Invalid SAT score. Must be between 400 and 1600.', chips:[{kind:"error", text:"invalid_param"}], hits:[] };
+  }
+
+  // Get current IvyReady score and SAT
+  const baseQuery = `
+    SELECT
+      ivy_ready_score AS base_score,
+      (factor_breakdown->>'academics')::NUMERIC AS academics_factor
+    FROM v_ivyready_current
+    WHERE student_id = $1
+  `;
+  const { rows: baseRows } = await pg.query(baseQuery, [studentId]);
+
+  const currentQuery = `SELECT feature_value FROM v_features_all WHERE student_id=$1 AND feature_key='sat_composite'`;
+  const { rows: currentRows } = await pg.query(currentQuery, [studentId]);
+
+  const currentSAT = currentRows.length > 0 ? Number(currentRows[0].feature_value) : 0;
+  const baseScore = baseRows.length > 0 ? Number(baseRows[0].base_score) : 0;
+  const academicsFactor = baseRows.length > 0 ? Number(baseRows[0].academics_factor) : 0;
+
+  // Calculate delta using v3.7.1 formula:
+  // SAT contributes 60% of academics factor (40% weight)
+  // SAT max is 1600, so normalized contribution is (SAT/1600 * 60)
+  const currentSATContrib = (currentSAT / 1600.0) * 60;
+  const targetSATContrib = (targetScore / 1600.0) * 60;
+  const satDelta = (targetSATContrib - currentSATContrib) * 0.40; // Academics has 40% weight
+  const projectedScore = baseScore + satDelta;
+
+  const parts: string[] = [];
+  parts.push(`**What-If: Raise SAT to ${targetScore}**\n`);
+  parts.push(`**Current SAT**: ${currentSAT}`);
+  parts.push(`**Target SAT**: ${targetScore}`);
+  parts.push(`**SAT Improvement**: +${targetScore - currentSAT} points\n`);
+  parts.push(`**Current IvyReady Score**: ${baseScore.toFixed(2)}`);
+  parts.push(`**Projected IvyReady Score**: ${projectedScore.toFixed(2)}`);
+  parts.push(`**Net Change**: ${satDelta >= 0 ? '+' : ''}${satDelta.toFixed(2)} points\n`);
+  parts.push(`**Impact Analysis**:`);
+  parts.push(`  • SAT contributes 60% of your Academics factor (40% of total score)`);
+  parts.push(`  • This ${targetScore - currentSAT} point increase would ${satDelta > 0 ? 'boost' : 'lower'} your overall readiness by ${Math.abs(satDelta).toFixed(2)} points`);
+  parts.push(`\n*Note: This simulation uses deterministic scoring from v_ivyready_current view (v3.7.2 UAPX).*`);
+
+  log.event('resolver.sql_complete', { resolver: 'readinessWhatIfSAT', base_score: baseScore, projected_score: projectedScore, delta: satDelta, took_ms: Date.now() - start });
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_ivyready_current"}, {kind:"notice", text:"simulation"}], hits: baseRows };
+}
+
+export async function readinessWhatIfAward(pg: Pool, studentId: string, uapxOrLegacy: any) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessWhatIfAward', student_id: studentId, uapx: uapxOrLegacy });
+
+  // v3.7.2 UAPX support with legacy fallback
+  let awardTier: string;
+  if (typeof uapxOrLegacy === 'object' && uapxOrLegacy.target?.name === 'award_tier') {
+    awardTier = uapxOrLegacy.target.value;
+    // Normalize: "national" -> "National"
+    awardTier = awardTier.charAt(0).toUpperCase() + awardTier.slice(1).toLowerCase();
+  } else {
+    // Legacy string param
+    awardTier = String(uapxOrLegacy);
+  }
+
+  if (!awardTier || !['Regional', 'National', 'International'].includes(awardTier)) {
+    return { answer: 'Invalid award tier. Must be Regional, National, or International.', chips:[{kind:"error", text:"invalid_param"}], hits:[] };
+  }
+
+  // Get current IvyReady score
+  const baseQuery = `
+    SELECT
+      ivy_ready_score AS base_score,
+      (factor_breakdown->>'awards')::NUMERIC AS awards_factor
+    FROM v_ivyready_current
+    WHERE student_id = $1
+  `;
+  const { rows: baseRows } = await pg.query(baseQuery, [studentId]);
+
+  const tierKey = awardTier.toLowerCase() + '_awards_count';
+  const currentQuery = `SELECT feature_value FROM v_features_all WHERE student_id=$1 AND feature_key=$2`;
+  const { rows: currentRows } = await pg.query(currentQuery, [studentId, tierKey]);
+
+  const currentCount = currentRows.length > 0 ? Number(currentRows[0].feature_value) : 0;
+  const baseScore = baseRows.length > 0 ? Number(baseRows[0].base_score) : 0;
+  const awardsFactor = baseRows.length > 0 ? Number(baseRows[0].awards_factor) : 0;
+
+  // Calculate delta using v3.7.1 formula:
+  // Awards factor (25% weight) with tier-specific bumps
+  const tierBumps: Record<string, number> = {
+    'International': 40,
+    'National': 20,
+    'Regional': 10
+  };
+  const tierBump = tierBumps[awardTier];
+  const awardDelta = tierBump * 0.25; // Awards has 25% weight
+  const projectedScore = baseScore + awardDelta;
+
+  const parts: string[] = [];
+  parts.push(`**What-If: Win ${awardTier} Award**\n`);
+  parts.push(`**Current ${awardTier} Awards**: ${currentCount}`);
+  parts.push(`**After Winning**: ${currentCount + 1}\n`);
+  parts.push(`**Current IvyReady Score**: ${baseScore.toFixed(2)}`);
+  parts.push(`**Projected IvyReady Score**: ${projectedScore.toFixed(2)}`);
+  parts.push(`**Net Change**: +${awardDelta.toFixed(2)} points\n`);
+  parts.push(`**Impact Analysis**:`);
+  parts.push(`  • ${awardTier} awards contribute ${tierBump} points to your Awards factor (25% of total score)`);
+  parts.push(`  • Winning this award would boost your overall readiness by ${awardDelta.toFixed(2)} points`);
+
+  if (awardTier === 'International') {
+    parts.push(`\n*International awards have the highest impact—consider ISEF, IOI, IMO-level competitions.*`);
+  } else if (awardTier === 'National') {
+    parts.push(`\n*National awards significantly boost your profile—target USAMO, NatSciOlympiad, Regeneron STS.*`);
+  } else {
+    parts.push(`\n*Regional awards demonstrate local excellence—State Science Fair, regional olympiad honors.*`);
+  }
+
+  parts.push(`\n*v3.7.2 UAPX extraction with deterministic scoring.*`);
+
+  log.event('resolver.sql_complete', { resolver: 'readinessWhatIfAward', base_score: baseScore, projected_score: projectedScore, delta: awardDelta, took_ms: Date.now() - start });
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_ivyready_current"}, {kind:"notice", text:"simulation"}], hits: baseRows };
+}
+
+export async function readinessWhatIfEC(pg: Pool, studentId: string, uapx: any) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessWhatIfEC', student_id: studentId, uapx });
+
+  if (!uapx || uapx.domain !== "ecs") {
+    return { answer: 'Missing or invalid UAPX parameter for EC what-if scenario.', chips:[{kind:"error", text:"missing_uapx"}], hits:[] };
+  }
+
+  // Normalize activity name using fuzzy matching
+  const { normalizeActivityName } = await import('../utils/activityNormalizer.js');
+  const activityName = await normalizeActivityName(pg, studentId, uapx.qualifiers?.activity_name);
+
+  // Get current IvyReady score
+  const baseQuery = `
+    SELECT
+      ivy_ready_score AS base_score,
+      (factor_breakdown->>'ecs')::NUMERIC AS ecs_factor
+    FROM v_ivyready_current
+    WHERE student_id = $1
+  `;
+  const { rows: baseRows } = await pg.query(baseQuery, [studentId]);
+  const baseScore = baseRows.length > 0 ? Number(baseRows[0].base_score) : 0;
+
+  // Determine metric and target/delta
+  const metric = uapx.target?.name || uapx.delta?.name;
+  if (!metric || !["users", "funds_usd", "hours_per_week", "leadership_roles"].includes(metric)) {
+    return { answer: 'Unsupported EC metric. Try users, funds_usd, hours_per_week, or leadership_roles.', chips:[{kind:"error", text:"invalid_metric"}], hits:[] };
+  }
+
+  // Calculate current value (stubbed - in production, query kb_items metadata)
+  let currentValue = 0;
+  // TODO: const currentValue = await getECMetric(pg, studentId, metric, activityName);
+
+  // Calculate target value
+  let targetValue = currentValue;
+  if (uapx.action === "set" && uapx.target && typeof uapx.target.value === "number") {
+    targetValue = uapx.target.value;
+  } else if (uapx.action === "increase" && uapx.delta && typeof uapx.delta.value === "number") {
+    if (uapx.delta.unit === "%") {
+      targetValue = Math.round(currentValue * (1 + uapx.delta.value / 100));
+    } else {
+      targetValue = currentValue + uapx.delta.value;
+    }
+  } else {
+    return { answer: 'Unsupported what-if form for this EC metric.', chips:[{kind:"error", text:"invalid_form"}], hits:[] };
+  }
+
+  if (targetValue < 0) {
+    return { answer: 'Target cannot be negative.', chips:[{kind:"error", text:"negative_target"}], hits:[] };
+  }
+
+  // EC impact model: metric-specific scoring
+  let ecDelta = 0;
+  let description = '';
+
+  if (metric === 'users') {
+    ecDelta = targetValue >= 10000 ? 2.5 : targetValue >= 5000 ? 2.0 : 1.5;
+    description = `${activityName ? `${activityName}: ` : ''}Growing to ${targetValue.toLocaleString()} users`;
+  } else if (metric === 'funds_usd') {
+    ecDelta = targetValue >= 25000 ? 3.0 : targetValue >= 10000 ? 2.0 : 1.0;
+    description = `${activityName ? `${activityName}: ` : ''}Raising $${(targetValue/1000).toFixed(0)}k`;
+  } else if (metric === 'hours_per_week') {
+    ecDelta = targetValue >= 15 ? 1.5 : targetValue >= 10 ? 1.0 : 0.5;
+    description = `${activityName ? `${activityName}: ` : ''}Increasing hours/week to ${targetValue}`;
+  } else if (metric === 'leadership_roles') {
+    ecDelta = targetValue >= 3 ? 2.0 : targetValue >= 2 ? 1.5 : 1.0;
+    description = `${activityName ? `${activityName}: ` : ''}Adding ${targetValue} leadership roles`;
+  }
+
+  const projectedScore = baseScore + ecDelta;
+
+  const parts: string[] = [];
+  parts.push(`**What-If: ${description}**\n`);
+  if (activityName) parts.push(`**Activity**: ${activityName}`);
+  parts.push(`**Metric**: ${metric}`);
+  parts.push(`**Current Value**: ${currentValue.toLocaleString()}`);
+  parts.push(`**Target Value**: ${targetValue.toLocaleString()}\n`);
+  parts.push(`**Current IvyReady Score**: ${baseScore.toFixed(2)}`);
+  parts.push(`**Projected IvyReady Score**: ${projectedScore.toFixed(2)}`);
+  parts.push(`**Net Change**: +${ecDelta.toFixed(2)} points\n`);
+  parts.push(`**Impact Analysis**:`);
+  parts.push(`  • EC ${metric.replace('_', ' ')} scaling demonstrates growth, reach, and leadership capacity`);
+  parts.push(`  • This ${targetValue - currentValue > 0 ? 'increase' : 'change'} would boost your overall readiness by ${ecDelta.toFixed(2)} points`);
+  if (activityName) {
+    parts.push(`  • Activity "${activityName}" recognized from your profile`);
+  }
+  parts.push(`\n*v3.7.3 UAPX with activity-aware extraction and multi-metric support.*`);
+
+  log.event('resolver.sql_complete', { resolver: 'readinessWhatIfEC', activity: activityName, metric, current: currentValue, target: targetValue, base_score: baseScore, projected_score: projectedScore, delta: ecDelta, took_ms: Date.now() - start });
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_ivyready_current"}, {kind:"notice", text:"simulation"}, ...(activityName ? [{kind:"context", text:activityName}] : [])], hits: baseRows };
+}
+
+export async function readinessWhatIfGPA(pg: Pool, studentId: string, uapx: any) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessWhatIfGPA', student_id: studentId, uapx });
+
+  if (!uapx || !uapx.target?.name?.includes('gpa')) {
+    return { answer: 'Missing or invalid UAPX parameter for GPA what-if scenario.', chips:[{kind:"error", text:"missing_uapx"}], hits:[] };
+  }
+
+  const targetGPA = uapx.target.value;
+
+  if (targetGPA < 0 || targetGPA > 4.5) {
+    return { answer: 'Invalid GPA. Must be between 0 and 4.5.', chips:[{kind:"error", text:"invalid_param"}], hits:[] };
+  }
+
+  // Get current IvyReady score and GPA
+  const baseQuery = `
+    SELECT
+      ivy_ready_score AS base_score,
+      (factor_breakdown->>'academics')::NUMERIC AS academics_factor
+    FROM v_ivyready_current
+    WHERE student_id = $1
+  `;
+  const { rows: baseRows } = await pg.query(baseQuery, [studentId]);
+
+  const currentQuery = `SELECT feature_value FROM v_features_all WHERE student_id=$1 AND feature_key='gpa_unweighted'`;
+  const { rows: currentRows } = await pg.query(currentQuery, [studentId]);
+
+  const currentGPA = currentRows.length > 0 ? Number(currentRows[0].feature_value) : 0;
+  const baseScore = baseRows.length > 0 ? Number(baseRows[0].base_score) : 0;
+
+  // GPA contributes 40% of academics factor (40% weight)
+  // GPA max is 4.0, so normalized contribution is (GPA/4.0 * 40)
+  const currentGPAContrib = (currentGPA / 4.0) * 40;
+  const targetGPAContrib = (targetGPA / 4.0) * 40;
+  const gpaDelta = (targetGPAContrib - currentGPAContrib) * 0.40; // Academics has 40% weight
+  const projectedScore = baseScore + gpaDelta;
+
+  const parts: string[] = [];
+  parts.push(`**What-If: Raise GPA to ${targetGPA.toFixed(2)}**\n`);
+  parts.push(`**Current GPA**: ${currentGPA.toFixed(2)}`);
+  parts.push(`**Target GPA**: ${targetGPA.toFixed(2)}`);
+  parts.push(`**GPA Improvement**: +${(targetGPA - currentGPA).toFixed(2)}\n`);
+  parts.push(`**Current IvyReady Score**: ${baseScore.toFixed(2)}`);
+  parts.push(`**Projected IvyReady Score**: ${projectedScore.toFixed(2)}`);
+  parts.push(`**Net Change**: ${gpaDelta >= 0 ? '+' : ''}${gpaDelta.toFixed(2)} points\n`);
+  parts.push(`**Impact Analysis**:`);
+  parts.push(`  • GPA contributes 40% of your Academics factor (40% of total score)`);
+  parts.push(`  • This ${(targetGPA - currentGPA).toFixed(2)} point increase would ${gpaDelta > 0 ? 'boost' : 'lower'} your overall readiness by ${Math.abs(gpaDelta).toFixed(2)} points`);
+  parts.push(`\n*v3.7.2 UAPX extraction with deterministic scoring.*`);
+
+  log.event('resolver.sql_complete', { resolver: 'readinessWhatIfGPA', base_score: baseScore, projected_score: projectedScore, delta: gpaDelta, took_ms: Date.now() - start });
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_ivyready_current"}, {kind:"notice", text:"simulation"}], hits: baseRows };
+}
+
+export async function readinessWhatIfProgram(pg: Pool, studentId: string, uapx: any) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessWhatIfProgram', student_id: studentId, uapx });
+
+  if (!uapx) {
+    return { answer: 'Missing UAPX parameter for program what-if scenario.', chips:[{kind:"error", text:"missing_uapx"}], hits:[] };
+  }
+
+  const programName = uapx.target?.value || uapx.qualifiers?.program_name || 'selective program';
+
+  // Get current IvyReady score
+  const baseQuery = `
+    SELECT
+      ivy_ready_score AS base_score,
+      (factor_breakdown->>'programs')::NUMERIC AS programs_factor
+    FROM v_ivyready_current
+    WHERE student_id = $1
+  `;
+  const { rows: baseRows } = await pg.query(baseQuery, [studentId]);
+  const baseScore = baseRows.length > 0 ? Number(baseRows[0].base_score) : 0;
+
+  // Program admit impact: RSI/TASP = +5 points, other selective = +3 points
+  const highImpactPrograms = ['rsi', 'tasp', 'ssp', 'yygs', 'launchx'];
+  const programLower = String(programName).toLowerCase();
+  const programDelta = highImpactPrograms.includes(programLower) ? 5.0 : 3.0;
+  const projectedScore = baseScore + programDelta;
+
+  const parts: string[] = [];
+  parts.push(`**What-If: Get into ${programName}**\n`);
+  parts.push(`**Current IvyReady Score**: ${baseScore.toFixed(2)}`);
+  parts.push(`**Projected IvyReady Score**: ${projectedScore.toFixed(2)}`);
+  parts.push(`**Net Change**: +${programDelta.toFixed(2)} points\n`);
+  parts.push(`**Impact Analysis**:`);
+  parts.push(`  • Admission to selective programs demonstrates competitive standing`);
+  parts.push(`  • Getting into ${programName} would boost your overall readiness by ${programDelta.toFixed(2)} points`);
+
+  if (highImpactPrograms.includes(programLower)) {
+    parts.push(`\n*${programName.toUpperCase()} is a highly selective program with significant prestige value.*`);
+  } else {
+    parts.push(`\n*Selective summer programs enhance your profile—aim for research or leadership programs.*`);
+  }
+
+  parts.push(`\n*v3.7.2 UAPX extraction with simplified program impact model.*`);
+
+  log.event('resolver.sql_complete', { resolver: 'readinessWhatIfProgram', base_score: baseScore, projected_score: projectedScore, delta: programDelta, took_ms: Date.now() - start });
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_ivyready_current"}, {kind:"notice", text:"simulation"}], hits: baseRows };
+}
+
+export async function readinessNextMoves(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessNextMoves', student_id: studentId });
+
+  const query = `SELECT * FROM v_features_all WHERE student_id=$1 ORDER BY domain, feature_value ASC`;
+  const { rows } = await pg.query(query, [studentId]);
+  log.event('resolver.sql_complete', { resolver: 'readinessNextMoves', view: 'v_features_all', row_count: rows.length, took_ms: Date.now() - start });
+
+  if (!rows.length) {
+    return { answer: 'No feature data available for recommendations.', chips:[{kind:"evidence", text:"v_features_all"}], hits:[] };
+  }
+
+  // Analyze gaps and suggest improvements
+  const parts: string[] = [];
+  parts.push(`**Recommended Next Moves** (Strategic priorities)\n`);
+
+  // Check SAT
+  const satFeature = rows.find(r => r.feature_key === 'sat_composite');
+  if (satFeature && satFeature.feature_value < 1500) {
+    parts.push(`\n1. **Test Prep**: Current SAT ${satFeature.feature_value} → Target 1500+ for top schools`);
+  }
+
+  // Check Awards
+  const nationalAwards = rows.find(r => r.feature_key === 'national_awards_count');
+  if (!nationalAwards || nationalAwards.feature_value < 2) {
+    parts.push(`\n2. **Pursue National Awards**: ${nationalAwards?.feature_value || 0} current → Target 2-3 national recognitions`);
+  }
+
+  // Check Leadership
+  const leadership = rows.find(r => r.feature_key === 'leadership_roles_count');
+  if (!leadership || leadership.feature_value < 3) {
+    parts.push(`\n3. **Build Leadership**: ${leadership?.feature_value || 0} roles → Aim for 3+ significant leadership positions`);
+  }
+
+  // Check Programs
+  const programs = rows.find(r => r.feature_key === 'acceptances_count');
+  if (!programs || programs.feature_value < 2) {
+    parts.push(`\n4. **Competitive Programs**: ${programs?.feature_value || 0} acceptances → Apply to 2-3 selective summer programs`);
+  }
+
+  parts.push(`\n*These recommendations are based on your current profile features and typical Ivy+ benchmarks.*`);
+
+  return { answer: parts.join('\n'), chips:[{kind:"evidence", text:"v_features_all"}], hits: rows };
+}
+
+// ============================================================================
+// v3.9 Universal Readiness Intelligence Resolvers
+// ============================================================================
+
+// v3.9.1: Helper for safe number conversion from SQL
+function num(n: any): number {
+  const v = Number(n);
+  return Number.isFinite(v) ? v : 0;
+}
+
+/**
+ * readinessWeakspots - Identify top weak spots (largest gaps)
+ * Query: "what's my top weak spot?", "what's dragging my IvyReady score down?"
+ */
+export async function readinessWeakspots(pg: Pool, studentId: string, limit: number = 5) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessWeakspots', student_id: studentId, limit });
+
+  const { rows } = await pg.query(`
+    SELECT
+      student_id,
+      domain,
+      feature_key,
+      current_value,
+      target_value,
+      gap_raw,
+      impact_coefficient,
+      gap_weighted,
+      gap_rank
+    FROM v_readiness_weakspots
+    WHERE student_id = $1
+    ORDER BY gap_rank ASC
+    LIMIT $2
+  `, [studentId, limit]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'readinessWeakspots',
+    view: 'v_readiness_weakspots',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!rows.length) {
+    return {
+      answer: "No weakspots identified. You're at benchmarks across tracked features.",
+      chips: [{kind: "evidence", text: "v_readiness_weakspots"}],
+      hits: []
+    };
+  }
+
+  const parts: string[] = ["**Top Weak Spots** (now)\n"];
+
+  rows.forEach((r, i) => {
+    const emoji = i === 0 ? "1️⃣" : i === 1 ? "2️⃣" : i === 2 ? "3️⃣" : `${i+1}.`;
+    const domainLabel = r.domain.toUpperCase();
+    parts.push(`${emoji} **${domainLabel}** → ${r.feature_key}`);
+    parts.push(`   • Current ${num(r.current_value)} vs target ${num(r.target_value)} • Weighted gap ${num(r.gap_weighted).toFixed(2)}\n`);
+  });
+
+  return {
+    answer: parts.join('\n'),
+    chips: [
+      {kind: "evidence", text: "v_readiness_weakspots"},
+      {kind: "notice", text: `top_${rows.length}_gaps`}
+    ],
+    hits: rows
+  };
+}
+
+/**
+ * readinessBoostMax - Find the single highest-impact improvement
+ * Query: "which one thing can give me the biggest boost?"
+ */
+export async function readinessBoostMax(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessBoostMax', student_id: studentId });
+
+  const { rows } = await pg.query(`
+    SELECT
+      domain,
+      feature_key,
+      current_value,
+      target_value,
+      gap_raw,
+      gap_weighted,
+      recommended_action,
+      recommended_window,
+      estimated_lift
+    FROM v_readiness_top_priorities
+    WHERE student_id = $1
+    ORDER BY gap_weighted DESC
+    LIMIT 1
+  `, [studentId]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'readinessBoostMax',
+    view: 'v_readiness_top_priorities',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!rows.length) {
+    return {
+      answer: "No high-impact boosts found. You're already at or above targets.",
+      chips: [{kind: "evidence", text: "v_readiness_top_priorities"}],
+      hits: []
+    };
+  }
+
+  const r = rows[0];
+  const domainLabel = r.domain.toUpperCase();
+
+  const answer = `**Highest-Impact Boost**
+• Domain: ${domainLabel}
+• Feature: ${r.feature_key}
+• Gap to Target: ${num(r.gap_raw).toFixed(2)} (weighted ${num(r.gap_weighted).toFixed(2)})
+• Why: ${r.recommended_action}
+• Time Window: ${r.recommended_window}
+• Estimated Lift: +${num(r.estimated_lift).toFixed(1)} IvyReady points
+
+Tip: say "simulate it" (e.g., "what if I win a national award?" or "what if I raise my SAT to 1560?").`;
+
+  return {
+    answer,
+    chips: [
+      {kind: "evidence", text: "v_readiness_top_priorities"},
+      {kind: "context", text: domainLabel},
+      {kind: "notice", text: `lift_+${num(r.estimated_lift).toFixed(1)}`}
+    ],
+    hits: rows
+  };
+}
+
+/**
+ * readinessBoostPlan - Get full action plan to fix weakspots
+ * Query: "how do I fix my weak spots?", "what should I prioritize this month?"
+ */
+export async function readinessBoostPlan(pg: Pool, studentId: string, limit: number = 5) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessBoostPlan', student_id: studentId, limit });
+
+  const { rows } = await pg.query(`
+    SELECT
+      domain,
+      feature_key,
+      current_value,
+      target_value,
+      gap_raw,
+      gap_weighted,
+      recommended_action,
+      recommended_window,
+      estimated_lift
+    FROM v_readiness_top_priorities
+    WHERE student_id = $1
+    ORDER BY gap_weighted DESC
+    LIMIT $2
+  `, [studentId, limit]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'readinessBoostPlan',
+    view: 'v_readiness_top_priorities',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!rows.length) {
+    return {
+      answer: "No action plan needed. Your profile is well-optimized!",
+      chips: [{kind: "evidence", text: "v_readiness_top_priorities"}],
+      hits: []
+    };
+  }
+
+  const parts: string[] = ["**Action Plan (Strategic Priorities)**\n"];
+  const totalLift = rows.reduce((sum, r) => sum + num(r.estimated_lift), 0);
+
+  rows.forEach((r, i) => {
+    const domainLabel = r.domain.charAt(0).toUpperCase() + r.domain.slice(1);
+    parts.push(`**${i + 1}. ${domainLabel}** → ${r.feature_key}`);
+    parts.push(`   • Gap: ${num(r.current_value).toFixed(2)} → ${num(r.target_value).toFixed(2)} (weighted gap ${num(r.gap_weighted).toFixed(2)})`);
+    parts.push(`   • Action: ${r.recommended_action}`);
+    parts.push(`   • Window: ${r.recommended_window}`);
+    parts.push(`   • Estimated Lift: +${num(r.estimated_lift).toFixed(1)} points\n`);
+  });
+
+  parts.push(`**Total Potential Lift**: +${totalLift.toFixed(1)} IvyReady points if completed within 3 months.`);
+
+  return {
+    answer: parts.join('\n'),
+    chips: [
+      {kind: "evidence", text: "v_readiness_top_priorities"},
+      {kind: "notice", text: `${rows.length}_priorities`},
+      {kind: "context", text: `lift_+${totalLift.toFixed(1)}`}
+    ],
+    hits: rows
+  };
+}
+
+/**
+ * readinessProgression - Track readiness improvement over time
+ * Query: "how has my readiness improved?", "track my growth"
+ */
+export async function readinessProgression(pg: Pool, studentId: string, limit: number = 5) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'readinessProgression', student_id: studentId, limit });
+
+  const { rows } = await pg.query(`
+    SELECT
+      snapshot_id,
+      snapshot_name,
+      ivy_ready_score,
+      features_json,
+      created_at
+    FROM readiness_snapshots
+    WHERE student_id = $1
+    ORDER BY created_at DESC
+    LIMIT $2
+  `, [studentId, limit]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'readinessProgression',
+    table: 'readiness_snapshots',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!rows.length) {
+    return {
+      answer: "No readiness snapshots available yet. Check back after your first snapshot is created.",
+      chips: [{kind: "evidence", text: "readiness_snapshots"}],
+      hits: []
+    };
+  }
+
+  const parts: string[] = ["**Readiness Progression**\n"];
+
+  rows.forEach((r, i) => {
+    const scoreChange = i < rows.length - 1
+      ? r.ivy_ready_score - rows[i + 1].ivy_ready_score
+      : 0;
+    const changeIcon = scoreChange > 0 ? "📈" : scoreChange < 0 ? "📉" : "➡️";
+
+    parts.push(`${changeIcon} **${r.snapshot_name}**: ${r.ivy_ready_score} points${scoreChange !== 0 ? ` (${scoreChange > 0 ? '+' : ''}${scoreChange.toFixed(1)})` : ''}`);
+
+    if (r.features_json && r.features_json.top_drivers) {
+      const drivers = Object.entries(r.features_json.top_drivers)
+        .slice(0, 2)
+        .map(([k, v]) => `${k}=${v}`)
+        .join(', ');
+      parts.push(`   • Top drivers: ${drivers}`);
+    }
+  });
+
+  const totalChange = rows.length > 1
+    ? rows[0].ivy_ready_score - rows[rows.length - 1].ivy_ready_score
+    : 0;
+
+  if (totalChange !== 0) {
+    parts.push(`\n**Total Change**: ${totalChange > 0 ? '+' : ''}${totalChange.toFixed(1)} points`);
+  }
+
+  return {
+    answer: parts.join('\n'),
+    chips: [
+      {kind: "evidence", text: "readiness_snapshots"},
+      {kind: "notice", text: `${rows.length}_snapshots`}
+    ],
+    hits: rows
+  };
+}
+
+// ============================================================================
+// College & Scholarship Resolvers (v4.6.1)
+// ============================================================================
+
+export async function collegeList(pg: Pool, studentId: string, filters: any = {}, userMessage = '') {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'collegeList', student_id: studentId, filters });
+
+  const whereClauses = ['student_id = $1'];
+  const params: any[] = [studentId];
+  let paramIndex = 2;
+
+  if (filters.decision_result) {
+    whereClauses.push(`decision_result = $${paramIndex}`);
+    params.push(filters.decision_result);
+    paramIndex++;
+  }
+
+  if (filters.category) {
+    whereClauses.push(`bucket_category = $${paramIndex}`);
+    params.push(filters.category);
+    paramIndex++;
+  }
+
+  if (filters.attending !== undefined) {
+    whereClauses.push(`attending = $${paramIndex}`);
+    params.push(filters.attending);
+    paramIndex++;
+  }
+
+  // v4.6.2c: Hard safety - if user mentions deciding/attending but filters are still empty
+  const decidedOrAttendingMention = /\b(attending|going to|decided to go|decided on|final decision|final choice|matriculat|enroll|chose)\b/i;
+  if (userMessage && decidedOrAttendingMention.test(userMessage) && !whereClauses.some(w => /attending =/.test(w))) {
+    whereClauses.push(`attending = $${paramIndex}`);
+    params.push(true);
+    paramIndex++;
+    log.event('resolver.safety_check', {
+      resolver: 'collegeList',
+      action: 'forced_attending_filter',
+      reason: 'detected attending/decided keywords but no filter present'
+    });
+  }
+
+  const whereClause = whereClauses.join(' AND ');
+  const query = `
+    SELECT college_name, bucket_category, decision_result, decision_plan,
+           program, location, acceptance_rate, attending
+    FROM college_list
+    WHERE ${whereClause}
+    ORDER BY
+      CASE bucket_category
+        WHEN 'Reach' THEN 1
+        WHEN 'Match' THEN 2
+        WHEN 'Safety' THEN 3
+        ELSE 4
+      END,
+      college_name
+  `;
+
+  const { rows } = await pg.query(query, params);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'collegeList',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!rows.length) {
+    const filterDesc = filters.decision_result
+      ? ` with decision result "${filters.decision_result}"`
+      : '';
+    const categoryDesc = filters.category
+      ? ` in the "${filters.category}" category`
+      : '';
+    return {
+      answer: `No colleges found${categoryDesc}${filterDesc}.`,
+      chips: [{kind: "evidence", text: "college_list"}],
+      hits: []
+    };
+  }
+
+  const parts: string[] = [];
+
+  // v4.6.2b: Answer shaping for attending-only queries
+  const showOnlyAttending = filters.attending === true;
+  if (showOnlyAttending) {
+    const attending = rows.filter(r => r.attending);
+    if (attending.length === 0) {
+      return {
+        answer: 'No attending college found.',
+        chips: [{kind: "evidence", text: "college_list"}],
+        hits: []
+      };
+    }
+    parts.push(`**Attending (${attending.length})**`);
+    attending.forEach((r, i) => {
+      const programInfo = r.program ? ` — ${r.program}` : '';
+      parts.push(`${i + 1}. ${r.college_name}${programInfo} 🎓`);
+    });
+    return {
+      answer: parts.join('\n'),
+      chips: [
+        {kind: "evidence", text: "college_list"},
+        {kind: "notice", text: `attending`}
+      ],
+      hits: attending
+    };
+  }
+
+  // Group by decision result if no filter applied
+  if (!filters.decision_result) {
+    const accepted = rows.filter(r => r.decision_result === 'Accepted');
+    const waitlisted = rows.filter(r => r.decision_result === 'Waitlisted');
+    const rejected = rows.filter(r => r.decision_result === 'Rejected');
+    const pending = rows.filter(r => r.decision_result === 'Pending');
+
+    if (accepted.length > 0) {
+      parts.push(`**Accepted (${accepted.length})**`);
+      accepted.forEach((r, i) => {
+        const programInfo = r.program ? ` — ${r.program}` : '';
+        const attendingMark = r.attending ? ' 🎓 (Attending)' : '';
+        parts.push(`${i + 1}. ${r.college_name}${programInfo}${attendingMark}`);
+      });
+    }
+
+    if (waitlisted.length > 0) {
+      parts.push(`\n**Waitlisted (${waitlisted.length})**`);
+      waitlisted.forEach((r, i) => {
+        const programInfo = r.program ? ` — ${r.program}` : '';
+        parts.push(`${i + 1}. ${r.college_name}${programInfo}`);
+      });
+    }
+
+    if (rejected.length > 0) {
+      parts.push(`\n**Rejected (${rejected.length})**`);
+      rejected.forEach((r, i) => {
+        parts.push(`${i + 1}. ${r.college_name}`);
+      });
+    }
+
+    if (pending.length > 0) {
+      parts.push(`\n**Pending (${pending.length})**`);
+      pending.forEach((r, i) => {
+        parts.push(`${i + 1}. ${r.college_name}`);
+      });
+    }
+  } else {
+    // Single filtered result
+    const filterTitle = filters.category
+      ? `${filters.category} Schools - ${filters.decision_result}`
+      : filters.decision_result;
+    parts.push(`**${filterTitle} (${rows.length})**`);
+    rows.forEach((r, i) => {
+      const programInfo = r.program ? ` — ${r.program}` : '';
+      const categoryInfo = !filters.category ? ` [${r.bucket_category}]` : '';
+      parts.push(`${i + 1}. ${r.college_name}${programInfo}${categoryInfo}`);
+    });
+  }
+
+  return {
+    answer: parts.join('\n'),
+    chips: [
+      {kind: "evidence", text: "college_list"},
+      {kind: "notice", text: `${rows.length}_colleges`}
+    ],
+    hits: rows
+  };
+}
+
+export async function scholarshipList(pg: Pool, studentId: string, filters: any = {}) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'scholarshipList', student_id: studentId, filters });
+
+  const whereClauses = ['student_id = $1'];
+  const params: any[] = [studentId];
+  let paramIndex = 2;
+
+  if (filters.application_status) {
+    whereClauses.push(`application_status = $${paramIndex}`);
+    params.push(filters.application_status);
+    paramIndex++;
+  }
+
+  const whereClause = whereClauses.join(' AND ');
+  const query = `
+    SELECT scholarship_name, sponsor_org, amount_usd, application_status, decision_date
+    FROM scholarships
+    WHERE ${whereClause}
+    ORDER BY
+      CASE application_status
+        WHEN 'Accepted' THEN 1
+        WHEN 'Applied' THEN 2
+        WHEN 'Rejected' THEN 3
+        ELSE 4
+      END,
+      amount_usd DESC NULLS LAST,
+      scholarship_name
+  `;
+
+  const { rows } = await pg.query(query, params);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'scholarshipList',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!rows.length) {
+    const filterDesc = filters.application_status
+      ? ` with status "${filters.application_status}"`
+      : '';
+    return {
+      answer: `No scholarships found${filterDesc}.`,
+      chips: [{kind: "evidence", text: "scholarships"}],
+      hits: []
+    };
+  }
+
+  const parts: string[] = [];
+
+  if (!filters.application_status) {
+    // Group by status
+    const accepted = rows.filter(r => r.application_status === 'Accepted');
+    const applied = rows.filter(r => r.application_status === 'Applied');
+    const rejected = rows.filter(r => r.application_status === 'Rejected');
+
+    if (accepted.length > 0) {
+      parts.push(`**Accepted (${accepted.length})**`);
+      accepted.forEach((r, i) => {
+        const amount = r.amount_usd ? ` — $${r.amount_usd.toLocaleString()}` : '';
+        const org = r.sponsor_org ? ` (${r.sponsor_org})` : '';
+        parts.push(`${i + 1}. ${r.scholarship_name}${org}${amount}`);
+      });
+    }
+
+    if (applied.length > 0) {
+      parts.push(`\n**Applied (${applied.length})**`);
+      applied.forEach((r, i) => {
+        const amount = r.amount_usd ? ` — $${r.amount_usd.toLocaleString()}` : '';
+        const org = r.sponsor_org ? ` (${r.sponsor_org})` : '';
+        parts.push(`${i + 1}. ${r.scholarship_name}${org}${amount}`);
+      });
+    }
+
+    if (rejected.length > 0) {
+      parts.push(`\n**Rejected (${rejected.length})**`);
+      rejected.forEach((r, i) => {
+        const org = r.sponsor_org ? ` (${r.sponsor_org})` : '';
+        parts.push(`${i + 1}. ${r.scholarship_name}${org}`);
+      });
+    }
+  } else {
+    // Single filtered result
+    parts.push(`**${filters.application_status} Scholarships (${rows.length})**`);
+    rows.forEach((r, i) => {
+      const amount = r.amount_usd ? ` — $${r.amount_usd.toLocaleString()}` : '';
+      const org = r.sponsor_org ? ` (${r.sponsor_org})` : '';
+      parts.push(`${i + 1}. ${r.scholarship_name}${org}${amount}`);
+    });
+  }
+
+  return {
+    answer: parts.join('\n'),
+    chips: [
+      {kind: "evidence", text: "scholarships"},
+      {kind: "notice", text: `${rows.length}_scholarships`}
+    ],
+    hits: rows
+  };
+}
+
+export async function scholarshipTotal(pg: Pool, studentId: string, filters: any = {}) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'scholarshipTotal', student_id: studentId, filters });
+
+  const whereClauses = ['student_id = $1', 'amount_usd IS NOT NULL'];
+  const params: any[] = [studentId];
+  let paramIndex = 2;
+
+  if (filters.application_status) {
+    whereClauses.push(`application_status = $${paramIndex}`);
+    params.push(filters.application_status);
+    paramIndex++;
+  }
+
+  const whereClause = whereClauses.join(' AND ');
+  const query = `
+    SELECT
+      SUM(amount_usd) AS total_amount,
+      COUNT(*) AS count
+    FROM scholarships
+    WHERE ${whereClause}
+  `;
+
+  const { rows } = await pg.query(query, params);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'scholarshipTotal',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  const total = rows[0]?.total_amount || 0;
+  const count = rows[0]?.count || 0;
+
+  if (total === 0) {
+    const filterDesc = filters.application_status
+      ? ` with status "${filters.application_status}"`
+      : '';
+    return {
+      answer: `No scholarship amounts found${filterDesc}.`,
+      chips: [{kind: "evidence", text: "scholarships"}],
+      hits: []
+    };
+  }
+
+  const statusDesc = filters.application_status
+    ? ` (${filters.application_status})`
+    : '';
+  const answer = `**Total Scholarship Amount${statusDesc}**: $${total.toLocaleString()}\n\nFrom ${count} scholarship${count !== 1 ? 's' : ''}`;
+
+  return {
+    answer,
+    chips: [
+      {kind: "evidence", text: "scholarships"},
+      {kind: "notice", text: `$${total.toLocaleString()}`}
+    ],
+    hits: rows
+  };
+}
+
+export async function collegeCompareReadiness(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'collegeCompareReadiness', student_id: studentId });
+
+  const query = `
+    SELECT
+      college_name,
+      bucket_category,
+      decision_result,
+      acceptance_rate,
+      ivyready_score_at_submit
+    FROM college_list
+    WHERE student_id = $1
+      AND decision_result IN ('Accepted', 'Waitlisted', 'Rejected')
+    ORDER BY
+      CASE decision_result
+        WHEN 'Accepted' THEN 1
+        WHEN 'Waitlisted' THEN 2
+        WHEN 'Rejected' THEN 3
+      END,
+      acceptance_rate ASC NULLS LAST
+  `;
+
+  const { rows } = await pg.query(query, [studentId]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'collegeCompareReadiness',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!rows.length) {
+    return {
+      answer: 'No college outcomes found to compare with readiness scores.',
+      chips: [{kind: "evidence", text: "college_list"}],
+      hits: []
+    };
+  }
+
+  const parts: string[] = [];
+  const accepted = rows.filter(r => r.decision_result === 'Accepted');
+  const waitlisted = rows.filter(r => r.decision_result === 'Waitlisted');
+  const rejected = rows.filter(r => r.decision_result === 'Rejected');
+
+  if (accepted.length > 0) {
+    parts.push(`**Accepted Schools (${accepted.length})**`);
+    const avgAcceptRate = accepted.reduce((sum, r) => sum + (r.acceptance_rate || 0), 0) / accepted.length;
+    parts.push(`Average acceptance rate: ${avgAcceptRate.toFixed(1)}%`);
+    accepted.slice(0, 5).forEach((r, i) => {
+      const rate = r.acceptance_rate ? ` (${r.acceptance_rate}% acceptance rate)` : '';
+      parts.push(`${i + 1}. ${r.college_name}${rate}`);
+    });
+  }
+
+  if (waitlisted.length > 0) {
+    parts.push(`\n**Waitlisted (${waitlisted.length})**`);
+    const avgAcceptRate = waitlisted.reduce((sum, r) => sum + (r.acceptance_rate || 0), 0) / waitlisted.length;
+    parts.push(`Average acceptance rate: ${avgAcceptRate.toFixed(1)}%`);
+  }
+
+  if (rejected.length > 0) {
+    parts.push(`\n**Rejected (${rejected.length})**`);
+    const avgAcceptRate = rejected.reduce((sum, r) => sum + (r.acceptance_rate || 0), 0) / rejected.length;
+    parts.push(`Average acceptance rate: ${avgAcceptRate.toFixed(1)}%`);
+  }
+
+  const ivyReadyScore = rows[0]?.ivyready_score_at_submit;
+  if (ivyReadyScore) {
+    parts.push(`\n**Your IvyReady Score at Submission**: ${ivyReadyScore}`);
+  }
+
+  return {
+    answer: parts.join('\n'),
+    chips: [
+      {kind: "evidence", text: "college_list"},
+      {kind: "notice", text: `${rows.length}_colleges`}
+    ],
+    hits: rows
+  };
+}

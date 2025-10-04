@@ -19,6 +19,7 @@ import { getInitialAwardTargets, getAwardTargetsByPhase, getAwardTargetsAsOf } f
 import { EnumerationResolver, FactsResolver } from './resolvers/kb-items.js';
 import { pool } from './db/pool.js';
 import { enumsRouter } from './routes/enums.js';
+import { createSnapshotRoutes } from './routes/snapshots.js';
 import { routePrompt } from './router/intentRouter.js';
 
 const app = express();
@@ -46,6 +47,9 @@ app.use(express.json());
 
 // Mount universal enumerations router
 app.use('/enum', enumsRouter(pool));
+
+// Mount snapshot routes (v3.7.1)
+app.use('/', createSnapshotRoutes(pool));
 
 // Health routes
 app.get('/health', (_req, res) => {
@@ -149,20 +153,19 @@ app.get('/students/:id/lifecycle', async (req, res) => {
   }
 });
 
-// Agent chat route with UTFA
+// Agent chat route with GPT-5 Intent Router (v3.7.3)
 app.post('/agent/chat', async (req, res) => {
   try {
-    console.log('[UTFA] Chat request:', {
-      message: req.body.message,
-      student_id: req.body.student_id,
-      temporal: 'UTFA'
+    const { message, student_id } = req.body;
+    console.log('[GPT5-Intent] Chat request:', { message: message?.slice(0, 80), student_id });
+
+    const result = await routePrompt({
+      studentId: student_id,
+      message,
+      pg: pool
     });
 
-    const result = await agentChat(req.body, res);
-
-    if (!req.body?.stream) {
-      res.json(result);
-    }
+    res.json(result);
   } catch (error: any) {
     console.error('Chat error:', error);
     res.status(500).json({ error: error.message });

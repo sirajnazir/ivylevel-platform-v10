@@ -1,0 +1,7 @@
+{
+  "name": "@packages/intent",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./classifier.ts",
+  "types": "./classifier.ts"
+}

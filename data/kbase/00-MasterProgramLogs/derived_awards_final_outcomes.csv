@@ -1,0 +1,7 @@
+student_id,type,occurred_at,source_id,details_json
+huda-2025,achievement,2024-03-15,SRC-INT-NCWIT-NAT,"{""label"":""NCWIT Aspirations in Computing — National Awardee"",""level"":""National""}"
+huda-2025,achievement,2024-03-15,SRC-INT-NCWIT-REG,"{""label"":""NCWIT Aspirations in Computing — Northern California Regional Winner"",""level"":""Regional""}"
+huda-2025,achievement,2024-06-01,SRC-INT-CTE,"{""label"":""Mountain House HS Computer Science CTE Award"",""level"":""School""}"
+huda-2025,achievement,2024-07-01,SRC-INT-APSD,"{""label"":""AP Scholar with Distinction"",""level"":""National""}"
+huda-2025,achievement,2024-07-20,SRC-INT-G4C,"{""label"":""Games for Change — Writing Impact Award"",""level"":""International""}"
+huda-2025,achievement,2024-09-01,SRC-INT-CB-NRSTA,"{""label"":""College Board National Rural & Small Town Award"",""level"":""National""}"
