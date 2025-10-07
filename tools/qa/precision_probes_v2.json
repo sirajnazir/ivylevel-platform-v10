@@ -1,0 +1,177 @@
+[
+  {
+    "q": "168-hour framework time audit only 2 hours left",
+    "expect": ["FRAMEWORK", "SILVER"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "time_management"
+  },
+  {
+    "q": "Naviance scattergram acceptance history data analysis",
+    "expect": ["INSIGHT", "TACTIC"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "research"
+  },
+  {
+    "q": "let colleges reject you don't reject yourself mindset",
+    "expect": ["TRUST"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "confidence"
+  },
+  {
+    "q": "teacher gift strategy thank-you card timing",
+    "expect": ["TRUST", "TACTIC", "STRATEGY"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "relationships"
+  },
+  {
+    "q": "Stanford REA vs USC early decision strategy comparison",
+    "expect": ["STRATEGY", "FRAMEWORK"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "application_strategy"
+  },
+  {
+    "q": "recommendation letter micro-ask sequence formal request",
+    "expect": ["STRATEGY", "TACTIC"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "letters_of_rec"
+  },
+  {
+    "q": "outcome correlation map bidirectional evidence planning",
+    "expect": ["FRAMEWORK"],
+    "ns": "sessions",
+    "family": "exec",
+    "category": "execution"
+  },
+  {
+    "q": "proofpack structure screenshots testimonials artifacts",
+    "expect": ["FRAMEWORK", "TACTIC"],
+    "ns": "sessions",
+    "family": "exec",
+    "category": "proof_building"
+  },
+  {
+    "q": "application lanes P5 rework rejected to admitted pivot",
+    "expect": ["STRATEGY", "FRAMEWORK"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "application_strategy"
+  },
+  {
+    "q": "CAP-CC cold email template initial outreach template",
+    "expect": ["TACTIC"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "outreach"
+  },
+  {
+    "q": "narrative architecture thread weave spine identity coherence",
+    "expect": ["FRAMEWORK"],
+    "ns": "sessions",
+    "family": "exec",
+    "category": "narrative"
+  },
+  {
+    "q": "Synthoria DNA embedding voice values vantage velocity",
+    "expect": ["FRAMEWORK"],
+    "ns": "sessions",
+    "family": "exec",
+    "category": "identity"
+  },
+  {
+    "q": "assessment to acceptance ladder nine-rung execution",
+    "expect": ["FRAMEWORK"],
+    "ns": "sessions",
+    "family": "exec",
+    "category": "execution"
+  },
+  {
+    "q": "essay block creativity unblock writing strategies",
+    "expect": ["STRATEGY", "TACTIC"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "essay_writing"
+  },
+  {
+    "q": "interview prep rehearsal confidence building techniques",
+    "expect": ["TACTIC", "STRATEGY"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "interviews"
+  },
+  {
+    "q": "scholarship strategy stacking financial aid optimization",
+    "expect": ["STRATEGY", "FRAMEWORK"],
+    "ns": "sessions",
+    "family": "session",
+    "category": "financial_aid"
+  },
+  {
+    "q": "deadline crunch escalation after no response urgent",
+    "expect": ["Escalation_Pattern_Chip", "Micro_Tactic_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "escalation"
+  },
+  {
+    "q": "confidence reset tone cues after setback reassurance",
+    "expect": ["Tone_Cue_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "confidence"
+  },
+  {
+    "q": "thank you note template after help gratitude message",
+    "expect": ["Message_Template_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "gratitude"
+  },
+  {
+    "q": "48 hour turnaround case rapid response success story",
+    "expect": ["Turnaround_Case_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "turnaround"
+  },
+  {
+    "q": "parent pushback handling mom dad disagreement navigation",
+    "expect": ["Escalation_Pattern_Chip", "Tone_Cue_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "parent_dynamics"
+  },
+  {
+    "q": "quick check-in follow-up nudge gentle reminder script",
+    "expect": ["Micro_Tactic_Chip", "Message_Template_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "follow_up"
+  },
+  {
+    "q": "emoji tone calm gentle validation empathy mirror",
+    "expect": ["Tone_Cue_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "tone"
+  },
+  {
+    "q": "blocker unresponsive teacher recommender not replying",
+    "expect": ["Escalation_Pattern_Chip", "Micro_Tactic_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "blockers"
+  },
+  {
+    "q": "time management schedule conflict juggling priorities",
+    "expect": ["Micro_Tactic_Chip", "Tone_Cue_Chip"],
+    "ns": "imsg",
+    "family": "imessage",
+    "category": "time_management"
+  }
+]

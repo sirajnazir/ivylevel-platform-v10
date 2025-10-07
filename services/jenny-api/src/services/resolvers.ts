@@ -280,14 +280,6 @@ export async function academicsSummary(pg: Pool, studentId: string, phase: strin
   };
 }
 
-export async function kbSearch(_pg: Pool, _studentId: string, _q: string) {
-  return {
-    answer: "I can search your knowledge base if you want, but for accuracy I recommend asking for a specific list (e.g., 'final awards list').",
-    chips:[{kind:"notice", text:"facts-first"}],
-    hits:[]
-  };
-}
-
 // ============================================================================
 // V3.4 RESOLVERS: GamePlan, Common App, IvyReady
 // ============================================================================
@@ -1762,4 +1754,51 @@ export async function collegeCompareReadiness(pg: Pool, studentId: string) {
     ],
     hits: rows
   };
+}
+
+// ============================================================================
+// KB INTEL RESOLVER (RAG-powered coaching intelligence)
+// ============================================================================
+
+export async function kbSearch(pg: Pool, studentId: string, userMessage: string, filters?: any) {
+  const start = Date.now();
+  log.event('resolver.kb_search_start', { student_id: studentId, query: userMessage.slice(0, 100), filters });
+
+  try {
+    // Import KB resolver dynamically (to avoid circular dependencies)
+    const { resolveKBQuery, applyFacetHeuristics } = await import('./kb_resolver.js');
+
+    // Apply facet heuristics to extract filters from text if not provided
+    const enhancedFilters = applyFacetHeuristics(userMessage, filters || {});
+
+    log.event('resolver.kb_filters_applied', {
+      student_id: studentId,
+      original_filters: filters,
+      enhanced_filters: enhancedFilters
+    });
+
+    const result = await resolveKBQuery(pg, studentId, userMessage, enhancedFilters);
+
+    log.event('resolver.kb_search_complete', {
+      student_id: studentId,
+      result_count: result.hits.length,
+      filters: enhancedFilters,
+      took_ms: Date.now() - start
+    });
+
+    return result;
+  } catch (error: any) {
+    log.error('resolver.kb_search_failed', {
+      student_id: studentId,
+      error: error.message,
+      stack: error.stack,
+      took_ms: Date.now() - start
+    });
+
+    return {
+      answer: "KB search encountered an error. Please try again or contact support.",
+      chips: [{kind: "error", text: `kb_error: ${error.message}`}],
+      hits: []
+    };
+  }
 }

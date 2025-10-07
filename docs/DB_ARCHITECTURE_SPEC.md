@@ -2,8 +2,8 @@
 **IvyLevel Platform v10 - Jenny Agentic AI**
 
 **Document Status:** Living Specification
-**Last Major Update:** 2025-10-04 10:30 UTC
-**Version:** v4.6.1 (College List + Scholarship + Readiness Correlation)
+**Last Major Update:** 2025-10-07 09:45 UTC
+**Version:** v1.2 (KBv6 Assessment+GamePlan + Legacy Cleanup) + v5.5 (KB Intel Chips + Vector DB) + v4.6.1 (College + Scholarship)
 
 ---
 
@@ -13,28 +13,36 @@
 3. [Core Schema](#core-schema)
 4. [Universal Ledger (KB Items)](#universal-ledger-kb-items)
 5. [Enumeration Tables](#enumeration-tables)
-6. [Views & Queries](#views--queries)
-7. [Functions & Helpers](#functions--helpers)
-8. [Data Types & Enums](#data-types--enums)
-9. [Indexes & Performance](#indexes--performance)
-10. [Migration History](#migration-history)
-11. [Incremental Updates](#incremental-updates)
+6. [Vector Database (Pinecone) - v5.5](#vector-database-pinecone---v55)
+7. [Views & Queries](#views--queries)
+8. [Functions & Helpers](#functions--helpers)
+9. [Data Types & Enums](#data-types--enums)
+10. [Indexes & Performance](#indexes--performance)
+11. [Migration History](#migration-history)
+12. [Incremental Updates](#incremental-updates)
 
 ---
 
 ## Overview
 
 The Jenny Agentic AI database follows a **hybrid architecture** combining:
-- **Universal Vitals Model**: Append-only temporal facts for student data
-- **Universal KB Items Ledger**: Single table for all targets and outcomes with state machine
-- **Enumeration Tables**: Domain-specific optimized tables for phase-based tracking
-- **Outcomes & Interactions**: Event sourcing for student journey
+- **PostgreSQL (Primary)**: Structured data with temporal resolution
+  - Universal Vitals Model: Append-only temporal facts for student data
+  - Universal KB Items Ledger: Single table for all targets and outcomes with state machine
+  - Enumeration Tables: Domain-specific optimized tables for phase-based tracking
+  - Outcomes & Interactions: Event sourcing for student journey
+- **Pinecone (Vector DB)**: Intel Chips knowledge base (v1.2)
+  - 973 vectors across 4 KBv6 families (sessions+exec: 924, iMessage: 40, assessment+gameplan: 9)
+  - Federated search with namespace isolation and guard protection
+  - Metadata-rich embeddings for reranking
+  - Legacy cleanup complete (100% KBv6)
 
 **Key Principles:**
 - Facts-First: SQL-deterministic queries before RAG fallback
 - Temporal Resolution: Support for first/latest/nth/as-of queries
 - Provenance Tracking: All data linked to sources with evidence chains
 - State Machines: Explicit lifecycle states (Planned → In Transit → Submitted → Outcome → Archived)
+- Vector Search: Semantic retrieval for open-ended queries
 
 ---
 
@@ -305,6 +313,86 @@ CREATE TABLE evidence_links (
 ### kb_items
 **Purpose:** Universal ledger for all student targets and outcomes
 
+---
+
+## KB Intel Tables (v5.4)
+
+### Overview
+**Purpose:** Store coaching intelligence chips from INTEL JSONs with metadata-rich schema for filtering and future contributor mode.
+
+**Key Features:**
+- 7 chip types: tactic, micro_moment, jtbd, framework, reflection, success_path, style
+- Metadata-rich: award, framework, activity, phase, week as top-level columns
+- Content-based deduplication via content_hash
+- Vector search: FAISS (local) + Pinecone (production) with blue/green migration
+
+### kb_sources
+```sql
+CREATE TABLE IF NOT EXISTS kb_sources (
+  source_id TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  meta JSONB
+);
+```
+
+### kb_docs
+```sql
+CREATE TABLE IF NOT EXISTS kb_docs (
+  doc_id TEXT PRIMARY KEY,
+  student_id TEXT,
+  source_kind TEXT CHECK (source_kind IN ('TRANS-INTEL','EXEC-INTEL','IMSG-INTEL','DOCX-RECOVERED','RAW','OTHER')),
+  phase TEXT,
+  week INT,
+  doc_date DATE,
+  title TEXT,
+  path TEXT,
+  meta JSONB,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+```
+
+### kb_chips (v5.4 - Metadata-Rich)
+```sql
+CREATE TABLE IF NOT EXISTS kb_chips (
+  chip_id TEXT PRIMARY KEY,                -- "chip_{sha256(text+meta)}"
+  content_hash TEXT UNIQUE,                -- SHA256 for deduplication
+  doc_id TEXT REFERENCES kb_docs(doc_id) ON DELETE CASCADE,
+  chip_type TEXT CHECK (chip_type IN ('tactic','micro_moment','jtbd','framework','reflection','success_path','style')),
+  text TEXT NOT NULL,                      -- Full chip content
+  tokens INT,
+  student_id TEXT,
+  source_kind TEXT,
+  phase TEXT,
+  week INT,
+  chip_date DATE,
+  award TEXT,                              -- For filtering: e.g. "NCWIT"
+  activity TEXT,                           -- For filtering: e.g. "Empowering AI"
+  framework TEXT,                          -- For filtering: e.g. "168"
+  metrics TEXT[] DEFAULT '{}',
+  confidence NUMERIC,                      -- Extraction confidence 0.0-1.0
+  meta JSONB,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_kb_chips_doc ON kb_chips(doc_id);
+CREATE INDEX IF NOT EXISTS idx_kb_chips_type ON kb_chips(chip_type);
+CREATE INDEX IF NOT EXISTS idx_kb_chips_student ON kb_chips(student_id);
+CREATE INDEX IF NOT EXISTS idx_kb_chips_award ON kb_chips(award) WHERE award IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_kb_chips_framework ON kb_chips(framework) WHERE framework IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_kb_chips_date ON kb_chips(chip_date) WHERE chip_date IS NOT NULL;
+```
+
+**Design Rationale:**
+- **Metadata-first**: Top-level columns (award, framework, activity) enable fast SQL + Pinecone filtering
+- **Content-based dedup**: content_hash UNIQUE prevents duplicates across re-ingestions
+- **Text-based**: Stores full text instead of structured JSON for better embedding quality
+- **Future-proof**: Supports contributor mode (coaches/students submit tactics)
+
+---
+
+### kb_items (Student Targets)
+**Purpose:** Universal ledger for all student targets and outcomes
+
 ```sql
 CREATE TABLE kb_items (
   item_id            TEXT PRIMARY KEY,
@@ -536,6 +624,252 @@ CREATE TABLE sat_timeline_enum (
 - `official` - Official SAT
 - `practice` - Practice test
 - `unknown` - Type not specified
+
+---
+
+## Vector Database (Pinecone) - v1.2
+
+**Release:** 2025-10-07 (v1.2 updated)
+**Status:** Production
+**Purpose:** Semantic search over Intel Chips knowledge base
+
+### Architecture Overview
+
+The vector database stores **Intel Chips** - high-density knowledge artifacts extracted from Jenny's complete engagement lifecycle: pre-assessment, weekly sessions, execution frameworks, and micro-interactions. These chips support semantic retrieval for open-ended queries that cannot be answered via SQL.
+
+**Key Metrics:**
+- **Total Vectors:** 973 (v1.2 - 100% KBv6, legacy cleaned)
+- **Embedding Model:** `text-embedding-3-large` (3072 dimensions)
+- **Metric:** Cosine similarity
+- **Index:** `jenny-v3-3072-093025`
+- **Namespaces:** 3 KBv6 namespaces (sessions+exec, iMessage, assessment+gameplan)
+- **Security:** Namespace guard (`PINECONE_ALLOWED_NAMESPACES`) blocks unauthorized access
+
+### Four-Family Schema (KBv6)
+
+| Family | Namespace | Count | Chip Types | ID Format |
+|--------|-----------|-------|------------|-----------|
+| **Sessions+Exec** | `KBv6_2025-10-06_v1.0` | 924 | Framework, Strategy, Tactic, Result, Silver, Trust, Insight, Channel, Adaptation, Relatability, Framework_Chip | `W024-FRAMEWORK-001`, `W001-FRAMEWORK-168HOUR` |
+| **iMessage** | `KBv6_iMessage_2025-10-07_v1.0` | 40 | Message_Template_Chip, Tone_Cue_Chip, Escalation_Pattern_Chip, Micro_Tactic_Chip, Turnaround_Case_Chip | `IMSG-ESCALATIONPATTERNCHIP-abc123` |
+| **Assessment+GamePlan** | `KBv6_Assessment_2025-10-07_v1.0` | 9 | Insight_Chip, Trust_Chip, Strategy_Chip, Silver_Bullet_Chip | `ASSESS-INSIGHT-001`, `GAMEPLAN-STRATEGY-001` |
+
+**Timeline Boundaries:**
+- **Assessment** (pre-execution): Rapid assessment, strengths/gaps mapping, constraint identification
+- **GamePlan** (pre-execution): Tactics, portfolio architecture, identity synthesis
+- **W001 Execution** (post-assessment/gameplan): 168-hour framework, weekly planning cadence
+
+### Vector Schema
+
+**Pinecone Vector Format:**
+```json
+{
+  "id": "W024-FRAMEWORK-001",
+  "values": [0.123, -0.456, ...],  // 3072 dimensions
+  "metadata": {
+    "chip_id": "W024-FRAMEWORK-001",
+    "chip_family": "session",
+    "type": "Framework_Chip",
+    "week": "024",
+    "phase": "P3-JUNIOR",
+    "quality_score": 0.96,
+    "confidence_score": 0.94,
+    "content": "Assessment→Acceptance Ladder — A nine-rung execution...",
+    "filename": "2023-06-21_W024_SessionNotes.pdf",
+    "participants": ["Jenny", "Huda"],
+
+    // iMessage chips only:
+    "situation_tag": "deadline_crunch"  // 16 possible tags
+  }
+}
+```
+
+### Metadata Fields
+
+**Common Fields (all chips):**
+- `chip_id` (string) - Unique identifier
+- `chip_family` (string) - "session", "exec", "imessage", "assessment", or "gameplan"
+- `type` (string) - Chip type (Framework_Chip, Insight_Chip, etc.)
+- `week` (string) - Week number or "IMSG"/"000"/"001" (for W001 exec chips)
+- `phase` (string) - Student phase (P1-P5, EXEC, IMSG, FOUNDATION)
+- `quality_score` (float) - Content quality (0.85-0.98)
+- `confidence_score` (float) - Extraction confidence (0.85-0.95)
+- `content` (string) - Full chip text (truncated to 500 chars in metadata)
+- `filename` (string) - Source document
+- `participants` (array) - ["Jenny", "Huda", ...]
+
+**iMessage-Specific Fields:**
+- `situation_tag` (string) - One of 16 situation tags:
+  - `deadline_crunch`, `parent_pushback`, `confidence_reset`
+  - `recommender_outreach`, `blocker_unresponsive`, `time_management`
+  - `scope_creep`, `application_clarification`, `health_crisis`
+  - `schedule_conflict`, `offer_evaluation`, `scholarship_strategy`
+  - `logistics_followup`, `essay_block`, `testing_strategy`, `interview_prep`
+- `original_chip_id` (string) - Original ID before v3 transformation
+
+### Chip Types Distribution
+
+**Session Chips (877):**
+- FRAMEWORK: 93 (structural playbooks)
+- STRATEGY: 120 (multi-step approaches)
+- TACTIC: 150 (concrete actions)
+- RESULT: 85 (outcome examples)
+- SILVER: 45 (high-impact silver bullets)
+- TRUST: 120 (mindset/confidence resets)
+- INSIGHT: 90 (key realizations)
+- CHANNEL: 75 (communication strategies)
+- ADAPTATION: 60 (course corrections)
+- RELATABILITY: 39 (relatable examples)
+
+**Execution Chips (46):**
+- Framework_Chip: 46 (cross-week execution frameworks)
+  - Assessment→Acceptance Ladder (9-rung framework)
+  - Outcome Correlation Map (task-to-evidence mapping)
+  - Narrative Architecture (thread weave)
+  - Synthoria DNA Embedding (identity OS)
+  - Proofpack Structure (artifacts & testimonials)
+
+**iMessage Chips (40):**
+- Message_Template_Chip: 12 (reusable scripts)
+- Tone_Cue_Chip: 8 (emoji/tone guidance)
+- Escalation_Pattern_Chip: 10 (progressive urgency)
+- Micro_Tactic_Chip: 6 (quick-fix one-liners)
+- Turnaround_Case_Chip: 4 (48-hour success stories)
+
+### Federated Search
+
+**Strategy:** Pool results from multiple namespaces, then rerank by score
+
+**Query Flow:**
+1. Embed query with `text-embedding-3-large`
+2. Query each namespace in parallel (topK=10 per namespace)
+3. Pool all results into single list
+4. Sort by cosine similarity score
+5. Return top-8 results
+
+**Filter Options:**
+- `source: 'both'` - Query all namespaces
+- `source: 'sessions'` - Query sessions+exec only
+- `source: 'imessage'` - Query iMessage only
+
+**Implementation:** `services/jenny-api/src/services/kb_resolver.ts`
+
+### Data Sources
+
+**Session Chips:**
+```
+data/kb_intel_chips/chips/
+├── w001_intel_chips_batch.json  (10 chips)
+├── w002_intel_chips_batch.json  (10 chips)
+...
+└── w093_chips.json              (10 chips)
+```
+
+**Execution Chips:**
+```
+data/kb_intel_chips/exec-chips/
+└── EXEC_Intel_Chips_Batch_v2.jsonl  (46 chips)
+```
+
+**iMessage Chips:**
+```
+data/kb_intel_chips/imsg-chips/
+├── iMessage_Intel_Chips_Batch_v3.jsonl     (40 chips)
+└── imsg_situations_taxonomy.json           (16 situation tags)
+```
+
+### Ingestion Pipeline
+
+**Scripts:**
+- `tools/ingest/embed_kb_v6_to_v8.py` - Embed sessions+exec chips
+- `tools/ingest/embed_imsg_chips_v3.py` - Embed iMessage chips (with --overwrite)
+- `tools/ingest/transform_imsg_chips_v3.py` - Transform v2→v3 (add situation_tag)
+- `tools/ingest/validate_kb_v6_chips.py` - Validate KB v6 schema
+
+**Workflow:**
+```bash
+# 1. Validate schema
+python3 tools/ingest/validate_kb_v6_chips.py data/kb_intel_chips/chips/
+
+# 2. Embed to Pinecone
+python3 tools/ingest/embed_kb_v6_to_v8.py \
+  --input data/kb_intel_chips/chips/ \
+  --namespace KBv6_2025-10-06_v1.0
+
+# 3. Verify counts
+python3 tools/qa/check_vector_counts.py
+```
+
+### Quality Assurance
+
+**QA Suite Location:** `tools/qa/`
+
+**Components:**
+1. **Smoke Tests** - 2 queries, 10 seconds
+2. **Vector Count Validation** - Expected: 923 + 40
+3. **Precision Probes** - 25 golden queries
+4. **Federated Search Check** - Namespace isolation
+5. **Drift Watch** - Count monitoring (alert if > 2% drift)
+6. **Deployment Version Check** - Manifest validation
+7. **Backup Utility** - Snapshot/rollback capability
+
+**CI/CD:** `.github/workflows/kb-qa.yml`
+- Smoke tests on PRs (blocks merge if fails)
+- Full suite nightly
+- Drift watch nightly
+
+### Performance
+
+**Query Latency (P90):**
+- Single namespace: ~250ms
+- Federated (both): ~450ms
+
+**Precision (v5.5 baseline):**
+- Sessions: Top-1 ≥ 0.50 on 78% probes
+- iMessage: Top-1 ≥ 0.48 on 89% probes
+- Top-3 coverage: 100% for both families
+
+**Storage:**
+- Pinecone vectors: ~12.3MB
+- Metadata: ~2MB
+- Total: ~14.5MB
+
+### Operational Procedures
+
+**Daily:**
+- Run smoke tests before deploy: `./tools/qa/smoke_tests.sh`
+- Check deployment version: `python3 tools/qa/check_deployment_version.py`
+
+**Weekly:**
+- Review precision probe trends
+- Check drift reports: `data/kb_intel_chips/qa_runs/drift_*/`
+
+**Before Re-Embed:**
+1. Backup: `python3 tools/qa/backup_namespace.py --all`
+2. Note baseline counts
+3. Document expected changes
+
+**After Re-Embed:**
+1. Verify deployment version
+2. Run smoke tests
+3. Check drift matches expected delta
+4. Update manifest if permanent
+
+### Migration from v5.4
+
+**Changes:**
+- ✅ Upgraded: `text-embedding-3-small` → `text-embedding-3-large`
+- ✅ Added execution chips (46 W000-prefixed frameworks)
+- ✅ Added iMessage chips (40 micro-interactions)
+- ✅ Implemented federated search (2 namespaces)
+- ⚠️ **Breaking:** Namespace names changed (date-stamped)
+
+**Rollback:**
+```bash
+# Restore from snapshot
+cd data/kb_intel_chips/snapshots/YYYYMMDD_HHMMSS/
+cat MANIFEST.json  # Review snapshot details
+# Use Pinecone API to restore from vector_ids
+```
 
 ---
 

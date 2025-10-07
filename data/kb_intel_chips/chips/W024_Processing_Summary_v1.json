@@ -1,0 +1,44 @@
+{
+  "processing_summary": {
+    "source_file": "w024_intel_chips_batch.json",
+    "source_type": "NORMALIZED_FROM_LEGACY",
+    "date_processed": "2025-10-07",
+    "week": "024",
+    "phase": "",
+    "session_date": "2024-01-06",
+    "participants": [
+      "Jenny Duan",
+      "Huda",
+      "Huda's Dad (Ivylevel/Sarash)"
+    ],
+    "duration": "~60 minutes",
+    "version": "v1"
+  },
+  "chips_generated": {
+    "total_count": 10,
+    "chip_types": {
+      "Insight_Chip": 2,
+      "Strategy_Chip": 3,
+      "Tactic_Chip": 1,
+      "Framework_Chip": 1,
+      "Adaptation_Chip": 1,
+      "Trust_Chip": 1,
+      "Result_Chip": 1
+    }
+  },
+  "verification_status": {
+    "schema_integrity": "PASS",
+    "ontology_fit": "PASS",
+    "embedding_ready": true,
+    "notes": [
+      "Legacy chips normalized to KB v6 schema",
+      "Chip IDs regenerated to W{week}-{TYPE}-NNN format",
+      "Content flattened from chip_content when needed",
+      "Insight vectors auto-derived from first sentence"
+    ]
+  },
+  "output_files": {
+    "jsonl_batch": "W024_Intel_Chips_Batch_v1.jsonl",
+    "processing_summary": "W024_Processing_Summary_v1.json"
+  }
+}

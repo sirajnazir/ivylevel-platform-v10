@@ -1,0 +1,380 @@
+{
+  "validation_metadata": {
+    "timestamp": "2025-10-07T06:36:42.678917Z",
+    "validator_version": "1.0.0",
+    "schema_version": "6.0",
+    "chips_directory": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips",
+    "chip_category": "iMessage"
+  },
+  "summary": {
+    "total_files": 2,
+    "total_chips": 40,
+    "valid_chips": 1,
+    "invalid_chips": 39,
+    "validation_pass_rate": 2.5,
+    "files_passed": 0,
+    "files_failed": 2,
+    "files_errored": 0
+  },
+  "files": [
+    {
+      "filename": "iMessage_Intel_Chips_Batch_v1.jsonl",
+      "file_path": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v1.jsonl",
+      "status": "FAIL",
+      "total_chips": 12,
+      "valid_chips": 0,
+      "invalid_chips": 12,
+      "errors": [
+        {
+          "chip_id": "IM-2024-03-01-CRISIS-REC-001",
+          "line": 1,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-03-01-CRISIS-REC-001",
+            "Invalid type 'Crisis_Intervention_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-03-TONE-COUNSELOR-002",
+          "line": 2,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-03-03-TONE-COUNSELOR-002",
+            "Invalid type 'Tone_Style_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-04-PLAYBOOK-LOR-003",
+          "line": 3,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-03-04-PLAYBOOK-LOR-003",
+            "Invalid type 'Microtactic_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-09-SCHED-RAMADAN-004",
+          "line": 4,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-03-09-SCHED-RAMADAN-004",
+            "Invalid type 'Boundary_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-14-REJECTION-ALCHEMY-005",
+          "line": 5,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-03-14-REJECTION-ALCHEMY-005",
+            "Invalid type 'Crisis_Intervention_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-24-DECISION-FRAME-006",
+          "line": 6,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-03-24-DECISION-FRAME-006",
+            "Invalid type 'Microtactic_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-06-EC-LEADERSHIP-007",
+          "line": 7,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-10-06-EC-LEADERSHIP-007",
+            "Invalid type 'Strategy_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-07-ESSAY-CURIOSITY-008",
+          "line": 8,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-10-07-ESSAY-CURIOSITY-008",
+            "Invalid type 'Insight_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-10-DISNEY-FASTCAR-009",
+          "line": 9,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-10-10-DISNEY-FASTCAR-009",
+            "Invalid type 'Microtactic_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-11-AWARD-vs-EC-010",
+          "line": 10,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-10-11-AWARD-vs-EC-010",
+            "Invalid type 'Decision_Framework_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-23-FORMATTING-011",
+          "line": 11,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-10-23-FORMATTING-011",
+            "Invalid type 'Microtactic_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-28-CADENCE-012",
+          "line": 12,
+          "errors": [
+            "Invalid chip_id format (must start with 'IMSG-'): IM-2024-10-28-CADENCE-012",
+            "Invalid type 'Accountability_Chip'. Must be one of: Accountability, Boundary, Crisis_Intervention, Decision_Framework, Microtactic, Script, Strategy, Tone_Style",
+            "source_doc missing required field: week_range",
+            "source_doc missing required field: date_span",
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION",
+            "metadata missing required field: phase_enum"
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "iMessage_Intel_Chips_Batch_v2.jsonl",
+      "file_path": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v2.jsonl",
+      "status": "FAIL",
+      "total_chips": 28,
+      "valid_chips": 1,
+      "invalid_chips": 27,
+      "errors": [
+        {
+          "chip_id": "IMSG-P1-MICRO-001",
+          "line": 2,
+          "errors": [
+            "Invalid phase 'P1P2-FOUNDATION-BUILDING'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P1-BOUND-001",
+          "line": 3,
+          "errors": [
+            "Invalid phase 'P1P2-FOUNDATION-BUILDING'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P2-CRISIS-001",
+          "line": 4,
+          "errors": [
+            "Invalid phase 'P2P3-BUILDING-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P2-STRAT-001",
+          "line": 5,
+          "errors": [
+            "Invalid phase 'P2P3-BUILDING-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P2-DF-001",
+          "line": 6,
+          "errors": [
+            "Invalid phase 'P2P3-BUILDING-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P3-ACC-001",
+          "line": 7,
+          "errors": [
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P3-MICRO-002",
+          "line": 8,
+          "errors": [
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P3-TONE-001",
+          "line": 9,
+          "errors": [
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P4-CRISIS-002",
+          "line": 10,
+          "errors": [
+            "Invalid phase 'P4P5-SUMMER-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P4-STRAT-002",
+          "line": 11,
+          "errors": [
+            "Invalid phase 'P4P5-SUMMER-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P5-DF-002",
+          "line": 12,
+          "errors": [
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P5-ACCOUNT-001",
+          "line": 13,
+          "errors": [
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-PX-SYN-001",
+          "line": 14,
+          "errors": [
+            "Invalid phase 'P1P5-ALL'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-PX-TONE-002",
+          "line": 15,
+          "errors": [
+            "Invalid phase 'P1P5-ALL'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-RAW-MICRO-003",
+          "line": 16,
+          "errors": [
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-RAW-BOUND-002",
+          "line": 17,
+          "errors": [
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-RAW-CRISIS-003",
+          "line": 18,
+          "errors": [
+            "Invalid phase 'P3→P4'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-TONE-LOR-001",
+          "line": 19,
+          "errors": [
+            "Invalid phase 'P4P5-SUMMER-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-TONE-TEACHER-001",
+          "line": 20,
+          "errors": [
+            "Invalid phase 'P4P5-SUMMER-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P3-BOUND-RAM-001",
+          "line": 21,
+          "errors": [
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P5-MICRO-ESSAY-001",
+          "line": 22,
+          "errors": [
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P5-STRAT-FASTCAR-001",
+          "line": 23,
+          "errors": [
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-META-NOCONFLICT-001",
+          "line": 24,
+          "errors": [
+            "Invalid phase 'P1P5-ALL'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P3-MICRO-OUTREACH-001",
+          "line": 25,
+          "errors": [
+            "Invalid phase 'P3-JUNIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P4-BOUND-PORTAL-001",
+          "line": 26,
+          "errors": [
+            "Invalid phase 'P4P5-SUMMER-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-P5-ACCOUNT-FOCUS-002",
+          "line": 27,
+          "errors": [
+            "Invalid phase 'P5-SENIOR'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        },
+        {
+          "chip_id": "IMSG-PX-TONE-REF-001",
+          "line": 28,
+          "errors": [
+            "Invalid phase 'P1P5-ALL'. Must be one of: P1-FOUNDATION, P2-APPLICATION_INTENSITY, P3-APPLICATION_CLIMAX, P4-DECISIONS_CELEBRATION"
+          ]
+        }
+      ]
+    }
+  ],
+  "embedding_readiness": {
+    "ready_for_embedding": false,
+    "target_index": "jenny-v3-3072-093025",
+    "embedding_model": "text-embedding-3-large",
+    "suggested_namespace": "KBv6_iMessage_2025-10-07_v1.0"
+  }
+}

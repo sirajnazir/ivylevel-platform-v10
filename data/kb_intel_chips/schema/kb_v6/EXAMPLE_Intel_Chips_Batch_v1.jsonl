@@ -1,0 +1,3 @@
+
+{"chip_id": "W001-INSIGHT-001", "type": "Insight_Chip", "content": "Example insight content...", "source_doc": {"week": "001"}, "metadata": {"participants": ["Jenny", "Huda"]}, "insight_vector": "example insight vector"}
+{"chip_id": "W001-STRATEGY-001", "type": "Strategy_Chip", "content": "Example strategy content...", "source_doc": {"week": "001"}, "metadata": {"participants": ["Jenny", "Huda"]}, "insight_vector": "example strategy vector"}

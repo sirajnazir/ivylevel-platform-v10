@@ -1,0 +1,123 @@
+{
+  "validation_metadata": {
+    "timestamp": "2025-10-07T06:38:13.715317Z",
+    "validator_version": "1.0.0",
+    "schema_version": "6.0",
+    "chips_directory": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips",
+    "chip_category": "iMessage"
+  },
+  "summary": {
+    "total_files": 2,
+    "total_chips": 40,
+    "valid_chips": 29,
+    "invalid_chips": 11,
+    "validation_pass_rate": 72.5,
+    "files_passed": 1,
+    "files_failed": 1,
+    "files_errored": 0
+  },
+  "files": [
+    {
+      "filename": "iMessage_Intel_Chips_Batch_v1.jsonl",
+      "file_path": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v1.jsonl",
+      "status": "FAIL",
+      "total_chips": 12,
+      "valid_chips": 1,
+      "invalid_chips": 11,
+      "errors": [
+        {
+          "chip_id": "IM-2024-03-03-TONE-COUNSELOR-002",
+          "line": 2,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-04-PLAYBOOK-LOR-003",
+          "line": 3,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-09-SCHED-RAMADAN-004",
+          "line": 4,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-14-REJECTION-ALCHEMY-005",
+          "line": 5,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-03-24-DECISION-FRAME-006",
+          "line": 6,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-06-EC-LEADERSHIP-007",
+          "line": 7,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-07-ESSAY-CURIOSITY-008",
+          "line": 8,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-10-DISNEY-FASTCAR-009",
+          "line": 9,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-11-AWARD-vs-EC-010",
+          "line": 10,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-23-FORMATTING-011",
+          "line": 11,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        },
+        {
+          "chip_id": "IM-2024-10-28-CADENCE-012",
+          "line": 12,
+          "errors": [
+            "source_doc must have either (week_range AND date_span) OR date_range"
+          ]
+        }
+      ]
+    },
+    {
+      "filename": "iMessage_Intel_Chips_Batch_v2.jsonl",
+      "file_path": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v2.jsonl",
+      "status": "PASS",
+      "total_chips": 28,
+      "valid_chips": 28,
+      "invalid_chips": 0,
+      "errors": []
+    }
+  ],
+  "embedding_readiness": {
+    "ready_for_embedding": false,
+    "target_index": "jenny-v3-3072-093025",
+    "embedding_model": "text-embedding-3-large",
+    "suggested_namespace": "KBv6_iMessage_2025-10-07_v1.0"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "version": "v1.2",
+  "deployment_date": "2025-10-07",
+  "expected_namespaces": {
+    "sessions_exec": {
+      "name": "KBv6_2025-10-06_v1.0",
+      "vector_count": 924,
+      "chip_families": ["session", "exec"],
+      "embedding_model": "text-embedding-3-large",
+      "embedding_dim": 3072,
+      "metric": "cosine",
+      "description": "93 weeks of sessions (877 chips) + 46 execution framework chips + 1 W001-FRAMEWORK-168HOUR"
+    },
+    "imessage": {
+      "name": "KBv6_iMessage_2025-10-07_v1.0",
+      "vector_count": 40,
+      "chip_families": ["imessage"],
+      "embedding_model": "text-embedding-3-large",
+      "embedding_dim": 3072,
+      "metric": "cosine",
+      "description": "40 iMessage Intel Chips v3 with situation tags"
+    },
+    "assessment_gameplan": {
+      "name": "KBv6_Assessment_2025-10-07_v1.0",
+      "vector_count": 9,
+      "chip_families": ["assessment", "gameplan"],
+      "embedding_model": "text-embedding-3-large",
+      "embedding_dim": 3072,
+      "metric": "cosine",
+      "description": "4 Assessment chips + 5 GamePlan chips from W001 foundation phase (168-hour removed)"
+    }
+  },
+  "pinecone_index": "jenny-v3-3072-093025",
+  "schema_version": "6.0",
+  "ingest_sources": [
+    "data/kb_intel_chips/chips/w{001-093}_intel_chips*.json",
+    "data/kb_intel_chips/exec-chips/EXEC_Intel_Chips_Batch_v2.jsonl",
+    "data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v3.jsonl",
+    "data/kb_intel_chips/gameplan-chips/chips/ASSESS_Intel_Chips_Batch_v1.jsonl",
+    "data/kb_intel_chips/gameplan-chips/chips/GAMEPLAN_Intel_Chips_Batch_v1.jsonl"
+  ],
+  "qa_thresholds": {
+    "top1_min": 0.50,
+    "top1_min_imsg": 0.48,
+    "top1_min_assess": 0.50,
+    "top3_coverage": 1.00,
+    "outlier_max": 0.02,
+    "drift_max": 0.02
+  },
+  "last_validated": "2025-10-07T09:45:00Z",
+  "legacy_cleanup": {
+    "status": "completed",
+    "description": "Legacy namespaces successfully deleted. Index is clean (KBv6 only).",
+    "execution_timestamp": "2025-10-07T09:43:00Z",
+    "deleted_namespaces": {
+      "jenny_v2": 877,
+      "interactions": 346,
+      "jtbd": 148
+    },
+    "total_vectors_removed": 1371,
+    "backups_created": [
+      "backups/jenny_v2_backup_20251007_093918.json",
+      "backups/interactions_backup_20251007_093919.json",
+      "backups/jtbd_backup_20251007_093919.json"
+    ],
+    "post_cleanup_verification": {
+      "total_vectors": 973,
+      "vector_count_check": "PASS",
+      "smoke_tests": "PASS",
+      "audit_status": "CLEAN"
+    }
+  },
+  "changelog": {
+    "v1.2": "Added W001-FRAMEWORK-168HOUR to Sessions+Exec (924 total). Removed 168-hour from Assessment (9 total). Timeline correction: 168-hour belongs to W001 execution, not pre-assessment. Implemented and executed legacy namespace cleanup (removed 1,371 vectors from jenny_v2, interactions, jtbd). Production now 100% KBv6.",
+    "v1.1": "Initial Assessment+GamePlan namespace added (10 vectors).",
+    "v1.0": "Baseline deployment (Sessions+Exec 923, iMessage 40)."
+  }
+}

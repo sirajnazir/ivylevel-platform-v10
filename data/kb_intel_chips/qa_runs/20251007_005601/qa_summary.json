@@ -1,0 +1,20 @@
+{
+  "timestamp": "20251007_005601",
+  "index": "jenny-v3-3072-093025",
+  "namespaces": {
+    "sessions": "KBv6_2025-10-06_v1.0",
+    "imessage": "KBv6_iMessage_2025-10-07_v1.0"
+  },
+  "checks": {
+    "vector_counts": "PASS",
+    "metadata_integrity": "FAIL",
+    "precision_probes": "FAIL",
+    "structural_qa": "FAIL",
+    "final": "done"
+  },
+  "summary": {
+    "pass_count": 1,
+    "fail_count": 3,
+    "total_count": 4
+  }
+}

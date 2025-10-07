@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Intel Chip Schema",
+  "type": "object",
+  "properties": {
+    "chip_id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "source_doc": {
+      "type": "object"
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "content": {
+      "type": "string"
+    },
+    "insight_vector": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "chip_id",
+    "type",
+    "source_doc",
+    "metadata",
+    "content"
+  ]
+}

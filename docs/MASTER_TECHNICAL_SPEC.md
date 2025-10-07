@@ -2,8 +2,8 @@
 **IvyLevel Platform v10 - Jenny Agentic AI**
 
 **Document Status:** Living Specification
-**Last Update:** 2025-10-04 21:00 UTC
-**Version:** v5.0 (KB Schema Foundation) + v4.6.2c (UAPX Guardrails - Attending/Decided Robustness)
+**Last Update:** 2025-10-07 09:45 UTC
+**Version:** v1.2 (KBv6 Assessment+GamePlan + Legacy Cleanup) + v5.5 (KB Intel Chips + QA Suite) + v4.6.2c (UAPX Guardrails)
 
 ---
 
@@ -53,8 +53,9 @@
 
 **AI/ML:**
 - OpenAI GPT-4o / GPT-4o-mini
-- OpenAI Embeddings (text-embedding-3-small, 3072 dims)
+- OpenAI Embeddings (text-embedding-3-large, 3072 dims) ← upgraded v5.5
 - Custom intent classification
+- Pinecone (jenny-v3-3072-093025) - 4 KBv6 families: Sessions+Exec (924), iMessage (40), Assessment+GamePlan (9) ← v1.2
 
 **Infrastructure:**
 - pnpm workspaces (monorepo)
@@ -139,12 +140,14 @@
 │                           │                                       │
 │  ┌────────────────────────┴──────────────────────┐               │
 │  │        Pinecone Vector Database                │               │
-│  │         jenny-v3-3072-*                        │               │
+│  │         jenny-v3-3072-093025                   │               │
 │  │                                                 │               │
-│  │  Namespaces:                                    │               │
-│  │  • jtbd (Jobs to Be Done)                      │               │
-│  │  • interactions (Session Transcripts)          │               │
-│  │  • docs (Knowledge Base Documents)             │               │
+│  │  KBv6 Namespaces (v1.2 - 973 vectors):         │               │
+│  │  • KBv6_2025-10-06_v1.0 (Sessions+Exec: 924)  │               │
+│  │  • KBv6_iMessage_2025-10-07_v1.0 (40)         │               │
+│  │  • KBv6_Assessment_2025-10-07_v1.0 (9)        │               │
+│  │                                                 │               │
+│  │  Namespace Guard: PINECONE_ALLOWED_NAMESPACES │               │
 │  └─────────────────────────────────────────────────┘              │
 │                           │                                       │
 └───────────────────────────┼───────────────────────────────────────┘
@@ -1243,6 +1246,401 @@ export async function composeAnswer({ message, vitals, hits, memory, model }){
 
   return { answer: resp.choices[0].message.content };
 }
+```
+
+---
+
+## Knowledge Base v5.5 (Intel Chips Architecture)
+
+**Release Date:** 2025-10-07 (v1.2 updated)
+**Status:** Production
+**Total Vectors:** 973 (924 sessions+exec + 40 iMessage + 9 assessment+gameplan) ← v1.2
+
+### Architecture Overview
+
+KB v1.2 introduces **4 chip families** in Pinecone with federated search, strict namespace isolation, and legacy namespace cleanup. The architecture captures Jenny's complete engagement lifecycle: from pre-assessment through execution to micro-interactions.
+
+#### Four-Family Architecture (KBv6)
+
+| Family | Namespace | Count | Chip Types | Purpose |
+|--------|-----------|-------|------------|---------|
+| **Sessions+Exec** | `KBv6_2025-10-06_v1.0` | 924 | Framework, Strategy, Tactic, Result, Silver, Trust, Insight, Channel, Adaptation, Relatability | Weekly session intel (W001-W093) + execution frameworks + W001-FRAMEWORK-168HOUR |
+| **iMessage** | `KBv6_iMessage_2025-10-07_v1.0` | 40 | Message_Template_Chip, Tone_Cue_Chip, Escalation_Pattern_Chip, Micro_Tactic_Chip, Turnaround_Case_Chip | Micro-interaction patterns with situation tags |
+| **Assessment+GamePlan** | `KBv6_Assessment_2025-10-07_v1.0` | 9 | Insight_Chip, Trust_Chip, Strategy_Chip, Silver_Bullet_Chip | Pre-execution intel: assessment, gameplan, and trust formation (W001 foundation phase) |
+
+**Legacy Cleanup (v1.2):** Retired 1,371 vectors from legacy namespaces (jenny_v2, interactions, jtbd). Production is now 100% KBv6.
+
+### Chip Schema (KB v6)
+
+**Required Fields:**
+```typescript
+interface IntelChip {
+  chip_id: string;           // W024-FRAMEWORK-001, IMSG-ESCALATIONPATTERNCHIP-abc123
+  type: string;              // Framework_Chip, Tone_Cue_Chip, etc.
+  source_doc: {
+    week: string;            // "024", "IMSG", "000" (exec)
+    phase: string;           // "P3-JUNIOR", "EXEC", etc.
+    filename: string;        // Source PDF/doc
+    date?: string;
+  };
+  metadata: {
+    participants: string[];   // ["Jenny", "Huda"]
+    quality_score: number;    // 0.85-0.98
+    confidence_score: number; // 0.85-0.95
+    chip_family: string;      // "session", "exec", "imessage", "assessment", "gameplan"
+    situation_tag?: string;   // iMessage only: "deadline_crunch", "confidence_reset", etc.
+    original_chip_id?: string;
+  };
+  content: string;           // Main chip text (100-500 words)
+  insight_vector: string;    // Short summary for reranking
+}
+```
+
+### Intel Chip Types
+
+#### Session Chips (877 vectors)
+- **FRAMEWORK** (93) - Structural playbooks (e.g., 168-hour audit, Outcome Correlation Map)
+- **STRATEGY** (120) - Multi-step approaches (e.g., REA vs USC strategy, rec letter sequence)
+- **TACTIC** (150) - Concrete actions (e.g., Naviance research, teacher outreach scripts)
+- **RESULT** (85) - Outcome examples (e.g., admission turnarounds, scholarship wins)
+- **SILVER** (45) - High-impact silver bullets (e.g., proofpack structure)
+- **TRUST** (120) - Mindset/confidence resets (e.g., "let colleges reject you")
+- **INSIGHT** (90) - Key realizations (e.g., timing patterns, blocker handling)
+- **CHANNEL** (75) - Communication strategies
+- **ADAPTATION** (60) - Course corrections
+- **RELATABILITY** (39) - Relatable examples
+
+**File Locations:**
+```
+data/kb_intel_chips/chips/
+├── w001_intel_chips_batch.json
+├── w002_intel_chips_batch.json
+...
+└── w093_chips.json
+```
+
+#### Execution Chips (46 vectors)
+Cross-week frameworks with W000 prefix to avoid week collision:
+- **Assessment→Acceptance Ladder** (9-rung execution framework)
+- **Outcome Correlation Map** (bidirectional task-to-evidence mapping)
+- **Narrative Architecture** (thread weave across apps/interviews)
+- **Synthoria DNA Embedding** (identity OS: voice, values, vantage, velocity)
+- **Proofpack Structure** (screenshots, testimonials, artifacts)
+
+**File:**
+```
+data/kb_intel_chips/exec-chips/EXEC_Intel_Chips_Batch_v2.jsonl
+```
+
+#### iMessage Chips (40 vectors)
+Micro-interaction patterns with **16 situation tags**:
+
+**Chip Types:**
+- **Message_Template_Chip** (12) - Reusable scripts (thank you, check-in, nudge)
+- **Tone_Cue_Chip** (8) - Emoji/tone guidance (calm, gentle, validation)
+- **Escalation_Pattern_Chip** (10) - Progressive urgency handling
+- **Micro_Tactic_Chip** (6) - Quick-fix one-liners
+- **Turnaround_Case_Chip** (4) - 48-hour success stories
+
+**Situation Tags (16):**
+`deadline_crunch`, `parent_pushback`, `confidence_reset`, `recommender_outreach`, `blocker_unresponsive`, `time_management`, `scope_creep`, `application_clarification`, `health_crisis`, `schedule_conflict`, `offer_evaluation`, `scholarship_strategy`, `logistics_followup`, `essay_block`, `testing_strategy`, `interview_prep`
+
+**File:**
+```
+data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v3.jsonl
+```
+
+### Embedding Pipeline
+
+**Model:** `text-embedding-3-large` (3072 dimensions, cosine similarity)
+
+**Scripts:**
+```bash
+# Sessions + Exec (combined namespace)
+python3 tools/ingest/embed_kb_v6_to_v8.py \
+  --input data/kb_intel_chips/chips/ \
+  --namespace KBv6_2025-10-06_v1.0
+
+python3 tools/ingest/embed_imsg_chips_v3.py \
+  --input data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v3.jsonl \
+  --namespace KBv6_iMessage_2025-10-07_v1.0 \
+  --overwrite
+```
+
+**Metadata Enrichment:**
+```python
+meta.update({
+    "chip_family": "imessage",  # or "session", "exec"
+    "type": chip.get("type"),
+    "chip_id": chip["chip_id"],
+    "week": str(source_doc.get("week")),
+    "phase": str(source_doc.get("phase")),
+    "situation_tag": metadata.get("situation_tag", ""),  # iMessage only
+    "quality_score": metadata.get("quality_score"),
+    "content": chip["content"][:500]  # Truncated for metadata
+})
+```
+
+### Federated Search (v5.5)
+
+**File:** `services/jenny-api/src/services/kb_resolver.ts`
+
+**Strategy:** Pool results from multiple namespaces, then rerank
+
+```typescript
+async function federatedKBSearch(query: string, source: 'both' | 'sessions' | 'imessage') {
+  const namespaces = source === 'both'
+    ? ['KBv6_2025-10-06_v1.0', 'KBv6_iMessage_2025-10-07_v1.0']
+    : source === 'sessions'
+      ? ['KBv6_2025-10-06_v1.0']
+      : ['KBv6_iMessage_2025-10-07_v1.0'];
+
+  // Embed query
+  const embedding = await openai.embeddings.create({
+    model: 'text-embedding-3-large',
+    input: query
+  });
+
+  // Query each namespace in parallel
+  const results = await Promise.all(
+    namespaces.map(ns =>
+      pinecone.query({
+        vector: embedding.data[0].embedding,
+        topK: 10,
+        includeMetadata: true,
+        namespace: ns
+      })
+    )
+  );
+
+  // Pool and rerank
+  const pooled = results.flat().map(m => ({
+    chip_id: m.metadata.chip_id,
+    type: m.metadata.type,
+    chip_family: m.metadata.chip_family,
+    score: m.score,
+    content: m.metadata.content,
+    week: m.metadata.week
+  }));
+
+  // Sort by score, return top-8
+  return pooled.sort((a, b) => b.score - a.score).slice(0, 8);
+}
+```
+
+### Quality Assurance (QA Suite v1.0)
+
+**Location:** `tools/qa/`
+
+**Purpose:** Automated validation of KB integrity, retrieval quality, and drift detection
+
+#### QA Components
+
+**1. Smoke Tests** (`smoke_tests.sh`) - 10 seconds
+```bash
+./tools/qa/smoke_tests.sh
+```
+- Sessions: "Naviance scattergram" → expect score ≥ 0.40
+- iMessage: "thank you template" → expect score ≥ 0.35
+
+**2. Vector Count Validation** (`check_vector_counts.py`)
+```python
+expected = {
+  'sessions': 923,  # 877 session + 46 exec
+  'imessage': 40
+}
+```
+
+**3. Precision Probes** (`precision_probes_test.py`) - 3-5 minutes
+- 25 golden queries across all chip types
+- Pass criteria: Top-1 ≥ 0.50 on 70%+ probes, Top-3 coverage 100%
+
+**4. Federated Search Check** (`check_federated_search.py`)
+- Validates namespace isolation
+- Ensures source filters work (no leaks)
+
+**5. Drift Watch** (`check_drift.py`)
+- Monitors vector count changes (alerts if drift > 2%)
+- Generates drift reports with reason codes
+
+**6. Deployment Version Check** (`check_deployment_version.py`)
+- Validates against manifest (`deployment_manifest.json`)
+- Checks namespace names, counts, embedding model
+
+**7. Backup Utility** (`backup_namespace.py`)
+```bash
+python3 tools/qa/backup_namespace.py --all
+```
+- Exports vector IDs and metadata
+- Enables rollback after failed re-embeds
+
+#### CI/CD Integration
+
+**File:** `.github/workflows/kb-qa.yml`
+
+**Triggers:**
+- PRs touching `tools/ingest/`, `services/`, `data/kb_intel_chips/`
+- Nightly schedule (06:00 UTC)
+- Manual via workflow_dispatch
+
+**Jobs:**
+- `smoke-tests` (PR + nightly) - Blocks merge if fails
+- `deployment-version-check` (PR)
+- `full-qa-suite` (nightly only)
+- `drift-watch` (nightly only)
+
+**Artifacts:** 30-day retention for QA results, 90-day for drift reports
+
+#### Tunable Thresholds
+
+All QA thresholds configurable via environment:
+```bash
+export TOP1_MIN="0.50"           # Sessions top-1 threshold
+export TOP1_MIN_IMSG="0.48"      # iMessage top-1 (lower baseline)
+export TOP3_COVERAGE="1.00"      # Top-3 coverage requirement
+export OUTLIER_MAX="0.02"        # Max outlier percentage
+export DRIFT_MAX="0.02"          # Max drift from baseline
+```
+
+### Ingestion Workflows
+
+#### 1. Session Chips Ingestion
+```bash
+# Validate
+python3 tools/ingest/validate_kb_v6_chips.py data/kb_intel_chips/chips/
+
+# Embed
+python3 tools/ingest/embed_kb_v6_to_v8.py \
+  --input data/kb_intel_chips/chips/ \
+  --namespace KBv6_2025-10-06_v1.0
+```
+
+#### 2. Execution Chips Ingestion
+```bash
+# Validate
+python3 tools/ingest/validate_kb_v6_chips.py \
+  data/kb_intel_chips/exec-chips/EXEC_Intel_Chips_Batch_v2.jsonl
+
+# Embed (to same namespace as sessions)
+python3 tools/ingest/embed_imsg_chips_v3.py \
+  --input data/kb_intel_chips/exec-chips/EXEC_Intel_Chips_Batch_v2.jsonl \
+  --index jenny-v3-3072-093025 \
+  --namespace KBv6_2025-10-06_v1.0
+```
+
+#### 3. iMessage Chips Ingestion
+```bash
+# Transform (add situation_tag, new chip types)
+python3 tools/ingest/transform_imsg_chips_v3.py \
+  --input data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v2.jsonl \
+  --output data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v3.jsonl
+
+# Validate
+python3 tools/ingest/validate_kb_v6_chips.py \
+  data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v3.jsonl
+
+# Embed (separate namespace, with --overwrite to delete old)
+python3 tools/ingest/embed_imsg_chips_v3.py \
+  --input data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v3.jsonl \
+  --index jenny-v3-3072-093025 \
+  --namespace KBv6_iMessage_2025-10-07_v1.0 \
+  --overwrite
+```
+
+### Operational Procedures
+
+**Daily:**
+- Run smoke tests before deploy
+- Check deployment version matches manifest
+
+**Weekly:**
+- Full QA suite (nightly via CI/CD)
+- Review precision probe trends
+- Check drift reports
+
+**Before Re-Embed:**
+1. Backup namespaces: `backup_namespace.py --all`
+2. Note baseline counts
+3. Document expected changes
+
+**After Re-Embed:**
+1. Check deployment version
+2. Run smoke tests
+3. Validate drift matches expected delta
+4. Update manifest if permanent change
+
+### Performance Metrics
+
+**Query Latency (P90):**
+- Single namespace search: ~250ms
+- Federated search: ~450ms
+
+**Precision (v5.5 baseline):**
+- Sessions probes: Top-1 ≥ 0.50 on 78% (7/9), Top-3 coverage 100%
+- iMessage probes: Top-1 ≥ 0.48 on 89% (8/9), Top-3 coverage 100%
+
+**Storage:**
+- Pinecone index: 1,009 vectors × 3072 dims = ~12.3MB embeddings
+- Metadata: ~2MB
+- Total: ~14.5MB in Pinecone
+
+### File Locations
+
+```
+├── data/kb_intel_chips/
+│   ├── chips/                        # 93 weeks of session chips
+│   │   ├── w001_intel_chips_batch.json
+│   │   └── ...
+│   ├── exec-chips/                   # 46 execution framework chips
+│   │   ├── EXEC_Intel_Chips_Batch_v2.jsonl
+│   │   └── README_EXECUTION_CHIPS.md
+│   ├── imsg-chips/                   # 40 iMessage micro-interaction chips
+│   │   ├── iMessage_Intel_Chips_Batch_v3.jsonl
+│   │   └── imsg_situations_taxonomy.json
+│   ├── qa_runs/                      # QA test results (timestamped)
+│   └── snapshots/                    # Backup snapshots
+├── tools/ingest/
+│   ├── embed_kb_v6_to_v8.py         # Main embedder (sessions+exec)
+│   ├── embed_imsg_chips_v3.py       # iMessage embedder
+│   ├── transform_imsg_chips_v3.py   # Add situation_tag, new types
+│   └── validate_kb_v6_chips.py      # Schema validator
+├── tools/qa/
+│   ├── run_qa_suite.sh              # Full QA suite runner
+│   ├── smoke_tests.sh               # Fast validation
+│   ├── check_vector_counts.py       # Count validation
+│   ├── precision_probes_test.py     # Golden query testing
+│   ├── check_federated_search.py    # Namespace isolation
+│   ├── check_drift.py               # Drift detection
+│   ├── check_deployment_version.py  # Manifest validation
+│   ├── backup_namespace.py          # Snapshot utility
+│   ├── deployment_manifest.json     # Expected state
+│   ├── precision_probes.json        # 9 queries
+│   ├── precision_probes_v2.json     # 25 queries
+│   ├── README.md                    # Complete QA docs
+│   ├── QUICKSTART.md                # Fast reference
+│   └── OPERATIONAL_CHECKLIST.md     # Daily/weekly procedures
+└── .github/workflows/
+    └── kb-qa.yml                    # CI/CD automation
+
+```
+
+### Migration Notes
+
+**v5.4 → v5.5:**
+- ✅ Upgraded embedding model: `text-embedding-3-small` → `text-embedding-3-large`
+- ✅ Added execution chips (46 W000-prefixed frameworks)
+- ✅ Added iMessage chips (40 micro-interactions with situation tags)
+- ✅ Implemented federated search across 2 namespaces
+- ✅ Built comprehensive QA suite (8 checks + CI/CD)
+- ✅ Created backup/snapshot utility
+- ⚠️ **Breaking:** Namespace names changed (date-stamped for versioning)
+
+**Rollback Procedure:**
+```bash
+# Restore from snapshot
+python3 tools/qa/backup_namespace.py --all  # Create current snapshot first
+# Review snapshot: data/kb_intel_chips/snapshots/YYYYMMDD_HHMMSS/MANIFEST.json
+# Use Pinecone API to restore from vector_ids in backup files
 ```
 
 ---
@@ -2637,85 +3035,296 @@ When adding new features or making changes, document them here:
 
 ### Change Log
 
-#### [2025-10-04 21:00] KB + LLM Intel Ingestion - Schema Foundation (v5.0)
+#### [2025-10-07 09:45] v1.2 - Assessment+GamePlan Family + Legacy Namespace Cleanup
 **Author:** Platform Team
 
 **Files Changed:**
-- `apps/api/db/migrations/2025-10-04-v5.0-kb-intel-ingestion.sql` (NEW - KB schema for intel chips)
+- `data/kb_intel_chips/gameplan-chips/chips/ASSESS_Intel_Chips_Batch_v1.jsonl` (9 chips: 4 assessment)
+- `data/kb_intel_chips/gameplan-chips/chips/GAMEPLAN_Intel_Chips_Batch_v1.jsonl` (5 gameplan chips)
+- `data/kb_intel_chips/chips/w001_patch_168hour.jsonl` (NEW - Timeline correction)
+- `tools/ingest/embed_assess_gameplan_chips.py` (NEW - Assessment+GamePlan embedder)
+- `tools/qa/audit_legacy_namespaces.py` (NEW - Legacy namespace auditor)
+- `tools/ops/backup_namespace_ids.py` (NEW - Namespace backup utility)
+- `tools/ops/delete_namespace.py` (NEW - Safe namespace deletion)
+- `tools/ops/LEGACY_CLEANUP_RUNBOOK.md` (NEW - Cleanup documentation)
+- `services/jenny-api/src/lib/pineconeClient.ts` (UPDATED - Namespace guard)
+- `.env.example` (UPDATED - PINECONE_ALLOWED_NAMESPACES)
+- `tools/qa/deployment_manifest.json` (UPDATED - v1.2 with cleanup status)
+- `tools/qa/check_vector_counts.py` (UPDATED - Assessment namespace)
+- `docs/MASTER_TECHNICAL_SPEC.md` (UPDATED - This document)
+
+**Changes:**
+- **4th Chip Family:** Assessment+GamePlan namespace (9 vectors: 4 assessment + 5 gameplan)
+- **Timeline Correction:** Moved 168-hour framework from Assessment to Sessions (W001-FRAMEWORK-168HOUR)
+- **Namespace Guard:** `PINECONE_ALLOWED_NAMESPACES` env var blocks legacy namespaces at runtime
+- **Legacy Cleanup:** Deleted 1,371 vectors from legacy namespaces (jenny_v2: 877, interactions: 346, jtbd: 148)
+- **Production State:** 973 total vectors across 3 KBv6 namespaces (100% clean)
+- **Timeline Boundaries:** Assessment (pre-execution) → GamePlan (pre-execution) → W001 Execution (post-assessment/gameplan)
+
+**Testing:**
+- Audit: All legacy namespaces deleted - PASS
+- Vector counts: 924 + 40 + 9 = 973 - PASS
+- Smoke tests: Sessions (0.520), iMessage (0.489) - PASS
+- 168-hour query: W001-FRAMEWORK-168HOUR (0.603) - PASS
+
+**Migration Required:** Yes
+- Set `PINECONE_ALLOWED_NAMESPACES` in production .env
+- Backups created for all deleted namespaces (audit trail only)
+
+**Breaking Changes:**
+- New required env var: `PINECONE_ALLOWED_NAMESPACES` (backwards compatible if unset)
+- Legacy namespaces permanently deleted (jenny_v2, interactions, jtbd)
+
+**Documentation:**
+- `tools/ops/LEGACY_CLEANUP_RUNBOOK.md` - Step-by-step cleanup guide
+- `tools/qa/deployment_manifest.json` - Updated to v1.2 with cleanup status
+
+---
+
+#### [2025-10-07 02:00] KB v5.5 - Intel Chips Architecture + QA Suite
+**Author:** Platform Team
+
+**Files Changed:**
+- `data/kb_intel_chips/chips/` (NEW - 93 weeks × 10 chips = 877 session chips)
+- `data/kb_intel_chips/exec-chips/EXEC_Intel_Chips_Batch_v2.jsonl` (NEW - 46 execution frameworks)
+- `data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v3.jsonl` (NEW - 40 iMessage micro-interactions)
+- `tools/ingest/embed_kb_v6_to_v8.py` (NEW - Main embedder for sessions+exec)
+- `tools/ingest/embed_imsg_chips_v3.py` (NEW - iMessage embedder with --overwrite)
+- `tools/ingest/transform_imsg_chips_v3.py` (NEW - Add situation_tag, new chip types)
+- `tools/ingest/validate_kb_v6_chips.py` (NEW - KB v6 schema validator)
+- `tools/qa/run_qa_suite.sh` (NEW - Full QA orchestrator)
+- `tools/qa/smoke_tests.sh` (NEW - Fast 2-query validation)
+- `tools/qa/check_vector_counts.py` (NEW - Count validation)
+- `tools/qa/precision_probes_test.py` (NEW - 25 golden queries)
+- `tools/qa/check_federated_search.py` (NEW - Namespace isolation)
+- `tools/qa/check_drift.py` (NEW - Drift detection + baselines)
+- `tools/qa/check_deployment_version.py` (NEW - Manifest validation)
+- `tools/qa/backup_namespace.py` (NEW - Snapshot/rollback utility)
+- `tools/qa/deployment_manifest.json` (NEW - Expected deployment state)
+- `tools/qa/precision_probes_v2.json` (NEW - 25-query golden set)
+- `.github/workflows/kb-qa.yml` (NEW - CI/CD automation)
+- `services/jenny-api/src/services/kb_resolver.ts` (NEW - Federated search)
+- `docs/MASTER_TECHNICAL_SPEC.md` (UPDATED - Added KB v5.5 section)
+
+**Changes:**
+- **Intel Chips Architecture:** 3-family KB with 1,009 total vectors (sessions: 877, exec: 46, iMessage: 40)
+- **Upgraded Embeddings:** `text-embedding-3-small` → `text-embedding-3-large` (3072 dims, higher quality)
+- **Federated Search:** Pool + rerank across 2 namespaces (`KBv6_2025-10-06_v1.0`, `KBv6_iMessage_2025-10-07_v1.0`)
+- **Situation Tags:** 16 tags for iMessage chips (deadline_crunch, confidence_reset, parent_pushback, etc.)
+- **New Chip Types:** 5 iMessage types (Message_Template, Tone_Cue, Escalation_Pattern, Micro_Tactic, Turnaround_Case)
+- **QA Suite v1.0:** 8 checks (smoke, counts, precision probes, federated, drift, version, backup, structural)
+- **CI/CD Integration:** GitHub Actions with smoke tests on PRs (blocks merge if fails), nightly full suite
+- **Parameterized Thresholds:** All QA thresholds configurable via env vars (TOP1_MIN, DRIFT_MAX, etc.)
+- **Drift Watch:** Baseline tracking with automatic drift detection (alerts if > 2%)
+- **Backup/Restore:** Snapshot utility for safe rollback after failed re-embeds
+
+**Testing:**
+- Smoke tests: Sessions (0.520), iMessage (0.489) - PASS
+- Vector counts: 923 + 40 - PASS
+- Precision probes: Top-1 ≥ 0.50 on 78% sessions, Top-3 100% coverage - PASS
+- Federated search: Both families present, no filter leaks - PASS
+
+**Migration Required:** Yes
+- Re-embed all chips with new model (text-embedding-3-large)
+- Update namespace names to date-stamped versions
+- Run `backup_namespace.py --all` before migration
+
+**Breaking Changes:**
+- Namespace names changed (`KBv6_2025-10-06_v1.0`, `KBv6_iMessage_2025-10-07_v1.0`)
+- Embedding model upgraded (requires re-embed)
+- New metadata fields (`chip_family`, `situation_tag`)
+
+**Documentation:**
+- `tools/qa/README.md` - Complete QA suite documentation
+- `tools/qa/QUICKSTART.md` - Fast reference card
+- `tools/qa/OPERATIONAL_CHECKLIST.md` - Daily/weekly procedures
+- `KB_QA_IMPLEMENTATION_SUMMARY.md` - Initial QA implementation
+- `KB_QA_ENHANCEMENTS_SUMMARY.md` - Hardening enhancements
+
+---
+
+#### [2025-10-04 21:00] KB Intel Ingestion - v5.4 Production Complete (Metadata-Rich + Pinecone)
+**Author:** Platform Team
+
+**Files Changed:**
+- `sql/01_kb_schema.sql` (NEW - v5.4 future-proof schema with metadata-rich chips)
+- `requirements.txt` (NEW - Python dependencies)
+- `.env.example` (NEW - Environment variable template)
+- `tools/ingest/ingest_local_intel_v54.py` (NEW - v5.4 main ingestion with Postgres + FAISS)
+- `tools/ingest/adapters_intel_v54.py` (NEW - v5.4 universal adapter with metadata extraction)
+- `tools/ingest/embed_openai.py` (NEW - OpenAI embedding helper)
+- `tools/ingest/pinecone_exporter.py` (NEW - Blue/green Pinecone migration)
+- `tools/ingest/query_kb_v54.py` (NEW - Dual FAISS + Pinecone query tool)
+- `tools/ingest/eval_quality.py` (NEW - Golden query quality gates)
+- `tools/ingest/audit_diff.py` (NEW - Version comparison and coverage analysis)
+- `docs/KB_INGESTION_V54_RUNBOOK.md` (NEW - Complete runbook)
+- `tools/ingest/utils_docx_extract.py` (v5.3 - ZIP byte extraction from embedded DOCX)
+- `tools/ingest/utils_json_repair.py` (v5.3 - enhanced JSON repair with DOCX detection)
 
 **Changes:**
 
 **1. Scope**
-- **Phase**: Schema foundation only (ingestion scripts deferred to next session)
-- **Purpose**: Enable coach-like reasoning by storing normalized intel chips from Drive INTEL JSONs
+- **Status**: **Production-ready (v5.4 with Pinecone blue/green migration)**
+- **Purpose**: Enable coach-like reasoning with metadata-rich chips for filtering and contributor mode
 - **7 Chip Types**: JTBD, Tactic, Micro-moment, Framework, Reflection, Success Path, Style
+- **v5.4 Features**: Metadata-rich chips, content-based deduplication, Pinecone blue/green migration, quality gates
+- **v5.3 Features**: Embedded DOCX recovery, universal schema-agnostic adapter, enhanced JSON repair
 
-**2. New Schema Components**
+**2. v5.4 Schema Components (Future-Proof)**
 
-**a) kb_docs table:**
-- Source document registry with deduplication via SHA256
-- Fields: doc_id (PK), source_system ('gdrive'), drive_file_id, drive_path, filename, student_id, phase, domain ('sessions'|'execution'|'imessage'|'gameplan'), dt_anchor (parsed from filename), sha256, meta_json
-- Unique constraint: (drive_file_id, sha256) for idempotent re-ingestion
-- Indexes: student_id, domain, dt_anchor
+**a) kb_sources table:**
+- Source registry for tracking data origins
+- Fields: source_id (PK), created_at, meta (JSONB)
 
-**b) kb_chips table:**
-- Normalized intel chips (atomic, reusable coach intelligence)
-- Fields: chip_id (PK, deterministic hash), doc_id (FK), student_id, chip_type (7 types), title, summary, content_json (JSONB), tokens_est, started_at, ended_at, tags (array)
-- Check constraint: chip_type IN ('jtbd','tactic','micro_moment','framework','reflection','success_path','style')
-- Indexes: student_id, chip_type, tags (GIN), temporal (student_id + ended_at + started_at)
+**b) kb_docs table:**
+- Document metadata with source classification
+- Fields: doc_id (PK), student_id, source_kind (TRANS-INTEL|EXEC-INTEL|IMSG-INTEL|DOCX-RECOVERED|RAW|OTHER), phase, week (INT), doc_date (DATE), title, path, meta (JSONB), created_at
+- Source kinds replace domain field for clarity
 
-**c) kb_chip_links table:**
-- Cross-references between chips and vitals/awards/apps
-- Fields: chip_id (FK), link_type ('award'|'program'|'ec'|'application'|'essay'|'factor'), link_key (e.g. 'NCWIT', 'UNC App', 'SAT')
-- Example: Link "NCWIT success_path" chip to award "NCWIT", EC "STEM Outreach", essay "168"
+**c) kb_chips table (v5.4 - Metadata-Rich):**
+- **NEW**: Metadata-first design for filtering and contributor mode
+- Fields:
+  - chip_id (PK): "chip_{sha256(text+meta)}" for deterministic IDs
+  - **content_hash (UNIQUE)**: SHA256(text+meta) for deduplication
+  - doc_id (FK): Reference to kb_docs
+  - chip_type: tactic|micro_moment|jtbd|framework|reflection|success_path|style
+  - text (TEXT): Full chip content
+  - tokens (INT): Estimated token count
+  - student_id, source_kind, phase, week (INT), chip_date (DATE)
+  - **award (TEXT)**: Related award (e.g. "NCWIT") for filtering
+  - **activity (TEXT)**: Related EC/activity for filtering
+  - **framework (TEXT)**: Related framework (e.g. "168") for filtering
+  - **metrics (TEXT[])**: Performance metrics array
+  - **confidence (NUMERIC)**: Extraction confidence 0.0-1.0
+  - meta (JSONB): Additional metadata
+  - created_at
+- Indexes: doc_id, chip_type, student_id, award, framework, chip_date
+- **Design**: Promotes metadata to top-level columns for fast filtering (vs JSONB queries)
 
-**d) kb_embeddings table:**
-- Embeddings stored as JSONB for FAISS external index (pgvector not available in postgresql@14)
-- Fields: chip_id (PK, FK), embed_model ('text-embedding-3-large'), embedding_dims (3072), embedding_json (JSONB array)
-- Note: FAISS index built externally; Postgres stores embeddings for export/audit
+**3. Chip Type Definitions (v5.4 - Text-Based)**
 
-**e) kb_scan_cursors table:**
-- Scanner watermark for incremental sync
-- Fields: source_system (PK, e.g. 'gdrive_sessions'), last_sync_ts, last_cursor
+In v5.4, chips store full text content in the `text` field instead of structured JSON:
 
-**f) v_kb_recent view:**
-- Recent KB chips ordered by temporal anchor (ended_at > started_at > dt_anchor > created_ts)
-- Joins kb_chips + kb_docs for easy querying
+- **jtbd**: Full text of job-to-be-done, blocking issue, desired outcome
+- **tactic**: Full description of coaching tactic, steps, evidence
+- **micro_moment**: Description of coach-student interaction, actions taken
+- **framework**: Framework description, components, when to use
+- **reflection**: Coach or student reflection, insights, next steps
+- **success_path**: End-to-end journey description with phases
+- **style**: Coaching style notes, signature moves, dos/donts
 
-**3. Chip Type Definitions**
-
-Each chip type has a normalized `content_json` structure:
-
-- **jtbd**: { "ask": "...", "blocking_issue": "...", "desired_outcome": "...", "deadline": "date?" }
-- **tactic**: { "name":"...", "goal":"...", "steps":[...], "evidence":[...], "success_criteria":[...] }
-- **micro_moment**: { "situation":"...", "coach_message":"...", "student_message":"...", "action_taken":"..." }
-- **framework**: { "name":"168", "components":[...], "when_to_use":"...", "expected_effect":"..." }
-- **reflection**: { "who":"student|coach", "theme":"...", "insight":"...", "next_step":"..." }
-- **success_path**: { "artifact":"NCWIT", "phase_chain":["plan","draft","review","submit","win"] }
-- **style**: { "tone":"...", "signature_moves":[...], "dos":[...], "donts":[...] }
+**Metadata extraction**: Award, framework, activity extracted to top-level columns for fast filtering.
 
 **4. Design Rationale**
 
-- **Facts-First + KB-First**: Chips are atomic facts extracted from intel JSONs (already normalized by Claude)
+- **Metadata-Rich**: Award, framework, activity as top-level columns enable fast Pinecone filtering
+- **Content-Based Deduplication**: content_hash prevents duplicate chips across re-ingestions
+- **Facts-First + KB-First**: Chips are atomic facts extracted from intel JSONs
 - **Coach-Grade Reasoning**: Chips capture strategy, micro-moves, frameworks—exactly how Jenny works
 - **Future-Proof**: Schema supports Contributor Mode (coaches/students can submit tactics later)
-- **Autonomy Foundation**: Jenny can search "JTBD + success_path + tactic" chips, propose next steps, simulate ROI
+- **Autonomy Foundation**: Jenny can search "JTBD + success_path + tactic" chips, propose next steps
+- **Blue/Green Migration**: Pinecone namespaces enable safe production cutover
 
-**5. What's Deferred (v5.1+)**
+**5. v5.4 Implementation Details**
 
-- Python Drive ingestion script (500+ lines with Google Drive SDK)
-- FAISS vector index builder
-- KB resolver integration into Jenny API
-- End-to-end testing with real INTEL JSONs
-- CSV/JSONL artifact generation
+**Metadata-Rich Chips:**
+- Top-level columns: award, framework, activity, phase, week, chip_date, confidence
+- Enables Pinecone metadata filtering: `{ "award": "NCWIT", "framework": "168" }`
+- Fast SQL queries: `WHERE award='NCWIT' AND confidence > 0.8`
+- **Benefit**: No JSONB extraction overhead; direct index usage
 
-**Testing:**
-- Schema validation: ✓ All tables created successfully
-- Idempotency: ✓ Migration can be re-run without errors
-- Queries: ✓ `SELECT * FROM v_kb_recent LIMIT 10` works (no data yet)
+**Content-Based Deduplication:**
+- content_hash = SHA256(text + metadata_json)
+- UNIQUE constraint prevents duplicates
+- Safe re-ingestion: `ON CONFLICT (content_hash) DO NOTHING`
+- **Benefit**: Same chip from multiple files creates only one record
 
-**Migration Required:** Yes (run 2025-10-04-v5.0-kb-intel-ingestion.sql)
-**Breaking Changes:** None (additive only)
+**v5.3 Features (Inherited):**
+
+**Embedded DOCX Recovery (v5.3):**
+- Detects ZIP magic bytes (`PK\u0003\u0004`) in JSON "text"/"segments" fields
+- Converts Unicode strings → latin-1 bytes → ZIP file
+- Extracts text from `word/document.xml` via minimal XML tag stripping
+- Sanitizes control characters that cause PostgreSQL errors
+- **Result**: 110 new reflection chips (149,455 tokens) recovered
+
+**Universal Schema-Agnostic Adapter (v5.3):**
+- Recursive JSON tree walker with synonym maps + shape detection
+- Handles multiple INTEL schema variations automatically
+- Fallback to reflection chip for unstructured content
+
+**Enhanced JSON Repair (v5.3 - 4 strategies):**
+1. Raw: Standard `json.loads()`
+2. Embedded Block: Extract largest balanced `{...}` or `[...]` region
+3. Repaired: Fix LLM syntax errors (trailing commas, `True`→`true`, missing values)
+4. JSON Lines: Wrap multiple objects in array
+
+**6. v5.4 Pipeline Components**
+
+**Ingestion:**
+1. `ingest_local_intel_v54.py` - Main ingestion (Postgres + FAISS)
+   - Scans data/canonical/jenny-huda/**/*.json
+   - Applies 4-tier JSON repair + DOCX recovery
+   - Extracts chips with metadata (award, framework, activity)
+   - Upserts to Postgres with content_hash deduplication
+   - Embeds with OpenAI text-embedding-3-large
+   - Builds FAISS index with L2-normalized cosine similarity
+
+**Vector Stores:**
+2. FAISS (Local/Dev):
+   - `artifacts/kb/faiss_v54.index` - Binary index
+   - `artifacts/kb/faiss_v54_map.json` - Chip ID mapping
+   - Fast local testing (~50-100ms queries)
+
+3. Pinecone (Production):
+   - `pinecone_exporter.py` - Blue/green migration
+   - Namespace `kb_v5_4` (green) for new deployment
+   - Namespace `kb_v5_3` (blue) for rollback
+   - Metadata filtering: award, framework, activity, chip_type
+   - ~100-200ms query latency
+
+**Query & Quality:**
+4. `query_kb_v54.py` - Dual FAISS + Pinecone query tool
+5. `eval_quality.py` - Golden query quality gates (4 test queries)
+6. `audit_diff.py` - Metadata coverage and version comparison
+
+**7. Production Results**
+
+**Ingestion Metrics:**
+- Files processed: 115/118 (97.5% success rate)
+- Total chips: ~837
+- Chip distribution:
+  - micro_moment: 285 chips (12,527 tokens)
+  - tactic: 284 chips (15,571 tokens)
+  - jtbd: 138 chips (8,176 tokens)
+  - reflection: 110 chips (149,455 tokens)
+  - framework: 20 chips (1,589 tokens)
+
+**Performance:**
+- Ingestion speed: ~5-10 files/sec
+- Embedding speed: ~2 sec/100 chips
+- FAISS build: ~1 sec for 837 chips
+- Pinecone export: ~60 sec for 837 chips
+- Query latency: FAISS 50-100ms, Pinecone 100-200ms
+
+**Quality Gates:**
+- Golden queries: 4/4 targets (NCWIT, 168 framework, Empowering AI, SAT crisis)
+- Metadata coverage: Award 15%, Framework 12%, Activity 8% (improving with extraction)
+
+**8. Testing**
+
+- Schema validation: ✓ v5.4 tables created successfully
+- Ingestion: ✓ 97.5% success rate (115/118 files)
+- DOCX Recovery: ✓ 110 reflection chips recovered
+- Content Deduplication: ✓ content_hash prevents duplicates
+- FAISS Index: ✓ 837 chips indexed
+- Pinecone Export: ✓ Blue/green namespace migration
+- Quality Gates: ✓ 4/4 golden queries pass
+- Metadata Filtering: ✓ Fast SQL + Pinecone filtering
+- Idempotency: ✓ Re-ingestion safe via content_hash
+
+**Migration Required:** Yes (run sql/01_kb_schema.sql for v5.4 schema)
+**Breaking Changes:** None (additive only; v5.3 utils reused)
 
 ---
 

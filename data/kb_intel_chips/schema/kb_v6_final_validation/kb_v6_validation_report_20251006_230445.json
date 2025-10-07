@@ -1,0 +1,656 @@
+{
+  "summary": {
+    "total_files": 89,
+    "total_chips": 877,
+    "valid_chips": 877,
+    "invalid_chips": 0,
+    "passed": 89,
+    "failed": 0,
+    "errors": 0
+  },
+  "files": [
+    {
+      "file": "w001_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w002_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w003_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w004_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w005_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w006_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w007_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w008_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w009_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w010_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w011_intel_chips_batch_real.json",
+      "status": "PASS",
+      "total_chips": 9,
+      "valid_chips": 9,
+      "errors": [
+        "Line parse error: Extra data: line 1 column 348 (char 347)"
+      ]
+    },
+    {
+      "file": "w012_intel_chips_batch_real.json",
+      "status": "PASS",
+      "total_chips": 9,
+      "valid_chips": 9,
+      "errors": [
+        "Line parse error: Extra data: line 1 column 340 (char 339)"
+      ]
+    },
+    {
+      "file": "w013_intel_chips_batch_v2.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w014_intel_chips_batch_v2.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w015_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w016_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w017_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w018_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w019_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w020_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w021_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 9,
+      "valid_chips": 9,
+      "errors": [
+        "Line parse error: Extra data: line 1 column 339 (char 338)"
+      ]
+    },
+    {
+      "file": "w022_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 5,
+      "valid_chips": 5,
+      "errors": [
+        "Line parse error: Expecting ',' delimiter: line 1 column 300 (char 299)",
+        "Line parse error: Expecting ',' delimiter: line 1 column 318 (char 317)",
+        "Line parse error: Expecting ',' delimiter: line 1 column 320 (char 319)",
+        "Line parse error: Expecting ',' delimiter: line 1 column 330 (char 329)",
+        "Line parse error: Expecting ',' delimiter: line 1 column 325 (char 324)"
+      ]
+    },
+    {
+      "file": "w023_intel_chips_batch.json",
+      "status": "PASS",
+      "total_chips": 7,
+      "valid_chips": 7,
+      "errors": [
+        "Line parse error: Extra data: line 1 column 329 (char 328)",
+        "Line parse error: Expecting ',' delimiter: line 1 column 320 (char 319)",
+        "Line parse error: Expecting ',' delimiter: line 1 column 322 (char 321)"
+      ]
+    },
+    {
+      "file": "w024_intel_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w027_intel_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w028_intel_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w030_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w031_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w032_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w033_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w034_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w035_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w036_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w037_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w038_chips_jsonl.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w039_intel_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w040_intel_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w041_intel_chips_proper.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w042_intel_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w043_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w044_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w046_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w047_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w048_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w049_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w050_chips.json",
+      "status": "PASS",
+      "total_chips": 9,
+      "valid_chips": 9,
+      "errors": [
+        "Line parse error: Expecting ',' delimiter: line 1 column 336 (char 335)"
+      ]
+    },
+    {
+      "file": "w051_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w052_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w053_chips.json",
+      "status": "PASS",
+      "total_chips": 9,
+      "valid_chips": 9,
+      "errors": [
+        "Line parse error: Expecting ',' delimiter: line 1 column 328 (char 327)"
+      ]
+    },
+    {
+      "file": "w054_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w055_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w056_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w057_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w058_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w059_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w060_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w061_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w062_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w063_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w064_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w065_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w066_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w067_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w068_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w069_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w070_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w071_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w072_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w073_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w074_chips_v2.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w075_chips_sep.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w076_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w077_chips_separate.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w078_chips_separate.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w079_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w080_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w081_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w082_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w083_chips_proper.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w084_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w085_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w086_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w087_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w088_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w089_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w090_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w091_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w092_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    },
+    {
+      "file": "w093_chips.json",
+      "status": "PASS",
+      "total_chips": 10,
+      "valid_chips": 10,
+      "errors": []
+    }
+  ]
+}

@@ -68,6 +68,9 @@ const IntentSchema = z.object({
     scope: z.string().nullable().optional(),
     nth: z.union([z.string(), z.number()]).nullable().optional(),
     components: z.array(z.string()).nullable().optional(),
+    award: z.string().nullable().optional(),
+    framework: z.string().nullable().optional(),
+    activity: z.string().nullable().optional(),
   }).optional(),
   confidence: z.number().min(0).max(1),
   detector: z.enum(["llm","keyword-floor"]).optional(),
@@ -319,6 +322,24 @@ const FEW_SHOT = [
   // College Readiness Comparison (2 examples - v4.6.1)
   {input:"compare my readiness with schools that accepted me", output:{intent:"college.compare.readiness", phase:null, object:"college", filters:{}, confidence:0.96}},
   {input:"how does my readiness compare to my acceptances?", output:{intent:"college.compare.readiness", phase:null, object:"college", filters:{}, confidence:0.95}},
+
+  // KB Search - Coaching Intelligence (16 examples - v5.6 with facets)
+  {input:"how did Jenny coach me on NCWIT?", output:{intent:"kb.search", phase:null, object:"kb", filters:{award:"NCWIT"}, confidence:0.97}},
+  {input:"how did the coaching for NCWIT happen from start to win?", output:{intent:"kb.search", phase:null, object:"kb", filters:{award:"NCWIT"}, confidence:0.98}},
+  {input:"what were our ncwit essay surgery moves?", output:{intent:"kb.search", phase:null, object:"kb", filters:{award:"NCWIT"}, confidence:0.97}},
+  {input:"ncwit coaching steps", output:{intent:"kb.search", phase:null, object:"kb", filters:{award:"NCWIT"}, confidence:0.98}},
+  {input:"show me the 168 framework", output:{intent:"kb.search", phase:null, object:"kb", filters:{framework:"168"}, confidence:0.98}},
+  {input:"how did the 168-hour plan get implemented?", output:{intent:"kb.search", phase:null, object:"kb", filters:{framework:"168"}, confidence:0.97}},
+  {input:"show me the 168 framework we used to cut tiktok time", output:{intent:"kb.search", phase:null, object:"kb", filters:{framework:"168"}, confidence:0.98}},
+  {input:"how did we scale empowering ai to 100 users?", output:{intent:"kb.search", phase:null, object:"kb", filters:{activity:"Empowering AI"}, confidence:0.97}},
+  {input:"empowering ai growth tactics", output:{intent:"kb.search", phase:null, object:"kb", filters:{activity:"Empowering AI"}, confidence:0.97}},
+  {input:"what tactics did we use for essay writing?", output:{intent:"kb.search", phase:null, object:"kb", filters:{}, confidence:0.96}},
+  {input:"what was our strategy for UNC application?", output:{intent:"kb.search", phase:null, object:"kb", filters:{}, confidence:0.95}},
+  {input:"when did I struggle with time management?", output:{intent:"kb.search", phase:null, object:"kb", filters:{}, confidence:0.94}},
+  {input:"what were the key coaching moments?", output:{intent:"kb.search", phase:null, object:"kb", filters:{}, confidence:0.96}},
+  {input:"how did we approach the Common App essays?", output:{intent:"kb.search", phase:null, object:"kb", filters:{}, confidence:0.95}},
+  {input:"what frameworks did Jenny teach me?", output:{intent:"kb.search", phase:null, object:"kb", filters:{}, confidence:0.97}},
+  {input:"bank of america coaching approach", output:{intent:"kb.search", phase:null, object:"kb", filters:{award:"Bank of America"}, confidence:0.97}},
 ];
 
 const SYS = `You are an intent classifier for a college admissions coaching agent.
@@ -491,6 +512,64 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
   try {
     let intent = await classifyIntent(message);
 
+    // ========================================
+    // v5.6 KB Facet Post-Processor (Safety Net)
+    // ========================================
+    // Keyword-based extraction if LLM misses award/framework/activity filters
+    if (intent.intent === "kb.search") {
+      const q = message.toLowerCase();
+      const f = intent.filters ?? {};
+      if (/ncwit|national center for women.*computing/.test(q)) f.award = "NCWIT";
+      if (/168( |-)?hour/.test(q)) f.framework = "168";
+      if (/empowering ai/.test(q)) f.activity = "Empowering AI";
+      if (/bank of america/.test(q)) f.award = "Bank of America";
+      if (/jcamp|j-camp/.test(q)) f.activity = "JCamp";
+      if (/kwk|kode with klossy/.test(q)) f.activity = "Kode With Klossy";
+      intent.filters = f;
+    }
+
+    // ========================================
+    // v5.6 KB Guardrail Override (Force Pinecone for Facet Queries)
+    // ========================================
+    // If Pinecone is ready and query mentions facets, FORCE kb.search regardless of LLM classification
+    const pineconeReady = !!(process.env.PINECONE_INDEX_NAME && process.env.PINECONE_NAMESPACE);
+    const q = message.toLowerCase();
+    const mentionsFacet = (
+      /ncwit|national\s+center\s+for\s+women.*computing/.test(q) ||
+      /\b168([- ]?hour)?\b/.test(q) ||
+      /empowering\s+ai/.test(q) ||
+      /bank\s+of\s+america/.test(q) ||
+      /jcamp|j-camp/.test(q) ||
+      /kode\s+with\s+klossy|kwk/.test(q)
+    );
+
+    if (pineconeReady && mentionsFacet && intent.intent !== "kb.search") {
+      log.event('guardrail.force_kb_search', {
+        trace_id: traceId,
+        original_intent: intent.intent,
+        original_confidence: intent.confidence,
+        reason: 'facet_keyword_detected'
+      });
+
+      // Extract facets
+      const filters = intent.filters ?? {};
+      if (/ncwit|national\s+center\s+for\s+women.*computing/.test(q)) filters.award = "NCWIT";
+      if (/\b168([- ]?hour)?\b/.test(q)) filters.framework = "168";
+      if (/empowering\s+ai/.test(q)) filters.activity = "Empowering AI";
+      if (/bank\s+of\s+america/.test(q)) filters.award = "Bank of America";
+      if (/jcamp|j-camp/.test(q)) filters.activity = "JCamp";
+      if (/kode\s+with\s+klossy|kwk/.test(q)) filters.activity = "Kode With Klossy";
+
+      // Override intent
+      intent = {
+        intent: "kb.search",
+        object: "kb",
+        phase: null,
+        filters,
+        confidence: Math.max(intent.confidence ?? 0.0, 0.98)
+      };
+    }
+
     log.event('intent.classify', {
       trace_id: traceId,
       intent: intent.intent,
@@ -498,6 +577,7 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       phase: intent.phase,
       confidence: intent.confidence,
       detector: intent.detector,
+      filters: intent.filters,
       took_ms: Date.now() - t0
     });
 
@@ -731,8 +811,11 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       case "scholarship.total":
         data = await resolvers.scholarshipTotal(pg, studentId, intent.filters || {});
         break;
+      case "kb.search":
+        data = await resolvers.kbSearch(pg, studentId, message, intent.filters || {});
+        break;
       default:
-        data = await resolvers.kbSearch(pg, studentId, message);
+        data = await resolvers.kbSearch(pg, studentId, message, {});
     }
 
     log.event('router.route_complete', { trace_id: traceId, took_ms: Date.now()-t0 });

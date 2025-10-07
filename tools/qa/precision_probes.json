@@ -1,0 +1,11 @@
+[
+  {"q": "168-hour framework time audit only 2 hours left", "expect":["FRAMEWORK","SILVER"], "ns":"sessions"},
+  {"q": "Naviance scattergram acceptance history", "expect":["INSIGHT","TACTIC"], "ns":"sessions"},
+  {"q": "let colleges reject you don't reject yourself", "expect":["TRUST"], "ns":"sessions"},
+  {"q": "teacher gift strategy thank-you card", "expect":["TRUST","TACTIC","STRATEGY"], "ns":"sessions"},
+  {"q": "Stanford REA vs USC strategy", "expect":["STRATEGY"], "ns":"sessions"},
+  {"q": "deadline crunch escalation after no response", "expect":["Escalation_Pattern_Chip","Micro_Tactic_Chip"], "ns":"imsg"},
+  {"q": "confidence reset tone cues after setback", "expect":["Tone_Cue_Chip"], "ns":"imsg"},
+  {"q": "thank you note template", "expect":["Message_Template_Chip"], "ns":"imsg"},
+  {"q": "48 hour turnaround case", "expect":["Turnaround_Case_Chip"], "ns":"imsg"}
+]

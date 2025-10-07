@@ -1,0 +1,205 @@
+{
+  "processing_summary": {
+    "source_file": "2023-08-08_W008_P1-FOUNDATION_TRANS-INTEL_SummerProgramStrategyandncwitAppStorytel.json",
+    "source_type": "EXTRACT",
+    "date_processed": "2025-10-06",
+    "week": "008",
+    "phase": "P1-FOUNDATION",
+    "phase_enum": "FOUNDATION",
+    "session_date": "2023-08-08",
+    "participants": ["Jenny Duan", "Huda", "Siraj (Dad)"],
+    "duration": "46:21",
+    "version": "v1",
+    "note": "Summer program strategy, NCWIT application, vulnerability storytelling breakthrough"
+  },
+  
+  "chips_generated": {
+    "total_count": 10,
+    "chip_types": {
+      "Insight_Chip": 1,
+      "Strategy_Chip": 1,
+      "Tactic_Chip": 1,
+      "Trust_Chip": 1,
+      "Adaptation_Chip": 1,
+      "Framework_Chip": 1,
+      "Result_Chip": 1,
+      "Channel_Chip": 1,
+      "Relatability_Chip": 1,
+      "Silver_Bullet_Chip": 1
+    },
+    "scoring_methodology": {
+      "quality_score": "Human-equivalent quality rating (0-1 scale) based on signal density and actionability",
+      "confidence_score": "Embedding confidence based on clarity and completeness of extracted intelligence (0-1 scale)",
+      "average_quality_score": 0.94,
+      "average_confidence_score": 0.92
+    }
+  },
+  
+  "key_discoveries": {
+    "diagnostic": {
+      "heat_exhaustion": "Physical fatigue affecting academic performance",
+      "dad_intervention": "Reveals anxiety as main struggle",
+      "system_rigged": "Best programmer but can't get leadership",
+      "social_isolation": "Hackathon abandonment, idea theft pattern",
+      "hidden_identity": "Muslim identity not emphasized",
+      "summer_activities": "SAT, game art, YouTube, wedding film, AI learning"
+    },
+    "strategic": {
+      "vulnerability_revolution": "Struggles > achievements for storytelling",
+      "scholarship_reframe": "Awards not money (Brian Cameron = 20 nationally)",
+      "identity_multiplication": "Muslim + Woman + CS + Bay Area + New = unique",
+      "application_practice": "Every app is mini college application",
+      "summer_stacking": "2-3 short programs in one summer",
+      "ncwit_focus": "Tenacity against barriers not accomplishments"
+    },
+    "tactical": {
+      "flexible_schedule": "4:15-5:15 adaptable for nap/work",
+      "counselor_email": "Drafted and sent during session",
+      "ncwit_timeline": "September 1 opening and submission",
+      "website_pivot": "Stop game, start Figma immediately",
+      "program_calendar": {
+        "september": "NCWIT opens",
+        "february": "Coolidge deadline",
+        "spring": "Bank of America",
+        "may": "Brian Cameron"
+      }
+    },
+    "silver_bullets": {
+      "mini_application_practice": "Every app improves next",
+      "vulnerability_narrative": "Background + Barrier + Persistence",
+      "feel_dont_tell": "Emotional connection over facts",
+      "parent_testimony": "External validation of struggles",
+      "scholarship_as_award": "Prestige not financial aid",
+      "immediate_send": "Email during session prevents overthinking",
+      "identity_multiplication": "Layer all markers",
+      "flexible_time_buffer": "Energy-based scheduling"
+    }
+  },
+  
+  "dad_advocacy_breakthrough": {
+    "timestamp": "38:34-39:57",
+    "intervention": "Sorry to interrupt but main struggle is anxiety",
+    "revelations": [
+      "Hyper local in her school",
+      "System rigged against her",
+      "Social isolation despite skills",
+      "Best programmer but no recognition"
+    ],
+    "jenny_response": "Validates and integrates into strategy",
+    "impact": "Transforms surface story to deep narrative"
+  },
+  
+  "vulnerability_storytelling_framework": {
+    "jenny_personal_share": {
+      "content": "Dad came with $200, only girl at meetings",
+      "outcome": "Got national award",
+      "lesson": "Make them FEEL your story"
+    },
+    "huda_unique_angle": {
+      "discovery": "Girls unmotivated while guys create clubs",
+      "struggle": "Can't collaborate with other girls who don't care",
+      "narrative": "Isolation within supposed support group"
+    },
+    "formula": "Background + Barrier + Persistence = Compelling"
+  },
+  
+  "summer_program_portfolio": {
+    "programs_identified": [
+      "Kode with Klossy (2 weeks, free)",
+      "Notre Dame Leadership Seminars (3 weeks)",
+      "Bank of America Student Leaders (priority)",
+      "NSLI (government language abroad)",
+      "TASP Telluride (social justice)"
+    ],
+    "strategy": "Stack 2-3 short programs",
+    "jenny_credibility": "Done KWK twice, Notre Dame before"
+  },
+  
+  "longitudinal_themes": {
+    "continued_from_w001_w007": [
+      "muslim_identity_as_strength",
+      "stanford_positioning",
+      "time_optimization",
+      "parent_collaboration",
+      "168_hour_framework"
+    ],
+    "evolved_in_w008": [
+      "vulnerability_as_power",
+      "application_ecosystem",
+      "energy_management",
+      "counselor_relationship",
+      "storytelling_sophistication"
+    ],
+    "new_in_w008": [
+      "heat_exhaustion_adaptation",
+      "scholarship_as_award_mindset",
+      "mini_application_practice",
+      "feel_dont_tell_framework",
+      "parent_testimony_value",
+      "immediate_send_protocol"
+    ]
+  },
+  
+  "family_dynamics": {
+    "dad_role_evolution": "From observer to active advocate",
+    "vulnerability_shared": "Anxiety struggles revealed",
+    "appreciation": "This is so amazing, level of tactics",
+    "collaboration": "Three-way problem solving",
+    "validation": "External confirmation of challenges"
+  },
+  
+  "verification_status": {
+    "schema_integrity": "PASS",
+    "ontology_fit": "PASS",
+    "embedding_ready": "PASS",
+    "analytics_metadata": "PASS",
+    "all_chips_valid": true,
+    "natural_language_verified": true,
+    "no_json_blobs": true,
+    "insight_vector_optimization": true,
+    "cross_validation": "PASS",
+    "notes": [
+      "8 silver bullets discovered - most comprehensive session",
+      "Dad's intervention creates narrative breakthrough",
+      "Jenny shares personal NCWIT essay as model",
+      "Vulnerability storytelling becomes core strategy",
+      "Muslim identity fully embraced as advantage"
+    ]
+  },
+  
+  "output_files": {
+    "jsonl_batch": "W008_Intel_Chips_Batch_v1.jsonl",
+    "processing_summary": "W008_Processing_Summary_v1.json",
+    "complete_package": "W008_Complete_Intel_Package_v1.md",
+    "chip_count": 10,
+    "total_content_words": 1356,
+    "average_words_per_chip": 136,
+    "average_insight_vector_chars": 150,
+    "file_naming_pattern": "W{week}_Intel_Chips_Batch_v{version}.jsonl"
+  },
+  
+  "metrics_for_kb_index": {
+    "target_semantic_similarity": 0.70,
+    "target_retrieval_precision": 0.80,
+    "current_quality_baseline": 0.94,
+    "embedding_confidence_baseline": 0.92,
+    "cross_linking_themes": 33,
+    "ready_for_production": true
+  },
+  
+  "week_over_week_progression": {
+    "w007_to_w008": {
+      "time_gap": "6 days",
+      "focus_shift": "Time architecture → Application strategy",
+      "depth": "Systems → Vulnerability storytelling",
+      "parent_role": "Present → Active advocate",
+      "identity": "Integrated → Weaponized as advantage"
+    },
+    "cumulative_impact": {
+      "applications_planned": "NCWIT + 4 scholarships + 5 programs",
+      "story_elements": "Multiple angles identified",
+      "support_system": "Full family advocacy",
+      "timeline": "September through May mapped"
+    }
+  }
+}

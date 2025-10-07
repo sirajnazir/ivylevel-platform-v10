@@ -1,0 +1,67 @@
+{
+  "processing_summary": {
+    "source_files": [
+      "2023-08-01_W006-008_P1-FOUNDATION_IMSG-INTEL_InitialTrustBuilding.pdf",
+      "2023-09-01_W009-022_P1P2-FOUNDATION-BUILDING_IMSG-INTEL_EmotionalEvolution.pdf",
+      "2024-03-01_W032-038_P2P3-BUILDING-JUNIOR_IMSG-INTEL_RejectionAlchemy.pdf",
+      "2024-05-01_W044-061_P3-JUNIOR_IMSG-INTEL_SummerTransformation.pdf",
+      "2024-09-01_W065-077_P4P5-SUMMER-SENIOR_IMSG-INTEL_ApplicationIntensity.pdf",
+      "2024-10-01_W076-090_P5-SENIOR_IMSG-INTEL_ApplicationClimax.pdf",
+      "2023-06-01_W001-093_P1P5-COMPLETE_IMSG-INTEL_3YearSynthesis.pdf",
+      "Jenny-Huda Private iMessage Texts-Part-1_ImportedDoc.pdf",
+      "Jenny-Huda Private iMessage Texts-Part-2_ImportedDoc.pdf",
+      "Jenny-Huda Private iMessage Texts-Part-3_ImportedDoc.pdf"
+    ],
+    "date_processed": "2025-10-07",
+    "phases": [
+      "P1-FOUNDATION",
+      "P1P2-FOUNDATION-BUILDING",
+      "P2P3-BUILDING-JUNIOR",
+      "P3-JUNIOR",
+      "P4P5-SUMMER-SENIOR",
+      "P5-SENIOR",
+      "P1P5-ALL"
+    ],
+    "total_chips": 28,
+    "types_count": {
+      "Decision_Framework": 2,
+      "Accountability": 3,
+      "Crisis_Intervention": 3,
+      "Strategy": 5,
+      "Boundary": 4,
+      "Microtactic": 5,
+      "Tone_Style": 6
+    },
+    "retrieval_rules": {
+      "prefer_session_for": [
+        "planning",
+        "architecture",
+        "long-range strategy"
+      ],
+      "prefer_imessage_for": [
+        "text",
+        "message",
+        "email",
+        "teacher",
+        "counselor",
+        "LOR",
+        "schedule",
+        "unblock",
+        "tone",
+        "crisis",
+        "portal"
+      ]
+    },
+    "conflict_checks": {
+      "scope_separation": "PASS",
+      "overlap_keywords": [
+        "NCWIT",
+        "JCamp",
+        "LOR",
+        "Activities list",
+        "Common App"
+      ],
+      "notes": "iMessage chips focus on execution/tone; complementary to macro session chips."
+    }
+  }
+}
