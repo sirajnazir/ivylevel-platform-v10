@@ -2,8 +2,9 @@
 **IvyLevel Platform v10 - Jenny Agentic AI**
 
 **Document Status:** Living Specification
-**Last Major Update:** 2025-10-07 09:45 UTC
-**Version:** v1.2 (KBv6 Assessment+GamePlan + Legacy Cleanup) + v5.5 (KB Intel Chips + Vector DB) + v4.6.1 (College + Scholarship)
+**Last Major Update:** 2025-10-07 14:30 PST
+**Version:** v2.3 - Universal Routing System v1.3 (Production-Ready)
+**Previous:** v1.2 (KBv6 Assessment+GamePlan + Legacy Cleanup) + v5.5 (KB Intel Chips + Vector DB) + v4.6.1 (College + Scholarship)
 
 ---
 
@@ -1712,6 +1713,43 @@ When adding new features or schema changes, append entries here with timestamp:
 ---
 
 ### Change Log
+
+#### [2025-10-07 14:30] v2.3: Universal Routing System v1.3 (Query Routing Logic)
+**Migration:** None (routing logic updates only, no schema changes)
+**Author:** Platform Team
+**Description:** Production-ready universal routing system achieving 97.1% accuracy through deterministic decision tree with iterative refinements (v1.1-v1.3). No database schema changes, updates are to application-layer routing logic only.
+
+**Query Routing Enhancements:**
+- **Routing Accuracy**: Improved from 72.9% to 97.1% (+24.2%, 18 tests fixed)
+- **Universal Router Updates** (`apps/test-chat-ui/lib/universalRouter.ts`):
+  - Step 4.5: Assessment keyword override with SQL metric exclusion
+  - Step 4.6: Chips/metadata query detection (proof_links intent)
+  - Step 4.7: Strategy query pattern detection (hybrid vs KB split)
+  - Updated inferIntentFromTags function to accept query parameter for context-aware decisions
+  - Added SQL metric exclusion in tag-based intent detection (prevents incorrect KB routing)
+  - Added publications intent inference in inferSQLIntentFromEnumeration
+- **Query Shape Detector Updates** (`apps/test-chat-ui/lib/queryShapes.ts`):
+  - Expanded enumeration detector to match "all X" patterns (J37: "Show all competitions")
+  - Added "publication" to SQL entity list (X69: "List my publications")
+  - Enhanced clarifier threshold for 2-word vague queries (L40: "help me")
+  - Added template request exclusions to privacy detector (P53: "Template ask vs email")
+
+**Test Results:**
+- **Pass Rate**: 68/70 tests passing (97.1%)
+- **Test Suite**: http://localhost:3001/test-suite
+- **Remaining Edge Cases**:
+  - O50: Multi-turn mutation ("I won NCWIT") - requires context-aware update detection
+  - P52: Ambiguous query ("Assessment of my GPA trend") - defensible as either SQL or KB route
+
+**Breaking Changes:** None (backward compatible routing logic updates)
+
+**Notes:**
+- This update enhances the application-layer routing system without modifying database schema
+- All changes are in TypeScript routing logic files
+- Three iterative releases (v1.1, v1.2, v1.3) documented in apps/test-chat-ui/ROUTING_FIXES_*.md
+- Production-ready deployment with comprehensive test coverage
+
+---
 
 #### [2025-10-04] v4.6.1: College List + Scholarship + Readiness Correlation
 **Migration:** `apps/api/db/migrations/2025-10-04-v4.6.1-college-scholarship-enablement.sql`

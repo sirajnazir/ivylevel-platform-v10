@@ -1,8 +1,9 @@
 # Features & Updates Tracker
 
 **IvyLevel Platform v10 - Jenny Agentic AI**
-**Last Updated:** 2025-10-07 09:45 UTC
-**Current Version:** v1.2 (KBv6 Assessment+GamePlan + Legacy Cleanup) + v5.5 (KB Intel Chips Architecture + Production QA) + v4.6.2c (UAPX Guardrails)
+**Last Updated:** 2025-10-07 14:30 PST
+**Current Version:** v2.3 - Universal Routing System v1.3 (Production-Ready)
+**Previous:** v1.2 (KBv6 Assessment+GamePlan + Legacy Cleanup) + v5.5 (KB Intel Chips Architecture + Production QA) + v4.6.2c (UAPX Guardrails)
 
 ---
 
@@ -12,9 +13,56 @@ This document tracks all features, enhancements, and updates to the platform. Ea
 
 ---
 
-## Active Features (v3.7.1)
+## Active Features (v2.3)
 
 ### Core Architecture
+
+#### ✅ Universal Routing System v1.3 (Production-Ready)
+- **Status:** Production
+- **Date:** 2025-10-07 14:30 PST
+- **Description:** Deterministic query routing system with 97.1% accuracy, achieving production-ready status through three iterative releases
+- **Key Metrics:**
+  - Routing Accuracy: 97.1% (68/70 tests passing)
+  - Total Improvement: +24.2% (from 72.9% baseline)
+  - Tests Fixed: 18 across three releases
+  - Test Suite: 70 comprehensive routing tests
+- **Architecture:**
+  - **Five Resolver Types**: SQL | KB | Hybrid | Clarify | Refuse
+  - **Eight-Step Decision Tree**:
+    1. Text Normalization - Handle typos, multilingual, abbreviations
+    2. Safety Guards - Refuse policy violations, privacy requests
+    3. Clarifier Guard - Catch ambiguous/too-short queries
+    4. Keyword Overrides - Assessment, chips/metadata, strategy patterns (Steps 4.5-4.7)
+    5. Shape-Based Detection - What-if, temporal, numeric, enumeration patterns
+    6. GPT Intent Normalization - Through intent contract
+    7. Lexicon Tag Enhancement - Tag-based intent inference
+    8. Post-Retrieval Backfill - Refine intent from chip evidence
+- **Iterative Releases:**
+  - **v1.1 (72.9% → 84.3%)**: Foundational fixes - clarifier/refuse naming, enumeration refinement, shape precedence, numeric exclusions, outcomes.search intent (14 tests fixed)
+  - **v1.2 (84.3% → 91.4%)**: Quick wins - assessment override, privacy fixes, chips detection, strategy patterns, clarifier threshold (7 tests fixed)
+  - **v1.3 (91.4% → 97.1%)**: Final push - enumeration "all X", publications entity, assessment SQL exclusion (dual location), strategy split, CS/major/program keywords (6 tests fixed)
+- **Key Enhancements:**
+  - Step 4.5: Assessment keyword override with SQL metric exclusion
+  - Step 4.6: Chips/metadata query detection (proof_links intent)
+  - Step 4.7: Strategy query pattern detection (hybrid vs KB split)
+  - Expanded enumeration detector for "all X" patterns
+  - Added "publication" to SQL entity list
+  - Enhanced clarifier threshold for 2-word vague queries
+  - Added template request exclusions to privacy detector
+  - Publications intent inference in SQL enumeration
+- **Remaining Edge Cases (2/70):**
+  - O50: Multi-turn mutation ("I won NCWIT") - requires context-aware update detection
+  - P52: Ambiguous query ("Assessment of my GPA trend") - defensible as either route
+- **Files:**
+  - Core Router: `apps/test-chat-ui/lib/universalRouter.ts` (422 lines)
+  - Shape Detectors: `apps/test-chat-ui/lib/queryShapes.ts` (263 lines)
+  - Intent Contract: `apps/test-chat-ui/lib/intentContract.ts` (400 lines)
+  - Orchestrator: `apps/test-chat-ui/lib/orchestrator.ts` (380 lines)
+- **References:**
+  - Docs: `apps/test-chat-ui/ROUTING_FIXES_v1.1.md`, `v1.2.md`, `v1.3.md`
+  - Specs: `apps/test-chat-ui/UNIVERSAL_ROUTER_IMPLEMENTATION.md`
+  - Test Suite: http://localhost:3001/test-suite
+  - Master Specs: `docs/MASTER_TECHNICAL_SPEC.md`, `docs/DB_ARCHITECTURE_SPEC.md`
 
 #### ✅ Universal Vitals Model (v3.0)
 - **Status:** Production

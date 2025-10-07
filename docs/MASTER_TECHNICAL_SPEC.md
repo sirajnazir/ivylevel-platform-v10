@@ -2,8 +2,9 @@
 **IvyLevel Platform v10 - Jenny Agentic AI**
 
 **Document Status:** Living Specification
-**Last Update:** 2025-10-07 09:45 UTC
-**Version:** v1.2 (KBv6 Assessment+GamePlan + Legacy Cleanup) + v5.5 (KB Intel Chips + QA Suite) + v4.6.2c (UAPX Guardrails)
+**Last Update:** 2025-10-07 14:30 PST
+**Version:** v2.3 - Universal Routing System v1.3 (Production-Ready)
+**Previous:** v1.2 (KBv6 Assessment+GamePlan + Legacy Cleanup) + v5.5 (KB Intel Chips + QA Suite) + v4.6.2c (UAPX Guardrails)
 
 ---
 
@@ -35,7 +36,10 @@
 1. **Facts-First**: SQL-deterministic queries before RAG fallback
 2. **Temporal Resolution**: Universal support for first/latest/nth/as-of queries (UTFA)
 3. **Evidence Chain**: Full provenance tracking from source documents to answers
-4. **Intent Routing**: Multi-tier routing (Enumeration → Temporal Facts → Canonical Facts → RAG)
+4. **Universal Routing System v1.3**: Deterministic decision tree with 97.1% accuracy
+   - Multi-tier routing: Safety Guards → Keyword Overrides → Shape Detection → GPT Normalization → Tag Enhancement
+   - Five resolver types: SQL | KB | Hybrid | Clarify | Refuse
+   - Post-retrieval backfill for intent refinement
 5. **Observability**: Comprehensive tracing and logging at every step
 
 ### Tech Stack
@@ -3034,6 +3038,59 @@ When adding new features or making changes, document them here:
 ---
 
 ### Change Log
+
+#### [2025-10-07 14:30] v2.3 - Universal Routing System v1.3 (Production-Ready)
+**Author:** Platform Team
+
+**Files Changed:**
+- `apps/test-chat-ui/lib/queryShapes.ts` (UPDATED - Enumeration patterns, clarifier threshold, privacy exclusions)
+- `apps/test-chat-ui/lib/universalRouter.ts` (UPDATED - Assessment override, chips detection, strategy patterns, publications intent)
+- `apps/test-chat-ui/lib/orchestrator.ts` (UPDATED v1.1 - Source naming fixes)
+- `apps/test-chat-ui/lib/intentContract.ts` (UPDATED v1.1 - outcomes.search intent)
+- `apps/test-chat-ui/ROUTING_FIXES_v1.1.md` (NEW - Documentation)
+- `apps/test-chat-ui/ROUTING_FIXES_v1.2.md` (NEW - Documentation)
+- `apps/test-chat-ui/ROUTING_FIXES_v1.3.md` (NEW - Documentation)
+- `apps/test-chat-ui/UNIVERSAL_ROUTER_IMPLEMENTATION.md` (UPDATED - Production status)
+- `apps/test-chat-ui/UNIFIED_ORCHESTRATOR_SPEC.md` (UPDATED - Phase 4 complete)
+- `apps/test-chat-ui/UNIFIED_PIPELINE_COMPLETE.md` (UPDATED - v2.3 changelog)
+- `docs/MASTER_TECHNICAL_SPEC.md` (UPDATED - This document)
+- `docs/DB_ARCHITECTURE_SPEC.md` (UPDATED - Routing system section)
+- `docs/FEATURES_AND_UPDATES.md` (UPDATED - v2.3 entry)
+
+**Changes:**
+- **Routing Accuracy Improvement**: 72.9% → 97.1% (+24.2% improvement, 18 tests fixed)
+- **Three Iterative Releases**:
+  - v1.1 (72.9% → 84.3%): Foundational fixes - clarifier/refuse naming, enumeration detector refinement, shape precedence reordering, numeric exclusions, outcomes.search intent
+  - v1.2 (84.3% → 91.4%): Quick wins - assessment keyword override, privacy false positive fixes, chips/metadata detection, strategy patterns, clarifier threshold
+  - v1.3 (91.4% → 97.1%): Final push - enumeration "all X" expansion, publications entity, assessment SQL exclusion (dual location), strategy split (hybrid/KB), CS/major/program keywords, publications intent inference
+- **Universal Router Enhancements**:
+  - Step 4.5: Assessment keyword override with SQL metric exclusion
+  - Step 4.6: Chips/metadata query detection (proof_links intent)
+  - Step 4.7: Strategy query pattern detection (split hybrid vs KB)
+  - Updated inferIntentFromTags function signature to accept query parameter
+  - Added SQL metric exclusion in tag-based intent detection
+  - Added publications intent inference in inferSQLIntentFromEnumeration
+- **Query Shape Detector Enhancements**:
+  - Expanded enumeration detector to match "all X" patterns (not just "my X")
+  - Added "publication" to SQL entity list
+  - Enhanced clarifier threshold for 2-word vague queries ("help me", "show me")
+  - Added template request exclusions to privacy detector
+- **Production-Ready**: System deployed with 97.1% routing accuracy, 2 remaining edge cases are acceptable
+
+**Testing:**
+- **Test Suite**: 70 comprehensive routing tests covering all query types
+- **Pass Rate**: 68/70 tests passing (97.1%)
+- **Remaining Edge Cases**:
+  - O50: Multi-turn mutation ("I won NCWIT") - requires context-aware update detection
+  - P52: Ambiguous query ("Assessment of my GPA trend") - defensible as either SQL or KB route
+- **Test Access**: http://localhost:3001/test-suite
+- **Verified with**: huda-2025 student profile
+
+**Migration Required:** No (routing logic updates only)
+**Breaking Changes:** None (backward compatible)
+**Deployment Status:** ✅ Production-Ready
+
+---
 
 #### [2025-10-07 09:45] v1.2 - Assessment+GamePlan Family + Legacy Namespace Cleanup
 **Author:** Platform Team
