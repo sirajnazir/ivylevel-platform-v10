@@ -1,0 +1,41 @@
+v10.5.2 Cleanup Analysis
+
+## RESOLVERS - Currently Used (KEPT)
+✅ src/resolvers/enums.ts - Used (awards, ecs, narrative, programs)
+✅ src/resolvers/academics.ts - Used (transcript, gpa, overview, vitals)
+✅ src/resolvers/readiness.ts - Used (ivyscore, readiness)
+✅ src/resolvers/college.ts - Used (collegeList)
+✅ src/resolvers/gameplan.ts - Used (gameplan)
+
+## RESOLVERS - Archived (MOVED)
+❌ src/resolvers/compat.ts - BROKEN compat layer (queries bad vital_facts)
+❌ src/resolvers/enumerations.ts - Duplicate/old version
+❌ src/resolvers/awards.ts - Superseded by enums.ts
+❌ src/resolvers/kb-items.ts - Old KB resolver
+
+## ORCHESTRATOR - Currently Used (KEPT)
+✅ src/orchestrator/agentChat-utfa.ts - MAIN orchestrator (v10.5.2)
+✅ src/orchestrator/intent-enum.ts - Intent classification (v10.5.2 updated)
+
+## ORCHESTRATOR - Archived (MOVED)
+❌ src/orchestrator/agentChat-canonical.ts - Old canonical facts
+❌ src/orchestrator/agentChat-temporal.ts - Old temporal facts
+❌ src/orchestrator/agentChat-traced.ts - Old traced version
+❌ src/orchestrator/composer.ts - Duplicate composer
+❌ src/orchestrator/embeddings.ts - Duplicate embeddings
+❌ src/orchestrator/enumeration-router-v2.ts - Old enumeration router
+❌ src/orchestrator/enumeration-router.ts - Old enumeration router
+❌ src/orchestrator/evidenceChips.ts - Old evidence chips
+❌ src/orchestrator/factExtractor.ts - Old fact extractor
+❌ src/orchestrator/hybridSearch.ts - Duplicate hybrid search
+❌ src/orchestrator/index.ts - Old index
+❌ src/orchestrator/intent.ts - Old intent
+❌ src/orchestrator/queryRewrite.ts - Old query rewrite
+❌ src/orchestrator/reRank.ts - Old rerank
+❌ src/orchestrator/structured-first.ts - Old structured-first
+
+## TOTAL ARCHIVED
+- 4 resolver files
+- 15 orchestrator files
+= 19 files total
+

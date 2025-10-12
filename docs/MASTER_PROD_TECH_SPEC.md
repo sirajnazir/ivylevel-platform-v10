@@ -3,7 +3,7 @@
 
 **Document Status:** Production Source of Truth
 **Last Update:** 2025-10-11
-**Version:** v10.4 - Humanizer v2.1 (Jenny's Real Voice)
+**Version:** v10.5.2 - Complete Cat-1 Restoration (v4.6.2 Baseline)
 **Scope:** Production Code ONLY (`/services/jenny-api/`)
 
 ---
@@ -1420,6 +1420,15 @@ tsx scripts/diag_unified_pipeline.ts
 
 ## Version History
 
+**v10.5.2 (2025-10-11)** - Complete Cat-1 Restoration (v4.6.2 Baseline)
+- ONE LINE FIX: Changed orchestrator imports from compat.js → enums.js (fixed awards showing garbage data)
+- Intent Classification: Added IvyScore/College/GamePlan patterns to intent-enum.ts (3 new synonym arrays, 13 new route types)
+- Text Composition: Added formatting logic for IvyScore and College list queries
+- Complete v4.6.2 Resolvers: Restored 30+ proven resolvers (1765 lines)
+- Debug Logging: Added in-depth traces for root cause analysis
+- **ALL Cat-1 data now working**: Awards (real names), IvyScore (90.5/100), College List (28 schools), GamePlan
+
+**v10.4 (2025-10-11)** - Humanizer v2.1 (Jenny's Real Voice)
 **v10.3 (2025-10-10)** - KBv6 Locked Configuration + Pre-Flight Verification
 **v10.2 (2025-10-10)** - Unified Pipeline (Single Entry Point)
 **v10.1 (2025-10-09)** - Quality Guards
@@ -1447,6 +1456,6 @@ tsx scripts/diag_unified_pipeline.ts
 ---
 
 **Status:** ✅ Production Ready
-**Last Updated:** 2025-10-09
+**Last Updated:** 2025-10-11 (v10.5.2)
 **Maintainer:** IvyLevel Team
 **Production Code:** `/services/jenny-api/` ONLY

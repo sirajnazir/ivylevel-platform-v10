@@ -8,11 +8,14 @@ import {
 import { routeEnumerationQuery, isEnumerationQuery } from './enumeration-router.js';
 import { routeEnumerationQueryV2, isEnumerationQueryV2 } from './enumeration-router-v2.js';
 import { classifyEnumIntent, isEnumerationQuery as isUniversalEnum } from './intent-enum.js';
-// v10.2: Use compat resolvers to bridge legacy vital_facts → v3.0 schema
-import { awards, ecs, programs, academics, progression } from '../resolvers/compat.js';
-// Keep v3.0 resolvers for future use (when tables are populated)
-// import { awards, ecs, narrative, programs } from '../resolvers/enums.js';
-// import { transcript, gpa, overview, vitals } from '../resolvers/academics.js';
+// v10.5.2: RESTORED - Use proper v3.0 resolvers (data exists in views!)
+import { awards, ecs, narrative, programs } from '../resolvers/enums.js';
+import { transcript, gpa, overview, vitals } from '../resolvers/academics.js';
+import { ivyscore, readiness } from '../resolvers/readiness.js';
+import { collegeList } from '../resolvers/college.js';
+import { gameplan } from '../resolvers/gameplan.js';
+// v10.2-v10.5.1: BROKEN compat resolvers (queried bad vital_facts)
+// import { awards, ecs, programs, academics, progression } from '../resolvers/compat.js';
 import { hybridSearch } from '../retrieval/hybrid.js';
 import { composeAnswer } from '../compose/compose.js';
 import { ensureSession, getRecentMessages, storeMessage } from '../services/sessions.js';
@@ -67,6 +70,80 @@ function deduplicateAnswer(answer: string): string {
   return dedupedLines.join('\n');
 }
 
+// --- v10.5.1: Compact facts blocks for Humanizer (Cat-1) -----------------------------
+// Build terse, source-friendly facts blocks distinct from composed answers
+// These are passed as sqlBlock to humanizer to avoid duplication
+
+function factsBlockForEnumeration(route: string, result: any): string {
+  // Build terse, source-friendly lines from enumeration payloads
+  const items = result.items ?? (result.item ? [result.item] : []);
+  if (!items?.length) return "";
+
+  if (route.startsWith("awards.final")) {
+    return items.map((r: any) =>
+      `award: ${r.award_name}${r.won_date ? ` | date: ${r.won_date}` : ""}${r.source_id ? ` | src: ${r.source_id}` : ""}`
+    ).join("\n");
+  }
+
+  if (route.startsWith("program.")) {
+    return items.map((r: any) =>
+      `program: ${r.program_name}${
+        r.submit_date ? ` | submitted: ${r.submit_date}` : ""
+      }${r.decision ? ` | decision: ${r.decision}` : ""}${
+        r.decision_date ? ` (${r.decision_date})` : ""
+      }${r.source_id ? ` | src: ${r.source_id}` : ""}`
+    ).join("\n");
+  }
+
+  if (route.startsWith("ecs.")) {
+    return items.map((r: any) =>
+      `activity: ${r.activity_name}${r.category ? ` | cat: ${r.category}` : ""}${
+        r.event_date ? ` | since: ${r.event_date}` : ""
+      }${r.source_id ? ` | src: ${r.source_id}` : ""}`
+    ).join("\n");
+  }
+
+  if (route.startsWith("academics.gpa.")) {
+    const r = items[0] || result.item;
+    if (!r) return "";
+    const gpa = r.gpa_weighted
+      ? `${r.gpa_unweighted ?? "NA"} UW / ${r.gpa_weighted} W`
+      : `${r.gpa_unweighted ?? "NA"} UW`;
+    return `gpa: ${gpa}${r.credits_earned ? ` | credits: ${r.credits_earned}` : ""}${
+      r.source_id ? ` | src: ${r.source_id}` : ""}`;
+  }
+
+  if (route === "academics.vitals.latest") {
+    const r = result.item;
+    if (!r) return "";
+    const gpa = r.gpa_weighted
+      ? `${r.gpa_unweighted ?? "NA"} UW / ${r.gpa_weighted} W`
+      : `${r.gpa_unweighted ?? "NA"} UW`;
+    return `as_of: ${r.as_of_date} | week: W${String(r.week_no || r.week || 0).padStart(2, "0")} | gpa: ${gpa}` +
+           `${r.ap_count ? ` | ap: ${r.ap_count}` : ""}`;
+  }
+
+  // Fallback: join minimal titles
+  return items.map((r: any) =>
+    r.title_name || r.award_name || r.program_name || r.activity_name || r.item_key || "—"
+  ).join("\n");
+}
+
+function factsBlockForUTFA(result: any): string {
+  // Build a minimal SAT/GPA temporal block from UTFA facts
+  // Each line: date | value | flags
+  if (!result?.facts?.length) return "";
+  return result.facts.map((f: any) => {
+    const v = f.value ?? f.value_numeric ?? f.value_text ?? "";
+    const flags = [
+      f.official ? "official" : null,
+      f.confidence != null ? `conf:${f.confidence}` : null,
+      f.source ? `src:${f.source}` : null
+    ].filter(Boolean).join(" ");
+    return `${f.date ?? ""} | ${v}${flags ? ` | ${flags}` : ""}`;
+  }).join("\n");
+}
+
 // Helper functions for universal enumerations
 function inferChipTableFromRoute(route: string) {
   if (route.startsWith('awards.final')) return 'outcomes';
@@ -115,7 +192,14 @@ function composeEnumText(result: any): string {
     if (route.startsWith('academics.vitals.events')) {
       return `${i+1}. W${String(r.week_no).padStart(2, '0')} (${r.event_date}): ${r.label}`;
     }
-    return `${i+1}. ${r.title_name || r.award_name || r.program_name}`;
+    // v10.5.2: College list formatting
+    if (route.startsWith('college.')) {
+      const bucketTag = r.bucket_category ? ` [${r.bucket_category}]` : '';
+      const decision = r.decision_result ? ` — ${r.decision_result}` : '';
+      const attendingTag = r.attending ? ' ✓ ATTENDING' : '';
+      return `${i+1}. ${r.college_name}${bucketTag}${decision}${attendingTag}`;
+    }
+    return `${i+1}. ${r.title_name || r.award_name || r.program_name || r.college_name}`;
   });
   if (route === 'narrative.initial') {
     const r = result.item;
@@ -145,11 +229,48 @@ function composeEnumText(result: any): string {
     if (!r) return 'No trend data found.';
     return `Academic Trend (W${String(r.first_week).padStart(2, '0')}-W${String(r.last_week).padStart(2, '0')}): GPA U ${r.gpa_u_min}→${r.gpa_u_max}, W ${r.gpa_w_min}→${r.gpa_w_max}, AP: ${r.ap_max}, Weeks Recorded: ${r.weeks_recorded}`;
   }
+
+  // v10.5.2: IvyScore / Readiness
+  if (route.startsWith('ivyscore.')) {
+    const r = result.item;
+    if (!r) return 'No IvyScore data found.';
+    const score = r.overall_score ? Number(r.overall_score).toFixed(1) : 'N/A';
+    const phase = r.snapshot_phase || 'unknown';
+    const date = r.as_of ? new Date(r.as_of).toLocaleDateString() : 'unknown date';
+    return `IvyScore: ${score}/100 (${phase} phase, as of ${date})`;
+  }
+
+  // v10.5.2: College List
+  if (route.startsWith('college.')) {
+    if (route === 'college.attending') {
+      const attending = list.filter((c: any) => c.attending);
+      if (!attending.length) return 'No college marked as attending.';
+      const c = attending[0];
+      return `Attending: ${c.college_name}${c.program ? ` — ${c.program}` : ''}${c.location ? ` (${c.location})` : ''}`;
+    }
+    // college.list, college.reach, college.match, college.safety
+    return lines.length ? lines.join('\n') : 'No colleges found.';
+  }
+
+  // v10.5.2: Game Plan
+  if (route.startsWith('gameplan.')) {
+    const r = result.item;
+    if (!r) return 'No game plan data found.';
+    const parts: string[] = [];
+    if (r.narrative_items?.length) parts.push(`Narrative items: ${r.narrative_items.length}`);
+    if (r.award_targets?.length) parts.push(`Award targets: ${r.award_targets.length}`);
+    if (r.ec_targets?.length) parts.push(`EC targets: ${r.ec_targets.length}`);
+    if (r.program_targets?.length) parts.push(`Program targets: ${r.program_targets.length}`);
+    return parts.length ? `Game Plan: ${parts.join(', ')}` : 'No game plan data found.';
+  }
+
   return lines.length ? lines.join('\n') : 'No items found.';
 }
 
 async function maybeEnumAnswer(pg: any, studentId: string, userText: string) {
+  console.log('[ORCH:maybeEnumAnswer] 🔍 Checking enum intent for:', userText.substring(0, 80));
   const route = classifyEnumIntent(userText);
+  console.log('[ORCH:maybeEnumAnswer] → Classified route:', route || 'NULL (not an enum query)');
   if (!route) return null;
 
   // v10.2: Use compat resolvers (bridge legacy vital_facts → v3.0)
@@ -176,16 +297,36 @@ async function maybeEnumAnswer(pg: any, studentId: string, userText: string) {
     case 'academics.transcript.final':       return { kind: 'enum', route, items: [] };
     case 'academics.transcript.progression': return { kind: 'enum', route, items: [] };
 
-    // GPA from compat.academics.gpa.*
-    case 'academics.gpa.initial':     return { kind: 'enum', route, item:  await academics.gpa.initial(pg, studentId) };
-    case 'academics.gpa.final':       return { kind: 'enum', route, item:  await academics.gpa.final(pg, studentId) };
-    case 'academics.gpa.latest':      return { kind: 'enum', route, item:  await academics.gpa.latest(pg, studentId) };
-    case 'academics.gpa.progression': return { kind: 'enum', route, items: await academics.gpa.progression(pg, studentId) };
+    // GPA from academics.ts resolver
+    case 'academics.gpa.initial':     return { kind: 'enum', route, item:  await gpa.initial(pg, studentId) };
+    case 'academics.gpa.final':       return { kind: 'enum', route, item:  await gpa.final(pg, studentId) };
+    case 'academics.gpa.latest':      return { kind: 'enum', route, item:  await gpa.latest(pg, studentId) };
+    case 'academics.gpa.progression': return { kind: 'enum', route, items: await gpa.progression(pg, studentId) };
 
-    // vitals not available in compat layer (use academics.summary instead)
-    case 'academics.vitals.latest':   return { kind: 'enum', route, item:  await academics.summary(pg, studentId) };
+    // vitals from academics.ts resolver
+    case 'academics.vitals.latest':   return { kind: 'enum', route, item:  await vitals.latest(pg, studentId) };
     case 'academics.vitals.trend':    return { kind: 'enum', route, item:  null };
     case 'academics.vitals.events':   return { kind: 'enum', route, items: [] };
+
+    // IvyScore / Readiness from readiness.ts resolver (v10.5.2)
+    case 'ivyscore.latest':           console.log('[ORCH] → Calling ivyscore.latest'); return { kind: 'enum', route, item:  await ivyscore.latest(pg, studentId) };
+    case 'ivyscore.current':          console.log('[ORCH] → Calling ivyscore.current'); return { kind: 'enum', route, item:  await ivyscore.current(pg, studentId) };
+    case 'ivyscore.progression':      console.log('[ORCH] → Calling ivyscore.progression'); return { kind: 'enum', route, items: await ivyscore.progression(pg, studentId) };
+    case 'readiness.top_priorities':  return { kind: 'enum', route, items: await readiness.topPriorities(pg, studentId) };
+    case 'readiness.weakspots':       return { kind: 'enum', route, items: await readiness.weakspots(pg, studentId) };
+
+    // College List from college.ts resolver (v10.5.2)
+    case 'college.list':              return { kind: 'enum', route, items: await collegeList.all(pg, studentId) };
+    case 'college.attending':         return { kind: 'enum', route, item:  await collegeList.attending(pg, studentId) };
+    case 'college.accepted':          return { kind: 'enum', route, items: await collegeList.accepted(pg, studentId) };
+    case 'college.reach':             return { kind: 'enum', route, items: await collegeList.byBucket(pg, studentId, 'Reach') };
+    case 'college.match':             return { kind: 'enum', route, items: await collegeList.byBucket(pg, studentId, 'Match') };
+    case 'college.safety':            return { kind: 'enum', route, items: await collegeList.byBucket(pg, studentId, 'Safety') };
+
+    // Game Plan from gameplan.ts resolver (v10.5.2)
+    case 'gameplan.summary_initial':  return { kind: 'enum', route, item:  await gameplan.summaryInitial(pg, studentId) };
+    case 'gameplan.vs_execution':     return { kind: 'enum', route, items: await gameplan.vsExecution(pg, studentId) };
+    case 'gameplan.plan_events':      return { kind: 'enum', route, items: await gameplan.planEvents(pg, studentId) };
   }
   return null;
 }
@@ -235,6 +376,9 @@ export async function agentChat(req: any, res?: any) {
     const rawAnswer = composeEnumText(enumResult);
     const dedupedAnswer = deduplicateAnswer(rawAnswer);
 
+    // v10.5.1: Build compact facts block for humanizer (avoids duplication)
+    const enumFacts = factsBlockForEnumeration(enumResult.route, enumResult);
+
     // v10.4: Apply humanizer (Cat-1: SQL facts) with feature flag
     const humanized = HUMANIZER_ENABLED
       ? await humanize({
@@ -242,7 +386,7 @@ export async function agentChat(req: any, res?: any) {
           studentId: req.student_id,
           intent: enumResult.route,
           raw: dedupedAnswer,
-          sqlBlock: dedupedAnswer // Facts list is the answer itself
+          sqlBlock: enumFacts // compact, canonical facts block
         })
       : { ...NO_HUMANIZE, text: dedupedAnswer };
 
@@ -307,6 +451,9 @@ export async function agentChat(req: any, res?: any) {
 
       const dedupedAnswer = deduplicateAnswer(enumerationResult.answer);
 
+      // v10.5.1: Build compact facts block for humanizer (avoids duplication)
+      const enumFacts = factsBlockForEnumeration(enumerationResult.meta?.enumeration_type || "enumeration", enumerationResult);
+
       // v10.4: Apply humanizer (Cat-1: SQL facts) with feature flag
       const humanized = HUMANIZER_ENABLED
         ? await humanize({
@@ -314,7 +461,7 @@ export async function agentChat(req: any, res?: any) {
             studentId: req.student_id,
             intent: enumerationResult.meta.enumeration_type,
             raw: dedupedAnswer,
-            sqlBlock: dedupedAnswer // Facts text is the answer itself
+            sqlBlock: enumFacts // compact facts
           })
         : { ...NO_HUMANIZE, text: dedupedAnswer };
 
@@ -384,6 +531,9 @@ export async function agentChat(req: any, res?: any) {
       const rawAnswer = formatTemporalFactResult(result, intent.kind!);
       const dedupedAnswer = deduplicateAnswer(rawAnswer);
 
+      // v10.5.1: Build compact temporal facts block for humanizer (avoids duplication)
+      const utfaFacts = factsBlockForUTFA(result);
+
       // v10.4: Apply humanizer (Cat-1: UTFA SQL facts) with feature flag
       const humanized = HUMANIZER_ENABLED
         ? await humanize({
@@ -391,7 +541,7 @@ export async function agentChat(req: any, res?: any) {
             studentId: req.student_id,
             intent: `${intent.operator}_${intent.kind}`,
             raw: dedupedAnswer,
-            sqlBlock: dedupedAnswer // UTFA facts text is verbatim
+            sqlBlock: utfaFacts // compact temporal facts
           })
         : { ...NO_HUMANIZE, text: dedupedAnswer };
 

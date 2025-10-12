@@ -36,6 +36,17 @@ const ACADEMICS_SYNS = {
   events: ['academic events', 'grade jump', 'grade change', 'report cards', 'milestone', 'milestones']
 };
 
+// v10.5.2: IvyScore / Readiness patterns
+const IVYSCORE_SYNS = ['ivyscore', 'ivy score', 'ivyready', 'ivy ready', 'readiness score', 'readiness', 'chances', 'my score'];
+const READINESS_SYNS = ['priorities', 'top priorities', 'weakspots', 'weak spots', 'areas to improve', 'what should i work on'];
+
+// v10.5.2: College List patterns
+const COLLEGE_SYNS = ['college list', 'college', 'colleges', 'school list', 'schools', 'university', 'universities'];
+const COLLEGE_ATTENDING_SYNS = ['attending', 'going to', 'enrolled', 'matriculating', 'chose', 'decided', 'final choice'];
+
+// v10.5.2: Game Plan patterns
+const GAMEPLAN_SYNS = ['game plan', 'gameplan', 'plan', 'strategy', 'roadmap', 'targets', 'goals'];
+
 export type EnumRoute =
   | 'awards.initial'
   | 'awards.final'
@@ -59,6 +70,19 @@ export type EnumRoute =
   | 'academics.vitals.latest'
   | 'academics.vitals.trend'
   | 'academics.vitals.events'
+  | 'ivyscore.latest'  // v10.5.2
+  | 'ivyscore.current'  // v10.5.2
+  | 'ivyscore.progression'  // v10.5.2
+  | 'readiness.top_priorities'  // v10.5.2
+  | 'readiness.weakspots'  // v10.5.2
+  | 'college.list'  // v10.5.2
+  | 'college.attending'  // v10.5.2
+  | 'college.reach'  // v10.5.2
+  | 'college.match'  // v10.5.2
+  | 'college.safety'  // v10.5.2
+  | 'gameplan.summary_initial'  // v10.5.2
+  | 'gameplan.vs_execution'  // v10.5.2
+  | 'gameplan.plan_events'  // v10.5.2
   | null;
 
 // Check for word boundaries to avoid false matches
@@ -240,6 +264,73 @@ export function classifyEnumIntent(q: string): EnumRoute {
     return 'academics.vitals.events';
   }
 
+  // v10.5.2: IvyScore / Readiness
+  if (any(s, IVYSCORE_SYNS)) {
+    // "latest ivyscore" → ivyscore.latest
+    if (s.includes('latest') || s.includes('current') || s.includes('what is') || s.includes("what's")) {
+      log.event('intent_classified', { route: 'ivyscore.latest', query: q.slice(0, 80) });
+      return 'ivyscore.latest';
+    }
+    if (any(s, PROG_SYNS)) {
+      log.event('intent_classified', { route: 'ivyscore.progression', query: q.slice(0, 80) });
+      return 'ivyscore.progression';
+    }
+    // Default to latest for "my ivyscore"
+    log.event('intent_classified', { route: 'ivyscore.latest', query: q.slice(0, 80) });
+    return 'ivyscore.latest';
+  }
+
+  // v10.5.2: Readiness (priorities, weakspots)
+  if (any(s, READINESS_SYNS)) {
+    if (s.includes('weak') || s.includes('improve') || s.includes('area')) {
+      log.event('intent_classified', { route: 'readiness.weakspots', query: q.slice(0, 80) });
+      return 'readiness.weakspots';
+    }
+    // Default to top priorities
+    log.event('intent_classified', { route: 'readiness.top_priorities', query: q.slice(0, 80) });
+    return 'readiness.top_priorities';
+  }
+
+  // v10.5.2: College List
+  if (any(s, COLLEGE_SYNS)) {
+    // "which college am I attending?" → college.attending
+    if (any(s, COLLEGE_ATTENDING_SYNS)) {
+      log.event('intent_classified', { route: 'college.attending', query: q.slice(0, 80) });
+      return 'college.attending';
+    }
+    // "reach colleges" → college.reach
+    if (s.includes('reach')) {
+      log.event('intent_classified', { route: 'college.reach', query: q.slice(0, 80) });
+      return 'college.reach';
+    }
+    if (s.includes('match')) {
+      log.event('intent_classified', { route: 'college.match', query: q.slice(0, 80) });
+      return 'college.match';
+    }
+    if (s.includes('safety')) {
+      log.event('intent_classified', { route: 'college.safety', query: q.slice(0, 80) });
+      return 'college.safety';
+    }
+    // Default to full list for "my colleges" / "college list"
+    log.event('intent_classified', { route: 'college.list', query: q.slice(0, 80) });
+    return 'college.list';
+  }
+
+  // v10.5.2: Game Plan
+  if (any(s, GAMEPLAN_SYNS)) {
+    if (s.includes('execution') || s.includes('vs') || s.includes('compare')) {
+      log.event('intent_classified', { route: 'gameplan.vs_execution', query: q.slice(0, 80) });
+      return 'gameplan.vs_execution';
+    }
+    if (s.includes('event') || s.includes('milestone')) {
+      log.event('intent_classified', { route: 'gameplan.plan_events', query: q.slice(0, 80) });
+      return 'gameplan.plan_events';
+    }
+    // Default to initial summary for "my game plan"
+    log.event('intent_classified', { route: 'gameplan.summary_initial', query: q.slice(0, 80) });
+    return 'gameplan.summary_initial';
+  }
+
   log.event('intent_not_enumeration', { query: q.slice(0, 80) });
   return null;
 }
@@ -259,6 +350,11 @@ export function isEnumerationQuery(message: string): boolean {
   if (any(m, ACADEMICS_SYNS.gpa)) return true;
   if (any(m, ACADEMICS_SYNS.vitals)) return true;
   if (any(m, ACADEMICS_SYNS.events)) return true;
+  // v10.5.2: IvyScore, College, GamePlan
+  if (any(m, IVYSCORE_SYNS)) return true;
+  if (any(m, READINESS_SYNS)) return true;
+  if (any(m, COLLEGE_SYNS)) return true;
+  if (any(m, GAMEPLAN_SYNS)) return true;
 
   return false;
 }
