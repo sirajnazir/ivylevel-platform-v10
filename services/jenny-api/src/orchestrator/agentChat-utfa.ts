@@ -172,6 +172,7 @@ function deduplicateEnumItems(items: any[], route: string): any[] {
   if (route.startsWith('ecs.') || route.startsWith('activities.')) nameField = 'activity_name';
   if (route.startsWith('program.')) nameField = 'program_name';
   if (route.startsWith('academics.')) nameField = 'course_name'; // or subject
+  if (route.startsWith('college.')) nameField = 'college_name';
 
   // Normalize name function (remove hyphens, em-dashes, ampersands, trim spaces)
   // v10.5.4.1: Enhanced to handle "&" vs "and" variations
@@ -312,9 +313,9 @@ function composeEnumText(result: any): string {
   // v10.5.2: College List
   if (route.startsWith('college.')) {
     if (route === 'college.attending') {
-      const attending = list.filter((c: any) => c.attending);
-      if (!attending.length) return 'No college marked as attending.';
-      const c = attending[0];
+      // result.item is already filtered by resolver (returns single college or null)
+      const c = result.item;
+      if (!c) return 'No college marked as attending.';
       return `Attending: ${c.college_name}${c.program ? ` — ${c.program}` : ''}${c.location ? ` (${c.location})` : ''}`;
     }
     // college.list, college.reach, college.match, college.safety
@@ -325,12 +326,36 @@ function composeEnumText(result: any): string {
   if (route.startsWith('gameplan.')) {
     const r = result.item;
     if (!r) return 'No game plan data found.';
-    const parts: string[] = [];
-    if (r.narrative_items?.length) parts.push(`Narrative items: ${r.narrative_items.length}`);
-    if (r.award_targets?.length) parts.push(`Award targets: ${r.award_targets.length}`);
-    if (r.ec_targets?.length) parts.push(`EC targets: ${r.ec_targets.length}`);
-    if (r.program_targets?.length) parts.push(`Program targets: ${r.program_targets.length}`);
-    return parts.length ? `Game Plan: ${parts.join(', ')}` : 'No game plan data found.';
+
+    const sections: string[] = [];
+
+    // Narrative Items
+    if (r.narrative_items?.length) {
+      const items = r.narrative_items.map((n: any) => `  • ${n.category}: ${n.content}`).join('\n');
+      sections.push(`**Narrative Elements (${r.narrative_items.length}):**\n${items}`);
+    }
+
+    // Award Targets
+    if (r.award_targets?.length) {
+      const items = r.award_targets.slice(0, 10).map((a: any) => `  • ${a.label}`).join('\n');
+      const more = r.award_targets.length > 10 ? `\n  ... and ${r.award_targets.length - 10} more` : '';
+      sections.push(`**Award Targets (${r.award_targets.length}):**\n${items}${more}`);
+    }
+
+    // EC Targets
+    if (r.ec_targets?.length) {
+      const items = r.ec_targets.slice(0, 10).map((e: any) => `  • ${e.label}`).join('\n');
+      const more = r.ec_targets.length > 10 ? `\n  ... and ${r.ec_targets.length - 10} more` : '';
+      sections.push(`**EC Targets (${r.ec_targets.length}):**\n${items}${more}`);
+    }
+
+    // Program Targets
+    if (r.program_targets?.length) {
+      const items = r.program_targets.map((p: any) => `  • ${p.program}`).join('\n');
+      sections.push(`**Program Targets (${r.program_targets.length}):**\n${items}`);
+    }
+
+    return sections.length ? sections.join('\n\n') : 'No game plan data found.';
   }
 
   return lines.length ? lines.join('\n') : 'No items found.';

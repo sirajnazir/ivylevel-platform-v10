@@ -777,10 +777,22 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
     }
 
     // High confidence (>= 0.62): Route to resolver
+    // v10.5.2 DEBUG: Log intent routing
+    console.log('[INTENT-ROUTER] 🎯 Routing intent:', {
+      intent: intent.intent,
+      phase: intent.phase,
+      object: intent.object,
+      filters: intent.filters,
+      confidence: intent.confidence,
+      student_id: studentId
+    });
+
     let data;
     switch (intent.intent) {
       case "ecs.list":
+        console.log('[INTENT-ROUTER] → Calling resolvers.ecsList');
         data = await resolvers.ecsList(pg, studentId, intent.phase);
+        console.log('[INTENT-ROUTER] ✓ ecsList returned:', data?.hits?.length, 'rows');
         break;
       case "awards.list":
         data = await resolvers.awardsList(pg, studentId, intent.phase);
@@ -825,19 +837,27 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
         data = await resolvers.academicsSAT(pg, studentId, satPhase, intent.filters);
         break;
       case "gameplan.initial":
+        console.log('[INTENT-ROUTER] → Calling resolvers.gamePlanInitial');
         data = await resolvers.gamePlanInitial(pg, studentId);
+        console.log('[INTENT-ROUTER] ✓ gamePlanInitial returned:', JSON.stringify(data).substring(0, 300));
         break;
       case "gameplan.vs_progress":
+        console.log('[INTENT-ROUTER] → Calling resolvers.gamePlanVsExecution');
         data = await resolvers.gamePlanVsExecution(pg, studentId);
+        console.log('[INTENT-ROUTER] ✓ gamePlanVsExecution returned:', JSON.stringify(data).substring(0, 200));
         break;
       case "application.final":
         data = await resolvers.commonAppSubmitted(pg, studentId);
         break;
       case "ivyready.score":
+        console.log('[INTENT-ROUTER] → Calling resolvers.ivyReadyScore, phase:', intent.phase);
         data = await resolvers.ivyReadyScore(pg, studentId, intent.phase);
+        console.log('[INTENT-ROUTER] ✓ ivyReadyScore returned:', JSON.stringify(data).substring(0, 200));
         break;
       case "ivyready.initial":
+        console.log('[INTENT-ROUTER] → Calling resolvers.ivyReadyInitial');
         data = await resolvers.ivyReadyInitial(pg, studentId);
+        console.log('[INTENT-ROUTER] ✓ ivyReadyInitial returned:', JSON.stringify(data).substring(0, 200));
         break;
       case "ivyready.final":
         data = await resolvers.ivyReadyFinal(pg, studentId);
@@ -888,10 +908,14 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
         data = await resolvers.readinessProgression(pg, studentId, 5);
         break;
       case "college.list":
+        console.log('[INTENT-ROUTER] → Calling resolvers.collegeList, filters:', intent.filters, 'message:', message.substring(0, 50));
         data = await resolvers.collegeList(pg, studentId, intent.filters || {}, message);
+        console.log('[INTENT-ROUTER] ✓ collegeList returned:', JSON.stringify(data).substring(0, 300));
         break;
       case "college.compare.readiness":
+        console.log('[INTENT-ROUTER] → Calling resolvers.collegeCompareReadiness');
         data = await resolvers.collegeCompareReadiness(pg, studentId);
+        console.log('[INTENT-ROUTER] ✓ collegeCompareReadiness returned:', JSON.stringify(data).substring(0, 200));
         break;
       case "scholarship.list":
         data = await resolvers.scholarshipList(pg, studentId, intent.filters || {});
