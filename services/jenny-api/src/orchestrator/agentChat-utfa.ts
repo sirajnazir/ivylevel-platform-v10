@@ -75,6 +75,19 @@ function deduplicateAnswer(answer: string): string {
 // Build terse, source-friendly facts blocks distinct from composed answers
 // These are passed as sqlBlock to humanizer to avoid duplication
 
+// Helper: Format date to YYYY-MM-DD
+function formatDate(d: any): string {
+  if (!d) return '';
+  if (d instanceof Date) {
+    return d.toISOString().split('T')[0];
+  }
+  if (typeof d === 'string') {
+    // If it's already ISO format or similar, extract YYYY-MM-DD
+    return d.split('T')[0];
+  }
+  return String(d);
+}
+
 function factsBlockForEnumeration(route: string, result: any): string {
   // Build terse, source-friendly lines from enumeration payloads
   let items = result.items ?? (result.item ? [result.item] : []);
@@ -85,7 +98,7 @@ function factsBlockForEnumeration(route: string, result: any): string {
 
   if (route.startsWith("awards.final")) {
     return items.map((r: any) =>
-      `award: ${r.award_name}${r.won_date ? ` | date: ${r.won_date}` : ""}${r.source_id ? ` | src: ${r.source_id}` : ""}`
+      `award: ${r.award_name}${r.won_date ? ` | date: ${formatDate(r.won_date)}` : ""}${r.source_id ? ` | src: ${r.source_id}` : ""}`
     ).join("\n");
   }
 
@@ -213,7 +226,10 @@ function deduplicateEnumItems(items: any[], route: string): any[] {
         return 4;
       };
 
-      if (getPriority(newSource) < getPriority(existingSource)) {
+      const existingPriority = getPriority(existingSource);
+      const newPriority = getPriority(newSource);
+
+      if (newPriority < existingPriority) {
         // New source has higher priority - replace
         seen.set(key, item);
       }
@@ -233,20 +249,20 @@ function composeEnumText(result: any): string {
   const lines = list.map((r: any, i: number) => {
     if (route.startsWith('ecs.')) {
       return `${i+1}. ${r.activity_name}${r.category ? ` (${r.category})` : ''}${
-        r.submit_date ? ` — submitted ${r.submit_date}` : r.event_date ? ` — started ${r.event_date}` : ''}`;
+        r.submit_date ? ` — submitted ${formatDate(r.submit_date)}` : r.event_date ? ` — started ${formatDate(r.event_date)}` : ''}`;
     }
     if (route.startsWith('awards.final')) {
-      return `${i+1}. ${r.award_name}${r.won_date ? ` (${r.won_date})` : ''}${r.tier ? ` — ${r.tier}` : ''}`;
+      return `${i+1}. ${r.award_name}${r.won_date ? ` (${formatDate(r.won_date)})` : ''}${r.tier ? ` — ${r.tier}` : ''}`;
     }
     if (route.startsWith('awards.initial')) {
-      return `${i+1}. ${r.award_name}${r.tier ? ` — ${r.tier}` : ''}${r.as_of ? ` (as of ${r.as_of})` : ''}`;
+      return `${i+1}. ${r.award_name}${r.tier ? ` — ${r.tier}` : ''}${r.as_of ? ` (as of ${formatDate(r.as_of)})` : ''}`;
     }
     if (route.startsWith('program.')) {
       if (route.endsWith('decisions')) {
         return `${i+1}. ${r.program_name}${r.decision ? ` — ${r.decision}` : ''}${
-          r.decision_date ? ` (${r.decision_date})` : ''}`;
+          r.decision_date ? ` (${formatDate(r.decision_date)})` : ''}`;
       }
-      return `${i+1}. ${r.program_name}${r.submit_date ? ` — submitted ${r.submit_date}` : ''}`;
+      return `${i+1}. ${r.program_name}${r.submit_date ? ` — submitted ${formatDate(r.submit_date)}` : ''}`;
     }
     if (route.startsWith('academics.transcript.')) {
       return `${i+1}. ${r.course_title} — ${r.grade_letter || 'N/A'}${r.grade_percent ? ` (${r.grade_percent}%)` : ''}${
@@ -392,9 +408,9 @@ async function maybeEnumAnswer(pg: any, studentId: string, userText: string) {
     case 'academics.transcript.progression': return { kind: 'enum', route, items: [] };
 
     // GPA from academics.ts resolver
-    case 'academics.gpa.initial':     return { kind: 'enum', route, item:  await gpa.initial(pg, studentId) };
-    case 'academics.gpa.final':       return { kind: 'enum', route, item:  await gpa.final(pg, studentId) };
-    case 'academics.gpa.latest':      return { kind: 'enum', route, item:  await gpa.latest(pg, studentId) };
+    case 'academics.gpa.initial':     return { kind: 'enum', route, items: await gpa.initial(pg, studentId) };
+    case 'academics.gpa.final':       return { kind: 'enum', route, items: await gpa.final(pg, studentId) };
+    case 'academics.gpa.latest':      return { kind: 'enum', route, items: await gpa.latest(pg, studentId) };
     case 'academics.gpa.progression': return { kind: 'enum', route, items: await gpa.progression(pg, studentId) };
 
     // vitals from academics.ts resolver
