@@ -264,6 +264,13 @@ export function classifyEnumIntent(q: string): EnumRoute {
     return 'academics.vitals.events';
   }
 
+  // v10.5.3: Enhanced readiness detection (must come BEFORE college detection)
+  // "am i ready for top colleges?" should route to readiness, NOT college.list
+  if (s.includes('am i ready') || s.includes('ready for')) {
+    log.event('intent_classified', { route: 'ivyscore.latest', query: q.slice(0, 80), reason: 'readiness_question' });
+    return 'ivyscore.latest';
+  }
+
   // v10.5.2: IvyScore / Readiness
   if (any(s, IVYSCORE_SYNS)) {
     // "latest ivyscore" → ivyscore.latest

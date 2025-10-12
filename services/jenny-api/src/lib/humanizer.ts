@@ -48,6 +48,21 @@ const DEFAULT_CELEBRATE = [
   "Love this step forward."
 ];
 
+// v10.5.3: Factual query openers (neutral, context-appropriate for Cat-1)
+// Used when route === "sql" to avoid emotional/coaching phrases on data queries
+const FACTUAL_WARMTH = [
+  "Here's what I have on file:",
+  "Let me pull that up for you.",
+  "From your records:",
+  "Looking at your data:",
+];
+
+const FACTUAL_CLOSER = [
+  "Let me know if anything looks off.",
+  "Does this match what you expected?",
+  "Anything look different from what you remember?",
+];
+
 // Runtime guard rules (from v10.1 quality guards)
 const MAX_EXCL = 5;
 const MAX_EMOJI = 3;
@@ -147,11 +162,14 @@ function capPunctuation(text: string): string {
 /**
  * Safety scrubber - remove meta instructions, chip IDs, internal markers
  * (Keeps v10.1 quality guard patterns)
+ * v10.5.1: Fixed to avoid removing plain English words like "table"
  */
 function scrub(text: string): string {
   return text
     .replace(/^respond in .*$/gim, "")
-    .replace(/\b(scaffold|chip|namespace|family)[:/_-][\w-]+/gi, "")
+    // Only scrub INTERNAL markers that follow a token pattern like "chip:XYZ" / "namespace_FOO"
+    // (do NOT remove plain English words like "table")
+    .replace(/\b(?:chip|namespace|family)[_:\-][a-z0-9\-._]+/gi, "")
     .replace(/\[internal:.*?\]/gi, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -196,8 +214,14 @@ export async function humanize(input: HumanizeInput): Promise<HumanizeOutput> {
   // 1) Load Jenny's real phrasing from EQ signals (with safe fallbacks)
   const phrases = await loadJennyPhrases(studentId);
   const seed = `${studentId || "anon"}|${intent || route}`;
-  const opener = seedPick(phrases.warmth, seed) || "I'm with you.";
-  const closer = seedPick(phrases.celebrate, seed);
+
+  // v10.5.3: Use factual phrases for Cat-1 (SQL), emotional phrases for Cat-2/3
+  const isFactualQuery = route === "sql";
+  const warmthSet = isFactualQuery ? FACTUAL_WARMTH : (phrases.warmth || DEFAULT_WARMTH);
+  const closerSet = isFactualQuery ? FACTUAL_CLOSER : (phrases.celebrate || DEFAULT_CELEBRATE);
+
+  const opener = seedPick(warmthSet, seed) || (isFactualQuery ? "Here's what I have on file:" : "I'm with you.");
+  const closer = seedPick(closerSet, seed);
 
   // 2) Start with raw composed answer
   let out = raw;
@@ -220,17 +244,26 @@ export async function humanize(input: HumanizeInput): Promise<HumanizeOutput> {
     // CRITICAL: DO NOT alter sqlBlock - numbers/dates are sacred
     // Only wrap with warmth + proof presenter + gentle action
 
-    const proofPrefix = sqlBlock
-      ? `**Quick facts (from your records):**\n\`\`\`\n${sqlBlock.trim()}\n\`\`\`\n\n`
-      : "";
-    applied.proof_presenter = !!sqlBlock;
+    // v10.5.1: Only show proof block when it is distinct from the body text
+    // (protects against duplication if caller passes same text by mistake)
+    let proofPrefix = "";
+    if (sqlBlock) {
+      const a = (sqlBlock || "").trim();
+      const b = (out || "").trim();
+      if (a && a !== b) {
+        proofPrefix = `**Quick facts (from your records):**\n\`\`\`\n${a}\n\`\`\`\n\n`;
+        applied.proof_presenter = true;
+      }
+    }
 
     if (!hasWarmth(out)) {
       out = `${opener} ${out}`.trim();
       applied.warmth = true;
     }
 
-    const a = addAction(out, "Note this in your tracker and tell me if anything looks off.");
+    // v10.5.3: Use factual closer for action step (context-appropriate)
+    const actionText = closer || "Let me know if anything looks off.";
+    const a = addAction(out, actionText);
     out = a.text;
     applied.action = a.applied;
 

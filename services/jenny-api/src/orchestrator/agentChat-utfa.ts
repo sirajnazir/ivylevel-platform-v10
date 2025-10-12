@@ -6,7 +6,8 @@ import {
   formatTemporalFactResult
 } from '../services/temporalFacts.js';
 import { routeEnumerationQuery, isEnumerationQuery } from './enumeration-router.js';
-import { routeEnumerationQueryV2, isEnumerationQueryV2 } from './enumeration-router-v2.js';
+// v10.5.2: Legacy SAT-only enumeration router removed - now using unified intent classification
+// import { routeEnumerationQueryV2, isEnumerationQueryV2 } from './enumeration-router-v2.js';
 import { classifyEnumIntent, isEnumerationQuery as isUniversalEnum } from './intent-enum.js';
 // v10.5.2: RESTORED - Use proper v3.0 resolvers (data exists in views!)
 import { awards, ecs, narrative, programs } from '../resolvers/enums.js';
@@ -76,8 +77,11 @@ function deduplicateAnswer(answer: string): string {
 
 function factsBlockForEnumeration(route: string, result: any): string {
   // Build terse, source-friendly lines from enumeration payloads
-  const items = result.items ?? (result.item ? [result.item] : []);
+  let items = result.items ?? (result.item ? [result.item] : []);
   if (!items?.length) return "";
+
+  // v10.5.4: Apply universal deduplication before building facts block
+  items = deduplicateEnumItems(items, route);
 
   if (route.startsWith("awards.final")) {
     return items.map((r: any) =>
@@ -157,9 +161,74 @@ function inferChipTableFromRoute(route: string) {
   return 'kb_items';
 }
 
+// v10.5.4: Universal deduplication for enumerations
+// Removes duplicate entries from multi-source queries (e.g., awards from SRC-IMSG + SRC-INT)
+// Prioritizes SRC-INT-* (canonical intent sources) over SRC-IMSG-* (message scraping)
+function deduplicateEnumItems(items: any[], route: string): any[] {
+  if (!items?.length) return items;
+
+  // Determine primary key field based on route
+  let nameField = 'award_name';
+  if (route.startsWith('ecs.') || route.startsWith('activities.')) nameField = 'activity_name';
+  if (route.startsWith('program.')) nameField = 'program_name';
+  if (route.startsWith('academics.')) nameField = 'course_name'; // or subject
+
+  // Normalize name function (remove hyphens, em-dashes, ampersands, trim spaces)
+  // v10.5.4.1: Enhanced to handle "&" vs "and" variations
+  const normalize = (str: string) => {
+    if (typeof str !== 'string') return '';
+    return str.toLowerCase()
+      .replace(/&/g, 'and')           // Convert & to and
+      .replace(/[—\-\s]+/g, ' ')      // Normalize dashes/spaces
+      .replace(/\s+/g, ' ')           // Collapse multiple spaces
+      .trim();
+  };
+
+  // Group items by normalized name + date (where applicable)
+  const seen = new Map<string, any>();
+
+  for (const item of items) {
+    const name = item[nameField] || '';
+    const date = item.won_date || item.event_date || item.submit_date || item.decision_date || item.as_of || '';
+
+    // Create composite key: normalized_name + date
+    const normalizedName = normalize(name);
+    const key = `${normalizedName}|${date}`;
+
+    if (!seen.has(key)) {
+      // First occurrence - add to map
+      seen.set(key, item);
+    } else {
+      // Duplicate found - prioritize SRC-INT-* sources
+      const existing = seen.get(key);
+      const existingSource = existing?.source_id || '';
+      const newSource = item?.source_id || '';
+
+      // Priority: SRC-INT-* > SRC-COMMONAPP-* > SRC-IMSG-* > others
+      const getPriority = (src: string) => {
+        if (src.startsWith('SRC-INT-')) return 1;
+        if (src.startsWith('SRC-COMMONAPP-')) return 2;
+        if (src.startsWith('SRC-IMSG-')) return 3;
+        return 4;
+      };
+
+      if (getPriority(newSource) < getPriority(existingSource)) {
+        // New source has higher priority - replace
+        seen.set(key, item);
+      }
+      // Otherwise keep existing (higher priority or same priority, first wins)
+    }
+  }
+
+  return Array.from(seen.values());
+}
+
 function composeEnumText(result: any): string {
   const route = result.route as string;
-  const list  = result.items ?? (result.item ? [result.item] : []);
+  let list  = result.items ?? (result.item ? [result.item] : []);
+
+  // v10.5.4: Apply universal deduplication to remove duplicate entries
+  list = deduplicateEnumItems(list, route);
   const lines = list.map((r: any, i: number) => {
     if (route.startsWith('ecs.')) {
       return `${i+1}. ${r.activity_name}${r.category ? ` (${r.category})` : ''}${
@@ -436,6 +505,9 @@ export async function agentChat(req: any, res?: any) {
     return;
   }
 
+  // v10.5.2: Legacy SAT-only enumeration block disabled - now using unified intent classification
+  // All fact queries (awards, testing, ECs, programs) now route through classifyIntent() → resolvers
+  /*
   // SECOND: Check if this is an enumeration query V2 (facts-first from derived CSVs) - SAT only
   if (isEnumerationQueryV2(req.message)) {
     const sessionId = await ensureSession(req.session_id, req.student_id);
@@ -498,6 +570,7 @@ export async function agentChat(req: any, res?: any) {
       return;
     }
   }
+  */
   
   // Check if this is a temporal fact query
   const isTemporalFactQuery = shouldUseTemporalFacts(req.message);

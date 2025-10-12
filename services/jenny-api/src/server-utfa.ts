@@ -17,8 +17,9 @@ import { agentChat } from './orchestrator/agentChat-utfa.js';
 import { fetchVitals, getStudentFactValidation } from './services/facts-canonical.js';
 import { fetchLifecycle } from './services/lifecycle.js';
 import { resolveTemporalFact } from './services/temporalFacts.js';
-import { getInitialAwardTargets, getAwardTargetsByPhase, getAwardTargetsAsOf } from './resolvers/awards.js';
-import { EnumerationResolver, FactsResolver } from './resolvers/kb-items.js';
+// v10.5.2: Legacy imports removed - award targets now via /enum router (enums.ts)
+// import { getInitialAwardTargets, getAwardTargetsByPhase, getAwardTargetsAsOf } from './resolvers/awards.js';
+// import { EnumerationResolver, FactsResolver } from './resolvers/kb-items.js';
 import { pool } from './db/pool.js';
 import { enumsRouter } from './routes/enums.js';
 import { createSnapshotRoutes } from './routes/snapshots.js';
@@ -31,9 +32,9 @@ const app = express();
 // In-memory trace storage for GPT-5 Intent Router
 const traceStore = new Map<string, any>();
 
-// Initialize resolvers
-const enumResolver = new EnumerationResolver(pool);
-const factsResolver = new FactsResolver(pool);
+// v10.5.2: Legacy resolvers removed - now using /enum router (enums.ts)
+// const enumResolver = new EnumerationResolver(pool);
+// const factsResolver = new FactsResolver(pool);
 
 // Enable CORS
 app.use((req, res, next) => {
@@ -96,14 +97,17 @@ app.get('/utfa/test/:student_id', async (req, res) => {
   }
 });
 
-// Award targets endpoint
+// v10.5.2: Legacy award targets endpoint removed
+// Now served by /enum/awards/initial, /enum/awards/final, /enum/awards/progression
+// See routes/enums.ts for v10.5.2 universal enumeration endpoints
+/*
 app.get('/students/:id/awards/targets', async (req, res) => {
   try {
     const { id: studentId } = req.params;
     const { phase, as_of } = req.query;
-    
+
     let result;
-    
+
     if (as_of) {
       const asOfDate = new Date(String(as_of));
       result = await getAwardTargetsAsOf(pool, studentId, asOfDate);
@@ -113,10 +117,10 @@ app.get('/students/:id/awards/targets', async (req, res) => {
       // Default to initial
       result = await getInitialAwardTargets(pool, studentId);
     }
-    
+
     if (result.count === 0) {
-      res.status(412).json({ 
-        error: 'no_evidence', 
+      res.status(412).json({
+        error: 'no_evidence',
         message: 'No award targets found',
         student_id: studentId,
         phase: phase || 'initial'
@@ -128,6 +132,7 @@ app.get('/students/:id/awards/targets', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+*/
 
 // Student routes
 app.get('/students/:id/vitals', async (req, res) => {
