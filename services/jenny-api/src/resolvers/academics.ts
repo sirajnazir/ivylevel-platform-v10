@@ -215,3 +215,79 @@ export const overview = async (pg: Pool, studentId: string) => {
 
   return rows;
 };
+
+// ============================================================================
+// VITALS TIMELINE (Weekly GPA, AP rigor, course load W01-W93)
+// ============================================================================
+
+export const vitals = {
+  latest: async (pg: Pool, studentId: string) => {
+    const start = Date.now();
+    log.event('vitals.latest_start', { student_id: studentId });
+
+    const { rows } = await pg.query(
+      `SELECT student_id, week_no, as_of_date, gpa_unweighted, gpa_weighted,
+              ap_count_cum, honors_count_cum, core_stem_load, workload_hours_week
+         FROM v_academics_latest
+        WHERE student_id=$1`,
+      [studentId]
+    );
+
+    log.event('vitals.latest_complete', {
+      student_id: studentId,
+      found: rows.length > 0,
+      took_ms: Date.now() - start
+    });
+
+    return rows[0] || null;
+  },
+
+  trend: async (pg: Pool, studentId: string) => {
+    const start = Date.now();
+    log.event('vitals.trend_start', { student_id: studentId });
+
+    const { rows } = await pg.query(
+      `SELECT student_id, first_week, last_week,
+              gpa_u_min, gpa_u_max, gpa_w_min, gpa_w_max,
+              ap_max, weeks_recorded
+         FROM v_academics_trend
+        WHERE student_id=$1`,
+      [studentId]
+    );
+
+    log.event('vitals.trend_complete', {
+      student_id: studentId,
+      found: rows.length > 0,
+      took_ms: Date.now() - start
+    });
+
+    return rows[0] || null;
+  },
+
+  events: async (pg: Pool, studentId: string, eventType?: string) => {
+    const start = Date.now();
+    log.event('vitals.events_start', { student_id: studentId, event_type: eventType });
+
+    const query = eventType
+      ? `SELECT student_id, event_id, week_no, event_date, event_type, label, details, provenance
+           FROM academics_events
+          WHERE student_id=$1 AND event_type=$2
+          ORDER BY week_no, event_date`
+      : `SELECT student_id, event_id, week_no, event_date, event_type, label, details, provenance
+           FROM academics_events
+          WHERE student_id=$1
+          ORDER BY week_no, event_date`;
+
+    const params = eventType ? [studentId, eventType] : [studentId];
+    const { rows } = await pg.query(query, params);
+
+    log.event('vitals.events_complete', {
+      student_id: studentId,
+      event_type: eventType,
+      count: rows.length,
+      took_ms: Date.now() - start
+    });
+
+    return rows;
+  }
+};

@@ -1,0 +1,117 @@
+{
+  "id": "facts-suite",
+  "label": "Facts (SQL) Test Suite",
+  "category": "facts",
+  "tests": [
+    {
+      "id": "facts-001",
+      "label": "Awards List with Dates",
+      "category": "facts",
+      "prompt": "What awards did I win? include dates + sources",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-002",
+      "label": "GPA Trend Assessment",
+      "category": "facts",
+      "prompt": "Assessment of my GPA trend",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-003",
+      "label": "AP Count by Year",
+      "category": "facts",
+      "prompt": "How many APs did I take by year?",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-004",
+      "label": "First SAT Score",
+      "category": "facts",
+      "prompt": "What was my first SAT score?",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-005",
+      "label": "Latest GPA",
+      "category": "facts",
+      "prompt": "What's my latest GPA?",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-006",
+      "label": "Summer Programs Submitted",
+      "category": "facts",
+      "prompt": "Which summer programs did I submit to?",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-007",
+      "label": "Grade Jumps",
+      "category": "facts",
+      "prompt": "Show me my grade jumps",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-008",
+      "label": "Academic Vitals Trend",
+      "category": "facts",
+      "prompt": "What's my GPA trend?",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-009",
+      "label": "EC Activities Final",
+      "category": "facts",
+      "prompt": "Which ECs did I actually submit?",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-010",
+      "label": "Program Decisions",
+      "category": "facts",
+      "prompt": "Which programs accepted me?",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    }
+  ]
+}

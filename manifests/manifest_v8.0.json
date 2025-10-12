@@ -1,0 +1,565 @@
+{
+  "version": "8.0",
+  "name": "Jenny Agentic AI - Human-Grade Digital Twin",
+  "created_at": "2025-10-07T00:00:00Z",
+  "status": "tagged",
+  "vision": "Transform Jenny from a fact-retrieval AI into a human-grade, emotionally intelligent coach that reasons across facts, context, and tone while remaining fully proof-grounded and verifiable.",
+  "platform_overview": {
+    "fact_layer": {
+      "status": "enhanced",
+      "description": "Postgres + Readiness Tables + Forecast Features"
+    },
+    "kb_layer": {
+      "status": "enhanced",
+      "description": "973 intel chips + auto-linking via semantic graph (edges)"
+    },
+    "reasoning_layer": {
+      "status": "upgraded",
+      "description": "Fine-tuned Adapter v2 (ToneCue + TrustCue)"
+    },
+    "autonomy_layer": {
+      "status": "new",
+      "description": "Full loop: Diagnose \u2192 Plan \u2192 Act \u2192 Verify \u2192 Learn"
+    },
+    "governance_layer": {
+      "status": "new",
+      "description": "Live embedding + tone health dashboards"
+    }
+  },
+  "data_assets": {
+    "ToneCue": {
+      "source": "iMessage chips",
+      "records": 1200,
+      "purpose": "Learn warmth + brevity",
+      "quality_threshold": 0.9
+    },
+    "TrustCue": {
+      "source": "Session transcripts",
+      "records": 800,
+      "purpose": "Model EQ and credibility",
+      "quality_threshold": 0.9
+    },
+    "PlanGen": {
+      "source": "GamePlan + Assessment",
+      "records": 600,
+      "purpose": "Multi-step planning logic",
+      "quality_threshold": 0.8
+    },
+    "ProofLink": {
+      "source": "Outcome chips",
+      "records": 500,
+      "purpose": "Map text claims \u2192 evidence IDs",
+      "quality_threshold": 0.9
+    },
+    "total_records": 3100
+  },
+  "models": {
+    "llm_adapter_v2": {
+      "base_model": "gpt-4o-mini-2024-07-18",
+      "fine_tuned_model": "jenny-4o-tuned-v8",
+      "learning_rate": 2e-05,
+      "epochs": 3,
+      "batch_size": 16,
+      "metrics": {
+        "tone_similarity": {
+          "target": 0.88,
+          "description": "Alignment with ToneCue examples"
+        },
+        "citation_accuracy": {
+          "target": 0.98,
+          "description": "Correct evidence linking"
+        }
+      },
+      "training_datasets": [
+        "ToneCue",
+        "TrustCue",
+        "PlanGen",
+        "ProofLink"
+      ]
+    },
+    "forecast_model_v1": {
+      "algorithm": "logistic_regression",
+      "version": "1.0",
+      "r_squared": 0.72,
+      "baseline_r_squared": 0.64,
+      "features": {
+        "R": {
+          "name": "Readiness Score",
+          "weight": 2.1
+        },
+        "S": {
+          "name": "SAT/ACT Delta",
+          "weight": 0.8
+        },
+        "E": {
+          "name": "Essay Quality",
+          "weight": 1.2
+        },
+        "A": {
+          "name": "Award Tier Count",
+          "weight": 0.4
+        },
+        "EC": {
+          "name": "EC Depth Score",
+          "weight": 0.3
+        },
+        "REC": {
+          "name": "Recommendation Count",
+          "weight": 0.2
+        }
+      },
+      "output_categories": [
+        "reach",
+        "target",
+        "likely",
+        "safety"
+      ],
+      "confidence_bands": [
+        "high",
+        "medium",
+        "low"
+      ]
+    }
+  },
+  "database_schema": {
+    "new_tables": [
+      {
+        "name": "proof_registry",
+        "purpose": "Cryptographic verification ledger",
+        "indexes": 5
+      },
+      {
+        "name": "proof_audit_log",
+        "purpose": "Complete audit trail for verifications",
+        "indexes": 2
+      },
+      {
+        "name": "cross_namespace_links",
+        "purpose": "Semantic graph edges across KB families",
+        "indexes": 3
+      },
+      {
+        "name": "tone_cue_training",
+        "purpose": "Tone fine-tuning dataset",
+        "indexes": 3
+      },
+      {
+        "name": "trust_cue_training",
+        "purpose": "EQ and credibility training dataset",
+        "indexes": 3
+      },
+      {
+        "name": "autonomy_loop_log",
+        "purpose": "Execution trace for 6-stage autonomy loop",
+        "indexes": 4
+      },
+      {
+        "name": "readiness_forecast_features",
+        "purpose": "Feature store for outcome predictions",
+        "indexes": 3
+      }
+    ],
+    "new_columns": [
+      {
+        "table": "kb_items",
+        "column": "edges",
+        "type": "JSONB",
+        "purpose": "Self-learning semantic graph links"
+      }
+    ],
+    "new_views": [
+      {
+        "name": "v_proof_health",
+        "purpose": "Real-time proof verification metrics"
+      },
+      {
+        "name": "v_cross_namespace_stats",
+        "purpose": "Cross-namespace link statistics"
+      }
+    ]
+  },
+  "services": {
+    "proof_verifier": {
+      "endpoint": "/api/proof/verify",
+      "methods": [
+        "POST",
+        "GET"
+      ],
+      "status": "active",
+      "features": [
+        "SHA-256 hash generation",
+        "5-factor proof scoring",
+        "Automatic escalation (score < 0.7)",
+        "Audit logging",
+        "Health metrics"
+      ]
+    },
+    "forecast": {
+      "endpoint": "/api/forecast",
+      "methods": [
+        "GET"
+      ],
+      "status": "active",
+      "features": [
+        "6-feature logistic regression",
+        "Confidence band calculation",
+        "Feature importance ranking",
+        "Real-time predictions"
+      ]
+    },
+    "agent": {
+      "endpoint": "/api/agent/act",
+      "methods": [
+        "POST"
+      ],
+      "status": "active",
+      "features": [
+        "6-stage autonomy loop",
+        "Diagnose gaps",
+        "Generate plans",
+        "Simulate outcomes",
+        "Execute actions",
+        "Verify results",
+        "Learn and adapt"
+      ]
+    }
+  },
+  "workers": {
+    "selflearn_pipeline": {
+      "script": "workers/selflearn.sh",
+      "status": "operational",
+      "stages": [
+        {
+          "stage": "classify",
+          "worker": "workers/classify_chip.js",
+          "model": "gpt-4o-mini",
+          "output": "family, phase, tags, chip_type"
+        },
+        {
+          "stage": "enrich",
+          "worker": "workers/generate_metadata.js",
+          "model": "gpt-4o-mini",
+          "output": "edges, key_concepts, provenance"
+        },
+        {
+          "stage": "embed",
+          "worker": "workers/embed_upload.js",
+          "model": "text-embedding-3-large",
+          "dimensions": 3072,
+          "output": "vector + dual write (Pinecone + Postgres)"
+        }
+      ],
+      "max_latency_ms": 600000,
+      "directories": {
+        "ingest": "./ingest/new",
+        "processed": "./ingest/processed",
+        "errors": "./ingest/errors"
+      }
+    }
+  },
+  "dashboards": {
+    "governance": {
+      "path": "/dashboard/governance",
+      "status": "active",
+      "panels": [
+        {
+          "name": "Proof Health",
+          "metrics": [
+            "Total artifacts",
+            "Verification rate",
+            "Average proof score",
+            "By-type breakdown"
+          ]
+        },
+        {
+          "name": "Embedding Drift",
+          "metrics": [
+            "Mean retrieval score",
+            "Drift from baseline",
+            "Status indicator"
+          ]
+        },
+        {
+          "name": "Tone Quality",
+          "metrics": [
+            "Avg tone similarity",
+            "Samples evaluated",
+            "Degradation alerts"
+          ]
+        }
+      ],
+      "refresh_interval_ms": 30000
+    }
+  },
+  "qa_suite": {
+    "version": "8.0",
+    "total_prompts": 100,
+    "script": "tools/qa/run_qa_v8.sh",
+    "categories": [
+      {
+        "name": "llm_tone",
+        "count": 20,
+        "pass_criteria": "tone_similarity >= 0.88",
+        "test_ids": [
+          "TONE-001",
+          "TONE-002",
+          "TONE-003",
+          "..."
+        ]
+      },
+      {
+        "name": "cross_namespace",
+        "count": 25,
+        "pass_criteria": "linked_namespaces >= 2",
+        "test_ids": [
+          "CROSS-001",
+          "CROSS-002",
+          "CROSS-003",
+          "..."
+        ]
+      },
+      {
+        "name": "proof_verification",
+        "count": 20,
+        "pass_criteria": "hash_match >= 0.90",
+        "test_ids": [
+          "PROOF-001",
+          "PROOF-002",
+          "PROOF-003",
+          "..."
+        ]
+      },
+      {
+        "name": "self_learning",
+        "count": 10,
+        "pass_criteria": "chip_creation_latency <= 600s",
+        "test_ids": [
+          "LEARN-001",
+          "LEARN-002",
+          "..."
+        ]
+      },
+      {
+        "name": "simulation",
+        "count": 15,
+        "pass_criteria": "latency <= 2.5s",
+        "test_ids": [
+          "SIM-001",
+          "SIM-002",
+          "SIM-003",
+          "..."
+        ]
+      },
+      {
+        "name": "safety",
+        "count": 10,
+        "pass_criteria": "policy_compliance == 100%",
+        "test_ids": [
+          "SAFE-001",
+          "SAFE-002",
+          "SAFE-003",
+          "..."
+        ]
+      }
+    ]
+  },
+  "metrics_targets": {
+    "proof_presence": {
+      "target": 0.98,
+      "description": "% of responses with verified proof",
+      "eval_tool": "Verifier API"
+    },
+    "tone_alignment": {
+      "target": 0.88,
+      "description": "Similarity to ToneCue examples",
+      "eval_tool": "ToneEval"
+    },
+    "retrieval_mean": {
+      "target": 0.55,
+      "description": "Mean retrieval score across queries",
+      "eval_tool": "Drift Dashboard"
+    },
+    "autonomy_pass_rate": {
+      "target": 0.85,
+      "description": "% of successful autonomy loop executions",
+      "eval_tool": "Loop QA"
+    },
+    "outcome_r_squared": {
+      "target": 0.72,
+      "description": "Forecast model validation R\u00b2",
+      "eval_tool": "ForecastEval"
+    },
+    "human_eq_score": {
+      "target": 9,
+      "max": 10,
+      "description": "Blind review empathy rating",
+      "eval_tool": "Human Review"
+    }
+  },
+  "rollout_plan": {
+    "phase_1": {
+      "name": "Graph Schema + Proof API",
+      "week": 1,
+      "deliverables": [
+        "Database migration applied",
+        "Proof verification API deployed"
+      ]
+    },
+    "phase_2": {
+      "name": "Fine-tune Adapter v2",
+      "week": "2-3",
+      "deliverables": [
+        "Training data extracted (3,100 records)",
+        "Fine-tuning job completed",
+        "Model metrics validated"
+      ]
+    },
+    "phase_3": {
+      "name": "Composer Integration",
+      "week": 4,
+      "deliverables": [
+        "Cross-namespace reranker integrated",
+        "Chain-of-proof composer live"
+      ]
+    },
+    "phase_4": {
+      "name": "Self-Learning Pipeline",
+      "week": "5-6",
+      "deliverables": [
+        "Chip classification worker operational",
+        "Edge extraction working",
+        "Dual write to Pinecone + Postgres"
+      ]
+    },
+    "phase_5": {
+      "name": "Forecast Model",
+      "week": 7,
+      "deliverables": [
+        "Logistic regression model trained",
+        "Forecast API deployed",
+        "R\u00b2 \u2265 0.72 validated"
+      ]
+    },
+    "phase_6": {
+      "name": "Reviewer Console MVP",
+      "week": 8,
+      "deliverables": [
+        "Governance dashboard live",
+        "Manifest tracking operational"
+      ]
+    },
+    "phase_7": {
+      "name": "Hardening + Canary",
+      "week": "9-10",
+      "deliverables": [
+        "QA suite passes (100 prompts)",
+        "Canary deployment (10% traffic)",
+        "Production rollout"
+      ]
+    }
+  },
+  "files": {
+    "database": [
+      "apps/api/db/migrations/2025-10-07-v8.0-proof-verification.sql"
+    ],
+    "libraries": [
+      "apps/test-chat-ui/lib/proofVerifier.ts",
+      "apps/test-chat-ui/lib/reranker.ts",
+      "apps/test-chat-ui/lib/forecastModel.ts",
+      "apps/test-chat-ui/lib/autonomyLoop.ts"
+    ],
+    "api_routes": [
+      "apps/test-chat-ui/app/api/proof/verify/route.ts",
+      "apps/test-chat-ui/app/api/forecast/route.ts",
+      "apps/test-chat-ui/app/api/agent/act/route.ts"
+    ],
+    "workers": [
+      "workers/selflearn.sh",
+      "workers/classify_chip.js",
+      "workers/generate_metadata.js",
+      "workers/embed_upload.js"
+    ],
+    "scripts": [
+      "scripts/datagate_filter.py",
+      "scripts/finetune_adapter.py"
+    ],
+    "ui": [
+      "apps/test-chat-ui/app/dashboard/governance/page.tsx"
+    ],
+    "tools": [
+      "tools/ops/manifestTrack.py",
+      "tools/qa/qa_suite_v8.json",
+      "tools/qa/run_qa_v8.sh"
+    ],
+    "docs": [
+      "docs/V8.0_DEPLOYMENT_GUIDE.md",
+      "docs/V8.0_IMPLEMENTATION_SUMMARY.md",
+      "V8.0_QUICK_START.md",
+      "manifests/manifest_v8.0.json"
+    ],
+    "total_files": 21
+  },
+  "dependencies": {
+    "runtime": {
+      "node": ">=18.0.0",
+      "postgres": ">=14.0.0",
+      "python": ">=3.9.0"
+    },
+    "npm_packages": {
+      "@pinecone-database/pinecone": "latest",
+      "openai": "latest",
+      "pg": "latest"
+    },
+    "python_packages": {
+      "psycopg2": "latest",
+      "openai": "latest"
+    }
+  },
+  "risk_mitigation": {
+    "tone_regression": {
+      "risk": "LLM Adapter v2 tone diverges from baseline",
+      "mitigation": "Feature flag + A/B testing"
+    },
+    "chip_drift": {
+      "risk": "Self-learning creates low-quality chips",
+      "mitigation": "Namespace guard + audit jobs"
+    },
+    "proof_false_positive": {
+      "risk": "Incorrect proof verification",
+      "mitigation": "Double signal check + manual escalation"
+    },
+    "forecast_over_promising": {
+      "risk": "Model predictions too optimistic",
+      "mitigation": "Bucketed confidence bands only"
+    }
+  },
+  "acceptance_tests": {
+    "llm_tone": {
+      "prompts": 20,
+      "criteria": "tone_similarity >= 0.88"
+    },
+    "cross_namespace": {
+      "prompts": 25,
+      "criteria": "linked_namespaces >= 2"
+    },
+    "proof_verification": {
+      "prompts": 20,
+      "criteria": "hash_match >= 0.90"
+    },
+    "self_learning": {
+      "prompts": 10,
+      "criteria": "latency < 600s"
+    },
+    "simulation": {
+      "prompts": 15,
+      "criteria": "latency <= 2.5s"
+    },
+    "safety": {
+      "prompts": 10,
+      "criteria": "policy_compliance == 100%"
+    }
+  },
+  "end_state": "Jenny Agentic AI v8.0 = Empathic Digital Coach \u00d7 Verified Analyst \u2014 a self-learning, proof-grounded system that speaks with human warmth and Ivy-level precision.",
+  "release_tag": "v8.0-microcanary",
+  "tagged_at": "2025-10-07T14:14:56.424958"
+}

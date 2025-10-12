@@ -48,16 +48,17 @@ export async function awardsWins(pg: Pool, studentId: string) {
   const start = Date.now();
   log.event('resolver.sql_start', { resolver: 'awardsWins', student_id: studentId });
 
-  const { rows } = await pg.query(`SELECT * FROM v_awards_won WHERE student_id=$1 ORDER BY won_date`, [studentId]);
+  // v10.2: Use compat.v_awards_final (bridges legacy vital_facts)
+  const { rows } = await pg.query(`SELECT * FROM compat.v_awards_final WHERE student_id=$1 ORDER BY won_date`, [studentId]);
 
-  log.event('resolver.sql_complete', { resolver: 'awardsWins', view: 'v_awards_won', row_count: rows.length, took_ms: Date.now() - start });
+  log.event('resolver.sql_complete', { resolver: 'awardsWins', view: 'compat.v_awards_final', row_count: rows.length, took_ms: Date.now() - start });
 
   if (!rows.length) {
-    return { answer: "No award outcomes found.", chips:[{kind:"evidence", text:"v_awards_won"}], hits:[] };
+    return { answer: "No award outcomes found.", chips:[{kind:"evidence", text:"compat.v_awards_final"}], hits:[] };
   }
 
-  const list = rows.map((r, i) => `${i+1}. ${r.award_name}${r.tier ? ` — ${r.tier}` : ""}`).join("\n");
-  return { answer: list, chips:[{kind:"evidence", text:"v_awards_won"}], hits:rows };
+  const list = rows.map((r, i) => `${i+1}. ${r.award_name}${r.won_date ? ` (${r.won_date})` : ""}`).join("\n");
+  return { answer: list, chips:[{kind:"evidence", text:"compat.v_awards_final"}], hits:rows };
 }
 
 export async function programsList(pg: Pool, studentId: string, phase: string) {
@@ -99,50 +100,51 @@ export async function academicsSAT(pg: Pool, studentId: string, phase: string, s
   const start = Date.now();
   log.event('resolver.sql_start', { resolver: 'academicsSAT', student_id: studentId, phase, slots });
 
+  // v10.2: Use compat.v_sat_timeline (bridges legacy vital_facts)
   if (phase === "first") {
-    const { rows } = await pg.query(`SELECT * FROM v_sat_enum_first WHERE student_id=$1`, [studentId]);
-    log.event('resolver.sql_complete', { resolver: 'academicsSAT', view: 'v_sat_enum_first', row_count: rows.length, took_ms: Date.now() - start });
+    const { rows } = await pg.query(`SELECT total_score, fact_date, attempt_number, source_id FROM compat.v_sat_timeline WHERE student_id=$1 AND attempt_number=1`, [studentId]);
+    log.event('resolver.sql_complete', { resolver: 'academicsSAT', view: 'compat.v_sat_timeline', row_count: rows.length, took_ms: Date.now() - start });
 
     if (!rows.length) {
-      return { answer: "No SAT data.", chips:[{kind:"evidence", text:"v_sat_enum_first"}], hits:[] };
+      return { answer: "No SAT data.", chips:[{kind:"evidence", text:"compat.v_sat_timeline"}], hits:[] };
     }
 
     const s = rows[0];
-    return { answer: `Your first SAT total score was ${s.numeric_value} (${s.as_of}${s.type ? `, ${s.type}` : ""})`, chips:[{kind:"evidence", text:"v_sat_enum_first"}], hits:rows };
+    return { answer: `Your first SAT total score was ${s.total_score} (${s.fact_date})`, chips:[{kind:"evidence", text:"compat.v_sat_timeline"}], hits:rows };
   }
 
   if (phase === "latest") {
-    const { rows } = await pg.query(`SELECT * FROM v_sat_enum_latest WHERE student_id=$1`, [studentId]);
-    log.event('resolver.sql_complete', { resolver: 'academicsSAT', view: 'v_sat_enum_latest', row_count: rows.length, took_ms: Date.now() - start });
+    const { rows } = await pg.query(`SELECT total_score, fact_date, attempt_number, source_id FROM compat.v_sat_timeline WHERE student_id=$1 ORDER BY attempt_number DESC LIMIT 1`, [studentId]);
+    log.event('resolver.sql_complete', { resolver: 'academicsSAT', view: 'compat.v_sat_timeline', row_count: rows.length, took_ms: Date.now() - start });
 
     if (!rows.length) {
-      return { answer: "No SAT data.", chips:[{kind:"evidence", text:"v_sat_enum_latest"}], hits:[] };
+      return { answer: "No SAT data.", chips:[{kind:"evidence", text:"compat.v_sat_timeline"}], hits:[] };
     }
 
     const s = rows[0];
-    return { answer: `Your latest SAT total score is ${s.numeric_value} (${s.as_of}${s.type ? `, ${s.type}` : ""})`, chips:[{kind:"evidence", text:"v_sat_enum_latest"}], hits:rows };
+    return { answer: `Your latest SAT total score is ${s.total_score} (${s.fact_date})`, chips:[{kind:"evidence", text:"compat.v_sat_timeline"}], hits:rows };
   }
 
   if (phase === "nth" && slots?.nth) {
-    const { rows } = await pg.query(`SELECT * FROM v_sat_enum_progression WHERE student_id=$1 ORDER BY as_of ASC`, [studentId]);
-    log.event('resolver.sql_complete', { resolver: 'academicsSAT', view: 'v_sat_enum_progression', row_count: rows.length, took_ms: Date.now() - start });
+    const { rows } = await pg.query(`SELECT total_score, fact_date, attempt_number, source_id FROM compat.v_sat_timeline WHERE student_id=$1 ORDER BY attempt_number ASC`, [studentId]);
+    log.event('resolver.sql_complete', { resolver: 'academicsSAT', view: 'compat.v_sat_timeline', row_count: rows.length, took_ms: Date.now() - start });
 
     if (!rows.length) {
-      return { answer: "No SAT data.", chips:[{kind:"evidence", text:"v_sat_enum_progression"}], hits:[] };
+      return { answer: "No SAT data.", chips:[{kind:"evidence", text:"compat.v_sat_timeline"}], hits:[] };
     }
 
     const nth = slots.nth;
     if (nth > rows.length) {
-      return { answer: `You only have ${rows.length} SAT score${rows.length > 1 ? 's' : ''}.`, chips:[{kind:"evidence", text:"v_sat_enum_progression"}], hits:rows };
+      return { answer: `You only have ${rows.length} SAT score${rows.length > 1 ? 's' : ''}.`, chips:[{kind:"evidence", text:"compat.v_sat_timeline"}], hits:rows };
     }
 
     const s = rows[nth - 1];
     const ordinal = ['', 'first', 'second', 'third', 'fourth', 'fifth'][nth] || `${nth}th`;
-    return { answer: `Your ${ordinal} SAT total score was ${s.numeric_value} (${s.as_of}${s.type ? `, ${s.type}` : ""})`, chips:[{kind:"evidence", text:"v_sat_enum_progression"}], hits:[s] };
+    return { answer: `Your ${ordinal} SAT total score was ${s.total_score} (${s.fact_date})`, chips:[{kind:"evidence", text:"compat.v_sat_timeline"}], hits:[s] };
   }
 
   // progression
-  const { rows } = await pg.query(`SELECT * FROM v_sat_enum_progression WHERE student_id=$1 ORDER BY as_of ASC`, [studentId]);
+  const { rows } = await pg.query(`SELECT total_score, fact_date, attempt_number, source_id FROM compat.v_sat_timeline WHERE student_id=$1 ORDER BY attempt_number ASC`, [studentId]);
   log.event('resolver.sql_complete', { resolver: 'academicsSAT', view: 'v_sat_enum_progression', row_count: rows.length, took_ms: Date.now() - start });
 
   if (!rows.length) {

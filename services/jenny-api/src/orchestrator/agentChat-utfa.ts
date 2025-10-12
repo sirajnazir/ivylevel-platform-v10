@@ -8,15 +8,64 @@ import {
 import { routeEnumerationQuery, isEnumerationQuery } from './enumeration-router.js';
 import { routeEnumerationQueryV2, isEnumerationQueryV2 } from './enumeration-router-v2.js';
 import { classifyEnumIntent, isEnumerationQuery as isUniversalEnum } from './intent-enum.js';
-import { awards, ecs, narrative, programs } from '../resolvers/enums.js';
-import { transcript, gpa, overview } from '../resolvers/academics.js';
+// v10.2: Use compat resolvers to bridge legacy vital_facts → v3.0 schema
+import { awards, ecs, programs, academics, progression } from '../resolvers/compat.js';
+// Keep v3.0 resolvers for future use (when tables are populated)
+// import { awards, ecs, narrative, programs } from '../resolvers/enums.js';
+// import { transcript, gpa, overview, vitals } from '../resolvers/academics.js';
 import { hybridSearch } from '../retrieval/hybrid.js';
 import { composeAnswer } from '../compose/compose.js';
 import { ensureSession, getRecentMessages, storeMessage } from '../services/sessions.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 import { pool } from '../db/pool.js';
+// v10.4: Humanizer v2.1 - Jenny's Real Voice across all categories
+import { humanize, type HumanizeOutput } from '../lib/humanizer.js';
+import { HUMANIZER_ENABLED } from '../config/env.js';
 
 const log = createLogger('orchestrator-utfa');
+
+// v10.4: Safe fallback when humanizer disabled
+const NO_HUMANIZE: HumanizeOutput = {
+  text: '',
+  applied: { warmth: false, action: false, personal_ref: false, proof_presenter: false, safety_scrub: false },
+  plan: { phrase_source: 'fallback' as const, cadence: 'standard' as const }
+};
+
+// v10.1: Answer deduplication helper
+// Removes duplicate lines caused by slight text variations (different dashes, spacing, etc.)
+function deduplicateAnswer(answer: string): string {
+  if (!answer || !answer.includes('\n')) return answer;
+
+  const lines = answer.split('\n');
+  const seen = new Set<string>();
+  const dedupedLines = lines.filter(line => {
+    // Normalize: lowercase, remove all dashes/spaces/punctuation for comparison
+    const normalized = line.toLowerCase()
+      .replace(/[—\-–\s.,;:()]/g, '')
+      .trim();
+
+    // Keep non-empty unique lines
+    if (normalized && !seen.has(normalized)) {
+      seen.add(normalized);
+      return true;
+    }
+
+    // Keep empty lines (for formatting)
+    if (!normalized) return true;
+
+    return false;
+  });
+
+  if (dedupedLines.length < lines.length) {
+    log.event('deduplication', {
+      original_lines: lines.length,
+      deduped_lines: dedupedLines.length,
+      removed: lines.length - dedupedLines.length
+    });
+  }
+
+  return dedupedLines.join('\n');
+}
 
 // Helper functions for universal enumerations
 function inferChipTableFromRoute(route: string) {
@@ -27,6 +76,7 @@ function inferChipTableFromRoute(route: string) {
   if (route.startsWith('narrative.'))   return 'kb_items';
   if (route.startsWith('academics.transcript.')) return 'academic_courses';
   if (route.startsWith('academics.gpa.')) return 'academic_gpa';
+  if (route.startsWith('academics.vitals.')) return route.endsWith('events') ? 'academics_events' : 'academics_vitals';
   return 'kb_items';
 }
 
@@ -62,6 +112,9 @@ function composeEnumText(result: any): string {
       const scopeText = r.scope_key ? `${r.scope} (${r.scope_key})` : r.scope;
       return `${i+1}. ${scopeText}: ${gpaText}${r.credits_earned ? ` — ${r.credits_earned} credits` : ''}`;
     }
+    if (route.startsWith('academics.vitals.events')) {
+      return `${i+1}. W${String(r.week_no).padStart(2, '0')} (${r.event_date}): ${r.label}`;
+    }
     return `${i+1}. ${r.title_name || r.award_name || r.program_name}`;
   });
   if (route === 'narrative.initial') {
@@ -77,6 +130,21 @@ function composeEnumText(result: any): string {
     const scopeText = r.scope_key ? `${r.scope} (${r.scope_key})` : r.scope;
     return `Initial GPA — ${scopeText}: ${gpaText}${r.credits_earned ? ` — ${r.credits_earned} credits` : ''}`;
   }
+  if (route === 'academics.vitals.latest') {
+    const r = result.item;
+    if (!r) return 'No vitals data found.';
+    const gpaText = r.gpa_weighted
+      ? `${r.gpa_unweighted || 'N/A'} UW / ${r.gpa_weighted} W`
+      : `${r.gpa_unweighted || 'N/A'}`;
+    return `Latest vitals (W${String(r.week_no).padStart(2, '0')}, ${r.as_of_date}): GPA ${gpaText}, AP Count: ${r.ap_count_cum || 0}${
+      r.core_stem_load ? `, STEM Load: ${r.core_stem_load}` : ''}${
+      r.workload_hours_week ? `, Weekly Hours: ${r.workload_hours_week}` : ''}`;
+  }
+  if (route === 'academics.vitals.trend') {
+    const r = result.item;
+    if (!r) return 'No trend data found.';
+    return `Academic Trend (W${String(r.first_week).padStart(2, '0')}-W${String(r.last_week).padStart(2, '0')}): GPA U ${r.gpa_u_min}→${r.gpa_u_max}, W ${r.gpa_w_min}→${r.gpa_w_max}, AP: ${r.ap_max}, Weeks Recorded: ${r.weeks_recorded}`;
+  }
   return lines.length ? lines.join('\n') : 'No items found.';
 }
 
@@ -84,6 +152,7 @@ async function maybeEnumAnswer(pg: any, studentId: string, userText: string) {
   const route = classifyEnumIntent(userText);
   if (!route) return null;
 
+  // v10.2: Use compat resolvers (bridge legacy vital_facts → v3.0)
   switch (route) {
     case 'awards.initial':     return { kind: 'enum', route, items: await awards.initial(pg, studentId) };
     case 'awards.final':       return { kind: 'enum', route, items: await awards.final(pg, studentId) };
@@ -93,7 +162,8 @@ async function maybeEnumAnswer(pg: any, studentId: string, userText: string) {
     case 'ecs.final':          return { kind: 'enum', route, items: await ecs.final(pg, studentId) };
     case 'ecs.progression':    return { kind: 'enum', route, items: await ecs.progression(pg, studentId) };
 
-    case 'narrative.initial':  return { kind: 'enum', route, item:  await narrative.initial(pg, studentId) };
+    // narrative.initial not available in compat layer yet
+    case 'narrative.initial':  return { kind: 'enum', route, item: null };
 
     case 'program.initial':    return { kind: 'enum', route, items: await programs.initial(pg, studentId) };
     case 'program.submitted':  return { kind: 'enum', route, items: await programs.submitted(pg, studentId) };
@@ -101,14 +171,21 @@ async function maybeEnumAnswer(pg: any, studentId: string, userText: string) {
     case 'program.decisions':  return { kind: 'enum', route, items: await programs.decisions(pg, studentId) };
     case 'program.progression':return { kind: 'enum', route, items: await programs.progression(pg, studentId) };
 
-    case 'academics.transcript.initial':     return { kind: 'enum', route, items: await transcript.initial(pg, studentId) };
-    case 'academics.transcript.final':       return { kind: 'enum', route, items: await transcript.final(pg, studentId) };
-    case 'academics.transcript.progression': return { kind: 'enum', route, items: await transcript.progression(pg, studentId) };
+    // transcript not available in compat layer (no transcript data in vital_facts)
+    case 'academics.transcript.initial':     return { kind: 'enum', route, items: [] };
+    case 'academics.transcript.final':       return { kind: 'enum', route, items: [] };
+    case 'academics.transcript.progression': return { kind: 'enum', route, items: [] };
 
-    case 'academics.gpa.initial':     return { kind: 'enum', route, item:  await gpa.initial(pg, studentId) };
-    case 'academics.gpa.final':       return { kind: 'enum', route, items: await gpa.final(pg, studentId) };
-    case 'academics.gpa.latest':      return { kind: 'enum', route, items: await gpa.latest(pg, studentId) };
-    case 'academics.gpa.progression': return { kind: 'enum', route, items: await gpa.progression(pg, studentId) };
+    // GPA from compat.academics.gpa.*
+    case 'academics.gpa.initial':     return { kind: 'enum', route, item:  await academics.gpa.initial(pg, studentId) };
+    case 'academics.gpa.final':       return { kind: 'enum', route, item:  await academics.gpa.final(pg, studentId) };
+    case 'academics.gpa.latest':      return { kind: 'enum', route, item:  await academics.gpa.latest(pg, studentId) };
+    case 'academics.gpa.progression': return { kind: 'enum', route, items: await academics.gpa.progression(pg, studentId) };
+
+    // vitals not available in compat layer (use academics.summary instead)
+    case 'academics.vitals.latest':   return { kind: 'enum', route, item:  await academics.summary(pg, studentId) };
+    case 'academics.vitals.trend':    return { kind: 'enum', route, item:  null };
+    case 'academics.vitals.events':   return { kind: 'enum', route, items: [] };
   }
   return null;
 }
@@ -155,19 +232,32 @@ export async function agentChat(req: any, res?: any) {
       source_id:  r.source_id
     }));
 
-    const answer = composeEnumText(enumResult);
+    const rawAnswer = composeEnumText(enumResult);
+    const dedupedAnswer = deduplicateAnswer(rawAnswer);
+
+    // v10.4: Apply humanizer (Cat-1: SQL facts) with feature flag
+    const humanized = HUMANIZER_ENABLED
+      ? await humanize({
+          route: 'sql',
+          studentId: req.student_id,
+          intent: enumResult.route,
+          raw: dedupedAnswer,
+          sqlBlock: dedupedAnswer // Facts list is the answer itself
+        })
+      : { ...NO_HUMANIZE, text: dedupedAnswer };
 
     log.event('compose.enumeration_answer', {
       route: enumResult.route,
       items_count: enumResult.items?.length ?? 1,
-      chips_count: chips.length
+      chips_count: chips.length,
+      humanizer: humanized.applied
     });
 
     await storeMessage(sessionId, { role: 'user', content: req.message });
-    await storeMessage(sessionId, { role: 'assistant', content: answer });
+    await storeMessage(sessionId, { role: 'assistant', content: humanized.text });
 
     const response = {
-      answer,
+      answer: humanized.text,
       session_id: sessionId,
       hits: [],
       vitals: await fetchVitals(req.student_id),
@@ -177,6 +267,12 @@ export async function agentChat(req: any, res?: any) {
           route: enumResult.route,
           items_count: enumResult.items?.length ?? 1,
           sql_view: `v_${enumResult.route.replace('.', '_')}`
+        }
+      },
+      debug: {
+        humanizer: {
+          applied: humanized.applied,
+          plan: humanized.plan
         }
       },
       trace_id: `enum-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -209,8 +305,21 @@ export async function agentChat(req: any, res?: any) {
         enumeration_type: enumerationResult.meta.enumeration_type
       });
 
+      const dedupedAnswer = deduplicateAnswer(enumerationResult.answer);
+
+      // v10.4: Apply humanizer (Cat-1: SQL facts) with feature flag
+      const humanized = HUMANIZER_ENABLED
+        ? await humanize({
+            route: 'sql',
+            studentId: req.student_id,
+            intent: enumerationResult.meta.enumeration_type,
+            raw: dedupedAnswer,
+            sqlBlock: dedupedAnswer // Facts text is the answer itself
+          })
+        : { ...NO_HUMANIZE, text: dedupedAnswer };
+
       const response = {
-        answer: enumerationResult.answer,
+        answer: humanized.text,
         session_id: sessionId,
         hits: [], // No RAG needed for enumerations
         vitals: await fetchVitals(req.student_id),
@@ -219,12 +328,18 @@ export async function agentChat(req: any, res?: any) {
           enumeration: enumerationResult.meta,
           ...enumerationResult.trace
         },
+        debug: {
+          humanizer: {
+            applied: humanized.applied,
+            plan: humanized.plan
+          }
+        },
         trace_id: `enum-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         model: 'enumeration_facts'
       };
 
       await storeMessage(sessionId, { role: 'user', content: req.message });
-      await storeMessage(sessionId, { role: 'assistant', content: enumerationResult.answer });
+      await storeMessage(sessionId, { role: 'assistant', content: humanized.text });
 
       if (!req.stream) return response;
 
@@ -266,16 +381,28 @@ export async function agentChat(req: any, res?: any) {
       });
       
       // Format the answer
-      const answer = formatTemporalFactResult(result, intent.kind!);
-      
+      const rawAnswer = formatTemporalFactResult(result, intent.kind!);
+      const dedupedAnswer = deduplicateAnswer(rawAnswer);
+
+      // v10.4: Apply humanizer (Cat-1: UTFA SQL facts) with feature flag
+      const humanized = HUMANIZER_ENABLED
+        ? await humanize({
+            route: 'sql',
+            studentId: req.student_id,
+            intent: `${intent.operator}_${intent.kind}`,
+            raw: dedupedAnswer,
+            sqlBlock: dedupedAnswer // UTFA facts text is verbatim
+          })
+        : { ...NO_HUMANIZE, text: dedupedAnswer };
+
       // Build evidence chips
       const chips = result.facts
         .filter(f => f.source_id && f.source_id !== 'superscore')
         .map(f => ({ id: f.source_id, type: 'source' }))
-        .filter((chip, index, self) => 
+        .filter((chip, index, self) =>
           index === self.findIndex(c => c.id === chip.id)
         );
-      
+
       // Build trace with UTFA details
       const trace = {
         utfa: {
@@ -292,28 +419,35 @@ export async function agentChat(req: any, res?: any) {
           }))
         }
       };
-      
+
       log.event('utfa_resolution_complete', {
         kind: intent.kind,
         operator: intent.operator,
         facts_found: result.facts.length,
-        duration_ms: result.trace.took_ms
+        duration_ms: result.trace.took_ms,
+        humanizer: humanized.applied
       });
-      
+
       // Return structured response
       const response = {
-        answer,
+        answer: humanized.text,
         session_id: sessionId,
         hits: [], // No RAG needed for pure temporal facts
         vitals: await fetchVitals(req.student_id),
         chips,
         trace,
+        debug: {
+          humanizer: {
+            applied: humanized.applied,
+            plan: humanized.plan
+          }
+        },
         trace_id: `utfa-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         model: 'utfa' // Universal Temporal Facts Architecture
       };
-      
+
       await storeMessage(sessionId, { role: 'user', content: req.message });
-      await storeMessage(sessionId, { role: 'assistant', content: answer });
+      await storeMessage(sessionId, { role: 'assistant', content: humanized.text });
       
       log.event('orchestration_complete', {
         duration_ms: Date.now() - orchestrationStart,
@@ -373,32 +507,62 @@ export async function agentChat(req: any, res?: any) {
   
   const composed = await composeAnswer({
     message: req.message,
-    vitals, 
+    vitals,
     hits,
-    memory: { recent }, 
-    model: req.model, 
-    use_ft: req.use_ft, 
-    stream: req.stream, 
+    memory: { recent },
+    model: req.model,
+    use_ft: req.use_ft,
+    stream: req.stream,
     res,
     systemContext
   });
-  
+
+  // Apply deduplication to LLM-generated answers too
+  const dedupedAnswer = deduplicateAnswer(composed.answer);
+
+  // v10.4: Determine route for humanizer (Cat-2 KB/RAG vs Cat-3 FT/EQ)
+  // Cat-2: KB/RAG if hits > 0 (evidence-driven)
+  // Cat-3: FT/EQ if using fine-tuned model OR no hits (coaching/warmth)
+  const isFinetuned = composed.model?.includes('ft:') || req.use_ft;
+  const hasEvidence = hits?.length > 0;
+  const route = hasEvidence ? 'kb' : (isFinetuned ? 'llm' : 'kb');
+
+  // v10.4: Apply humanizer (Cat-2/Cat-3) with feature flag
+  const humanized = HUMANIZER_ENABLED
+    ? await humanize({
+        route,
+        studentId: req.student_id,
+        intent: 'kb_query',
+        raw: dedupedAnswer,
+        evidence: { passages: hits?.map((h: any) => ({ text: h.text, source: h.source })) }
+      })
+    : { ...NO_HUMANIZE, text: dedupedAnswer };
+
   await storeMessage(sessionId, { role: 'user', content: req.message });
-  await storeMessage(sessionId, { role: 'assistant', content: composed.answer });
-  
+  await storeMessage(sessionId, { role: 'assistant', content: humanized.text });
+
   const payload = {
-    answer: composed.answer,
+    answer: humanized.text,
     session_id: sessionId,
     hits,
     vitals,
+    debug: {
+      route,
+      humanizer: {
+        applied: humanized.applied,
+        plan: humanized.plan
+      }
+    },
     trace_id: `rag-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     model: composed.model
   };
-  
+
   log.event('orchestration_complete', {
     duration_ms: Date.now() - orchestrationStart,
-    type: 'rag_llm_response'
+    type: 'rag_llm_response',
+    route,
+    humanizer: humanized.applied
   });
-  
+
   if (!req.stream) return payload;
 }

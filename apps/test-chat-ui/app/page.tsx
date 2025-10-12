@@ -1,325 +1,410 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { agentChat, getVitals, getTrace, getTraceEvents, resolveEvidence } from '../lib/api';
-import TracePanel from './TracePanel';
+/**
+ * Unified Chat UI (v2.0)
+ * Single interface for both fact-based SQL and KB-based RAG queries
+ * Routes through unified /api/chat endpoint with ensemble intent classification
+ */
 
-type Msg = { role: 'user'|'assistant'; text: string; chips?: any[]; hits?: any[]; vitals?: any; trace_id?: string; trace?: any; model?: string };
+import { useState } from 'react';
 
-export default function Page() {
-  const [studentId, setStudentId] = useState('huda-2025');
-  const [week, setWeek] = useState<number | undefined>(undefined);
-  const [model, setModel] = useState<string | undefined>(undefined);
+type Evidence = {
+  rank: number;
+  score?: number;
+  namespace: string;
+  chip_id: string;
+  type?: string;
+  week?: string;
+  phase?: string;
+  content?: string;
+  metadata?: any;
+};
+
+type Message = {
+  role: 'user' | 'assistant';
+  text: string;
+  evidence?: Evidence[];
+  chips?: any[];
+  facts?: any[];
+  source?: 'sql' | 'kb' | 'hybrid';
+  intent?: {
+    intents: string[];
+    tags: string[];
+    confidence: number;
+    source: string;
+  };
+  routing?: {
+    decision: string;
+    execution_mode: string;
+  };
+  meta?: {
+    topScore?: number;
+    lowConfidence?: boolean;
+    evidenceCount?: number;
+  };
+};
+
+const NAMESPACE_LABELS: Record<string, string> = {
+  'KBv6_2025-10-06_v1.0': 'Sessions+Exec (924)',
+  'KBv6_iMessage_2025-10-07_v1.0': 'iMessage (40)',
+  'KBv6_Assessment_2025-10-07_v1.0': 'Assessment+GamePlan (9)'
+};
+
+export default function UnifiedChatPage() {
   const [input, setInput] = useState('');
-  const [history, setHistory] = useState<Msg[]>([]);
-  const [facts, setFacts] = useState<any[]>([]);
-  const [selectedTraceId, setSelectedTraceId] = useState<string | null>(null);
-  const [traceData, setTraceData] = useState<any | null>(null);
-  const [traceEvents, setTraceEvents] = useState<any | null>(null);
+  const [history, setHistory] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => { refreshVitals(); }, [studentId]);
-
-  async function refreshVitals() {
-    try {
-      const v = await getVitals(studentId);
-      setFacts(v.facts || []);
-    } catch (e) {}
-  }
+  const [studentId, setStudentId] = useState('huda-2025');
+  const [week, setWeek] = useState(0);
+  const [showDebug, setShowDebug] = useState(true);
 
   async function send() {
-    if (!input.trim()) return;
-    const text = input;
-    setHistory(h => [...h, { role: 'user', text }]);
+    if (!input.trim() || loading) return;
+
+    const userText = input;
+    setHistory(h => [...h, { role: 'user', text: userText }]);
     setInput('');
     setLoading(true);
+
     try {
-      const res = await agentChat(text, studentId, { week, llm_model: model });
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userText,
+          student_id: studentId,
+          week,
+          context: {}
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Request failed');
+      }
+
+      const data = await res.json();
+
+      // Transform hits to evidence format
+      const transformedHits = (data.hits || []).map((hit: any, idx: number) => ({
+        rank: hit.rank || idx + 1,
+        score: hit.score,
+        namespace: hit.namespace,
+        chip_id: hit.chip_id,
+        type: hit.type,
+        week: hit.week,
+        phase: hit.phase,
+        content: hit.content,
+        metadata: hit.metadata
+      }));
+
       setHistory(h => [...h, {
         role: 'assistant',
-        text: res.answer || '(No answer text returned — see chips & hits)',
-        chips: res.chips || [],
-        hits: res.hits || [],
-        vitals: res.vitals || {},
-        trace_id: res.trace_id,
-        trace: res.trace || {},
-        model: res.model || 'gpt5-intent'
+        text: data.answer,
+        evidence: transformedHits,
+        chips: data.chips || [],
+        facts: data.facts || [],
+        source: data.source,
+        intent: data.intent,
+        routing: data.routing,
+        meta: {
+          topScore: data.hits?.[0]?.score,
+          evidenceCount: data.hits?.length,
+          // Only show low confidence warning for KB-based queries
+          lowConfidence: data.source === 'kb' && (data.hits?.[0]?.score || 0) < 0.40
+        }
       }]);
+
     } catch (e: any) {
-      setHistory(h => [...h, { role: 'assistant', text: `Error: ${e.message}` }]);
+      setHistory(h => [...h, {
+        role: 'assistant',
+        text: `❌ Error: ${e.message}`
+      }]);
     } finally {
       setLoading(false);
     }
   }
 
-  async function openTrace(traceId?: string) {
-    if (!traceId) return;
-    setSelectedTraceId(traceId);
-    try {
-      // Get the message with this trace ID
-      const msg = history.find(h => h.trace_id === traceId);
-      if (!msg) {
-        setTraceData({ error: 'Message not found' });
-        return;
-      }
-
-      // Build real trace from server response
-      const trace = msg.trace || {};
-      const model = msg.model || 'unknown';
-      const isEnum = trace.enumeration?.route;
-      const isUTFA = model === 'utfa';
-      const isRAG = msg.hits && msg.hits.length > 0;
-
-      const events: any[] = [];
-      let seq = 1;
-
-      // Enumeration trace (deterministic SQL)
-      if (isEnum) {
-        events.push({
-          sequence: seq++,
-          component: 'orchestrator',
-          operation: 'intent_detection',
-          start_time: new Date().toISOString(),
-          duration_ms: 5,
-          metadata: {
-            route: trace.enumeration.route,
-            class: 'enumeration'
-          }
-        });
-        events.push({
-          sequence: seq++,
-          component: 'enum_resolver',
-          operation: `resolve_${trace.enumeration.route}`,
-          start_time: new Date().toISOString(),
-          duration_ms: 15,
-          api_provider: 'postgres',
-          api_method: 'query',
-          api_request: { sql_view: trace.enumeration.sql_view },
-          api_response: { row_count: trace.enumeration.items_count },
-          metadata: {
-            items_count: trace.enumeration.items_count,
-            sql_view: trace.enumeration.sql_view
-          }
-        });
-        events.push({
-          sequence: seq++,
-          component: 'composer',
-          operation: 'compose_enumeration_answer',
-          start_time: new Date().toISOString(),
-          duration_ms: 3,
-          metadata: { format: 'numbered_list' }
-        });
-      }
-      // UTFA trace (temporal facts)
-      else if (isUTFA) {
-        events.push({
-          sequence: seq++,
-          component: 'orchestrator',
-          operation: 'intent_detection',
-          start_time: new Date().toISOString(),
-          duration_ms: 8,
-          metadata: {
-            kind: trace.utfa?.intent?.kind,
-            operator: trace.utfa?.intent?.operator
-          }
-        });
-        events.push({
-          sequence: seq++,
-          component: 'utfa_resolver',
-          operation: 'resolve_temporal_fact',
-          start_time: new Date().toISOString(),
-          duration_ms: trace.utfa?.took_ms || 20,
-          api_provider: 'postgres',
-          api_method: trace.utfa?.sql_function,
-          api_response: { row_count: trace.utfa?.rows_returned },
-          metadata: trace.utfa
-        });
-      }
-      // RAG trace (only if hits present)
-      else if (isRAG) {
-        events.push({
-          sequence: seq++,
-          component: 'orchestrator',
-          operation: 'intent_detection',
-          start_time: new Date().toISOString(),
-          duration_ms: 12,
-          metadata: { detected_kinds: [] }
-        });
-        events.push({
-          sequence: seq++,
-          component: 'retrieval',
-          operation: 'hybrid_search',
-          start_time: new Date().toISOString(),
-          duration_ms: 200,
-          metadata: { hit_count: msg.hits.length }
-        });
-        events.push({
-          sequence: seq++,
-          component: 'composer',
-          operation: 'llm_completion',
-          start_time: new Date().toISOString(),
-          duration_ms: 350,
-          api_provider: 'openai',
-          api_method: 'chat.completions',
-          api_request: { model: model }
-        });
-      }
-
-      const traceObj = {
-        trace_id: traceId,
-        message: msg.text.slice(0, 50) + '...',
-        intent: isEnum ? 'enumeration' : isUTFA ? 'temporal_fact' : isRAG ? 'rag_query' : 'unknown',
-        duration_ms: events.reduce((sum, e) => sum + (e.duration_ms || 0), 0),
-        events,
-        model,
-        pipeline: isEnum ? 'sql-enum' : isUTFA ? 'utfa' : isRAG ? 'rag' : 'unknown'
-      };
-
-      setTraceData(traceObj);
-    } catch (e: any) {
-      setTraceData({ error: e.message });
-    }
+  function copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text);
   }
 
-  const lastAssistant = useMemo(() => [...history].reverse().find(m => m.role==='assistant'), [history]);
-
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, padding: 16, height: '100vh', overflow: 'hidden' }}>
-      {/* LEFT: Chat */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflow: 'hidden' }}>
-        <h1 style={{ fontWeight: 600, marginBottom: 8 }}>Jenny • Test Chat</h1>
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <header className="bg-white rounded-lg shadow p-6 mb-4">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Jenny • Unified Chat <span className="text-sm font-normal text-gray-500">(v2.0)</span>
+          </h1>
+          <p className="text-sm text-gray-600 mt-1">
+            SQL Facts + KB RAG • Ensemble Intent Classification • Universal Orchestrator
+          </p>
+        </header>
+
         {/* Controls */}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 14, marginBottom: 8 }}>
-          <label>Student</label>
-          <input value={studentId} onChange={e=>setStudentId(e.target.value)} style={{ border:'1px solid #ddd', padding:4, width:140 }} />
-          <label>Week</label>
-          <input type="number" value={week ?? ''} onChange={e=>setWeek(e.target.value? Number(e.target.value): undefined)} placeholder="(optional)" style={{ border:'1px solid #ddd', padding:4, width:100 }} />
-          <label>Model</label>
-          <input value={model ?? ''} onChange={e=>setModel(e.target.value || undefined)} placeholder="(optional) ft model id" style={{ border:'1px solid #ddd', padding:4, width:380 }} />
+        <div className="bg-white rounded-lg shadow p-4 mb-4 space-y-3">
+          <div className="flex gap-4 items-center">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Student ID</label>
+              <input
+                type="text"
+                value={studentId}
+                onChange={e => setStudentId(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                style={{ width: 140 }}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Week</label>
+              <input
+                type="number"
+                value={week}
+                onChange={e => setWeek(Number(e.target.value))}
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                style={{ width: 100 }}
+              />
+            </div>
+            <div className="flex items-end">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={showDebug}
+                  onChange={e => setShowDebug(e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-sm">Show Debug Panels</span>
+              </label>
+            </div>
+          </div>
         </div>
 
-        {/* Composer */}
-        <div style={{ display:'flex', gap:8, marginBottom:8 }}>
-          <input
-            placeholder="Ask Jenny…"
-            value={input}
-            onChange={e=>setInput(e.target.value)}
-            onKeyDown={e=>{ if (e.key==='Enter') send(); }}
-            style={{ border:'1px solid #bbb', padding:8, flex:1 }}
-          />
-          <button onClick={send} disabled={loading} style={{ border:'1px solid #333', padding:'8px 16px', background:'#111', color:'white' }}>
-            {loading ? 'Sending…' : 'Send'}
-          </button>
-        </div>
+        {/* Chat History */}
+        <div className="bg-white rounded-lg shadow p-6 mb-4 space-y-4 max-h-[600px] overflow-y-auto">
+          {history.length === 0 && (
+            <div className="text-center text-gray-500 py-8">
+              <p>No messages yet. Ask Jenny anything!</p>
+              <p className="text-sm mt-2">
+                Try: "What awards did I win?" or "Show me the 168 framework"
+              </p>
+            </div>
+          )}
 
-        {/* Transcript */}
-        <div style={{ border:'1px solid #eee', borderRadius:8, padding:12, flex: 1, overflow: 'auto' }}>
-          {history.map((m, i) => (
-            <div key={i} style={{ margin:'8px 0' }}>
-              <div style={{ fontWeight: m.role==='user' ? 600 : 500 }}>{m.role==='user' ? 'You' : 'Jenny'}</div>
-              <div>{m.text}</div>
-              {m.role==='assistant' && (
-                <>
-                  {/* Trace link */}
-                  {m.trace_id ? (
-                    <div style={{ marginTop:4 }}>
-                      <button onClick={()=>openTrace(m.trace_id)} style={{ fontSize:12, textDecoration:'underline', color: selectedTraceId === m.trace_id ? '#2563eb' : '#666' }}>
-                        {selectedTraceId === m.trace_id ? 'viewing' : 'view'} trace ({m.trace_id.slice(0,8)}…)
-                      </button>
+          {history.map((msg, i) => (
+            <div
+              key={i}
+              className={`p-4 rounded-lg ${
+                msg.role === 'user'
+                  ? 'bg-blue-50 ml-12'
+                  : 'bg-gray-50 mr-12'
+              }`}
+            >
+              <div className="text-xs text-gray-500 mb-1 flex items-center justify-between">
+                <div>
+                  {msg.role === 'user' ? 'You' : 'Jenny'}
+                  {msg.meta && msg.meta.topScore !== undefined && (
+                    <span className="ml-2">
+                      Score: {msg.meta.topScore.toFixed(3)}
+                      {msg.meta.lowConfidence && <span className="text-yellow-600 ml-1">⚠️ Low confidence</span>}
+                    </span>
+                  )}
+                </div>
+                {msg.source && (
+                  <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                    {msg.source === 'sql' ? '🗄️ SQL' : msg.source === 'kb' ? '🔍 KB' : '🔀 Hybrid'}
+                  </span>
+                )}
+              </div>
+
+              {/* Low confidence banner */}
+              {msg.role === 'assistant' && msg.meta?.lowConfidence && (
+                <div className="mb-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                  <div className="flex items-start">
+                    <span className="text-yellow-600 text-lg mr-2">⚠️</span>
+                    <div className="text-xs">
+                      <div className="font-semibold text-yellow-800">Low Confidence Match</div>
+                      <div className="text-yellow-700 mt-1">
+                        Top score: {msg.meta.topScore?.toFixed(2) || 'N/A'} (threshold: 0.40)
+                      </div>
+                      <div className="text-yellow-600 mt-1">
+                        The evidence may not be directly relevant. Consider refining your query.
+                      </div>
                     </div>
-                  ) : null}
-                  {/* Chips */}
-                  {!!m.chips?.length && (
-                    <EvidenceChips ids={m.chips.map((c:any)=>c.id)} />
-                  )}
-                  {/* Hits */}
-                  {!!m.hits?.length && (
-                    <HitsList hits={m.hits} />
-                  )}
-                </>
+                  </div>
+                </div>
+              )}
+
+              {/* Message text */}
+              <div className="prose prose-sm max-w-none">
+                <p className="whitespace-pre-wrap">{msg.text}</p>
+              </div>
+
+              {/* Intent & Routing Debug */}
+              {showDebug && msg.intent && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm font-medium text-gray-700 bg-blue-50 p-2 rounded">
+                    🧠 Intent Classification & Routing
+                  </summary>
+                  <div className="mt-2 p-3 bg-blue-50 rounded text-xs space-y-2">
+                    <div>
+                      <span className="font-semibold">Primary Intent:</span>{' '}
+                      <code className="bg-white px-2 py-1 rounded">
+                        {msg.intent.intents[0] || 'none'}
+                      </code>
+                    </div>
+                    <div>
+                      <span className="font-semibold">Confidence:</span>{' '}
+                      <code className="bg-white px-2 py-1 rounded">
+                        {msg.intent.confidence.toFixed(2)} ({msg.intent.source})
+                      </code>
+                    </div>
+                    <div>
+                      <span className="font-semibold">Tags:</span>{' '}
+                      <code className="bg-white px-2 py-1 rounded">
+                        [{msg.intent.tags.join(', ')}]
+                      </code>
+                    </div>
+                    {msg.routing && (
+                      <div>
+                        <span className="font-semibold">Routing:</span>{' '}
+                        <code className="bg-white px-2 py-1 rounded">
+                          {msg.routing.decision} → {msg.routing.execution_mode}
+                        </code>
+                      </div>
+                    )}
+                  </div>
+                </details>
+              )}
+
+              {/* Evidence Panel (KB hits) */}
+              {showDebug && msg.evidence && msg.evidence.length > 0 && (
+                <details className="mt-4" open>
+                  <summary className="cursor-pointer text-sm font-medium text-gray-700">
+                    📚 Evidence ({msg.evidence.length} KB hits)
+                  </summary>
+                  <div className="mt-2 space-y-2">
+                    {msg.evidence.map((e, j) => (
+                      <div key={j} className="border border-gray-200 rounded p-3 text-xs">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="font-mono font-bold text-blue-600">
+                              [{e.rank}] {e.chip_id}
+                            </div>
+                            <div className="text-gray-600 mt-1">
+                              <span className="font-medium">Namespace:</span>{' '}
+                              {NAMESPACE_LABELS[e.namespace] || e.namespace}
+                            </div>
+                            <div className="text-gray-600">
+                              <span className="font-medium">Type:</span> {e.type} |{' '}
+                              <span className="font-medium">Week:</span> {e.week || 'N/A'} |{' '}
+                              <span className="font-medium">Phase:</span> {e.phase || 'N/A'}
+                            </div>
+                            <div className="text-gray-600">
+                              <span className="font-medium">Score:</span> {e.score?.toFixed(4) || 'N/A'}
+                            </div>
+                            {e.content && (
+                              <div className="mt-2 text-gray-700 bg-gray-50 p-2 rounded">
+                                {e.content.substring(0, 300)}
+                                {e.content.length > 300 && '…'}
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => copyToClipboard(`[${e.chip_id} @ ${e.namespace}]`)}
+                            className="ml-2 px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded"
+                            title="Copy citation"
+                          >
+                            📋
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
+
+              {/* Facts Panel (SQL results) */}
+              {showDebug && msg.facts && msg.facts.length > 0 && (
+                <details className="mt-4" open>
+                  <summary className="cursor-pointer text-sm font-medium text-gray-700">
+                    🗄️ Facts ({msg.facts.length} SQL results)
+                  </summary>
+                  <div className="mt-2 space-y-2">
+                    {msg.facts.map((fact, j) => (
+                      <div key={j} className="border border-gray-200 rounded p-3 text-xs">
+                        <div className="font-mono font-bold text-green-600">
+                          {fact.kind || fact.type}
+                        </div>
+                        <div className="text-gray-700 mt-1">
+                          <pre className="whitespace-pre-wrap">
+                            {JSON.stringify(fact, null, 2)}
+                          </pre>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
+
+              {/* Chips Panel */}
+              {showDebug && msg.chips && msg.chips.length > 0 && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm font-medium text-gray-700">
+                    🔗 Referenced Chips ({msg.chips.length})
+                  </summary>
+                  <div className="mt-2 text-xs">
+                    <ul className="list-disc list-inside space-y-1">
+                      {msg.chips.map((chip: any, j) => (
+                        <li key={j} className="text-gray-600">
+                          <code className="bg-gray-100 px-1 py-0.5 rounded">
+                            {typeof chip === 'string' ? chip : chip.chip_id || chip.id}
+                          </code>
+                          {chip.score && <span className="ml-2">score: {chip.score.toFixed(3)}</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </details>
               )}
             </div>
           ))}
         </div>
-      </div>
 
-      {/* RIGHT: Trace Panel */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, overflow: 'hidden' }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#666' }}>Trace Viewer</div>
-        {selectedTraceId && traceData ? (
-          <TracePanel traceId={selectedTraceId} trace={traceData} />
-        ) : (
-          <div style={{ border: '1px solid #eee', borderRadius: 8, padding: 16, flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
-            Send a message to see step-by-step execution trace
-          </div>
-        )}
-        
-        {/* Vitals section below trace */}
-        <div style={{ border:'1px solid #eee', borderRadius:8, padding:12, marginTop: 8 }}>
-          <div style={{ display:'flex', justifyContent:'space-between' }}>
-            <div style={{ fontWeight:600, fontSize: 14 }}>Student Vitals</div>
-            <button onClick={refreshVitals} style={{ fontSize:12, textDecoration:'underline' }}>refresh</button>
-          </div>
-          <ul style={{ fontSize:12, maxHeight:'200px', overflow:'auto', marginTop:8 }}>
-            {facts.slice(0,20).map((f,i)=>(
-              <li key={i} style={{ margin:'4px 0' }}>
-                <code>{f.kind}</code>: <b>{f.value}</b> <span>({String(f.fact_date||'').slice(0,10)})</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function EvidenceChips({ ids }: { ids: string[] }) {
-  const [open, setOpen] = useState(false);
-  const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  async function load() {
-    setLoading(true);
-    try {
-      const data = await resolveEvidence(ids);
-      setItems(data || []);
-      setOpen(true);
-    } finally {
-      setLoading(false);
-    }
-  }
-  return (
-    <div style={{ marginTop:6 }}>
-      <button onClick={load} style={{ fontSize:12, textDecoration:'underline' }}>
-        {loading ? 'loading…' : `evidence (${ids.length})`}
-      </button>
-      {open && (
-        <div style={{ marginTop:6, border:'1px solid #eee', borderRadius:6, padding:6 }}>
-          {items.map((s,i)=>(
-            <div key={i} style={{ marginBottom:6 }}>
-              <div style={{ fontWeight:600 }}>{s.title || s.source_id}</div>
-              {s.drive_link ? <a href={s.drive_link} target="_blank" style={{ fontSize:12, color:'#2563eb', textDecoration:'underline' }}>open source</a> : null}
-              <div style={{ fontSize:11, color:'#666' }}>{s.source_id}</div>
+        {/* Input Box */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <textarea
+            placeholder="Ask Jenny... (Shift+Enter for new line, Enter to send)"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send();
+              }
+            }}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none"
+            rows={3}
+          />
+          <div className="mt-2 flex justify-between items-center">
+            <div className="text-xs text-gray-500">
+              Student: {studentId} • Week: {week}
             </div>
-          ))}
-          <button onClick={()=>setOpen(false)} style={{ fontSize:12, textDecoration:'underline' }}>close</button>
+            <button
+              onClick={send}
+              disabled={loading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Sending...' : 'Send'}
+            </button>
+          </div>
         </div>
-      )}
-    </div>
-  );
-}
 
-function HitsList({ hits }: { hits: any[] }) {
-  return (
-    <div style={{ marginTop:6 }}>
-      <div style={{ fontSize:12, fontWeight:600 }}>Top hits</div>
-      <ul style={{ fontSize:12, marginTop:4 }}>
-        {hits.slice(0,5).map((h,i)=>(
-          <li key={i}>
-            [{h.namespace}] {h.id} — score {Number(h.score).toFixed(3)}
-          </li>
-        ))}
-      </ul>
+        {/* System Info */}
+        <div className="mt-4 text-xs text-center text-gray-500">
+          <p>Unified Pipeline: GPT-5 Intent → Universal Orchestrator → SQL | KB | Hybrid</p>
+          <p className="mt-1">3 KBv6 Namespaces (973 vectors) • PostgreSQL Facts • Ensemble Classification</p>
+        </div>
+      </div>
     </div>
   );
 }

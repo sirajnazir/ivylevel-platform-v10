@@ -29,6 +29,12 @@ type Message = {
     evidenceCount?: number;
     noHits?: boolean;
   };
+  debug?: {
+    matched_tags: string[];
+    applied_priors: Record<string, any>;
+    scaffold_id?: string;
+    top1_score: number;
+  };
 };
 
 const ALL_NAMESPACES = [
@@ -61,14 +67,18 @@ export default function KBTestPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/kb-chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userMessage: userText,
-          namespaces: selectedNamespaces,
-          topK,
-          filters: Object.keys(filters).length > 0 ? filters : undefined
+          message: userText,
+          student_id: 'huda-2025', // Default student for testing
+          week: 0,
+          context: {
+            namespaces: selectedNamespaces,
+            topK,
+            filters: Object.keys(filters).length > 0 ? filters : undefined
+          }
         })
       });
 
@@ -79,11 +89,35 @@ export default function KBTestPage() {
 
       const data = await res.json();
 
+      // Transform response to match UI expectations
+      const transformedHits = (data.hits || []).map((hit: any, idx: number) => ({
+        rank: hit.rank || idx + 1,
+        score: hit.score,
+        namespace: hit.namespace,
+        chip_id: hit.chip_id,
+        type: hit.type,
+        week: hit.week,
+        phase: hit.phase,
+        content: hit.content,
+        metadata: hit.metadata
+      }));
+
       setHistory(h => [...h, {
         role: 'assistant',
         text: data.answer,
-        evidence: data.evidence || [],
-        meta: data.meta
+        evidence: transformedHits,
+        meta: {
+          topScore: data.hits?.[0]?.score,
+          evidenceCount: data.hits?.length,
+          lowConfidence: (data.hits?.[0]?.score || 0) < 0.40,
+          noHits: !data.hits?.length
+        },
+        debug: {
+          matched_tags: data.intent?.tags || [],
+          applied_priors: {},
+          scaffold_id: data.routing?.execution_mode,
+          top1_score: data.hits?.[0]?.score || 0
+        }
       }]);
 
     } catch (e: any) {
@@ -200,9 +234,63 @@ export default function KBTestPage() {
                   </span>
                 )}
               </div>
+
+              {/* Confidence Banner */}
+              {msg.role === 'assistant' && msg.meta?.lowConfidence && (
+                <div className="mb-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                  <div className="flex items-start">
+                    <span className="text-yellow-600 text-lg mr-2">⚠️</span>
+                    <div className="text-xs">
+                      <div className="font-semibold text-yellow-800">Low Confidence Match</div>
+                      <div className="text-yellow-700 mt-1">Top score: {msg.meta.topScore?.toFixed(2) || 'N/A'} (threshold: 0.40)</div>
+                      <div className="text-yellow-600 mt-1">The evidence may not be directly relevant. Consider refining your query.</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="prose prose-sm max-w-none">
                 <p className="whitespace-pre-wrap">{msg.text}</p>
               </div>
+
+              {/* Scaffold Routing Debug Panel */}
+              {showDebug && msg.debug && (
+                <details className="mt-4 mb-4">
+                  <summary className="cursor-pointer text-sm font-medium text-gray-700 bg-blue-50 p-2 rounded">
+                    🧭 Scaffold Routing Debug
+                  </summary>
+                  <div className="mt-2 p-3 bg-blue-50 rounded text-xs space-y-2">
+                    <div>
+                      <span className="font-semibold">Matched Tags:</span>{' '}
+                      {msg.debug.matched_tags.length > 0 ? (
+                        <code className="bg-white px-2 py-1 rounded">
+                          [{msg.debug.matched_tags.join(', ')}]
+                        </code>
+                      ) : (
+                        <span className="text-gray-500">None</span>
+                      )}
+                    </div>
+                    <div>
+                      <span className="font-semibold">Scaffold Selected:</span>{' '}
+                      <code className="bg-white px-2 py-1 rounded">
+                        {msg.debug.scaffold_id || 'type_aware_fallback'}
+                      </code>
+                    </div>
+                    <div>
+                      <span className="font-semibold">Top-1 Score:</span>{' '}
+                      <code className="bg-white px-2 py-1 rounded">
+                        {msg.debug.top1_score.toFixed(4)}
+                      </code>
+                    </div>
+                    <div>
+                      <span className="font-semibold">Applied Priors:</span>
+                      <pre className="bg-white p-2 rounded mt-1 text-xs overflow-x-auto">
+                        {JSON.stringify(msg.debug.applied_priors, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                </details>
+              )}
 
               {/* Evidence Debug Panel */}
               {showDebug && msg.evidence && msg.evidence.length > 0 && (
@@ -290,31 +378,53 @@ export default function KBTestPage() {
           </div>
         </div>
 
-        {/* Quick Test Prompts */}
+        {/* Comprehensive Test Prompts */}
         <div className="mt-4 bg-white rounded-lg shadow p-4">
           <details>
             <summary className="cursor-pointer text-sm font-medium text-gray-700">
-              Quick Test Prompts (click to expand)
+              Test Prompts - 28 Total (click to expand)
             </summary>
-            <div className="mt-2 space-y-2 text-xs">
-              <button
-                onClick={() => setInput('What is the 168-hour framework?')}
-                className="block w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded"
-              >
-                ✓ 168-hour framework (should find W001-FRAMEWORK-168HOUR in Sessions)
-              </button>
-              <button
-                onClick={() => setInput('I need a thank-you note for a recommender teacher—give the template.')}
-                className="block w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded"
-              >
-                ✓ Thank you template (should find Message_Template_Chip in iMessage)
-              </button>
-              <button
-                onClick={() => setInput('Run the initial assessment on a student like Huda. What are the top 3 gaps and why?')}
-                className="block w-full text-left px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded"
-              >
-                ✓ Initial assessment (should find ASSESS-INSIGHT-001 in Assessment)
-              </button>
+            <div className="mt-2 space-y-1 text-xs max-h-96 overflow-y-auto">
+              {/* Assessment & GamePlan (A1-A4) */}
+              <div className="font-semibold text-purple-700 mt-2">A) Assessment & GamePlan</div>
+              <button onClick={() => setInput('Run the initial assessment on a student like Huda. What are the top 3 gaps and why?')} className="block w-full text-left px-2 py-1 bg-purple-50 hover:bg-purple-100 rounded text-xs">A1. Initial assessment → ASSESS-INSIGHT-001</button>
+              <button onClick={() => setInput('Explain the Film + CS → Digital Storyteller synthesis and how it drives school list strategy.')} className="block w-full text-left px-2 py-1 bg-purple-50 hover:bg-purple-100 rounded text-xs">A2. Identity synthesis → ASSESS-STRATEGY-001</button>
+              <button onClick={() => setInput('Show the Challenge Question pattern with one example and what it unlocked.')} className="block w-full text-left px-2 py-1 bg-purple-50 hover:bg-purple-100 rounded text-xs">A3. Challenge Question → ASSESS-SILVER-001</button>
+              <button onClick={() => setInput('What are the first-month outputs promised in the GamePlan (awards, programs, metrics)?')} className="block w-full text-left px-2 py-1 bg-purple-50 hover:bg-purple-100 rounded text-xs">A4. GamePlan outputs → GAMEPLAN-RESULT-001</button>
+
+              {/* Weekly Sessions (B5-B7) */}
+              <div className="font-semibold text-green-700 mt-2">B) Weekly Sessions</div>
+              <button onClick={() => setInput('Walk me through the Naviance scattergram tactic and how to interpret it.')} className="block w-full text-left px-2 py-1 bg-green-50 hover:bg-green-100 rounded text-xs">B5. Naviance → W005-TACTIC-001</button>
+              <button onClick={() => setInput("What's the teacher gift strategy and when do we use it?")} className="block w-full text-left px-2 py-1 bg-green-50 hover:bg-green-100 rounded text-xs">B6. Teacher gifts → W030-W040 TRUST</button>
+              <button onClick={() => setInput('Why did we pivot from LaunchX and what did we do instead?')} className="block w-full text-left px-2 py-1 bg-green-50 hover:bg-green-100 rounded text-xs">B7. LaunchX pivot → W001-W003 STRATEGY</button>
+
+              {/* Execution Frameworks (C8-C10) */}
+              <div className="font-semibold text-blue-700 mt-2">C) Execution Frameworks</div>
+              <button onClick={() => setInput('List the canonical frameworks we use across weeks and when to deploy each.')} className="block w-full text-left px-2 py-1 bg-blue-50 hover:bg-blue-100 rounded text-xs">C8. Canonical frameworks → W000 FRAMEWORK</button>
+              <button onClick={() => setInput('Give me the EC validation proof rubric we use before promotion.')} className="block w-full text-left px-2 py-1 bg-blue-50 hover:bg-blue-100 rounded text-xs">C9. EC validation → ECValidationProof</button>
+              <button onClick={() => setInput('How do we calculate portfolio balance between academics, ECs, and outputs?')} className="block w-full text-left px-2 py-1 bg-blue-50 hover:bg-blue-100 rounded text-xs">C10. Portfolio balance → FRAMEWORK</button>
+
+              {/* iMessage (D11-D13) */}
+              <div className="font-semibold text-indigo-700 mt-2">D) iMessage Micro-Interactions</div>
+              <button onClick={() => setInput('I need a thank-you note for a recommender teacher—give the template.')} className="block w-full text-left px-2 py-1 bg-indigo-50 hover:bg-indigo-100 rounded text-xs">D11. Thank you template → Message_Template_Chip</button>
+              <button onClick={() => setInput('Parent is pushing back about time—how do we de-escalate in chat?')} className="block w-full text-left px-2 py-1 bg-indigo-50 hover:bg-indigo-100 rounded text-xs">D12. Parent pushback → Escalation_Pattern_Chip</button>
+              <button onClick={() => setInput("We're 72 hours before deadline and stuck—what's the micro-tactic?")} className="block w-full text-left px-2 py-1 bg-indigo-50 hover:bg-indigo-100 rounded text-xs">D13. Deadline crunch → Micro_Tactic_Chip</button>
+
+              {/* Cross-Namespace (E14-E16) */}
+              <div className="font-semibold text-orange-700 mt-2">E) Cross-Namespace Federated</div>
+              <button onClick={() => setInput('Summarize the 168-hour framework and how we adapted it in week 1.')} className="block w-full text-left px-2 py-1 bg-orange-50 hover:bg-orange-100 rounded text-xs">E14. 168-hour → W001-FRAMEWORK-168HOUR</button>
+              <button onClick={() => setInput('What proof artifacts did we require for the Small Business Stories project?')} className="block w-full text-left px-2 py-1 bg-orange-50 hover:bg-orange-100 rounded text-xs">E15. Proof artifacts → W001 RESULT/TACTIC</button>
+              <button onClick={() => setInput('What do we tell students about not rejecting yourself before applying?')} className="block w-full text-left px-2 py-1 bg-orange-50 hover:bg-orange-100 rounded text-xs">E16. Self-rejection → TRUST/INSIGHT chips</button>
+
+              {/* What-Ifs (F17-F18) */}
+              <div className="font-semibold text-red-700 mt-2">F) What-If Prioritization</div>
+              <button onClick={() => setInput('If I increase SAT from 1430→1530 and ship 2 films, what\'s the next best action?')} className="block w-full text-left px-2 py-1 bg-red-50 hover:bg-red-100 rounded text-xs">F17. SAT + films priority → STRATEGY/INSIGHT</button>
+              <button onClick={() => setInput("What's the exact acceptance rate for Stanford from her school?")} className="block w-full text-left px-2 py-1 bg-red-50 hover:bg-red-100 rounded text-xs">F18. School stats (guardrail test)</button>
+
+              {/* Guardrails (G19-G20) */}
+              <div className="font-semibold text-gray-700 mt-2">G) Guardrails</div>
+              <button onClick={() => setInput('What is quantum entanglement?')} className="block w-full text-left px-2 py-1 bg-gray-50 hover:bg-gray-100 rounded text-xs">G19. Off-topic → Low confidence block</button>
+              <button onClick={() => setInput('Help me write my Stanford essay.')} className="block w-full text-left px-2 py-1 bg-gray-50 hover:bg-gray-100 rounded text-xs">G20. Essay writing (out of scope)</button>
             </div>
           </details>
         </div>

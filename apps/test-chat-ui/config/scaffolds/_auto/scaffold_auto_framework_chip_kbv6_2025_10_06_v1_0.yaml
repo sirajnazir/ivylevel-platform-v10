@@ -1,0 +1,40 @@
+id: scaffold.auto.framework.chip.kbv6_2025_10_06_v1_0
+priority: 50
+requires:
+  anyTag:
+    - time_math
+    - execution_framework
+    - weekly_planning
+  anyNamespace:
+    - KBv6_2025-10-06_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - W000
+      - W001
+      - W021
+    preferType: Framework_Chip
+    fallbackTopK: 5
+template: |-
+  **Framework_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 104
+  tags:
+    - time_math
+    - execution_framework
+    - weekly_planning
+  phases:
+    - EXEC
+    - P2-BUILDING
+    - P3-JUNIOR
+    - P5-SENIOR
+    - P1-FOUNDATION
+    - P4-SUMMER

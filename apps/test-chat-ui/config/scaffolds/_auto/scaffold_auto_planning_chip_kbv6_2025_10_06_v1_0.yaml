@@ -1,0 +1,28 @@
+id: scaffold.auto.planning.chip.kbv6_2025_10_06_v1_0
+priority: 50
+requires:
+  anyTag:
+    - planning
+  anyNamespace:
+    - KBv6_2025-10-06_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - W060
+    preferType: Planning_Chip
+    fallbackTopK: 5
+template: |-
+  **Planning_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 1
+  tags: []
+  phases:
+    - P3-JUNIOR

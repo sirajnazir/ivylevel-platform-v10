@@ -1,0 +1,44 @@
+{
+  "description": "KBv6 Retrieval Configuration - Locked to known-good namespaces",
+  "version": "v10.2-kbv6-locked",
+  "last_updated": "2025-10-10",
+  "namespaces": {
+    "jtbd": "KBv6_2025-10-06_v1.0",
+    "interactions": "KBv6_iMessage_2025-10-07_v1.0",
+    "assessments": "KBv6_Assessment_2025-10-07_v1.0"
+  },
+  "namespace_metadata": {
+    "KBv6_2025-10-06_v1.0": {
+      "label": "jtbd",
+      "description": "Sessions + Exec protocols (W001-W093)",
+      "expected_vector_count": 924,
+      "families": ["session", "exec"]
+    },
+    "KBv6_iMessage_2025-10-07_v1.0": {
+      "label": "interactions",
+      "description": "iMessage interaction templates",
+      "expected_vector_count": 40,
+      "families": ["imessage"]
+    },
+    "KBv6_Assessment_2025-10-07_v1.0": {
+      "label": "assessments",
+      "description": "Assessment + GamePlan chips",
+      "expected_vector_count": 9,
+      "families": ["assessment", "gameplan"]
+    }
+  },
+  "include_assessments_in_rag": false,
+  "rag_topk_per_ns": 6,
+  "lexical_topk": 10,
+  "rerank": {
+    "topk": 8,
+    "min_score": 0.12,
+    "keep_at_least": 3,
+    "comment": "keep_at_least ensures graceful degradation - always return SOME results"
+  },
+  "embedding_config": {
+    "model": "text-embedding-3-large",
+    "dimensions": 3072,
+    "comment": "KBv6 REQUIRES these exact settings"
+  }
+}

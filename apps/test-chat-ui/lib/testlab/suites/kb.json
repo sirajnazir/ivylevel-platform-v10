@@ -1,0 +1,87 @@
+{
+  "id": "kb-suite",
+  "label": "KB/Indexing Test Suite",
+  "category": "kb",
+  "tests": [
+    {
+      "id": "kb-001",
+      "label": "Narrative Arc Summary",
+      "category": "kb",
+      "prompt": "My narrative arc in one paragraph",
+      "expected": {
+        "source": "kb",
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "kb-002",
+      "label": "Rejection Growth Summary",
+      "category": "kb",
+      "prompt": "Summarize my rejection growth",
+      "expected": {
+        "source": "kb",
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "kb-003",
+      "label": "Game Plan Focus",
+      "category": "kb",
+      "prompt": "What's my game plan focus?",
+      "expected": {
+        "source": "kb",
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "kb-004",
+      "label": "Strategic Positioning",
+      "category": "kb",
+      "prompt": "How should I position myself for Stanford?",
+      "expected": {
+        "source": "kb",
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "kb-005",
+      "label": "Identity Synthesis",
+      "category": "kb",
+      "prompt": "What's my core identity as an applicant?",
+      "expected": {
+        "source": "kb",
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "kb-006",
+      "label": "Essay Strategy",
+      "category": "kb",
+      "prompt": "What should my main essay focus on?",
+      "expected": {
+        "source": "kb",
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "kb-007",
+      "label": "Strengths and Gaps",
+      "category": "kb",
+      "prompt": "What are my biggest strengths and gaps?",
+      "expected": {
+        "source": "kb",
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "kb-008",
+      "label": "168-Hour Framework",
+      "category": "kb",
+      "prompt": "Explain the 168-hour framework for my schedule",
+      "expected": {
+        "source": "kb",
+        "noMetaLeak": true
+      }
+    }
+  ]
+}

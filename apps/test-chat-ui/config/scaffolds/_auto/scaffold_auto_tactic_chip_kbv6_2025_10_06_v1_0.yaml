@@ -1,0 +1,35 @@
+id: scaffold.auto.tactic.chip.kbv6_2025_10_06_v1_0
+priority: 50
+requires:
+  anyTag:
+    - tactic
+  anyNamespace:
+    - KBv6_2025-10-06_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - W000
+      - W028
+      - W027
+    preferType: Tactic_Chip
+    fallbackTopK: 5
+template: |-
+  **Tactic_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 101
+  tags: []
+  phases:
+    - EXEC
+    - P3-JUNIOR
+    - P5-SENIOR
+    - P1-FOUNDATION
+    - P4-SUMMER
+    - P2-BUILDING

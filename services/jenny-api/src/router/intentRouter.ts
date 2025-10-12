@@ -510,14 +510,103 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
   log.event('router.route_start', { student_id: studentId, query_preview: message.slice(0, 80), trace_id: traceId });
 
   try {
-    let intent = await classifyIntent(message);
+    // ========================================
+    // v10.1 Fact-Based Guardrails (Pre-Classification)
+    // ========================================
+    // Force deterministic SQL routing for known fact patterns BEFORE GPT classification
+    // This ensures 100% accuracy for enumeration queries (awards, GPA, testing, etc.)
+
+    const q = message.toLowerCase();
+    let factIntent: typeof intent | null = null;
+
+    // Awards fact queries
+    if (/\b(what|which|list|show|tell me).*(award|honor|recognition|prize|won|ncwit)/i.test(message)) {
+      const hasPhase = /\b(initial|final|submit|common\s*app)\b/i.test(message);
+      const hasWin = /\b(win|won|actual|get|got|receive)/i.test(message);
+
+      if (hasWin || /progression|timeline|over time/.test(q)) {
+        factIntent = { intent: "progression.timeline", phase: null, object: "award", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+      } else if (hasPhase) {
+        const phase = /initial|game\s*plan|target/.test(q) ? "initial" : "final";
+        factIntent = { intent: "awards.list", phase, object: "award", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+      } else {
+        factIntent = { intent: "awards.list", phase: "final", object: "award", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+      }
+    }
+    // GPA/grades fact queries
+    else if (/\b(gpa|grade\s*point|grades|weighted|unweighted|transcript)/i.test(message)) {
+      const hasPhase = /\b(initial|final|latest|current)\b/i.test(message);
+      const hasTrend = /\b(trend|change|delta|timeline|progress|improve)/i.test(message);
+
+      if (hasTrend) {
+        factIntent = { intent: "progression.timeline", phase: null, object: "academics", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+      } else {
+        const phase = /initial/.test(q) ? "initial" : "final";
+        factIntent = { intent: "academics.summary", phase, object: "academics", filters: { components: ["gpa", "grades"] }, confidence: 0.98, detector: "keyword-floor" };
+      }
+    }
+    // Testing (SAT/ACT) fact queries
+    else if (/\b(SAT|ACT|test\s*score)/i.test(message) && /\b(first|second|third|last|latest|initial|final|was\s*my|show|scores?)/i.test(message)) {
+      const hasOrdinal = /\b(first|second|third|last|latest|nth)/i.test(message);
+
+      if (hasOrdinal) {
+        const nth = /first|1st/.test(q) ? "first" : /second|2nd/.test(q) ? "second" : /third|3rd/.test(q) ? "third" : "latest";
+        factIntent = { intent: "sat.ordinal", phase: null, object: "sat", filters: { nth }, confidence: 0.98, detector: "keyword-floor" };
+      } else {
+        factIntent = { intent: "academics.summary", phase: "final", object: "academics", filters: { components: ["sat", "act"] }, confidence: 0.98, detector: "keyword-floor" };
+      }
+    }
+    // AP courses fact queries
+    else if (/\b(how\s*many|count|list|show).*(ap|aps|advanced\s*placement|honors|courses?)/i.test(message)) {
+      factIntent = { intent: "academics.summary", phase: "final", object: "academics", filters: { components: ["ap", "courses"] }, confidence: 0.98, detector: "keyword-floor" };
+    }
+    // Summer programs fact queries
+    else if (/\b(which|what|list|show).*(summer\s*program|programs).*(submit|submitted|applied|decisions?|accepted|got\s*in)/i.test(message)) {
+      const hasDecision = /\b(accept|admitted|got\s*in|decision)/i.test(message);
+      const phase = hasDecision ? "final" : /submit|applied/.test(q) ? "final" : null;
+      factIntent = { intent: "programs.list", phase, object: "program", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+    }
+    // ECs/Activities fact queries
+    else if (/\b(which|what|list|show).*(ec|ecs|activities|extracurricular).*(submit|submitted|final|actually|common\s*app)/i.test(message)) {
+      const phase = /initial|game\s*plan|target/.test(q) ? "initial" : "final";
+      factIntent = { intent: "ecs.list", phase, object: "ec", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+    }
+    // College list/decisions fact queries
+    else if (/\b(what|which|show|list).*(college|school|university).*(list|results?|final|applied|outcomes?|choose|chose|chosen|attend|attending|accept|admitted)/i.test(message)) {
+      const hasDecision = /\b(accept|admitted|got\s*in|waitlist|reject)/i.test(message);
+      const hasAttend = /\b(choose|chose|chosen|attend|attending|enroll)/i.test(message);
+
+      if (hasAttend) {
+        factIntent = { intent: "application.final", phase: "final", object: "application", filters: { scope: "attending" }, confidence: 0.98, detector: "keyword-floor" };
+      } else {
+        factIntent = { intent: "college.list", phase: null, object: "college", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+      }
+    }
+    // Grade jumps/academic vitals queries
+    else if (/\b(show|what|list).*(grade\s*jump|jumps|vitals|academic\s*trend)/i.test(message)) {
+      factIntent = { intent: "progression.timeline", phase: null, object: "academics", filters: { scope: "vitals" }, confidence: 0.98, detector: "keyword-floor" };
+    }
+
+    // If fact guardrail matched, use it and skip GPT classification
+    let intent = factIntent;
+
+    if (factIntent) {
+      log.event('guardrail.fact_pattern_matched', {
+        trace_id: traceId,
+        pattern_intent: factIntent.intent,
+        pattern_confidence: factIntent.confidence,
+        reason: 'deterministic_fact_query'
+      });
+    } else {
+      // No fact pattern matched, use GPT classification
+      intent = await classifyIntent(message);
+    }
 
     // ========================================
     // v5.6 KB Facet Post-Processor (Safety Net)
     // ========================================
     // Keyword-based extraction if LLM misses award/framework/activity filters
     if (intent.intent === "kb.search") {
-      const q = message.toLowerCase();
       const f = intent.filters ?? {};
       if (/ncwit|national center for women.*computing/.test(q)) f.award = "NCWIT";
       if (/168( |-)?hour/.test(q)) f.framework = "168";
@@ -533,7 +622,6 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
     // ========================================
     // If Pinecone is ready and query mentions facets, FORCE kb.search regardless of LLM classification
     const pineconeReady = !!(process.env.PINECONE_INDEX_NAME && process.env.PINECONE_NAMESPACE);
-    const q = message.toLowerCase();
     const mentionsFacet = (
       /ncwit|national\s+center\s+for\s+women.*computing/.test(q) ||
       /\b168([- ]?hour)?\b/.test(q) ||

@@ -1,0 +1,28 @@
+id: scaffold.auto.turnaround.case.chip.kbv6_imessage_2025_10_07_v1_0
+priority: 50
+requires:
+  anyTag:
+    - turnaround
+  anyNamespace:
+    - KBv6_iMessage_2025-10-07_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - IMSG
+    preferType: Turnaround_Case_Chip
+    fallbackTopK: 5
+template: |-
+  **Turnaround_Case_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 1
+  tags: []
+  phases:
+    - P5-SENIOR

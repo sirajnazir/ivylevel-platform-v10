@@ -1,7 +1,0 @@
-student_id,term_code,course_title,grade_letter,grade_percent,credits,weighting,status,source_id,confidence
-huda-2025,2024-SENIOR,AP Computer Science A,A,98,5,weighted,final,SRC-COMMONAPP-UNC,high
-huda-2025,2024-SENIOR,AP Calculus BC,A,96,5,weighted,final,SRC-COMMONAPP-UNC,high
-huda-2025,2024-SENIOR,AP English Language,A-,93,5,weighted,final,SRC-COMMONAPP-UNC,high
-huda-2025,2024-SENIOR,AP US History,A,95,5,weighted,final,SRC-COMMONAPP-UNC,high
-huda-2025,2024-SENIOR,AP Physics 1,A-,92,5,weighted,final,SRC-COMMONAPP-UNC,high
-huda-2025,2024-SENIOR,Spanish 3 Honors,A,94,5,weighted,final,SRC-COMMONAPP-UNC,high

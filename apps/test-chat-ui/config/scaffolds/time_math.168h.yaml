@@ -1,0 +1,31 @@
+id: scaffold.time_math.168h
+priority: 80
+requires:
+  anyTag:
+    - time_math
+    - execution_framework
+  anyType:
+    - Framework_Chip
+    - Silver_Bullet_Chip
+  anyNamespace:
+    - KBv6_2025-10-06_v1.0
+  minScore: 0.45
+select:
+  topChip:
+    preferIdPrefix:
+      - W001-FRAMEWORK-168HOUR
+    fallbackTopK: 3
+template: |
+  ## 168-Hour Framework
+
+  **Breakdown (W001-FRAMEWORK-168HOUR)**:
+  - After school (8h), sleep (8h), homework (4h), basics (2h) ⇒ **~2 hours/day** for high-leverage work ({{topChip.id}} @ {{topChip.namespace}}).
+  - Focus those 2 hours on **proof-generating tasks** (NCWIT scaffolding, outreach sprints, portfolio work).
+  - Revisit weekly; reallocate based on ROI and blockers.
+
+  **Action**: Block Tue/Thu 60-min sessions for proof tasks; log artifacts in the tracker ({{topChip.id}} @ {{topChip.namespace}}).
+
+  **Why it matters**: Time is the ultimate constraint. The 168-hour math forces clarity on what truly moves the needle vs. what feels productive but yields no proof.
+outputs:
+  chips:
+    - "{{topChip.id}}"

@@ -1,0 +1,28 @@
+id: scaffold.auto.teaching.chip.kbv6_2025_10_06_v1_0
+priority: 50
+requires:
+  anyTag:
+    - teaching
+  anyNamespace:
+    - KBv6_2025-10-06_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - W069
+    preferType: Teaching_Chip
+    fallbackTopK: 5
+template: |-
+  **Teaching_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 1
+  tags: []
+  phases:
+    - P4-SUMMER

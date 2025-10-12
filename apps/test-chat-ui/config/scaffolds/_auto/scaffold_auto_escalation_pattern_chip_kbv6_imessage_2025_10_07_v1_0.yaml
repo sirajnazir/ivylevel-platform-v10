@@ -1,0 +1,28 @@
+id: scaffold.auto.escalation.pattern.chip.kbv6_imessage_2025_10_07_v1_0
+priority: 50
+requires:
+  anyTag:
+    - escalation
+  anyNamespace:
+    - KBv6_iMessage_2025-10-07_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - IMSG
+    preferType: Escalation_Pattern_Chip
+    fallbackTopK: 5
+template: |-
+  **Escalation_Pattern_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 2
+  tags: []
+  phases:
+    - P3-JUNIOR

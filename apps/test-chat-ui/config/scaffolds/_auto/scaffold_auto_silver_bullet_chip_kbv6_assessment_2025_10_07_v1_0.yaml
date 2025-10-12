@@ -1,0 +1,28 @@
+id: scaffold.auto.silver.bullet.chip.kbv6_assessment_2025_10_07_v1_0
+priority: 50
+requires:
+  anyTag:
+    - silver
+  anyNamespace:
+    - KBv6_Assessment_2025-10-07_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - ASSESS
+    preferType: Silver_Bullet_Chip
+    fallbackTopK: 5
+template: |-
+  **Silver_Bullet_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 1
+  tags: []
+  phases:
+    - FOUNDATION

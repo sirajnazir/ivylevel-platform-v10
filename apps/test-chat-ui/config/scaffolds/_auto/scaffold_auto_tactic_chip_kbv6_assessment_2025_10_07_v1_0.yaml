@@ -1,0 +1,28 @@
+id: scaffold.auto.tactic.chip.kbv6_assessment_2025_10_07_v1_0
+priority: 50
+requires:
+  anyTag:
+    - tactic
+  anyNamespace:
+    - KBv6_Assessment_2025-10-07_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - GAMEPLAN
+    preferType: Tactic_Chip
+    fallbackTopK: 5
+template: |-
+  **Tactic_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 1
+  tags: []
+  phases:
+    - FOUNDATION

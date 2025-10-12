@@ -1,22 +1,51 @@
 /**
- * KB-powered Chat API Route (v1.2)
- * Retrieves evidence from Pinecone and generates LLM response with citations
+ * KB-powered Chat API Route (v2.0 - Universal Policy-Driven System)
+ * Unified endpoint for fact-based and KB/RAG queries
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
-import { retrieve, truncate, type Evidence } from "@/lib/retrieval";
+import { retrieve } from "@/lib/retrieval";
+import { tagQuery } from "@/lib/intentLexicon";
+import { composeAnswer } from "@/lib/composeAnswer";
+import { composeAnswer as llmCompose } from "@/lib/llmAdapter";
+import { guardAndPolish } from "@/lib/composerGuards";
+import { loadPolicy } from "@/lib/policy";
+import { loadIntentLexicon } from "@/lib/intentLexicon";
+import { loadScaffolds } from "@/lib/scaffoldRegistry";
+import type { Hit } from "@/lib/types";
+import routing from "@/config/routing.json";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+// Initialize loaders on first request
+let initialized = false;
+function ensureInitialized() {
+  if (!initialized) {
+    console.log("[KB Chat] Initializing universal system...");
+    try {
+      loadPolicy();
+      loadIntentLexicon();
+      loadScaffolds();
+      initialized = true;
+      console.log("[KB Chat] Initialization complete");
+    } catch (e) {
+      console.error("[KB Chat] Initialization failed:", e);
+      throw e;
+    }
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
+    ensureInitialized();
+
     const body = await req.json();
     const {
       userMessage,
       filters,
       namespaces,
       topK = 6,
+      userId,
+      sessionId,
+      studentId,
     } = body;
 
     if (!userMessage) {
@@ -26,94 +55,180 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Generate sessionId from timestamp if not provided
+    const effectiveSessionId = sessionId ?? userId ?? `session-${Date.now()}`;
+
     console.log(`\n[KB Chat] New query: "${userMessage}"`);
 
-    // 1) Retrieve evidence from KB
+    // 1) Tag query using intent lexicon
+    const { tags, preferTypes } = tagQuery(userMessage);
+    console.log(`[KB Chat] Tags: [${tags.join(", ")}]`);
+    console.log(`[KB Chat] Prefer types: [${preferTypes.join(", ")}]`);
+
+    // 1.5) Authoritative SQL routing - if preferTypes includes "sql", use orchestrator instead
+    if (preferTypes.includes("sql")) {
+      console.log(`[KB Chat] Authoritative SQL preference detected → using orchestrator`);
+      const { orchestrateResponse } = await import("@/lib/orchestrator");
+
+      const orchestratorResult = await orchestrateResponse({
+        message: userMessage,
+        intent: { intents: tags, tags, preferTypes },
+        student_id: studentId || "unknown",
+        context: { userId, sessionId: effectiveSessionId }
+      });
+
+      return NextResponse.json({
+        answer: orchestratorResult.answer,
+        source: orchestratorResult.source,
+        chips: orchestratorResult.chips || [],
+        facts: orchestratorResult.facts || [],
+        debug: {
+          routing: orchestratorResult.routing,
+          modelBadge: null
+        },
+        meta: {
+          tags,
+          preferTypes,
+          executionMode: orchestratorResult.source
+        }
+      });
+    }
+
+    // 2) Retrieve evidence from KB (with policy-driven priors)
     const evidence = await retrieve({
       query: userMessage,
       filters,
       namespaces,
       topK,
+      tags, // Pass tags for prior boosting
     });
 
-    // 2) Safety rails: check retrieval quality
-    const topScore = evidence[0]?.score ?? 0;
-    const lowConfidence = topScore < 0.40;
-    const noHits = evidence.length === 0;
+    // 3) Convert Evidence[] to Hit[] for composer
+    const hits: Hit[] = evidence.map(e => ({
+      id: e.chip_id,
+      score: e.score ?? 0,
+      content: e.content || "",
+      namespace: e.namespace,
+      metadata: e.metadata || {}
+    }));
 
-    console.log(`[KB Chat] Evidence count: ${evidence.length}, top score: ${topScore.toFixed(3)}`);
-
-    if (noHits) {
-      return NextResponse.json({
-        answer: "⚠️ **No grounded evidence found.** I can provide general advice, but I recommend:\n" +
-                "• Verify the query is related to coaching sessions, frameworks, or micro-interactions.\n" +
-                "• Try refining keywords or filters (e.g., phase, week, chip type).\n\n" +
-                "What would you like to know more specifically?",
-        evidence: [],
-        meta: { noHits: true, topScore: 0 },
-      });
+    console.log(`[KB Chat] Retrieved ${hits.length} hits`);
+    if (hits.length > 0) {
+      console.log(`[KB Chat] Top hit: ${hits[0].id} (score: ${hits[0].score.toFixed(3)})`);
     }
 
-    // 3) Build context for LLM
-    const evidenceContext = evidence
-      .map(
-        (e) =>
-          `[#${e.rank}] **${e.chip_id}** (${e.namespace}, ${e.type}, W${e.week || "?"}, ${e.phase || "?"}) :: ${truncate(e.content || "", 450)}`
-      )
-      .join("\n\n");
+    // 4) Compose answer: use LLM adapter for tone-sensitive intents, scaffolds for fact-based
+    const toneSensitive = new Set(routing.composer.tone_sensitive_intents);
+    const useLLM = tags.some(tag => toneSensitive.has(tag));
 
-    // 4) Compose prompt with citations
-    const systemPrompt = `You are Jenny (digital twin). Use "proof-over-prose" methodology:
-- **Always cite chips** with [chip_id] and namespace when referencing specific evidence.
-- If confidence is low (score < 0.40), add a disclaimer and ask a clarifying question.
-- **Never invent facts**; label inferences as hypotheses.
-- Be concise, actionable, and empathetic.
-- Use markdown formatting for readability.`;
+    let result;
+    let rawAnswer = "";
 
-    const userPrompt = `User query: "${userMessage}"
+    if (useLLM && hits.length > 0) {
+      console.log(`[KB Chat] Using LLM adapter for tone-sensitive intent`);
 
-${lowConfidence ? "⚠️ **Low-confidence match detected.** Treat evidence as tentative. Ask clarifying questions.\n\n" : ""}Top evidence (cite chip_id in your answer):
-${evidenceContext}
+      // Build context from top hits
+      const context = hits.slice(0, 3).map(h =>
+        `[${h.id}] ${h.content.slice(0, 200)}`
+      ).join("\n\n");
 
-Instructions:
-- Answer the user's question using the evidence above.
-- Cite relevant chips with [chip_id @ namespace].
-- If evidence is incomplete, suggest refinements or clarifying questions.
-- Keep the answer under 400 words.`;
+      const prompt = `Context from knowledge base:\n${context}\n\nUser question: ${userMessage}\n\nProvide a warm, empathetic response using the context above.`;
 
-    // 5) Generate LLM response
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.3,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-    });
+      const llmResult = await llmCompose({
+        prompt,
+        intent: tags[0] || "general",
+        system: "You are Jenny, an empathetic college admissions coach. Provide warm, supportive guidance while grounding your response in the provided context.",
+        temperature: 0.7,
+        userId,
+        sessionId: effectiveSessionId,
+        studentId
+      });
 
-    const answer = completion.choices[0].message.content || "No response generated.";
+      rawAnswer = llmResult.text;
 
-    console.log(`[KB Chat] Response generated (${answer.length} chars)`);
+      // Log trace info
+      if (llmResult.__trace) {
+        console.log(`[KB Chat] Model used: ${llmResult.__trace.isAdapter ? "🔶 Adapter v8" : "⚪ Base"} (${llmResult.__trace.model})`);
+        console.log(`[KB Chat] Latency: ${llmResult.__trace.latency_ms}ms`);
+      }
 
-    // 6) Log for QA
+      // Build result in same format as scaffold composer
+      result = {
+        answer: rawAnswer,
+        chips: hits.slice(0, 3).map(h => h.id),
+        hits,
+        scaffold_used: "llm_adapter_v8",
+        __trace: llmResult.__trace
+      };
+    } else {
+      console.log(`[KB Chat] Using scaffold-based composition`);
+      result = composeAnswer(userMessage, tags, hits);
+      rawAnswer = result.answer;
+    }
+
+    // 5) Apply guards to polish tone and proof
+    const primaryIntentRaw = tags[0] || "general";
+
+    // Map noisy tags to tone intents for guard
+    const toneIntentMap: Record<string,string> = {
+      tactic: "deadline_crunch",
+      micro_interaction: "message_template"
+    };
+    const primaryIntent = toneIntentMap[primaryIntentRaw] || primaryIntentRaw;
+
+    const topScore = hits[0]?.score ?? 0;
+    const source = result.scaffold_used ? "scaffold" : (result.source || undefined);
+    const guarded = await guardAndPolish(rawAnswer, primaryIntent, { topScore, source });
+
+    if (guarded.rewritten) {
+      console.log(`[KB Chat] Answer rewritten by guards (tone: ${guarded.toneScore.toFixed(2)}, proof: ${guarded.proofScore.toFixed(2)})`);
+      result.answer = guarded.text;
+    }
+
+    console.log(`[KB Chat] Answer generated (${result.answer.length} chars)`);
+    console.log(`[KB Chat] Chips used: [${result.chips.join(", ")}]`);
+    if (result.scaffold_used) {
+      console.log(`[KB Chat] Scaffold: ${result.scaffold_used}`);
+    }
+
+    // 6) Build response
+    const modelBadge = result.__trace?.isAdapter ? "🔶 Adapter v8" : (result.__trace ? "⚪ Base" : null);
+
+    const response = {
+      answer: result.answer,
+      evidence: evidence, // Keep original Evidence format for UI compatibility
+      chips: result.chips,
+      scaffold_used: result.scaffold_used,
+      debug: {
+        ...result.debug,
+        trace: result.__trace,
+        modelBadge
+      },
+      meta: {
+        topScore: hits[0]?.score ?? 0,
+        lowConfidence: hits.length === 0 || (hits[0]?.score ?? 0) < 0.40,
+        evidenceCount: evidence.length,
+        tags,
+        preferTypes,
+        toneScore: guarded.toneScore,
+        proofScore: guarded.proofScore,
+        guardRewritten: guarded.rewritten
+      },
+    };
+
+    // 7) Log for QA
     logQueryForQA({
       query: userMessage,
-      namespaces: evidence.map(e => e.namespace),
+      tags,
+      namespaces: hits.map(h => h.namespace),
       filters,
-      top1_chip: evidence[0]?.chip_id,
-      top1_score: topScore,
-      evidence_count: evidence.length,
+      top1_chip: hits[0]?.id,
+      top1_score: hits[0]?.score ?? 0,
+      evidence_count: hits.length,
+      scaffold_used: result.scaffold_used
     });
 
-    return NextResponse.json({
-      answer,
-      evidence,
-      meta: {
-        topScore,
-        lowConfidence,
-        evidenceCount: evidence.length,
-      },
-    });
+    return NextResponse.json(response);
 
   } catch (error: any) {
     console.error("[KB Chat] Error:", error);
@@ -132,11 +247,13 @@ Instructions:
  */
 function logQueryForQA(data: {
   query: string;
+  tags: string[];
   namespaces: string[];
   filters?: any;
   top1_chip?: string;
   top1_score: number;
   evidence_count: number;
+  scaffold_used?: string;
 }) {
   // In production, send to logging service (e.g., Datadog, CloudWatch)
   console.log(`[QA Log]`, JSON.stringify(data));

@@ -31,7 +31,9 @@ const PROGRAM_SYNS = [
 
 const ACADEMICS_SYNS = {
   transcript: ['transcript', 'report card', 'grades', 'courses', 'course list', 'subjects', 'semester grades', 'coursework', 'classes'],
-  gpa: ['gpa', 'grade point average', 'unweighted gpa', 'weighted gpa', 'cumulative gpa', 'cum gpa', 'term gpa']
+  gpa: ['gpa', 'grade point average', 'unweighted gpa', 'weighted gpa', 'cumulative gpa', 'cum gpa', 'term gpa'],
+  vitals: ['vitals', 'timeline', 'trend', 'academic trend', 'gpa trend', 'rigor', 'ap count', 'ap rigor', 'course load', 'weekly'],
+  events: ['academic events', 'grade jump', 'grade change', 'report cards', 'milestone', 'milestones']
 };
 
 export type EnumRoute =
@@ -54,6 +56,9 @@ export type EnumRoute =
   | 'academics.gpa.final'
   | 'academics.gpa.latest'
   | 'academics.gpa.progression'
+  | 'academics.vitals.latest'
+  | 'academics.vitals.trend'
+  | 'academics.vitals.events'
   | null;
 
 // Check for word boundaries to avoid false matches
@@ -217,6 +222,24 @@ export function classifyEnumIntent(q: string): EnumRoute {
     return 'academics.gpa.latest';
   }
 
+  // Academics - Vitals (Weekly timeline GPA, AP rigor, course load)
+  if (any(s, ACADEMICS_SYNS.vitals)) {
+    // "academic trend" or "GPA trend" → vitals.trend
+    if (s.includes('trend') || s.includes('range') || s.includes('min') || s.includes('max')) {
+      log.event('intent_classified', { route: 'academics.vitals.trend', query: q.slice(0, 80) });
+      return 'academics.vitals.trend';
+    }
+    // Default to latest for "academic vitals"
+    log.event('intent_classified', { route: 'academics.vitals.latest', query: q.slice(0, 80) });
+    return 'academics.vitals.latest';
+  }
+
+  // Academics - Events (Grade jumps, AP additions, report cards)
+  if (any(s, ACADEMICS_SYNS.events)) {
+    log.event('intent_classified', { route: 'academics.vitals.events', query: q.slice(0, 80) });
+    return 'academics.vitals.events';
+  }
+
   log.event('intent_not_enumeration', { query: q.slice(0, 80) });
   return null;
 }
@@ -234,6 +257,8 @@ export function isEnumerationQuery(message: string): boolean {
   if (m.includes('narrative')) return true;
   if (any(m, ACADEMICS_SYNS.transcript)) return true;
   if (any(m, ACADEMICS_SYNS.gpa)) return true;
+  if (any(m, ACADEMICS_SYNS.vitals)) return true;
+  if (any(m, ACADEMICS_SYNS.events)) return true;
 
   return false;
 }

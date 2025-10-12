@@ -1,0 +1,43 @@
+id: scaffold.assessment.top3gaps
+priority: 90
+requires:
+  anyTag:
+    - assessment
+  anyNamespace:
+    - KBv6_Assessment_2025-10-07_v1.0
+select:
+  assess:
+    preferIdPrefix:
+      - ASSESS-INSIGHT-001
+    fallbackTopK: 5
+  w1:
+    preferIdPrefix:
+      - W001-INSIGHT
+      - W002-INSIGHT
+    fallbackTopK: 5
+  w2:
+    preferIdPrefix:
+      - W002-INSIGHT
+      - W003-INSIGHT
+    fallbackTopK: 5
+template: |
+  ## Initial Assessment: Top 3 Gaps
+
+  - **Gap #1: Community Service / Awards** — Zero documented community service and minimal awards. This limits narrative proof for "impact beyond self" ({{assess.id}} @ {{assess.namespace}}).
+    *Why it matters*: Top schools require evidence of sustained commitment + measurable outcomes. Without this, the profile reads as academically strong but lacking leadership/service depth.
+
+  - **Gap #2: Leadership Visibility** — Current ECs lack clear leadership titles or roles with decision-making authority ({{assess.id}} @ {{assess.namespace}}).
+    *Why it matters*: "Participant" doesn't differentiate. Schools want founders, captains, presidents—roles that demonstrate initiative and influence.
+
+  - **Gap #3: Time Misallocation** — Analysis shows ~2h/day for high-leverage work after accounting for school (8h), sleep (8h), homework (4h), basics (2h) ({{w1.id}} @ {{w1.namespace}}; {{w2.id}} @ {{w2.namespace}}).
+    *Why it matters*: Most time is spent on low-ROI activities. The 2-hour window is where all proof must be generated—films, apps, competition wins. Misallocating it kills momentum.
+
+  **Immediate Action**:
+  Pick ONE service lane aligned to Film+CS (e.g., teach coding to middle schoolers, create film tutorials for underserved communities). Schedule 2×60-min blocks this week. Apply to a near-term award (e.g., Congressional App Challenge, local film festival) by Friday.
+
+  **Evidence cited**: {{assess.id}}, {{w1.id}}, {{w2.id}}
+outputs:
+  chips:
+    - "{{assess.id}}"
+    - "{{w1.id}}"
+    - "{{w2.id}}"

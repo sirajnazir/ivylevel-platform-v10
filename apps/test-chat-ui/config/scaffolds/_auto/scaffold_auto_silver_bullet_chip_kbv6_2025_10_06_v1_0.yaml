@@ -1,0 +1,35 @@
+id: scaffold.auto.silver.bullet.chip.kbv6_2025_10_06_v1_0
+priority: 50
+requires:
+  anyTag:
+    - silver
+  anyNamespace:
+    - KBv6_2025-10-06_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - W000
+      - W013
+      - W010
+    preferType: Silver_Bullet_Chip
+    fallbackTopK: 5
+template: |-
+  **Silver_Bullet_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 89
+  tags: []
+  phases:
+    - EXEC
+    - P2-BUILDING
+    - P1-FOUNDATION
+    - P5-SENIOR
+    - P3-JUNIOR
+    - P4-SUMMER

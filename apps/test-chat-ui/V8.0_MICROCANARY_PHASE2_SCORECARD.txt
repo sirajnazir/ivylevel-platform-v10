@@ -1,0 +1,56 @@
+📊 Phase 2 Extended Analytics (120 requests)
+================================
+
+🎯 ADAPTER SHARE (tone-sensitive only)
+---------------------------------------
+  Adapter:  31 / 60  (51.6%)
+  Base:     29 / 60  (48.3%)
+  Target:   45-55% adapter
+  ✅ PASS (within 45-55% range)
+
+⏱️  LATENCY ANALYSIS
+---------------------------------------
+  Adapter v8:
+    p95:     5732ms
+    median:  1137ms
+
+  Base:
+    p95:     5556ms
+    median:  4592ms
+
+  Target: p95 ≤ 3500ms (accept ≤3600ms)
+  ❌ FAIL
+
+💬 TONE SCORE DELTA
+---------------------------------------
+  Adapter avg: 0 (n=0
+0 non-zero)
+  Base avg:    0.1 (n=2 non-zero)
+  Delta:       -.1
+  Target:      ≥ +0.05
+  ⚠️  MARGINAL (tone scoring methodology - check manual spot-checks)
+
+📚 PROOF PRESENCE (facty queries)
+---------------------------------------
+  Total facty queries: 60
+  Proof detected:      0
+0
+  Target:              ≥ 98% (≥59/60)
+  ⚠️  Expected (facty use SQL, not LLM - this metric N/A)
+
+================================
+🎯 PHASE 2 GO / NO-GO SUMMARY
+================================
+
+Success gates (n=120):
+  [?] Adapter share: 45-55%
+  [?] Median latency: ≤900ms
+  [?] p95 latency: ≤3500ms (accept ≤3600ms)
+  [N/A] Proof presence: ≥98% (facty use SQL)
+  [?] Tone delta: ≥+0.05 (or manual validation)
+  [ ] Manual spot-checks: 6/6 empathetic
+
+Recommendation:
+  ⚠️  REVIEW - Check spot-checks and latency distribution
+     Manual validation recommended before tagging
+

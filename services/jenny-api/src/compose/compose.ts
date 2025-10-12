@@ -1,4 +1,35 @@
 import { openai, moderate } from '../ai/openai';
+
+// v10.1: Meta-leakage stripping helper
+// Removes internal metadata from user-facing answers
+function stripMetadata(text: string): string {
+  if (!text) return text;
+
+  return text
+    // Remove chip ID patterns: (W016-RESULT-001), W015-STRATEGY-001
+    .replace(/\([A-Z]\d+-[A-Z]+-\d+\)/g, '')
+    .replace(/\b[A-Z]\d{3}-[A-Z]+-\d{3}\b/g, '')
+    // Remove source citations: *Source*: KBv6_2025-10-06_v1.0
+    .replace(/\*Source\*:\s*[^\n]+/gi, '')
+    // Remove namespace refs: @ KBv6_2025-10-06_v1.0, KBv6_iMessage_2025-10-07_v1.0
+    .replace(/@\s?KBv\d+[^\s]*/g, '')
+    .replace(/\bKBv\d+[_\-][^\s]*/gi, '')
+    // Remove internal identifiers: chip_id:, scaffold., SRC-, src-, file-, proof_, debug_
+    .replace(/chip_id:\s?[A-Z0-9\-]+/gi, '')
+    .replace(/scaffold\.[a-z_.]+/gi, '')
+    .replace(/\b(?:#|SRC-|src-|file-|proof_|debug_)\S+/gi, '')
+    // Remove system prompts leakage
+    .replace(/System:|User:|Assistant:/gi, '')
+    // Remove internal table/namespace/family refs
+    .replace(/\b(?:chip|table|namespace|family)[_:\-a-z0-9]+/gi, '')
+    // Remove breakdown metadata
+    .replace(/\*\*Breakdown\s?\([A-Z0-9\-]+\)\*\*/gi, '')
+    // Clean up multiple spaces and empty lines
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 export async function composeAnswer({ message, vitals, hits, memory, model, use_ft, stream, res }: any){
   const mod = await moderate(message);
   if(mod?.flagged) return { answer: "I can't help with that.", model: 'moderation_block' };
@@ -20,7 +51,9 @@ export async function composeAnswer({ message, vitals, hits, memory, model, use_
 
   if(!stream){
     const resp = await openai.chat.completions.create({ model: chosenModel!, messages: msgs });
-    return { answer: resp.choices?.[0]?.message?.content || '', model: chosenModel, usage: resp.usage };
+    const rawAnswer = resp.choices?.[0]?.message?.content || '';
+    const cleanAnswer = stripMetadata(rawAnswer);
+    return { answer: cleanAnswer, model: chosenModel, usage: resp.usage };
   }
 
   // SSE
@@ -34,5 +67,8 @@ export async function composeAnswer({ message, vitals, hits, memory, model, use_
   }
   res.write(`data:${JSON.stringify({ done:true })}\n\n`);
   res.end();
-  return { answer: acc, model: chosenModel };
+
+  // Apply metadata stripping to streaming response too
+  const cleanAnswer = stripMetadata(acc);
+  return { answer: cleanAnswer, model: chosenModel };
 }

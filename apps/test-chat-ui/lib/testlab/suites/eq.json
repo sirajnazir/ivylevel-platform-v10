@@ -1,0 +1,117 @@
+{
+  "id": "eq-suite",
+  "label": "EQ/Tone Test Suite",
+  "category": "eq",
+  "tests": [
+    {
+      "id": "eq-001",
+      "label": "Rejection Response",
+      "category": "eq",
+      "prompt": "I got rejected from Stanford",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-002",
+      "label": "Parent Conflict De-escalation",
+      "category": "eq",
+      "prompt": "Parents say I'm wasting time on apps",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-003",
+      "label": "Deadline Crunch Template",
+      "category": "eq",
+      "prompt": "Deadline crunch text to counselor for Fri 3pm",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-004",
+      "label": "Time-Boxing Guidance",
+      "category": "eq",
+      "prompt": "I feel behind—what should I do first 60 minutes today?",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-005",
+      "label": "Celebration Response",
+      "category": "eq",
+      "prompt": "I won the science fair!",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-006",
+      "label": "Crisis Management",
+      "category": "eq",
+      "prompt": "I'm overwhelmed and can't focus on anything",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-007",
+      "label": "Normalization Response",
+      "category": "eq",
+      "prompt": "Everyone else seems to have their essays done already",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-008",
+      "label": "Identity Reinforcement",
+      "category": "eq",
+      "prompt": "I don't think I'm good enough for top schools",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-009",
+      "label": "Permissioning Guidance",
+      "category": "eq",
+      "prompt": "Can I take a break from college apps this weekend?",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "eq-010",
+      "label": "Future Pacing",
+      "category": "eq",
+      "prompt": "What will happen after I submit my apps?",
+      "expected": {
+        "warmth": true,
+        "action": true,
+        "noMetaLeak": true
+      }
+    }
+  ]
+}

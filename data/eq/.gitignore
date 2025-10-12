@@ -1,0 +1,13 @@
+# EQ Signal Data - Do not commit actual conversation data
+# Only commit README and structure, not JSON files
+
+# Ignore all JSON files (actual EQ data)
+*.json
+
+# Ignore any extracted artifacts
+*.csv
+*.txt
+*.log
+
+# Allow README
+!README.md

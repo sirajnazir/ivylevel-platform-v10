@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+// Load from jenny-api/.env.local first, then root .env as fallback
+dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 // Override with correct index
@@ -21,6 +23,8 @@ import { pool } from './db/pool.js';
 import { enumsRouter } from './routes/enums.js';
 import { createSnapshotRoutes } from './routes/snapshots.js';
 import { routePrompt } from './router/intentRouter.js';
+import { assertIndexParity } from './retrieval/pinecone.js';
+import { CFG } from './config/env.js';
 
 const app = express();
 
@@ -172,28 +176,37 @@ app.post('/agent/chat', async (req, res) => {
   }
 });
 
-// GPT-5 Intent Router (v3.2 experimental)
+// UNIFIED PIPELINE: Single entry point for all queries (v10.2)
+// Facts-First SQL → KB/RAG → LLM Adapter/EQ
 app.post('/agent/chat/gpt5', async (req, res) => {
   try {
-    const { message, student_id } = req.body;
-    console.log('[GPT5-Intent] Chat request:', { message: message?.slice(0, 50), student_id });
+    const { message, student_id, observability } = req.body;
+    console.log('[Unified-Pipeline] Chat request:', { message, student_id });
 
-    const result = await routePrompt({
-      studentId: student_id,
+    // All queries go through agentChat orchestrator (NOT intentRouter directly)
+    // This ensures RAG/KB fallback for unknown intents
+    // use_ft: true enables Jenny fine-tuned adapter v8 for tone/EQ queries
+    const result = await agentChat({
       message,
-      pg: pool
-    });
+      student_id,
+      session_id: null,
+      model: null,  // Let compose.ts decide based on use_ft flag
+      use_ft: true,  // Enable fine-tuned adapter (Category 3)
+      stream: false
+    }, null);
 
     // Store trace in memory for UI viewing
-    if (result.traceId) {
-      traceStore.set(result.traceId, {
-        id: result.traceId,
+    const traceId = result.trace_id || `trace-${Date.now()}-${Math.random().toString(36).slice(2,9)}`;
+    if (observability) {
+      traceStore.set(traceId, {
+        id: traceId,
         student_id,
         message,
         intent: result.intent,
         answer: result.answer,
         chips: result.chips,
         hits: result.hits,
+        trace: result.trace,
         timestamp: new Date().toISOString()
       });
 
@@ -204,9 +217,9 @@ app.post('/agent/chat/gpt5', async (req, res) => {
       }
     }
 
-    res.json({ ...result, trace_id: result.traceId });
+    res.json({ ...result, traceId });
   } catch (error: any) {
-    console.error('[GPT5-Intent] Error:', error);
+    console.error('[Unified-Pipeline] Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -357,14 +370,33 @@ app.use((err: any, _req: any, res: any, _next: any) => {
 });
 
 const port = process.env.PORT || 8787;
-app.listen(port, () => {
-  console.log(`
+
+// Boot validation - Verify KBv6 configuration before accepting requests
+(async () => {
+  try {
+    // Log boot config
+    console.log('[BOOT] KBv6 Configuration:', {
+      model: CFG.JENNY_MODEL_ID,
+      embed: CFG.EMBEDDING_MODEL_ID,
+      dim: CFG.PINECONE_INDEX_DIM,
+      index: CFG.PINECONE_INDEX_NAME
+    });
+
+    // Assert index/embedding parity (fails fast on mismatch)
+    await assertIndexParity(3072, 'text-embedding-3-large');
+
+    // Start server after validation passes
+    app.listen(port, () => {
+      console.log(`
 ============================================
-Jenny v3 API with UTFA (Universal Temporal Facts Architecture)
+Jenny v3 API with UTFA + KBv6 Locked
 ============================================
 Port: ${port}
-Index: ${process.env.PINECONE_INDEX}
+Index: ${CFG.PINECONE_INDEX_NAME} ✓
+Embedding: ${CFG.EMBEDDING_MODEL_ID} (${CFG.PINECONE_INDEX_DIM}d) ✓
+Model: ${CFG.JENNY_MODEL_ID}
 Temporal Facts: UTFA ENABLED ✓
+KB Retrieval: KBv6 (3 namespaces) ✓
 
 UTFA provides deterministic temporal resolution for:
 - First/initial/earliest facts
@@ -411,6 +443,17 @@ Try these queries:
 - "Show me all my SAT scores"
 - "What was my SAT score as of March 2024?"
 - "What's my SAT superscore?"
+
+KBv6 Namespaces (validated at boot):
+- Sessions/JTBD: 924 vectors
+- iMessage: 40 vectors
+- Assessment: 9 vectors (SQL-gated, excluded from general RAG)
 ============================================
 `);
-});
+    });
+  } catch (err) {
+    console.error('[BOOT] ❌ KBv6 validation failed:', err);
+    console.error('[BOOT] Server NOT started. Fix configuration and restart.');
+    process.exit(1);
+  }
+})();

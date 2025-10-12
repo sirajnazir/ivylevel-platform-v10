@@ -1,0 +1,34 @@
+id: scaffold.auto.adaptation.chip.kbv6_2025_10_06_v1_0
+priority: 50
+requires:
+  anyTag:
+    - adaptation
+  anyNamespace:
+    - KBv6_2025-10-06_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - W028
+      - W093
+      - W080
+    preferType: Adaptation_Chip
+    fallbackTopK: 5
+template: |-
+  **Adaptation_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 90
+  tags: []
+  phases:
+    - P5-SENIOR
+    - P1-FOUNDATION
+    - P3-JUNIOR
+    - P2-BUILDING
+    - P4-SUMMER

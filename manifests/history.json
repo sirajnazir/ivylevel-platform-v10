@@ -1,0 +1,20 @@
+[
+  {
+    "action": "tag",
+    "version": "8.0",
+    "tag": "v8.0-stable",
+    "timestamp": "2025-10-07T11:46:57.802452"
+  },
+  {
+    "action": "tag",
+    "version": "8.0",
+    "tag": "v8.0-stable-LLM",
+    "timestamp": "2025-10-07T13:41:49.184467"
+  },
+  {
+    "action": "tag",
+    "version": "8.0",
+    "tag": "v8.0-microcanary",
+    "timestamp": "2025-10-07T14:14:56.425874"
+  }
+]

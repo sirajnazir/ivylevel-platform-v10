@@ -1,0 +1,28 @@
+id: scaffold.auto.crisis.chip.kbv6_2025_10_06_v1_0
+priority: 50
+requires:
+  anyTag:
+    - crisis
+  anyNamespace:
+    - KBv6_2025-10-06_v1.0
+select:
+  topChip:
+    preferIdPrefix:
+      - W068
+    preferType: Crisis_Chip
+    fallbackTopK: 5
+template: |-
+  **Crisis_Chip** ({{topChip.id}}):
+
+  {{topChip.content}}
+
+  *Source*: {{topChip.namespace}}
+outputs:
+  chips:
+    - "{{topChip.id}}"
+meta:
+  generated: true
+  chip_count: 1
+  tags: []
+  phases:
+    - P4-SUMMER

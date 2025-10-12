@@ -1,0 +1,270 @@
+# Universal Session-EQ Field Aliases (v1.3)
+# Tolerant mapping for diverse JSON schemas
+
+# Top-level metadata mappings
+session_meta:
+  title:
+    - session_title
+    - title
+    - name
+    - doc_id
+    - conversation_summary.one_liner
+
+  phase:
+    - phase
+    - session_phase
+    - source.phase
+
+  week:
+    - week
+    - session_week
+    - source.week
+    # Regex pattern: W\d{3,4}
+
+  started_at:
+    - start
+    - started_at
+    - date
+    - source.date
+    - session_date
+
+  ended_at:
+    - end
+    - ended_at
+    - end_time
+
+  duration:
+    - duration
+    - source.duration
+    - length
+
+  provenance_uri:
+    - provenance
+    - source
+    - source.path
+    - doc_uri
+    - file_path
+
+# Utterance/dialogue mappings
+utterances:
+  array_key:
+    - utterance_spans
+    - lines
+    - turns
+    - dialogue
+    - dialog
+    - exchanges
+    - conversation
+
+  fields:
+    speaker:
+      - speaker
+      - who
+      - role
+      - from
+
+    text:
+      - text
+      - content
+      - message
+      - utterance
+
+    timestamp:
+      - at
+      - time
+      - ts
+      - timestamp
+
+    turn_index:
+      - turn
+      - index
+      - turn_number
+
+    move_type:
+      - move_type
+      - tactic
+      - technique_used
+      - action_type
+
+    confidence:
+      - confidence
+      - score
+      - strength
+      - weight
+
+# Signal/cue mappings
+signals:
+  array_key:
+    - speech_patterns
+    - jenny_speech_patterns
+    - coach_patterns
+    - cues
+    - signals
+    - techniques
+    - tactics
+    - formulas
+    - protocols
+    - insights
+    - discoveries
+
+  counts_key:
+    - counts
+    - cue_counts
+    - signal_counts
+    - distribution
+
+  exemplars_key:
+    - exemplars
+    - examples
+    - samples
+    - representative_quotes
+
+  fields:
+    cue_type:
+      - cue
+      - cue_type
+      - signal_type
+      - type
+      - category
+
+    evidence:
+      - quote
+      - evidence
+      - text
+      - exemplar
+      - evidence_anchor
+
+    confidence:
+      - confidence
+      - score
+      - strength
+      - weight
+
+    provenance:
+      - provenance
+      - source
+      - anchor
+      - reference
+
+# Confidence calibration
+confidence_mapping:
+  high: 0.9
+  medium: 0.7
+  med: 0.7
+  low: 0.5
+  unknown: 0.5
+
+# Cue type normalization
+cue_type_normalization:
+  warmth:
+    - warmth
+    - empathy
+    - supportive_tone
+
+  normalization:
+    - normalization
+    - normalizing
+    - vulnerability_dosing
+
+  celebration:
+    - celebration
+    - praise
+    - acknowledgment
+    - validation
+
+  specificity:
+    - specificity
+    - concrete_details
+    - numbers_first
+    - quant_targets
+
+  identity_reinforcement:
+    - identity_reinforcement
+    - self_belonging
+    - capability_affirmation
+
+  permissioning:
+    - permissioning
+    - permission_granting
+    - autonomy_support
+
+  future_pacing:
+    - future_pacing
+    - forward_looking
+    - strategic_positioning
+
+  trust_microacts:
+    - trust_microacts
+    - trust_building
+    - micro_trust
+
+  escalation_deescalation:
+    - escalation_deescalation
+    - conflict_navigation
+    - tension_management
+
+  rupture_repair:
+    - rupture_repair
+    - relationship_repair
+    - recovery
+
+  accountability:
+    - accountability
+    - follow_through
+    - commitment
+
+  reframing:
+    - reframing
+    - perspective_shift
+    - reconceptualization
+
+# Speaker normalization
+speaker_normalization:
+  jenny:
+    - Jenny
+    - jenny
+    - JENNY
+    - coach
+    - Coach
+    - counselor
+
+  student:
+    - Student
+    - student
+    - Huda
+    - huda
+    - client
+
+  other:
+    - other
+    - system
+    - unknown
+
+# Student ID inference patterns
+student_id_inference:
+  # From filename patterns
+  filename_patterns:
+    - huda  # jenny_eq_session_huda_w001
+    - student_(\w+)
+
+  # From directory
+  directory_patterns:
+    - jenny-huda
+    - canonical/(\w+)
+
+  # Default fallback
+  default: huda-2025
+
+# Quality thresholds
+quality_thresholds:
+  min_signals: 1
+  min_utterances: 3
+  min_density: 1  # at least 1 signal OR 3 utterances
+  max_single_cue_ratio: 0.40  # no cue > 40% unless mono-focus
+  min_student_utterance_ratio: 0.10  # at least 10% student speech
+
+# PII patterns (block if found)
+pii_patterns:
+  email: '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+  phone: '\b\d{3}[-.]?\d{3}[-.]?\d{4}\b'
+  ssn: '\b\d{3}-\d{2}-\d{4}\b'

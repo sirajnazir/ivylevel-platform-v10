@@ -1,0 +1,49 @@
+{
+  "student_id": "huda-2025",
+  "final_gpa_unweighted": 3.92,
+  "final_gpa_weighted": 4.37,
+  "ap_courses_total": 7,
+  "as_of_date": "2025-02-01",
+  "highlights": [
+    {
+      "week_no": 44,
+      "type": "grade_jump",
+      "course": "PreCalc Honors",
+      "from": "B",
+      "to": "A",
+      "description": "Turned B into 100% through tutoring and problem-set marathons"
+    },
+    {
+      "week_no": 72,
+      "type": "ap_added",
+      "course": "AP Physics C",
+      "description": "Added rigorous STEM course for senior year"
+    },
+    {
+      "week_no": 54,
+      "type": "grade_jump",
+      "course": "AP Computer Science A",
+      "from": "B+",
+      "to": "A",
+      "description": "Improved through Synthoria project application"
+    },
+    {
+      "week_no": 18,
+      "type": "report_card",
+      "semester": "Sophomore Fall",
+      "description": "First semester with honors courses"
+    },
+    {
+      "week_no": 36,
+      "type": "report_card",
+      "semester": "Sophomore Spring",
+      "description": "Established baseline academic trajectory"
+    },
+    {
+      "week_no": 90,
+      "type": "report_card",
+      "semester": "Senior Fall",
+      "description": "Final GPA reported to colleges"
+    }
+  ]
+}
