@@ -90,11 +90,9 @@ function formatDate(d: any): string {
 
 function factsBlockForEnumeration(route: string, result: any): string {
   // Build terse, source-friendly lines from enumeration payloads
+  // v10.5.8: Deduplication now happens at orchestration layer (line ~508), not here
   let items = result.items ?? (result.item ? [result.item] : []);
   if (!items?.length) return "";
-
-  // v10.5.4: Apply universal deduplication before building facts block
-  items = deduplicateEnumItems(items, route);
 
   if (route.startsWith("awards.final")) {
     return items.map((r: any) =>
@@ -189,13 +187,40 @@ function deduplicateEnumItems(items: any[], route: string): any[] {
 
   // Normalize name function (remove hyphens, em-dashes, ampersands, trim spaces)
   // v10.5.4.1: Enhanced to handle "&" vs "and" variations
+  // v10.5.7: Enhanced for activities - extract core name after role prefix
   const normalize = (str: string) => {
     if (typeof str !== 'string') return '';
-    return str.toLowerCase()
+
+    let normalized = str.toLowerCase()
       .replace(/&/g, 'and')           // Convert & to and
       .replace(/[—\-\s]+/g, ' ')      // Normalize dashes/spaces
       .replace(/\s+/g, ' ')           // Collapse multiple spaces
       .trim();
+
+    // For activities: Remove role prefixes to get core activity name
+    // "Founder, Empowering AI; description..." → "empowering ai"
+    // "President, Filmmaker's Club" → "filmmaker's club"
+    // "Founder/Solo Developer, Synthoria" → "synthoria"
+    if (nameField === 'activity_name') {
+      // Remove common role prefixes (including compound roles like "Founder/Solo Developer")
+      // Match roles followed by comma, slash, or space
+      // IMPORTANT: Longer patterns must come FIRST in alternation (e.g., "vice president" before "president")
+      // Run in loop to handle compound roles like "Founder/Solo Developer"
+      let prev;
+      do {
+        prev = normalized;
+        normalized = normalized
+          .replace(/^(vice president|student leader|solo developer|co-founder|co founder|president|founder|ambassador|coordinator|participant|volunteer|freelancer|developer|director|manager|teacher|scholar|captain|leader|member|editor|intern|solo)[\/,\s]+/i, '');
+      } while (normalized !== prev && normalized);
+
+      normalized = normalized
+        .replace(/[;:].*/g, '')  // Remove everything after semicolon/colon (descriptions)
+        .replace(/\([^)]*\)/g, '') // Remove parentheticals
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    return normalized;
   };
 
   // Group items by normalized name + date (where applicable)
@@ -206,12 +231,21 @@ function deduplicateEnumItems(items: any[], route: string): any[] {
     const date = item.won_date || item.event_date || item.submit_date || item.decision_date || item.as_of || '';
 
     // Create composite key: normalized_name + date
+    // For activities, don't use date since different sources have inconsistent dates
     const normalizedName = normalize(name);
-    const key = `${normalizedName}|${date}`;
+    const key = nameField === 'activity_name' ? normalizedName : `${normalizedName}|${date}`;
+
+    // DEBUG for activities
+    if (nameField === 'activity_name' && items.length > 15) {
+      console.log(`[DEDUP-EC] "${name}" → normalized: "${normalizedName}" | key: "${key}" | src: ${item.source_id}`);
+    }
 
     if (!seen.has(key)) {
       // First occurrence - add to map
       seen.set(key, item);
+      if (nameField === 'activity_name' && items.length > 15) {
+        console.log(`[DEDUP-EC]   → FIRST, added`);
+      }
     } else {
       // Duplicate found - prioritize SRC-INT-* sources
       const existing = seen.get(key);
@@ -242,10 +276,8 @@ function deduplicateEnumItems(items: any[], route: string): any[] {
 
 function composeEnumText(result: any): string {
   const route = result.route as string;
+  // v10.5.8: Deduplication now happens at orchestration layer (line ~508), not here
   let list  = result.items ?? (result.item ? [result.item] : []);
-
-  // v10.5.4: Apply universal deduplication to remove duplicate entries
-  list = deduplicateEnumItems(list, route);
   const lines = list.map((r: any, i: number) => {
     if (route.startsWith('ecs.')) {
       return `${i+1}. ${r.activity_name}${r.category ? ` (${r.category})` : ''}${
@@ -476,18 +508,30 @@ export async function agentChat(req: any, res?: any) {
       return;
     }
 
+    // v10.5.8: Deduplicate items ONCE at orchestration layer (before passing to helpers)
+    // This prevents double deduplication in factsBlockForEnumeration() and composeEnumText()
+    const originalItems = enumResult.items ?? (enumResult.item ? [enumResult.item] : []);
+    const dedupedItems = deduplicateEnumItems(originalItems, enumResult.route);
+
+    // Create deduplicated result object
+    const dedupedEnumResult = {
+      ...enumResult,
+      items: dedupedItems,
+      item: dedupedItems.length === 1 ? dedupedItems[0] : undefined
+    };
+
     // Compose deterministic list answer with chips
-    const chips = (enumResult.items ?? [enumResult.item]).filter(Boolean).map((r: any) => ({
+    const chips = dedupedItems.filter(Boolean).map((r: any) => ({
       chip_table: r.chip_table ?? inferChipTableFromRoute(enumResult.route),
       chip_id:    r.chip_id,
       source_id:  r.source_id
     }));
 
-    const rawAnswer = composeEnumText(enumResult);
+    const rawAnswer = composeEnumText(dedupedEnumResult);
     const dedupedAnswer = deduplicateAnswer(rawAnswer);
 
     // v10.5.1: Build compact facts block for humanizer (avoids duplication)
-    const enumFacts = factsBlockForEnumeration(enumResult.route, enumResult);
+    const enumFacts = factsBlockForEnumeration(enumResult.route, dedupedEnumResult);
 
     // v10.4: Apply humanizer (Cat-1: SQL facts) with feature flag
     const humanized = HUMANIZER_ENABLED
