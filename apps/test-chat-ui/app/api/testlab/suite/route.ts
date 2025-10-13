@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { suiteId, label, category, tests, parallel } = SuiteRequestSchema.parse(body);
 
-    const baseUrl = process.env.NEXT_PUBLIC_UI_BASE || "http://localhost:8787";
+    // Suite runner calls its own /api/testlab/run endpoint (same server)
+    const baseUrl = "http://localhost:3000";
 
     // Run tests (parallel or sequential)
     let results: TestRunResponse[];

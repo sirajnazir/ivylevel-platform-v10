@@ -11,10 +11,14 @@ import { routeEnumerationQuery, isEnumerationQuery } from './enumeration-router.
 import { classifyEnumIntent, isEnumerationQuery as isUniversalEnum } from './intent-enum.js';
 // v10.5.2: RESTORED - Use proper v3.0 resolvers (data exists in views!)
 import { awards, ecs, narrative, programs } from '../resolvers/enums.js';
-import { transcript, gpa, overview, vitals } from '../resolvers/academics.js';
+import { transcript, gpa, overview, vitals as academicVitals } from '../resolvers/academics.js';
 import { ivyscore, readiness } from '../resolvers/readiness.js';
 import { collegeList } from '../resolvers/college.js';
 import { gameplan } from '../resolvers/gameplan.js';
+import { sat } from '../resolvers/testing.js';
+// v10.6: EC Vitals + JTBD resolvers (fact-based metric progression)
+import { vitals as ecVitals } from '../resolvers/vitals.js';
+import { jtbd } from '../resolvers/jtbd.js';
 // v10.2-v10.5.1: BROKEN compat resolvers (queried bad vital_facts)
 // import { awards, ecs, programs, academics, progression } from '../resolvers/compat.js';
 import { hybridSearch } from '../retrieval/hybrid.js';
@@ -136,6 +140,31 @@ function factsBlockForEnumeration(route: string, result: any): string {
       : `${r.gpa_unweighted ?? "NA"} UW`;
     return `as_of: ${r.as_of_date} | week: W${String(r.week_no || r.week || 0).padStart(2, "0")} | gpa: ${gpa}` +
            `${r.ap_count ? ` | ap: ${r.ap_count}` : ""}`;
+  }
+
+  // v10.6: EC Vitals
+  if (route.startsWith("vitals.")) {
+    if (route === "vitals.summary") {
+      const r = result.item;
+      if (!r) return "";
+      return `vitals_summary: ${r.activities_tracked} activities | ${r.unique_metrics} metrics | ${r.total_snapshots} snapshots | ${formatDate(r.tracking_start)} to ${formatDate(r.tracking_latest)}`;
+    }
+    return items.map((r: any) => {
+      const val = r.numeric_value ? `${r.numeric_value}${r.unit || ""}` : r.text_value || "NA";
+      return `${r.activity_name} | ${r.metric_name}: ${val}${r.as_of ? ` | date: ${formatDate(r.as_of)}` : ""}${r.nth ? ` | #${r.nth}` : ""}`;
+    }).join("\n");
+  }
+
+  // v10.6: JTBD
+  if (route.startsWith("jtbd.")) {
+    if (route === "jtbd.week") {
+      const r = result.item;
+      if (!r) return "";
+      return `week_${r.week_number}: ${r.completed_jobs}/${r.total_jobs} completed | ${formatDate(r.week_start_date)} to ${formatDate(r.week_end_date)}`;
+    }
+    return items.map((r: any) =>
+      `${r.week_number ? `W${r.week_number} | ` : ""}${r.job_description}${r.completion_date ? ` | done: ${formatDate(r.completion_date)}` : ""}${r.outcome_value ? ` | result: ${r.outcome_value}${r.outcome_unit || ""}` : ""}`
+    ).join("\n");
   }
 
   // Fallback: join minimal titles
@@ -310,6 +339,12 @@ function composeEnumText(result: any): string {
     if (route.startsWith('academics.vitals.events')) {
       return `${i+1}. W${String(r.week_no).padStart(2, '0')} (${r.event_date}): ${r.label}`;
     }
+    // v10.5.9: SAT score formatting
+    if (route.startsWith('testing.sat.')) {
+      const typeLabel = r.type === 'practice' ? ' (practice)' : '';
+      const dateLabel = r.as_of ? ` — ${formatDate(r.as_of)}` : '';
+      return `${i+1}. SAT: ${r.numeric_value}${typeLabel}${dateLabel}`;
+    }
     // v10.5.2: College list formatting
     if (route.startsWith('college.')) {
       const bucketTag = r.bucket_category ? ` [${r.bucket_category}]` : '';
@@ -406,6 +441,45 @@ function composeEnumText(result: any): string {
     return sections.length ? sections.join('\n\n') : 'No game plan data found.';
   }
 
+  // v10.6: EC Vitals formatting
+  if (route.startsWith('vitals.')) {
+    if (route === 'vitals.summary') {
+      const r = result.item;
+      if (!r) return 'No vitals data found.';
+      return `Vitals Tracking Summary:\n• Activities tracked: ${r.activities_tracked}\n• Unique metrics: ${r.unique_metrics}\n• Total snapshots: ${r.total_snapshots}\n• Tracking period: ${formatDate(r.tracking_start)} to ${formatDate(r.tracking_latest)}\n• Metric types: ${r.metric_types_tracked?.join(', ') || 'N/A'}`;
+    }
+    // vitals.latest, vitals.progression, vitals.funding.progression, vitals.scale.progression, vitals.impact.latest
+    return list.map((r: any, i: number) => {
+      const value = r.numeric_value ? `${r.numeric_value}${r.unit ? ` ${r.unit}` : ''}` : r.text_value || 'N/A';
+      const activityLabel = r.activity_name ? `${r.activity_name} — ` : '';
+      const dateLabel = r.as_of ? ` (${formatDate(r.as_of)})` : '';
+      const nthLabel = r.nth ? ` [#${r.nth}]` : '';
+      return `${i+1}. ${activityLabel}${r.metric_name}: ${value}${dateLabel}${nthLabel}`;
+    }).join('\n') || 'No vitals data found.';
+  }
+
+  // v10.6: JTBD (Jobs To Be Done) formatting
+  if (route.startsWith('jtbd.')) {
+    if (route === 'jtbd.week') {
+      const r = result.item;
+      if (!r) return 'No jobs found for this week.';
+      return `Week ${r.week_number} (${formatDate(r.week_start_date)} to ${formatDate(r.week_end_date)}):\n• Total jobs: ${r.total_jobs}\n• Completed: ${r.completed_jobs}\n• In progress: ${r.in_progress_jobs}\n• Planned: ${r.planned_jobs}\n\nCompleted this week:\n${r.completed_descriptions?.map((d: string, i: number) => `  ${i+1}. ${d}`).join('\n') || '  (none)'}`;
+    }
+    if (route === 'jtbd.progression') {
+      return list.map((r: any, i: number) => {
+        return `${i+1}. Week ${r.week_number} (${formatDate(r.week_start_date)}): ${r.completed_this_week}/${r.jobs_this_week} completed (${r.completion_rate}%) — Cumulative: ${r.cumulative_completed}/${r.cumulative_jobs}`;
+      }).join('\n') || 'No progression data found.';
+    }
+    // jtbd.completed, jtbd.pending, jtbd.milestones
+    return list.map((r: any, i: number) => {
+      const weekLabel = r.week_number ? `W${r.week_number} — ` : '';
+      const dateLabel = r.completion_date ? ` (${formatDate(r.completion_date)})` : '';
+      const statusLabel = r.status ? ` [${r.status}]` : '';
+      const outcomeLabel = r.outcome_value ? ` → ${r.outcome_value}${r.outcome_unit ? ` ${r.outcome_unit}` : ''}` : '';
+      return `${i+1}. ${weekLabel}${r.job_description}${dateLabel}${statusLabel}${outcomeLabel}`;
+    }).join('\n') || 'No jobs found.';
+  }
+
   return lines.length ? lines.join('\n') : 'No items found.';
 }
 
@@ -446,9 +520,14 @@ async function maybeEnumAnswer(pg: any, studentId: string, userText: string) {
     case 'academics.gpa.progression': return { kind: 'enum', route, items: await gpa.progression(pg, studentId) };
 
     // vitals from academics.ts resolver
-    case 'academics.vitals.latest':   return { kind: 'enum', route, item:  await vitals.latest(pg, studentId) };
+    case 'academics.vitals.latest':   return { kind: 'enum', route, item:  await academicVitals.latest(pg, studentId) };
     case 'academics.vitals.trend':    return { kind: 'enum', route, item:  null };
     case 'academics.vitals.events':   return { kind: 'enum', route, items: [] };
+
+    // SAT from testing.ts resolver (v10.5.9)
+    case 'testing.sat.first':         return { kind: 'enum', route, items: await sat.first(pg, studentId) };
+    case 'testing.sat.latest':        return { kind: 'enum', route, items: await sat.latest(pg, studentId) };
+    case 'testing.sat.progression':   return { kind: 'enum', route, items: await sat.progression(pg, studentId) };
 
     // IvyScore / Readiness from readiness.ts resolver (v10.5.2)
     case 'ivyscore.latest':           console.log('[ORCH] → Calling ivyscore.latest'); return { kind: 'enum', route, item:  await ivyscore.latest(pg, studentId) };
@@ -465,12 +544,39 @@ async function maybeEnumAnswer(pg: any, studentId: string, userText: string) {
     case 'college.match':             return { kind: 'enum', route, items: await collegeList.byBucket(pg, studentId, 'Match') };
     case 'college.safety':            return { kind: 'enum', route, items: await collegeList.byBucket(pg, studentId, 'Safety') };
 
+    // College Decision Plan from college.ts resolver (v10.7.1)
+    case 'college.early_decision':    return { kind: 'enum', route, items: await collegeList.byDecisionPlan(pg, studentId, 'Early Decision') };
+    case 'college.early_action':      return { kind: 'enum', route, items: await collegeList.byDecisionPlan(pg, studentId, 'Early Action') };
+    case 'college.restrictive_early': return { kind: 'enum', route, items: await collegeList.byDecisionPlan(pg, studentId, 'Restrictive Early Action') };
+    case 'college.regular_decision':  return { kind: 'enum', route, items: await collegeList.byDecisionPlan(pg, studentId, 'Regular Decision') };
+
     // Game Plan from gameplan.ts resolver (v10.5.2)
     case 'gameplan.summary_initial':  return { kind: 'enum', route, item:  await gameplan.summaryInitial(pg, studentId) };
     case 'gameplan.vs_execution':     return { kind: 'enum', route, items: await gameplan.vsExecution(pg, studentId) };
     case 'gameplan.plan_events':      return { kind: 'enum', route, items: await gameplan.planEvents(pg, studentId) };
+
+    // EC Vitals from vitals.ts resolver (v10.6)
+    case 'vitals.latest':             return { kind: 'enum', route, items: await ecVitals.latest(pg, studentId) };
+    case 'vitals.progression':        return { kind: 'enum', route, items: await ecVitals.progression(pg, studentId) };
+    case 'vitals.funding.progression': return { kind: 'enum', route, items: await ecVitals.fundingProgression(pg, studentId) };
+    case 'vitals.scale.progression':  return { kind: 'enum', route, items: await ecVitals.scaleProgression(pg, studentId) };
+    case 'vitals.impact.latest':      return { kind: 'enum', route, items: await ecVitals.impactMetrics(pg, studentId) };
+    case 'vitals.summary':            return { kind: 'enum', route, item:  await ecVitals.summary(pg, studentId) };
+
+    // JTBD (Jobs To Be Done) from jtbd.ts resolver (v10.6)
+    case 'jtbd.week':                 return { kind: 'enum', route, item:  await jtbd.byWeek(pg, studentId, extractWeekNumber(q)) };
+    case 'jtbd.completed':            return { kind: 'enum', route, items: await jtbd.completed(pg, studentId) };
+    case 'jtbd.pending':              return { kind: 'enum', route, items: await jtbd.pending(pg, studentId) };
+    case 'jtbd.milestones':           return { kind: 'enum', route, items: await jtbd.milestones(pg, studentId) };
+    case 'jtbd.progression':          return { kind: 'enum', route, items: await jtbd.progression(pg, studentId) };
   }
   return null;
+}
+
+// Helper: Extract week number from query (e.g., "week 8" → 8)
+function extractWeekNumber(q: string): number {
+  const match = q.match(/week\s+(\d+)/i);
+  return match ? parseInt(match[1], 10) : 1;
 }
 
 export async function agentChat(req: any, res?: any) {

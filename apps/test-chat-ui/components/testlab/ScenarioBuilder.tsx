@@ -162,7 +162,7 @@ export function ScenarioBuilder({ onRunSingle, onRunSuite, running }: ScenarioBu
             }`}
             disabled={running}
           >
-            Facts Suite (10 tests)
+            Facts Suite v2.0 (50 tests - Complete Cat-1)
           </button>
 
           <button

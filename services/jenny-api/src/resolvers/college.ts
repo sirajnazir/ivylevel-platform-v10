@@ -124,5 +124,29 @@ export const collegeList = {
     });
 
     return rows;
+  },
+
+  byDecisionPlan: async (pg: Pool, studentId: string, decisionPlan: string) => {
+    const start = Date.now();
+    log.event('collegeList.byDecisionPlan_start', { student_id: studentId, decision_plan: decisionPlan });
+
+    const { rows } = await pg.query(
+      `SELECT college_id, college_name, bucket_category, decision_plan,
+              decision_result, program, location, acceptance_rate
+         FROM college_list
+        WHERE student_id=$1
+          AND decision_plan=$2
+        ORDER BY college_name`,
+      [studentId, decisionPlan]
+    );
+
+    log.event('collegeList.byDecisionPlan_complete', {
+      student_id: studentId,
+      decision_plan: decisionPlan,
+      count: rows.length,
+      took_ms: Date.now() - start
+    });
+
+    return rows;
   }
 };

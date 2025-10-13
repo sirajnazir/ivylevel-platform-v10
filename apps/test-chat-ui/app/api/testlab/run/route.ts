@@ -28,11 +28,11 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { test } = RequestSchema.parse(body);
 
-    // Build kb-chat request
+    // Build agent/chat request (jenny-api format)
     const kbReq = {
-      userMessage: test.prompt,
-      studentId: test.studentId ?? "huda-2025",
-      sessionId: test.sessionId ?? `testlab-${test.id}`,
+      message: test.prompt,
+      student_id: test.studentId ?? "huda-2025",
+      session_id: test.sessionId ?? `testlab-${test.id}`,
       intentOverride: test.intentOverride,
       includeDebug: true,
       includeTrace: true
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     // Execute query
     const t0 = Date.now();
     const baseUrl = process.env.NEXT_PUBLIC_UI_BASE || "http://localhost:8787";
-    const resp = await fetch(`${baseUrl}/api/kb-chat`, {
+    const resp = await fetch(`${baseUrl}/agent/chat`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(kbReq)
@@ -55,13 +55,35 @@ export async function POST(req: NextRequest) {
     const t1 = Date.now();
 
     // Parse response into RunResult
+    // Detect SQL source from provenance chips
+    const chips = data.chips ?? data.debug?.provenance ?? [];
+    const hasSQLEvidence = chips.some((chip: any) => {
+      if (chip.kind !== 'evidence') return false;
+      const text = chip.text || '';
+      // SQL view patterns
+      if (text.startsWith('v_')) return true;
+      if (text.includes('_enum_')) return true;
+      if (text.includes('_snapshots')) return true;
+      if (text.includes('_rubric')) return true;
+      if (text.includes('academic_')) return true;
+      // SQL-backed KB evidence patterns
+      if (text === 'GPA') return true;
+      if (text === 'college_list') return true;
+      if (text === 'scholarships') return true;
+      if (text.includes('_submitted')) return true;
+      if (text.includes('_final')) return true;
+      if (text.includes('_initial')) return true;
+      return false;
+    });
+    const detectedSource = hasSQLEvidence ? 'sql' : (data.source ?? data.debug?.source ?? "unknown");
+
     const run: RunResult = {
       id: test.id,
       label: test.label,
       category: test.category,
       prompt: test.prompt,
       answer: data.answer ?? "",
-      source: (data.source ?? data.debug?.source ?? "unknown") as any,
+      source: detectedSource as any,
       modelBadge: data.debug?.modelBadge ?? data.model ?? null,
       scaffold: data.debug?.scaffold_used ?? null,
       debug: {

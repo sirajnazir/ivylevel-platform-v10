@@ -103,7 +103,7 @@ export const readiness = {
       `SELECT *
          FROM v_readiness_top_priorities
         WHERE student_id=$1
-        ORDER BY priority_rank
+        ORDER BY gap_weighted DESC
         LIMIT 5`,
       [studentId]
     );

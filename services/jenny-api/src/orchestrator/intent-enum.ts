@@ -36,6 +36,13 @@ const ACADEMICS_SYNS = {
   events: ['academic events', 'grade jump', 'grade change', 'report cards', 'milestone', 'milestones']
 };
 
+// v10.5.9: Testing (SAT/ACT/AP) patterns
+const TESTING_SYNS = {
+  sat: ['sat', 'sat score', 'sat scores', 'sat test', 'scholastic aptitude test', 'scholastic assessment test'],
+  act: ['act', 'act score', 'act scores', 'act test', 'american college testing'],
+  ap: ['ap', 'ap score', 'ap scores', 'ap test', 'ap exam', 'advanced placement']
+};
+
 // v10.5.2: IvyScore / Readiness patterns
 const IVYSCORE_SYNS = ['ivyscore', 'ivy score', 'ivyready', 'ivy ready', 'readiness score', 'readiness', 'chances', 'my score'];
 const READINESS_SYNS = ['priorities', 'top priorities', 'weakspots', 'weak spots', 'areas to improve', 'what should i work on'];
@@ -46,6 +53,18 @@ const COLLEGE_ATTENDING_SYNS = ['attending', 'going to', 'enrolled', 'matriculat
 
 // v10.5.2: Game Plan patterns
 const GAMEPLAN_SYNS = ['game plan', 'gameplan', 'plan', 'strategy', 'roadmap', 'targets', 'goals'];
+
+// v10.6: EC Vitals patterns (metric progression tracking)
+const VITALS_SYNS = ['vitals', 'metrics', 'progression', 'growth', 'tracking'];
+const FUNDING_SYNS = ['funding', 'raised', 'money', 'grants', 'revenue', 'financial'];
+const SCALE_SYNS = ['scale', 'reach', 'students reached', 'members', 'audience', 'participants'];
+const IMPACT_SYNS = ['impact', 'media', 'features', 'views', 'recognition', 'social media'];
+const LEADERSHIP_SYNS = ['team', 'partnerships', 'leadership', 'team size', 'growth rate'];
+const PRODUCT_SYNS = ['product', 'shipped', 'downloads', 'users', 'content'];
+
+// v10.6: JTBD patterns (weekly execution facts)
+const JTBD_SYNS = ['week', 'weekly', 'done', 'accomplished', 'completed', 'progress'];
+const MILESTONE_SYNS = ['milestone', 'milestones', 'achievement', 'achievements'];
 
 export type EnumRoute =
   | 'awards.initial'
@@ -70,6 +89,12 @@ export type EnumRoute =
   | 'academics.vitals.latest'
   | 'academics.vitals.trend'
   | 'academics.vitals.events'
+  | 'testing.sat.first'  // v10.5.9
+  | 'testing.sat.latest'  // v10.5.9
+  | 'testing.sat.progression'  // v10.5.9
+  | 'testing.act.first'  // v10.5.9
+  | 'testing.act.latest'  // v10.5.9
+  | 'testing.act.progression'  // v10.5.9
   | 'ivyscore.latest'  // v10.5.2
   | 'ivyscore.current'  // v10.5.2
   | 'ivyscore.progression'  // v10.5.2
@@ -80,9 +105,24 @@ export type EnumRoute =
   | 'college.reach'  // v10.5.2
   | 'college.match'  // v10.5.2
   | 'college.safety'  // v10.5.2
+  | 'college.early_decision'  // v10.7.1
+  | 'college.early_action'  // v10.7.1
+  | 'college.restrictive_early'  // v10.7.1
+  | 'college.regular_decision'  // v10.7.1
   | 'gameplan.summary_initial'  // v10.5.2
   | 'gameplan.vs_execution'  // v10.5.2
   | 'gameplan.plan_events'  // v10.5.2
+  | 'vitals.latest'  // v10.6 - Latest values for all metrics
+  | 'vitals.progression'  // v10.6 - Full timeline of all metrics
+  | 'vitals.funding.progression'  // v10.6 - Funding raised progression
+  | 'vitals.scale.progression'  // v10.6 - Scale metrics progression
+  | 'vitals.impact.latest'  // v10.6 - Impact metrics
+  | 'vitals.summary'  // v10.6 - Student vitals summary
+  | 'jtbd.week'  // v10.6 - Jobs for specific week
+  | 'jtbd.completed'  // v10.6 - All completed jobs
+  | 'jtbd.pending'  // v10.6 - Pending jobs
+  | 'jtbd.milestones'  // v10.6 - EC milestones only
+  | 'jtbd.progression'  // v10.6 - Week-over-week progression
   | null;
 
 // Check for word boundaries to avoid false matches
@@ -264,6 +304,46 @@ export function classifyEnumIntent(q: string): EnumRoute {
     return 'academics.vitals.events';
   }
 
+  // v10.5.9: Testing - SAT
+  if (any(s, TESTING_SYNS.sat)) {
+    // Check for progression patterns: "improve", "over time", "history", "all scores"
+    if (any(s, PROG_SYNS) || s.includes('improve') || s.includes('all') || s.includes('scores')) {
+      log.event('intent_classified', { route: 'testing.sat.progression', query: q.slice(0, 80) });
+      return 'testing.sat.progression';
+    }
+    // "latest SAT" or "current SAT" or "most recent SAT"
+    if (s.includes('latest') || s.includes('current') || s.includes('most recent') || s.includes('last')) {
+      log.event('intent_classified', { route: 'testing.sat.latest', query: q.slice(0, 80) });
+      return 'testing.sat.latest';
+    }
+    // "first SAT" or "initial SAT"
+    if (s.includes('first') || any(s, INIT_SYNS)) {
+      log.event('intent_classified', { route: 'testing.sat.first', query: q.slice(0, 80) });
+      return 'testing.sat.first';
+    }
+    // Default to latest for "what's my SAT?"
+    log.event('intent_classified', { route: 'testing.sat.latest', query: q.slice(0, 80) });
+    return 'testing.sat.latest';
+  }
+
+  // v10.5.9: Testing - ACT
+  if (any(s, TESTING_SYNS.act)) {
+    if (any(s, PROG_SYNS) || s.includes('improve') || s.includes('all') || s.includes('scores')) {
+      log.event('intent_classified', { route: 'testing.act.progression', query: q.slice(0, 80) });
+      return 'testing.act.progression';
+    }
+    if (s.includes('latest') || s.includes('current') || s.includes('most recent') || s.includes('last')) {
+      log.event('intent_classified', { route: 'testing.act.latest', query: q.slice(0, 80) });
+      return 'testing.act.latest';
+    }
+    if (s.includes('first') || any(s, INIT_SYNS)) {
+      log.event('intent_classified', { route: 'testing.act.first', query: q.slice(0, 80) });
+      return 'testing.act.first';
+    }
+    log.event('intent_classified', { route: 'testing.act.latest', query: q.slice(0, 80) });
+    return 'testing.act.latest';
+  }
+
   // v10.5.3: Enhanced readiness detection (must come BEFORE college detection)
   // "am i ready for top colleges?" should route to readiness, NOT college.list
   if (s.includes('am i ready') || s.includes('ready for')) {
@@ -338,6 +418,69 @@ export function classifyEnumIntent(q: string): EnumRoute {
     return 'gameplan.summary_initial';
   }
 
+  // v10.6: EC Vitals (metric progression tracking)
+  if (any(s, VITALS_SYNS) || any(s, FUNDING_SYNS) || any(s, SCALE_SYNS) || any(s, IMPACT_SYNS)) {
+    // "How much funding have I raised?" → vitals.funding.progression
+    if (any(s, FUNDING_SYNS)) {
+      if (any(s, PROG_SYNS) || s.includes('progression') || s.includes('over time') || s.includes('timeline')) {
+        log.event('intent_classified', { route: 'vitals.funding.progression', query: q.slice(0, 80) });
+        return 'vitals.funding.progression';
+      }
+    }
+    // "Show me scale metrics" / "How many students reached?" → vitals.scale.progression
+    if (any(s, SCALE_SYNS)) {
+      if (any(s, PROG_SYNS) || s.includes('progression') || s.includes('over time') || s.includes('growth')) {
+        log.event('intent_classified', { route: 'vitals.scale.progression', query: q.slice(0, 80) });
+        return 'vitals.scale.progression';
+      }
+    }
+    // "What's my impact?" / "Media features" → vitals.impact.latest
+    if (any(s, IMPACT_SYNS)) {
+      log.event('intent_classified', { route: 'vitals.impact.latest', query: q.slice(0, 80) });
+      return 'vitals.impact.latest';
+    }
+    // "Show me all vitals progression" → vitals.progression
+    if (any(s, PROG_SYNS) || s.includes('progression') || s.includes('timeline') || s.includes('history')) {
+      log.event('intent_classified', { route: 'vitals.progression', query: q.slice(0, 80) });
+      return 'vitals.progression';
+    }
+    // "Summary of vitals" → vitals.summary
+    if (s.includes('summary')) {
+      log.event('intent_classified', { route: 'vitals.summary', query: q.slice(0, 80) });
+      return 'vitals.summary';
+    }
+    // Default to latest for "my vitals" / "current metrics"
+    log.event('intent_classified', { route: 'vitals.latest', query: q.slice(0, 80) });
+    return 'vitals.latest';
+  }
+
+  // v10.6: JTBD (weekly execution facts)
+  if (any(s, JTBD_SYNS) || any(s, MILESTONE_SYNS)) {
+    // "What did I accomplish in week 8?" → jtbd.week
+    if (s.includes('week') && /week\s+\d+/.test(s)) {
+      log.event('intent_classified', { route: 'jtbd.week', query: q.slice(0, 80) });
+      return 'jtbd.week';
+    }
+    // "What's pending?" / "What do I need to do?" → jtbd.pending
+    if (s.includes('pending') || s.includes('planned') || s.includes('need to do') || s.includes('todo')) {
+      log.event('intent_classified', { route: 'jtbd.pending', query: q.slice(0, 80) });
+      return 'jtbd.pending';
+    }
+    // "My milestones" / "EC achievements" → jtbd.milestones
+    if (any(s, MILESTONE_SYNS) || s.includes('achievement')) {
+      log.event('intent_classified', { route: 'jtbd.milestones', query: q.slice(0, 80) });
+      return 'jtbd.milestones';
+    }
+    // "Week over week progress" → jtbd.progression
+    if (any(s, PROG_SYNS) || s.includes('progression') || s.includes('completion rate')) {
+      log.event('intent_classified', { route: 'jtbd.progression', query: q.slice(0, 80) });
+      return 'jtbd.progression';
+    }
+    // Default to completed jobs for "what have I done?" / "my progress"
+    log.event('intent_classified', { route: 'jtbd.completed', query: q.slice(0, 80) });
+    return 'jtbd.completed';
+  }
+
   log.event('intent_not_enumeration', { query: q.slice(0, 80) });
   return null;
 }
@@ -357,11 +500,22 @@ export function isEnumerationQuery(message: string): boolean {
   if (any(m, ACADEMICS_SYNS.gpa)) return true;
   if (any(m, ACADEMICS_SYNS.vitals)) return true;
   if (any(m, ACADEMICS_SYNS.events)) return true;
+  // v10.5.9: Testing (SAT/ACT/AP)
+  if (any(m, TESTING_SYNS.sat)) return true;
+  if (any(m, TESTING_SYNS.act)) return true;
+  if (any(m, TESTING_SYNS.ap)) return true;
   // v10.5.2: IvyScore, College, GamePlan
   if (any(m, IVYSCORE_SYNS)) return true;
   if (any(m, READINESS_SYNS)) return true;
   if (any(m, COLLEGE_SYNS)) return true;
   if (any(m, GAMEPLAN_SYNS)) return true;
+  // v10.6: EC Vitals, JTBD
+  if (any(m, VITALS_SYNS)) return true;
+  if (any(m, FUNDING_SYNS)) return true;
+  if (any(m, SCALE_SYNS)) return true;
+  if (any(m, IMPACT_SYNS)) return true;
+  if (any(m, JTBD_SYNS)) return true;
+  if (any(m, MILESTONE_SYNS)) return true;
 
   return false;
 }

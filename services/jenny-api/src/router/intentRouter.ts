@@ -20,12 +20,24 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 type Intent =
   | "ecs.list"
+  | "ecs.leadership"
+  | "ecs.by_role"
   | "awards.list"
   | "programs.list"
   | "academics.summary"
+  | "academics.transcript.initial"
+  | "academics.transcript.final"
+  | "academics.transcript.progression"
+  | "academics.gpa.initial"
+  | "academics.gpa.final"
+  | "academics.gpa.latest"
+  | "academics.gpa.progression"
   | "narrative.summary"
   | "progression.timeline"
   | "sat.ordinal"
+  | "testing.sat.first"
+  | "testing.sat.latest"
+  | "testing.sat.progression"
   | "gameplan.initial"
   | "gameplan.vs_progress"
   | "application.final"
@@ -47,15 +59,36 @@ type Intent =
   | "readiness.boost.max"
   | "readiness.boost.plan"
   | "readiness.progression"
+  | "readiness.top_priorities"
   | "college.list"
+  | "college.attending"
+  | "college.accepted"
+  | "college.reach"
+  | "college.match"
+  | "college.safety"
+  | "college.early_decision"
+  | "college.early_action"
+  | "college.restrictive_early"
+  | "college.regular_decision"
   | "college.compare.readiness"
   | "scholarship.list"
   | "scholarship.total"
+  | "vitals.latest"
+  | "vitals.progression"
+  | "vitals.funding.progression"
+  | "vitals.scale.progression"
+  | "vitals.impact.latest"
+  | "vitals.summary"
+  | "jtbd.week"
+  | "jtbd.completed"
+  | "jtbd.pending"
+  | "jtbd.milestones"
+  | "jtbd.progression"
   | "kb.search"
   | "unknown";
 
 type Phase = "initial" | "final" | null;
-type Object = "ec" | "award" | "program" | "academics" | "narrative" | "sat";
+type Object = "ec" | "award" | "program" | "academics" | "narrative" | "sat" | "testing" | "vitals" | "jtbd" | "college" | "readiness" | "gameplan" | "application" | "rubric" | "scholarship" | "kb";
 type NthOrdinal = "first" | "second" | "third" | "latest" | number;
 
 const IntentSchema = z.object({
@@ -84,11 +117,19 @@ const FEW_SHOT = [
   {input:"what activities did we target at the start?", output:{intent:"ecs.list", phase:"initial", object:"ec", filters:{}, confidence:0.9}},
   {input:"in the gameplan, which ECs were listed?", output:{intent:"ecs.list", phase:"initial", object:"ec", filters:{}, confidence:0.92}},
 
-  // ECs - Final (4 examples)
+  // ECs - Final (4 examples - v10.7.1)
   {input:"what was my final EC list?", output:{intent:"ecs.list", phase:"final", object:"ec", filters:{}, confidence:0.95}},
   {input:"which activities made it into my Common App?", output:{intent:"ecs.list", phase:"final", object:"ec", filters:{}, confidence:0.96}},
   {input:"ECs I submitted in the college application", output:{intent:"ecs.list", phase:"final", object:"ec", filters:{}, confidence:0.94}},
   {input:"what ECs did I end up submitting?", output:{intent:"ecs.list", phase:"final", object:"ec", filters:{}, confidence:0.93}},
+
+  // ECs - By Role (6 examples - v10.7.1 NEW)
+  {input:"show only my leadership roles", output:{intent:"ecs.leadership", phase:"final", object:"ec", filters:{role:"leadership"}, confidence:0.96}},
+  {input:"filter my ECs to leadership positions", output:{intent:"ecs.leadership", phase:"final", object:"ec", filters:{role:"leadership"}, confidence:0.95}},
+  {input:"which activities was I a leader?", output:{intent:"ecs.leadership", phase:"final", object:"ec", filters:{role:"leadership"}, confidence:0.94}},
+  {input:"show ECs where I was captain", output:{intent:"ecs.by_role", phase:"final", object:"ec", filters:{role:"captain"}, confidence:0.95}},
+  {input:"president roles in my activities", output:{intent:"ecs.by_role", phase:"final", object:"ec", filters:{role:"president"}, confidence:0.94}},
+  {input:"founder positions", output:{intent:"ecs.by_role", phase:"final", object:"ec", filters:{role:"founder"}, confidence:0.93}},
 
   // Awards - Initial (4 examples)
   {input:"what was my initial awards list?", output:{intent:"awards.list", phase:"initial", object:"award", filters:{}, confidence:0.95}},
@@ -96,11 +137,13 @@ const FEW_SHOT = [
   {input:"which honors did we aim for initially?", output:{intent:"awards.list", phase:"initial", object:"award", filters:{}, confidence:0.91}},
   {input:"initial list of prizes to pursue", output:{intent:"awards.list", phase:"initial", object:"award", filters:{}, confidence:0.9}},
 
-  // Awards - Final (4 examples)
+  // Awards - Final (6 examples - v10.7.1 EXPANDED)
   {input:"what was my final awards list?", output:{intent:"awards.list", phase:"final", object:"award", filters:{}, confidence:0.95}},
   {input:"which awards did I submit on my application?", output:{intent:"awards.list", phase:"final", object:"award", filters:{}, confidence:0.96}},
   {input:"which honors ended up on the Common App?", output:{intent:"awards.list", phase:"final", object:"award", filters:{}, confidence:0.95}},
   {input:"awards that made the final cut", output:{intent:"awards.list", phase:"final", object:"award", filters:{}, confidence:0.92}},
+  {input:"how many National vs Regional awards do I have?", output:{intent:"awards.list", phase:"final", object:"award", filters:{}, confidence:0.93}},
+  {input:"breakdown of my awards by tier", output:{intent:"awards.list", phase:"final", object:"award", filters:{}, confidence:0.92}},
 
   // Awards - Wins/Progression (4 examples)
   {input:"which awards did I win?", output:{intent:"progression.timeline", phase:null, object:"award", filters:{scope:null}, confidence:0.95}},
@@ -270,7 +313,7 @@ const FEW_SHOT = [
   {input:"how much did I improve this semester?", output:{intent:"readiness.progression", phase:null, object:"readiness", filters:{}, confidence:0.93}},
   {input:"what's my readiness trajectory?", output:{intent:"readiness.progression", phase:null, object:"readiness", filters:{}, confidence:0.94}},
 
-  // Readiness - What-If EC (8 examples with activity-aware patterns)
+  // Readiness - What-If EC (10 examples with activity-aware patterns - v10.7.1 EXPANDED)
   {input:"what if I grow Empowering AI to 10,000 users?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.96}},
   {input:"what if I only scaled the empowering AI to 100 users?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.95}},
   {input:"what if I double users on Synthoria?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.95}},
@@ -279,6 +322,8 @@ const FEW_SHOT = [
   {input:"scale Synthoria to 5000 users impact?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.94}},
   {input:"reach 10k users on Empowering AI?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.94}},
   {input:"2x users for my main EC?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+  {input:"what if I expand Empowering AI to 20 countries?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"expand my EC to more countries?", output:{intent:"readiness.whatif.ec", phase:null, object:"readiness", filters:{}, confidence:0.93}},
 
   // Readiness - What-If GPA (4 examples)
   {input:"what if I raise my GPA to 3.95?", output:{intent:"readiness.whatif.gpa", phase:null, object:"readiness", filters:{}, confidence:0.96}},
@@ -340,14 +385,144 @@ const FEW_SHOT = [
   {input:"how did we approach the Common App essays?", output:{intent:"kb.search", phase:null, object:"kb", filters:{}, confidence:0.95}},
   {input:"what frameworks did Jenny teach me?", output:{intent:"kb.search", phase:null, object:"kb", filters:{}, confidence:0.97}},
   {input:"bank of america coaching approach", output:{intent:"kb.search", phase:null, object:"kb", filters:{award:"Bank of America"}, confidence:0.97}},
+
+  // EC Vitals - Funding Progression (4 examples - v10.7)
+  {input:"how much funding have I raised over time?", output:{intent:"vitals.funding.progression", phase:null, object:"vitals", filters:{metric_type:"financial"}, confidence:0.97}},
+  {input:"show money raised progression", output:{intent:"vitals.funding.progression", phase:null, object:"vitals", filters:{metric_type:"financial"}, confidence:0.95}},
+  {input:"track funding growth", output:{intent:"vitals.funding.progression", phase:null, object:"vitals", filters:{metric_type:"financial"}, confidence:0.94}},
+  {input:"funding timeline", output:{intent:"vitals.funding.progression", phase:null, object:"vitals", filters:{metric_type:"financial"}, confidence:0.93}},
+
+  // EC Vitals - Scale Progression (4 examples - v10.7)
+  {input:"show me scale metrics over time", output:{intent:"vitals.scale.progression", phase:null, object:"vitals", filters:{metric_type:"scale"}, confidence:0.96}},
+  {input:"how many students have I reached?", output:{intent:"vitals.scale.progression", phase:null, object:"vitals", filters:{metric_type:"scale"}, confidence:0.95}},
+  {input:"members growth", output:{intent:"vitals.scale.progression", phase:null, object:"vitals", filters:{metric_type:"scale"}, confidence:0.93}},
+  {input:"track my reach over time", output:{intent:"vitals.scale.progression", phase:null, object:"vitals", filters:{metric_type:"scale"}, confidence:0.94}},
+
+  // EC Vitals - Impact Latest (3 examples - v10.7)
+  {input:"what's my impact?", output:{intent:"vitals.impact.latest", phase:null, object:"vitals", filters:{metric_type:"impact"}, confidence:0.96}},
+  {input:"show impact metrics", output:{intent:"vitals.impact.latest", phase:null, object:"vitals", filters:{metric_type:"impact"}, confidence:0.95}},
+  {input:"media features and views", output:{intent:"vitals.impact.latest", phase:null, object:"vitals", filters:{metric_type:"impact"}, confidence:0.93}},
+
+  // EC Vitals - Progression (3 examples - v10.7)
+  {input:"show me all vitals progression", output:{intent:"vitals.progression", phase:null, object:"vitals", filters:{}, confidence:0.96}},
+  {input:"track all my metrics over time", output:{intent:"vitals.progression", phase:null, object:"vitals", filters:{}, confidence:0.94}},
+  {input:"full vitals timeline", output:{intent:"vitals.progression", phase:null, object:"vitals", filters:{}, confidence:0.93}},
+
+  // EC Vitals - Latest (8 examples - v10.7 EXPANDED)
+  {input:"show my latest vitals", output:{intent:"vitals.latest", phase:null, object:"vitals", filters:{}, confidence:0.95}},
+  {input:"current metrics", output:{intent:"vitals.latest", phase:null, object:"vitals", filters:{}, confidence:0.93}},
+  {input:"what are my current EC metrics?", output:{intent:"vitals.latest", phase:null, object:"vitals", filters:{}, confidence:0.94}},
+  {input:"show my EC vitals", output:{intent:"vitals.latest", phase:null, object:"vitals", filters:{}, confidence:0.96}},
+  {input:"EC metrics", output:{intent:"vitals.latest", phase:null, object:"vitals", filters:{}, confidence:0.94}},
+  {input:"my quantitative impact", output:{intent:"vitals.latest", phase:null, object:"vitals", filters:{}, confidence:0.93}},
+  {input:"show vitals", output:{intent:"vitals.latest", phase:null, object:"vitals", filters:{}, confidence:0.95}},
+  {input:"activity metrics", output:{intent:"vitals.latest", phase:null, object:"vitals", filters:{}, confidence:0.93}},
+
+  // EC Vitals - Summary (2 examples - v10.7)
+  {input:"vitals summary", output:{intent:"vitals.summary", phase:null, object:"vitals", filters:{}, confidence:0.94}},
+  {input:"summarize my EC metrics", output:{intent:"vitals.summary", phase:null, object:"vitals", filters:{}, confidence:0.93}},
+
+  // JTBD - Week (4 examples - v10.7)
+  {input:"what did I accomplish in week 8?", output:{intent:"jtbd.week", phase:null, object:"jtbd", filters:{week:8}, confidence:0.98}},
+  {input:"show me week 12 progress", output:{intent:"jtbd.week", phase:null, object:"jtbd", filters:{week:12}, confidence:0.97}},
+  {input:"what happened in week 20?", output:{intent:"jtbd.week", phase:null, object:"jtbd", filters:{week:20}, confidence:0.96}},
+  {input:"week 30 milestones", output:{intent:"jtbd.week", phase:null, object:"jtbd", filters:{week:30}, confidence:0.95}},
+
+  // JTBD - Completed (4 examples - v10.7)
+  {input:"what have I completed?", output:{intent:"jtbd.completed", phase:null, object:"jtbd", filters:{}, confidence:0.96}},
+  {input:"show my completed jobs", output:{intent:"jtbd.completed", phase:null, object:"jtbd", filters:{}, confidence:0.95}},
+  {input:"what did I finish?", output:{intent:"jtbd.completed", phase:null, object:"jtbd", filters:{}, confidence:0.94}},
+  {input:"all done tasks", output:{intent:"jtbd.completed", phase:null, object:"jtbd", filters:{}, confidence:0.93}},
+
+  // JTBD - Pending (10 examples - v10.7.1 EXPANDED)
+  {input:"what tasks do I have pending?", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{}, confidence:0.97}},
+  {input:"what do I still need to do?", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{}, confidence:0.96}},
+  {input:"what's left to complete?", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{}, confidence:0.95}},
+  {input:"upcoming tasks", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{}, confidence:0.94}},
+  {input:"what's on my todo list?", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{}, confidence:0.96}},
+  {input:"show pending work", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{}, confidence:0.95}},
+  {input:"what do I need to do?", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{}, confidence:0.94}},
+  {input:"show me pending week 3 tasks", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{week:3}, confidence:0.96}},
+  {input:"pending tasks for week 5", output:{intent:"jtbd.pending", phase:null, object:"jtbd", filters:{week:5}, confidence:0.95}},
+
+  // JTBD - Milestones (3 examples - v10.7)
+  {input:"show my milestones", output:{intent:"jtbd.milestones", phase:null, object:"jtbd", filters:{}, confidence:0.96}},
+  {input:"what milestones have I achieved?", output:{intent:"jtbd.milestones", phase:null, object:"jtbd", filters:{}, confidence:0.95}},
+  {input:"EC achievements", output:{intent:"jtbd.milestones", phase:null, object:"jtbd", filters:{}, confidence:0.93}},
+
+  // JTBD - Progression (3 examples - v10.7)
+  {input:"show week over week progress", output:{intent:"jtbd.progression", phase:null, object:"jtbd", filters:{}, confidence:0.96}},
+  {input:"completion rate over time", output:{intent:"jtbd.progression", phase:null, object:"jtbd", filters:{}, confidence:0.94}},
+  {input:"how has my progress changed?", output:{intent:"jtbd.progression", phase:null, object:"jtbd", filters:{}, confidence:0.93}},
+
+  // Testing - SAT (6 examples - v10.7)
+  {input:"what was my first SAT score?", output:{intent:"testing.sat.first", phase:null, object:"testing", filters:{nth:"first"}, confidence:0.98}},
+  {input:"initial SAT", output:{intent:"testing.sat.first", phase:null, object:"testing", filters:{nth:"first"}, confidence:0.95}},
+  {input:"what's my latest SAT?", output:{intent:"testing.sat.latest", phase:null, object:"testing", filters:{nth:"latest"}, confidence:0.98}},
+  {input:"most recent SAT score", output:{intent:"testing.sat.latest", phase:null, object:"testing", filters:{nth:"latest"}, confidence:0.96}},
+  {input:"show SAT progression", output:{intent:"testing.sat.progression", phase:null, object:"testing", filters:{}, confidence:0.97}},
+  {input:"all my SAT scores", output:{intent:"testing.sat.progression", phase:null, object:"testing", filters:{}, confidence:0.95}},
+
+  // Academics - Transcript (6 examples - v10.7)
+  {input:"show my initial transcript", output:{intent:"academics.transcript.initial", phase:"initial", object:"academics", filters:{components:["transcript"]}, confidence:0.96}},
+  {input:"gameplan transcript", output:{intent:"academics.transcript.initial", phase:"initial", object:"academics", filters:{components:["transcript"]}, confidence:0.94}},
+  {input:"show my final transcript", output:{intent:"academics.transcript.final", phase:"final", object:"academics", filters:{components:["transcript"]}, confidence:0.97}},
+  {input:"submitted transcript", output:{intent:"academics.transcript.final", phase:"final", object:"academics", filters:{components:["transcript"]}, confidence:0.95}},
+  {input:"transcript progression", output:{intent:"academics.transcript.progression", phase:null, object:"academics", filters:{components:["transcript"]}, confidence:0.96}},
+  {input:"how did my courses change?", output:{intent:"academics.transcript.progression", phase:null, object:"academics", filters:{components:["transcript"]}, confidence:0.93}},
+
+  // Academics - GPA Explicit (6 examples - v10.7)
+  {input:"what was my initial GPA?", output:{intent:"academics.gpa.initial", phase:"initial", object:"academics", filters:{components:["gpa"]}, confidence:0.97}},
+  {input:"baseline GPA", output:{intent:"academics.gpa.initial", phase:"initial", object:"academics", filters:{components:["gpa"]}, confidence:0.94}},
+  {input:"what was my final GPA?", output:{intent:"academics.gpa.final", phase:"final", object:"academics", filters:{components:["gpa"]}, confidence:0.97}},
+  {input:"submitted GPA", output:{intent:"academics.gpa.final", phase:"final", object:"academics", filters:{components:["gpa"]}, confidence:0.95}},
+  {input:"what's my latest GPA?", output:{intent:"academics.gpa.latest", phase:null, object:"academics", filters:{components:["gpa"]}, confidence:0.98}},
+  {input:"current GPA", output:{intent:"academics.gpa.latest", phase:null, object:"academics", filters:{components:["gpa"]}, confidence:0.96}},
+
+  // College - Enhanced (9 examples - v10.7.1 EXPANDED)
+  {input:"which college am I attending?", output:{intent:"college.attending", phase:null, object:"college", filters:{attending:true}, confidence:0.98}},
+  {input:"where am I going?", output:{intent:"college.attending", phase:null, object:"college", filters:{attending:true}, confidence:0.96}},
+  {input:"show my reach colleges", output:{intent:"college.reach", phase:null, object:"college", filters:{category:"Reach"}, confidence:0.96}},
+  {input:"match schools", output:{intent:"college.match", phase:null, object:"college", filters:{category:"Match"}, confidence:0.95}},
+  {input:"safety colleges", output:{intent:"college.safety", phase:null, object:"college", filters:{category:"Safety"}, confidence:0.95}},
+  {input:"which colleges accepted me?", output:{intent:"college.accepted", phase:null, object:"college", filters:{decision_result:"Accepted"}, confidence:0.97}},
+  {input:"what's my safety school acceptance rate?", output:{intent:"college.safety", phase:null, object:"college", filters:{category:"Safety"}, confidence:0.94}},
+  {input:"acceptance rates for my reach schools", output:{intent:"college.reach", phase:null, object:"college", filters:{category:"Reach"}, confidence:0.93}},
+  {input:"stats for match colleges", output:{intent:"college.match", phase:null, object:"college", filters:{category:"Match"}, confidence:0.92}},
+
+  // College - Decision Plan (12 examples - v10.7.1 NEW)
+  {input:"did I apply early decision anywhere?", output:{intent:"college.early_decision", phase:null, object:"college", filters:{decision_plan:"Early Decision"}, confidence:0.98}},
+  {input:"which schools did I apply ED to?", output:{intent:"college.early_decision", phase:null, object:"college", filters:{decision_plan:"Early Decision"}, confidence:0.97}},
+  {input:"show my early decision applications", output:{intent:"college.early_decision", phase:null, object:"college", filters:{decision_plan:"Early Decision"}, confidence:0.96}},
+  {input:"where did I apply early action?", output:{intent:"college.early_action", phase:null, object:"college", filters:{decision_plan:"Early Action"}, confidence:0.97}},
+  {input:"which colleges did I apply EA?", output:{intent:"college.early_action", phase:null, object:"college", filters:{decision_plan:"Early Action"}, confidence:0.96}},
+  {input:"show early action schools", output:{intent:"college.early_action", phase:null, object:"college", filters:{decision_plan:"Early Action"}, confidence:0.95}},
+  {input:"restrictive early action applications", output:{intent:"college.restrictive_early", phase:null, object:"college", filters:{decision_plan:"Restrictive Early Action"}, confidence:0.97}},
+  {input:"did I apply REA anywhere?", output:{intent:"college.restrictive_early", phase:null, object:"college", filters:{decision_plan:"Restrictive Early Action"}, confidence:0.96}},
+  {input:"which schools were regular decision?", output:{intent:"college.regular_decision", phase:null, object:"college", filters:{decision_plan:"Regular Decision"}, confidence:0.96}},
+  {input:"show my RD applications", output:{intent:"college.regular_decision", phase:null, object:"college", filters:{decision_plan:"Regular Decision"}, confidence:0.95}},
+  {input:"regular decision schools", output:{intent:"college.regular_decision", phase:null, object:"college", filters:{decision_plan:"Regular Decision"}, confidence:0.94}},
+  {input:"what did I apply regular to?", output:{intent:"college.regular_decision", phase:null, object:"college", filters:{decision_plan:"Regular Decision"}, confidence:0.93}},
+
+  // Readiness - Top Priorities (10 examples - v10.7 EXPANDED)
+  {input:"what should I prioritize?", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"top priorities", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"what should I focus on?", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"what are my key priorities?", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.96}},
+  {input:"what should I work on next?", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.95}},
+  {input:"what are the most important things to focus on?", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"what are my key deadlines?", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+  {input:"what needs my attention most?", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.94}},
+  {input:"what's most urgent?", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.93}},
+  {input:"give me my action items", output:{intent:"readiness.top_priorities", phase:null, object:"readiness", filters:{}, confidence:0.92}},
 ];
 
 const SYS = `You are an intent classifier for a college admissions coaching agent.
 Output ONLY valid JSON matching this schema:
 {
-  "intent": "ecs.list|awards.list|programs.list|academics.summary|narrative.summary|progression.timeline|sat.ordinal|gameplan.initial|gameplan.vs_progress|application.final|ivyready.score|ivyready.initial|ivyready.final|ivyready.compare|ivyready.factors|readiness.now|readiness.progress|readiness.drivers|readiness.whatif.sat|readiness.whatif.award|readiness.whatif.ec|readiness.whatif.gpa|readiness.whatif.program|readiness.next_moves|kb.search|unknown",
+  "intent": "ecs.list|awards.list|programs.list|academics.summary|academics.transcript.initial|academics.transcript.final|academics.transcript.progression|academics.gpa.initial|academics.gpa.final|academics.gpa.latest|academics.gpa.progression|narrative.summary|progression.timeline|sat.ordinal|testing.sat.first|testing.sat.latest|testing.sat.progression|gameplan.initial|gameplan.vs_progress|application.final|ivyready.score|ivyready.initial|ivyready.final|ivyready.compare|ivyready.factors|readiness.now|readiness.progress|readiness.drivers|readiness.whatif.sat|readiness.whatif.award|readiness.whatif.ec|readiness.whatif.gpa|readiness.whatif.program|readiness.next_moves|readiness.top_priorities|vitals.latest|vitals.progression|vitals.funding.progression|vitals.scale.progression|vitals.impact.latest|vitals.summary|jtbd.week|jtbd.completed|jtbd.pending|jtbd.milestones|jtbd.progression|college.attending|college.accepted|college.reach|college.match|college.safety|kb.search|unknown",
   "phase": "initial|final|null",
-  "object": "ec|award|program|academics|narrative|sat|gameplan|application|rubric|readiness",
+  "object": "ec|award|program|academics|narrative|sat|testing|vitals|jtbd|college|readiness|gameplan|application|rubric|scholarship|kb",
   "filters": {
     "as_of"?: string|null,
     "school"?: string|null,
@@ -372,6 +547,11 @@ OBJECT SYNONYMS:
 - Programs: "summer programs", "summer camps", "selective programs", "YYGS", "SAMS", "RSI" -> object:"program"
 - Academics: "academics", "grades and tests", "transcript and scores", "GPA and SAT", "academic stats" -> object:"academics"
 - Narrative: "narrative", "USP", "story", "identity/passion/aptitude/cause", "why-statement" -> object:"narrative"
+- Testing: "SAT", "ACT", "test scores", "standardized tests" -> object:"testing"
+- Vitals: "EC vitals", "metrics", "quantitative metrics", "funding", "scale", "impact", "reach" -> object:"vitals"
+- JTBD: "jobs to be done", "tasks", "weekly execution", "milestones", "action items" -> object:"jtbd"
+- College: "colleges", "schools", "universities", "college list" -> object:"college"
+- Readiness: "readiness", "preparation", "priorities", "next steps" -> object:"readiness"
 
 INTENT ROUTING RULES:
 - "which ECs/awards/programs did I win/get in/get into?" -> intent:"progression.timeline", phase:null
@@ -386,6 +566,31 @@ INTENT ROUTING RULES:
 - "IvyReady score/rubric score/admissions rating" -> intent:"ivyready.score", phase:null, object:"rubric"
 - "initial IvyReady score/baseline rubric" -> intent:"ivyready.score", phase:"initial", object:"rubric"
 - "final IvyReady score/rubric at submission" -> intent:"ivyready.score", phase:"final", object:"rubric"
+- "initial transcript/9th grade transcript" -> intent:"academics.transcript.initial", phase:null, object:"academics"
+- "final transcript/as submitted" -> intent:"academics.transcript.final", phase:null, object:"academics"
+- "transcript progression/show grades over time" -> intent:"academics.transcript.progression", phase:null, object:"academics"
+- "initial GPA/9th grade GPA" -> intent:"academics.gpa.initial", phase:null, object:"academics"
+- "final GPA/latest GPA/current GPA" -> intent:"academics.gpa.final" or "academics.gpa.latest", phase:null, object:"academics"
+- "GPA progression/GPA trend" -> intent:"academics.gpa.progression", phase:null, object:"academics"
+- "first SAT/second SAT/latest SAT" -> intent:"testing.sat.first|latest", phase:null, object:"testing"
+- "SAT progression/test score progression" -> intent:"testing.sat.progression", phase:null, object:"testing"
+- "EC vitals/EC metrics/latest vitals" -> intent:"vitals.latest", phase:null, object:"vitals"
+- "vitals progression/metrics over time" -> intent:"vitals.progression", phase:null, object:"vitals"
+- "funding raised/money progression" -> intent:"vitals.funding.progression", phase:null, object:"vitals", filters:{metric_type:"financial"}
+- "scale progression/reach over time" -> intent:"vitals.scale.progression", phase:null, object:"vitals", filters:{metric_type:"scale"}
+- "impact metrics/quantitative impact" -> intent:"vitals.impact.latest", phase:null, object:"vitals", filters:{metric_type:"impact"}
+- "vitals summary/EC metrics summary" -> intent:"vitals.summary", phase:null, object:"vitals"
+- "this week's tasks/week 3 jobs" -> intent:"jtbd.week", phase:null, object:"jtbd", filters:{week_number:N}
+- "completed tasks/done items" -> intent:"jtbd.completed", phase:null, object:"jtbd"
+- "pending tasks/what's left" -> intent:"jtbd.pending", phase:null, object:"jtbd"
+- "EC milestones/major achievements" -> intent:"jtbd.milestones", phase:null, object:"jtbd"
+- "JTBD progression/execution rate" -> intent:"jtbd.progression", phase:null, object:"jtbd"
+- "which college am I attending/where did I choose" -> intent:"college.attending", phase:null, object:"college"
+- "which schools accepted me" -> intent:"college.accepted", phase:null, object:"college"
+- "my reach schools" -> intent:"college.reach", phase:null, object:"college"
+- "my match schools" -> intent:"college.match", phase:null, object:"college"
+- "my safety schools" -> intent:"college.safety", phase:null, object:"college"
+- "top priorities/what should I focus on" -> intent:"readiness.top_priorities", phase:null, object:"readiness"
 
 ACADEMICS HANDLING:
 - Extract components from query: "grades", "gpa", "sat", "act", "ap", "transcript"
@@ -424,6 +629,22 @@ const ORDINALS = ["first", "second", "third", "latest", "last", "earliest", "ini
 
 // Keyword floor detection for academics queries
 const ACADEMIC_KEYWORDS = ['academic', 'academics', 'academic stats', 'report card'];
+
+// ============================================================================
+// v10.7: Helper function to extract week number from JTBD queries
+// ============================================================================
+function extractWeekNumber(message: string): number | null {
+  const t = message.toLowerCase();
+
+  // Pattern 1: "week 3", "week3", "wk 3"
+  const weekMatch = t.match(/(?:week|wk)\s*(\d+)/);
+  if (weekMatch) return parseInt(weekMatch[1], 10);
+
+  // Pattern 2: "this week" (default to current week, or null to get latest)
+  if (t.includes('this week')) return null;
+
+  return null;
+}
 
 function keywordFloor(query: string): any | null {
   const t = query.toLowerCase();
@@ -546,13 +767,17 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       }
     }
     // Testing (SAT/ACT) fact queries
-    else if (/\b(SAT|ACT|test\s*score)/i.test(message) && /\b(first|second|third|last|latest|initial|final|was\s*my|show|scores?)/i.test(message)) {
+    else if (/\b(SAT|ACT|test\s*score)/i.test(message)) {
       const hasOrdinal = /\b(first|second|third|last|latest|nth)/i.test(message);
+      const hasProgression = /\b(improve|improved|progress|progression|over\s*time|history|timeline|change|trend|all|scores?)/i.test(message);
 
-      if (hasOrdinal) {
+      if (hasProgression) {
+        // SAT progression/history queries
+        factIntent = { intent: "progression.timeline", phase: null, object: "sat", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+      } else if (hasOrdinal) {
         const nth = /first|1st/.test(q) ? "first" : /second|2nd/.test(q) ? "second" : /third|3rd/.test(q) ? "third" : "latest";
         factIntent = { intent: "sat.ordinal", phase: null, object: "sat", filters: { nth }, confidence: 0.98, detector: "keyword-floor" };
-      } else {
+      } else if (/\b(was\s*my|show|initial|final)/i.test(message)) {
         factIntent = { intent: "academics.summary", phase: "final", object: "academics", filters: { components: ["sat", "act"] }, confidence: 0.98, detector: "keyword-floor" };
       }
     }
@@ -581,6 +806,41 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       } else {
         factIntent = { intent: "college.list", phase: null, object: "college", filters: {}, confidence: 0.98, detector: "keyword-floor" };
       }
+    }
+    // College early decision/action fact queries (v10.7.1)
+    else if (/\b(did|which|what|show|list).*(apply|applied).*(early\s*decision|ed\b)/i.test(message)) {
+      factIntent = { intent: "college.early_decision", phase: null, object: "college", filters: { decision_plan: "Early Decision" }, confidence: 0.98, detector: "keyword-floor" };
+    }
+    else if (/\b(did|which|what|show|list).*(apply|applied).*(early\s*action|ea\b)/i.test(message)) {
+      // Check for restrictive early action
+      if (/restrictive|rea\b/i.test(message)) {
+        factIntent = { intent: "college.restrictive_early", phase: null, object: "college", filters: { decision_plan: "Restrictive Early Action" }, confidence: 0.98, detector: "keyword-floor" };
+      } else {
+        factIntent = { intent: "college.early_action", phase: null, object: "college", filters: { decision_plan: "Early Action" }, confidence: 0.98, detector: "keyword-floor" };
+      }
+    }
+    else if (/\b(did|which|what|show|list).*(apply|applied).*(regular\s*decision|rd\b)/i.test(message)) {
+      factIntent = { intent: "college.regular_decision", phase: null, object: "college", filters: { decision_plan: "Regular Decision" }, confidence: 0.98, detector: "keyword-floor" };
+    }
+    // What-if EC scale queries (v10.7.1)
+    else if (/\b(what\s*if|if\s*i|simulate).*(expand|scale|grow|increase|raise|double|2x).*(ec|activity|empowering|synthoria|users|countries|members|reach)/i.test(message)) {
+      factIntent = { intent: "readiness.whatif.ec", phase: null, object: "readiness", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+    }
+    // Award tier breakdown/comparison queries (v10.7.1)
+    else if (/\b(how\s*many|count|compare).*(national|regional|international|state|school).*\b(vs|versus|and|,).*(national|regional|international|state|school).*awards?/i.test(message)) {
+      factIntent = { intent: "awards.list", phase: "final", object: "award", filters: {}, confidence: 0.98, detector: "keyword-floor" };
+    }
+    // JTBD pending by week queries (v10.7.1)
+    else if (/\b(show|what|list).*(pending|todo|tasks?).*(week\s*\d+|week\s*[a-z]+)/i.test(message)) {
+      const weekMatch = message.match(/week\s*(\d+)/i);
+      const weekNumber = weekMatch ? parseInt(weekMatch[1]) : null;
+      factIntent = { intent: "jtbd.pending", phase: null, object: "jtbd", filters: { week_number: weekNumber }, confidence: 0.98, detector: "keyword-floor" };
+    }
+    // EC role filtering queries (v10.7.1 - Universal attribute filtering)
+    else if (/\b(show|filter|list).*(ec|activity|activities).*(leadership|leader|captain|president|founder|role|position)/i.test(message)) {
+      const roleMatch = message.match(/(leadership|leader|captain|president|founder)/i);
+      const role = roleMatch ? roleMatch[1] : 'leader';
+      factIntent = { intent: "ecs.leadership", phase: "final", object: "ec", filters: { role }, confidence: 0.98, detector: "keyword-floor" };
     }
     // Grade jumps/academic vitals queries
     else if (/\b(show|what|list).*(grade\s*jump|jumps|vitals|academic\s*trend)/i.test(message)) {
@@ -822,6 +1082,9 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
           data = await resolvers.programsAdmits(pg, studentId);
         } else if (intent.object === "sat") {
           data = await resolvers.academicsSAT(pg, studentId, "progression", {});
+        } else if (intent.object === "academics") {
+          // GPA progression queries - call academicsGPA with "progression" phase
+          data = await resolvers.academicsGPA(pg, studentId, "progression", {});
         } else {
           data = { answer: "Progression tracking not yet implemented for this entity.", chips:[], hits:[] };
         }
@@ -926,6 +1189,142 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       case "kb.search":
         data = await resolvers.kbSearch(pg, studentId, message, intent.filters || {});
         break;
+
+      // ============================================================================
+      // v10.7: NEW ROUTES - Academics Transcript & GPA
+      // ============================================================================
+      case "academics.transcript.initial":
+        data = await resolvers.academicsTranscript(pg, studentId, "initial", {});
+        break;
+      case "academics.transcript.final":
+        data = await resolvers.academicsTranscript(pg, studentId, "final", {});
+        break;
+      case "academics.transcript.progression":
+        data = await resolvers.academicsTranscript(pg, studentId, "progression", {});
+        break;
+      case "academics.gpa.initial":
+        data = await resolvers.academicsGPA(pg, studentId, "initial", {});
+        break;
+      case "academics.gpa.final":
+        data = await resolvers.academicsGPA(pg, studentId, "final", {});
+        break;
+      case "academics.gpa.latest":
+        data = await resolvers.academicsGPA(pg, studentId, "latest", {});
+        break;
+      case "academics.gpa.progression":
+        data = await resolvers.academicsGPA(pg, studentId, "progression", {});
+        break;
+
+      // ============================================================================
+      // v10.7: NEW ROUTES - Testing (SAT)
+      // ============================================================================
+      case "testing.sat.first":
+        data = await resolvers.academicsSAT(pg, studentId, "first", {});
+        break;
+      case "testing.sat.latest":
+        data = await resolvers.academicsSAT(pg, studentId, "latest", {});
+        break;
+      case "testing.sat.progression":
+        data = await resolvers.academicsSAT(pg, studentId, "progression", {});
+        break;
+
+      // ============================================================================
+      // v10.7: NEW ROUTES - EC Vitals (v10.6 data - 27 records huda-2025)
+      // ============================================================================
+      case "vitals.latest":
+        data = await resolvers.vitalsLatest(pg, studentId);
+        break;
+      case "vitals.progression":
+        data = await resolvers.vitalsProgression(pg, studentId);
+        break;
+      case "vitals.funding.progression":
+        data = await resolvers.vitalsFundingProgression(pg, studentId);
+        break;
+      case "vitals.scale.progression":
+        data = await resolvers.vitalsScaleProgression(pg, studentId);
+        break;
+      case "vitals.impact.latest":
+        data = await resolvers.vitalsImpactLatest(pg, studentId);
+        break;
+      case "vitals.summary":
+        data = await resolvers.vitalsSummary(pg, studentId);
+        break;
+
+      // ============================================================================
+      // v10.7: NEW ROUTES - JTBD (v10.6 data - 38 records huda-2025)
+      // ============================================================================
+      case "jtbd.week":
+        // Extract week number from filters or message
+        const weekNum = intent.filters?.week_number || extractWeekNumber(message);
+        data = await resolvers.jtbdWeek(pg, studentId, weekNum);
+        break;
+      case "jtbd.completed":
+        data = await resolvers.jtbdCompleted(pg, studentId);
+        break;
+      case "jtbd.pending":
+        data = await resolvers.jtbdPending(pg, studentId);
+        break;
+      case "jtbd.milestones":
+        data = await resolvers.jtbdMilestones(pg, studentId);
+        break;
+      case "jtbd.progression":
+        data = await resolvers.jtbdProgression(pg, studentId);
+        break;
+
+      // ============================================================================
+      // v10.7: NEW ROUTES - College Enhanced
+      // ============================================================================
+      case "college.attending":
+        data = await resolvers.collegeAttending(pg, studentId);
+        break;
+      case "college.accepted":
+        data = await resolvers.collegeAccepted(pg, studentId);
+        break;
+      case "college.reach":
+        data = await resolvers.collegeReach(pg, studentId);
+        break;
+      case "college.match":
+        data = await resolvers.collegeMatch(pg, studentId);
+        break;
+      case "college.safety":
+        data = await resolvers.collegeSafety(pg, studentId);
+        break;
+      case "college.early_decision":
+        data = await resolvers.collegeEarlyDecision(pg, studentId);
+        break;
+      case "college.early_action":
+        data = await resolvers.collegeEarlyAction(pg, studentId);
+        break;
+      case "college.restrictive_early":
+        data = await resolvers.collegeRestrictiveEarlyAction(pg, studentId);
+        break;
+      case "college.regular_decision":
+        data = await resolvers.collegeRegularDecision(pg, studentId);
+        break;
+
+      // ============================================================================
+      // v10.7.1: NEW ROUTES - EC Role Filtering (Universal Attribute Filtering)
+      // ============================================================================
+      case "ecs.leadership":
+        data = await resolvers.ecsLeadership(pg, studentId);
+        break;
+      case "ecs.by_role":
+        // Extract role from filters or message text
+        let roleFilter = intent.filters?.role;
+        if (!roleFilter) {
+          const roleMatch = message.match(/(leadership|leader|captain|president|founder|ambassador|editor|director|member|officer|coordinator)/i);
+          roleFilter = roleMatch ? roleMatch[1] : 'leader';
+        }
+        data = await resolvers.ecsByRole(pg, studentId, roleFilter);
+        break;
+
+      // ============================================================================
+      // v10.7: NEW ROUTES - Readiness Enhanced
+      // ============================================================================
+      case "readiness.top_priorities":
+        data = await resolvers.readinessTopPriorities(pg, studentId);
+        break;
+
       default:
         data = await resolvers.kbSearch(pg, studentId, message, {});
     }

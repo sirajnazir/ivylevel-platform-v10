@@ -1,116 +1,720 @@
 {
-  "id": "facts-suite",
-  "label": "Facts (SQL) Test Suite",
+  "id": "facts-suite-v2",
+  "label": "Facts (SQL) Test Suite v2.0 - Complete Cat-1 Coverage",
   "category": "facts",
+  "version": "2.0",
+  "description": "Comprehensive Cat-1 test scenarios covering all 10 domains with 50+ routes",
   "tests": [
     {
-      "id": "facts-001",
-      "label": "Awards List with Dates",
+      "id": "facts-awards-001",
+      "label": "Awards Initial (Baseline)",
       "category": "facts",
-      "prompt": "What awards did I win? include dates + sources",
+      "prompt": "What awards did I report initially?",
+      "studentId": "huda-2025",
       "expected": {
+        "route": "award.initial",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "expectedCount": 2
+      }
+    },
+    {
+      "id": "facts-awards-002",
+      "label": "Awards Final (Submitted)",
+      "category": "facts",
+      "prompt": "Which awards did I submit on my applications?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "award.final",
         "source": "sql",
         "minProof": 0.98,
         "noMetaLeak": true
       }
     },
     {
-      "id": "facts-002",
-      "label": "GPA Trend Assessment",
+      "id": "facts-awards-003",
+      "label": "Awards Progression",
       "category": "facts",
-      "prompt": "Assessment of my GPA trend",
+      "prompt": "Show me how my awards changed over time",
+      "studentId": "huda-2025",
       "expected": {
+        "route": "award.progression",
         "source": "sql",
         "minProof": 0.98,
         "noMetaLeak": true
       }
     },
     {
-      "id": "facts-003",
-      "label": "AP Count by Year",
+      "id": "facts-awards-004",
+      "label": "National Awards Only",
       "category": "facts",
-      "prompt": "How many APs did I take by year?",
+      "prompt": "What National awards do I have?",
+      "studentId": "huda-2025",
       "expected": {
+        "route": "award.final",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["J-Camp"]
+      }
+    },
+    {
+      "id": "facts-ecs-001",
+      "label": "ECs Initial (Baseline)",
+      "category": "facts",
+      "prompt": "Show my initial extracurricular activities",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "ec.initial",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "expectedCount": 8
+      }
+    },
+    {
+      "id": "facts-ecs-002",
+      "label": "ECs Final (Submitted)",
+      "category": "facts",
+      "prompt": "Which ECs did I actually submit?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "ec.final",
         "source": "sql",
         "minProof": 0.98,
         "noMetaLeak": true
       }
     },
     {
-      "id": "facts-004",
-      "label": "First SAT Score",
+      "id": "facts-ecs-003",
+      "label": "ECs with Scale Metrics",
       "category": "facts",
-      "prompt": "What was my first SAT score?",
+      "prompt": "Show my activities with impact scale",
+      "studentId": "huda-2025",
       "expected": {
+        "route": "ec.scale",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["countries_reached", "funding_raised"]
+      }
+    },
+    {
+      "id": "facts-ecs-004",
+      "label": "Leadership ECs",
+      "category": "facts",
+      "prompt": "What leadership activities do I have?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "ec.leadership",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["Founder", "President"]
+      }
+    },
+    {
+      "id": "facts-programs-001",
+      "label": "Summer Programs Initial",
+      "category": "facts",
+      "prompt": "Which summer programs did I initially plan to apply to?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "program.initial",
         "source": "sql",
         "minProof": 0.98,
         "noMetaLeak": true
       }
     },
     {
-      "id": "facts-005",
-      "label": "Latest GPA",
-      "category": "facts",
-      "prompt": "What's my latest GPA?",
-      "expected": {
-        "source": "sql",
-        "minProof": 0.98,
-        "noMetaLeak": true
-      }
-    },
-    {
-      "id": "facts-006",
+      "id": "facts-programs-002",
       "label": "Summer Programs Submitted",
       "category": "facts",
       "prompt": "Which summer programs did I submit to?",
+      "studentId": "huda-2025",
       "expected": {
+        "route": "program.submitted",
         "source": "sql",
         "minProof": 0.98,
-        "noMetaLeak": true
+        "noMetaLeak": true,
+        "expectedCount": 2
       }
     },
     {
-      "id": "facts-007",
-      "label": "Grade Jumps",
-      "category": "facts",
-      "prompt": "Show me my grade jumps",
-      "expected": {
-        "source": "sql",
-        "minProof": 0.98,
-        "noMetaLeak": true
-      }
-    },
-    {
-      "id": "facts-008",
-      "label": "Academic Vitals Trend",
-      "category": "facts",
-      "prompt": "What's my GPA trend?",
-      "expected": {
-        "source": "sql",
-        "minProof": 0.98,
-        "noMetaLeak": true
-      }
-    },
-    {
-      "id": "facts-009",
-      "label": "EC Activities Final",
-      "category": "facts",
-      "prompt": "Which ECs did I actually submit?",
-      "expected": {
-        "source": "sql",
-        "minProof": 0.98,
-        "noMetaLeak": true
-      }
-    },
-    {
-      "id": "facts-010",
-      "label": "Program Decisions",
+      "id": "facts-programs-003",
+      "label": "Summer Programs Decisions",
       "category": "facts",
       "prompt": "Which programs accepted me?",
+      "studentId": "huda-2025",
       "expected": {
+        "route": "program.decisions",
         "source": "sql",
         "minProof": 0.98,
         "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-programs-004",
+      "label": "Summer Programs Final",
+      "category": "facts",
+      "prompt": "Which programs did I attend?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "program.final",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-academics-001",
+      "label": "GPA Latest",
+      "category": "facts",
+      "prompt": "What's my current GPA?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "academics.gpa.latest",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["3.97"]
+      }
+    },
+    {
+      "id": "facts-academics-002",
+      "label": "GPA Initial",
+      "category": "facts",
+      "prompt": "What was my initial GPA?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "academics.gpa.initial",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-academics-003",
+      "label": "GPA Progression",
+      "category": "facts",
+      "prompt": "Show my GPA trend over time",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "academics.gpa.progression",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-academics-004",
+      "label": "Transcript Initial",
+      "category": "facts",
+      "prompt": "Show my initial transcript",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "academics.transcript.initial",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "expectedCount": 6
+      }
+    },
+    {
+      "id": "facts-academics-005",
+      "label": "Transcript Final",
+      "category": "facts",
+      "prompt": "What's my final transcript?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "academics.transcript.final",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-academics-006",
+      "label": "AP Courses Count",
+      "category": "facts",
+      "prompt": "How many AP courses did I take?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "academics.transcript.final",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["AP"]
+      }
+    },
+    {
+      "id": "facts-college-001",
+      "label": "Colleges Applied",
+      "category": "facts",
+      "prompt": "Which schools did I apply to?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "college.applied",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "expectedCount": 5
+      }
+    },
+    {
+      "id": "facts-college-002",
+      "label": "Colleges Submitted",
+      "category": "facts",
+      "prompt": "Which applications did I submit?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "college.submitted",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-college-003",
+      "label": "College Decisions",
+      "category": "facts",
+      "prompt": "Where did I get in?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "college.decisions",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-college-004",
+      "label": "College Final Choice",
+      "category": "facts",
+      "prompt": "Which school did I choose?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "college.final",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-college-005",
+      "label": "Early Decision/Action",
+      "category": "facts",
+      "prompt": "Did I apply early decision anywhere?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "college.applied",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-testing-001",
+      "label": "SAT Score Latest",
+      "category": "facts",
+      "prompt": "What's my SAT score?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "testing.sat",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["1530"]
+      }
+    },
+    {
+      "id": "facts-testing-002",
+      "label": "ACT Score",
+      "category": "facts",
+      "prompt": "What's my ACT score?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "testing.act",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-testing-003",
+      "label": "AP Exam Scores",
+      "category": "facts",
+      "prompt": "Show me my AP exam scores",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "testing.ap",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-testing-004",
+      "label": "All Test Scores",
+      "category": "facts",
+      "prompt": "Show all my test scores",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "testing.all",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-ivyscore-001",
+      "label": "IvyScore Latest",
+      "category": "facts",
+      "prompt": "What's my IvyScore?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "ivyscore.latest",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["90.51"]
+      }
+    },
+    {
+      "id": "facts-ivyscore-002",
+      "label": "IvyScore Current",
+      "category": "facts",
+      "prompt": "Show my current readiness score",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "ivyscore.current",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-ivyscore-003",
+      "label": "IvyScore Progression",
+      "category": "facts",
+      "prompt": "How has my IvyScore changed?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "ivyscore.progression",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-ivyscore-004",
+      "label": "IvyPlus Ready Check",
+      "category": "facts",
+      "prompt": "Am I IvyPlus ready?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "ivyscore.latest",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["IvyPlus Ready"]
+      }
+    },
+    {
+      "id": "facts-readiness-001",
+      "label": "Weakspots Analysis",
+      "category": "facts",
+      "prompt": "What are my weakspots?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "readiness.weakspots",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["GPA", "SAT"]
+      }
+    },
+    {
+      "id": "facts-readiness-002",
+      "label": "Top Priorities",
+      "category": "facts",
+      "prompt": "What should I prioritize?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "readiness.priorities",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-whatif-001",
+      "label": "What-If SAT 1560",
+      "category": "facts",
+      "prompt": "What if I raise my SAT to 1560?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.sat",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["+2"]
+      }
+    },
+    {
+      "id": "facts-whatif-002",
+      "label": "What-If SAT 1600",
+      "category": "facts",
+      "prompt": "How much would a perfect SAT help?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.sat",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["1600"]
+      }
+    },
+    {
+      "id": "facts-whatif-003",
+      "label": "What-If National Award",
+      "category": "facts",
+      "prompt": "What if I win a National award?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.award",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["National"]
+      }
+    },
+    {
+      "id": "facts-whatif-004",
+      "label": "What-If International Award",
+      "category": "facts",
+      "prompt": "What if I win an International award?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.award",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["International"]
+      }
+    },
+    {
+      "id": "facts-whatif-005",
+      "label": "What-If EC Scale (Countries)",
+      "category": "facts",
+      "prompt": "What if I expand Empowering AI to 20 countries?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.ec",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["20", "countries"]
+      }
+    },
+    {
+      "id": "facts-whatif-006",
+      "label": "What-If EC Scale (Funding)",
+      "category": "facts",
+      "prompt": "How would raising $50K help my score?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.ec",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["50", "funding"]
+      }
+    },
+    {
+      "id": "facts-whatif-007",
+      "label": "What-If GPA 4.0",
+      "category": "facts",
+      "prompt": "What if I raise my GPA to 4.0?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.gpa",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["4.0"]
+      }
+    },
+    {
+      "id": "facts-whatif-008",
+      "label": "What-If Program (RSI)",
+      "category": "facts",
+      "prompt": "What if I get into RSI?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.program",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["RSI", "IvyPlus"]
+      }
+    },
+    {
+      "id": "facts-whatif-009",
+      "label": "What-If Program (MIT Launch)",
+      "category": "facts",
+      "prompt": "MIT Launch acceptance impact?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "whatif.program",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["MIT Launch"]
+      }
+    },
+    {
+      "id": "facts-vitals-001",
+      "label": "Demographics",
+      "category": "facts",
+      "prompt": "Show my demographic information",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "vitals.demographics",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-vitals-002",
+      "label": "Timeline Dates",
+      "category": "facts",
+      "prompt": "What are my key deadlines?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "vitals.timeline",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-jtbd-001",
+      "label": "Weekly Tasks W1",
+      "category": "facts",
+      "prompt": "What are my tasks for Week 1?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "jtbd.weekly",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-jtbd-002",
+      "label": "Pending Tasks",
+      "category": "facts",
+      "prompt": "What tasks do I have pending?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "jtbd.pending",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-pattern-001",
+      "label": "Temporal Pattern: Initial vs Final (Awards)",
+      "category": "facts",
+      "prompt": "Compare my initial and final awards",
+      "studentId": "huda-2025",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["initial", "final"]
+      }
+    },
+    {
+      "id": "facts-pattern-002",
+      "label": "Temporal Pattern: Progression (GPA)",
+      "category": "facts",
+      "prompt": "Track my GPA over time",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "academics.gpa.progression",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-pattern-003",
+      "label": "Count Query: Award Count by Tier",
+      "category": "facts",
+      "prompt": "How many National vs Regional awards do I have?",
+      "studentId": "huda-2025",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["National", "Regional"]
+      }
+    },
+    {
+      "id": "facts-pattern-004",
+      "label": "Filter Query: Only Leadership ECs",
+      "category": "facts",
+      "prompt": "Show only my leadership roles",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "ec.leadership",
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["leadership", "Founder", "President"]
+      }
+    },
+    {
+      "id": "facts-edge-001",
+      "label": "Edge Case: Empty Result",
+      "category": "facts",
+      "prompt": "What scholarships did I win?",
+      "studentId": "huda-2025",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["No", "found", "none"]
+      }
+    },
+    {
+      "id": "facts-edge-002",
+      "label": "Edge Case: Ambiguous Intent",
+      "category": "facts",
+      "prompt": "What's my score?",
+      "studentId": "huda-2025",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.95,
+        "noMetaLeak": true
+      }
+    },
+    {
+      "id": "facts-edge-003",
+      "label": "Edge Case: Multiple Matches",
+      "category": "facts",
+      "prompt": "Show my transcript and GPA",
+      "studentId": "huda-2025",
+      "expected": {
+        "source": "sql",
+        "minProof": 0.98,
+        "noMetaLeak": true,
+        "mustContain": ["GPA", "transcript", "courses"]
       }
     }
   ]

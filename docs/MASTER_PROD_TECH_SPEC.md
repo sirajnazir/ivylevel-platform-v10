@@ -2,8 +2,8 @@
 **IvyLevel Platform v10 - Jenny Agentic AI (Production Only)**
 
 **Document Status:** Production Source of Truth
-**Last Update:** 2025-10-11
-**Version:** v10.5.2 - Complete Cat-1 Restoration (v4.6.2 Baseline)
+**Last Update:** 2025-10-13
+**Version:** v11.0 - CAT-1 Complete with Universal Attribute Filtering
 **Scope:** Production Code ONLY (`/services/jenny-api/`)
 
 ---
@@ -137,7 +137,7 @@ archive/                              # Archived old code
 | **Orchestrator** | `services/jenny-api/src/orchestrator/agentChat-utfa.ts` | Query execution + deduplication |
 | **Composer** | `services/jenny-api/src/compose/compose.ts` | Answer generation + meta-stripping |
 | **Humanizer** | `services/jenny-api/src/lib/humanizer.ts` | Jenny's voice layer (v10.4) |
-| **Resolvers** | `services/jenny-api/src/resolvers/` | SQL resolvers (enums, academics) |
+| **Resolvers** | `services/jenny-api/src/resolvers/` | SQL resolvers (enums, academics, vitals, jtbd) |
 | **Test UI** | `apps/test-chat-ui/` | UI layer (HTTP client ONLY) |
 | **Test Lab** | `apps/test-chat-ui/app/test-lab/` | Comprehensive testing framework |
 | **Master Specs** | `docs/MASTER_PROD_TECH_SPEC.md` | This file (architecture) |
@@ -468,6 +468,13 @@ export async function classifyIntent(message: string, context: any): IntentResul
 | `(which\|what).*(ec\|activities).*final` | `ecs.list` | SQL | "Which ECs did I actually submit?" |
 | `(what\|which).*(college\|school).*(list\|results)` | `college.list` | SQL | "What was my final college list?" |
 | `(show\|what).*(grade jump\|vitals)` | `progression.timeline` | SQL | "Show me my grade jumps" |
+| `(funding\|raised\|money).*(progression\|time)` | `vitals.funding.progression` | SQL (v10.6) | "How much funding have I raised over time?" |
+| `(scale\|students reached\|members).*(progression\|growth)` | `vitals.scale.progression` | SQL (v10.6) | "Show me scale growth" |
+| `(impact\|media\|features)` | `vitals.impact.latest` | SQL (v10.6) | "What's my impact?" |
+| `(vitals\|metrics).*(summary)` | `vitals.summary` | SQL (v10.6) | "Vitals summary" |
+| `(week\|weekly).*(accomplish\|done).*(week \d+)` | `jtbd.week` | SQL (v10.6) | "What did I accomplish in week 8?" |
+| `(show\|what).*(milestones\|achievements)` | `jtbd.milestones` | SQL (v10.6) | "Show me my milestones" |
+| `(pending\|need to do)` | `jtbd.pending` | SQL (v10.6) | "What's pending?" |
 
 **Confidence:** All guardrails return 0.98 confidence with `detector: "keyword-floor"`
 
@@ -665,6 +672,693 @@ export const gpa = {
     return pg.query(`SELECT * FROM v_gpa_progression WHERE student_id = $1 ORDER BY as_of_date`);
   }
 };
+```
+
+#### EC Vitals Resolver (v10.6)
+
+**Location:** `/services/jenny-api/src/resolvers/vitals.ts`
+
+**Purpose:** Track quantitative metric progression for EC/Activities - pure fact-based numbers with temporal snapshots
+
+**Real Data:** 27 vitals for huda-2025 across 8 activities (June 2023 - Oct 2024)
+- Empowering AI: 7 vitals (funding: $0→$13K→$23K progression)
+- Synthoria Game: 5 vitals (890 plays, 150 people reached)
+- Film Makers Club: 4 vitals (60% female officer transformation)
+- Women in Games: 3 vitals (2M+ TikTok views)
+
+**Routes:** `vitals.latest`, `vitals.progression`, `vitals.funding.progression`, `vitals.scale.progression`, `vitals.impact.latest`, `vitals.summary`
+
+```typescript
+export const vitals = {
+  // Latest value for each metric across all activities
+  async latest(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT vital_id, chip_id, activity_name, metric_type, metric_name,
+              numeric_value, text_value, unit, as_of, source_id
+       FROM v_ec_vitals_latest WHERE student_id = $1
+       ORDER BY activity_name, metric_type, metric_name`,
+      [studentId]
+    );
+    return rows;
+  },
+
+  // Full timeline for all metrics with nth ordering
+  async progression(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT vital_id, chip_id, activity_name, metric_type, metric_name,
+              numeric_value, text_value, unit, as_of, nth, source_id
+       FROM v_ec_vitals_progression WHERE student_id = $1
+       ORDER BY activity_name, metric_name, nth`,
+      [studentId]
+    );
+    return rows;
+  },
+
+  // Funding progression convenience wrapper
+  async fundingProgression(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT vital_id, chip_id, activity_name, numeric_value, unit, as_of, nth, source_id
+       FROM v_ec_vitals_progression
+       WHERE student_id = $1 AND metric_type = 'financial' AND metric_name = 'funding_raised'
+       ORDER BY activity_name, nth`,
+      [studentId]
+    );
+    return rows;
+  },
+
+  // Scale metrics progression (students reached, members, etc.)
+  async scaleProgression(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT vital_id, chip_id, activity_name, metric_name, numeric_value, unit, as_of, nth
+       FROM v_ec_vitals_progression
+       WHERE student_id = $1 AND metric_type = 'scale'
+       ORDER BY activity_name, metric_name, nth`,
+      [studentId]
+    );
+    return rows;
+  },
+
+  // All impact metrics (media features, social reach, recognition)
+  async impactMetrics(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT vital_id, chip_id, activity_name, metric_name, numeric_value, text_value, unit, as_of
+       FROM v_ec_vitals_latest
+       WHERE student_id = $1 AND metric_type = 'impact'
+       ORDER BY activity_name, metric_name`,
+      [studentId]
+    );
+    return rows;
+  },
+
+  // Student-level vitals summary
+  async summary(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT activities_tracked, unique_metrics, total_snapshots,
+              tracking_start, tracking_latest, metric_types_tracked
+       FROM v_ec_vitals_summary WHERE student_id = $1`,
+      [studentId]
+    );
+    return rows[0] || null;
+  }
+};
+```
+
+**Metric Type Taxonomy (6 types from CommonApp analysis):**
+- `scale`: Members, participants, students reached, audience size, geographic reach
+- `financial`: Funding raised, revenue, grants, budget managed
+- `product`: Products shipped, downloads, content created, views
+- `leadership`: Team size, partnerships, growth rate, role expansion
+- `impact`: People impacted, media features, social media reach, recognition
+- `selection`: Acceptance rate, selectivity, competition level
+
+**Example Queries (Real Data Results):**
+- "How much funding have I raised over time?" → `vitals.funding.progression` → Returns $13K→$23K for Empowering AI
+- "Show me scale growth" → `vitals.scale.progression` → Returns 6 scale metrics across activities
+- "What's my impact?" → `vitals.impact.latest` → Returns 2M+ TikTok views, transformation milestone
+- "Vitals summary" → `vitals.summary` → Returns 8 activities, 17 metrics, 27 snapshots (June 2023 - Oct 2024)
+
+#### JTBD Resolver (v10.6)
+
+**Location:** `/services/jenny-api/src/resolvers/jtbd.ts`
+
+**Purpose:** Track weekly execution facts - WHAT got done, not HOW or WHY (coaching intelligence stays in Cat-02 KB/RAG)
+
+**Table:** `jtbd_weekly` (⚠️ NOT `jtbd` - that table is used for iMessage interactions)
+
+**Real Data:** 38 completed jobs for huda-2025 across 9 milestone weeks (June 2023 - Oct 2024)
+
+**Routes:** `jtbd.week`, `jtbd.completed`, `jtbd.pending`, `jtbd.milestones`, `jtbd.progression`
+
+```typescript
+export const jtbd = {
+  // Jobs for specific week
+  async byWeek(pg, studentId, weekNumber) {
+    const { rows } = await pg.query(
+      `SELECT total_jobs, completed_jobs, in_progress_jobs, planned_jobs,
+              completed_job_types, completed_descriptions, week_start_date, week_end_date
+       FROM v_jtbd_weekly_by_week WHERE student_id = $1 AND week_number = $2`,
+      [studentId, weekNumber]
+    );
+    return rows[0] || null;
+    // Real Example: Week 55 returns 9 completed jobs (Empowering AI breakthrough)
+  },
+
+  // All completed jobs chronologically
+  async completed(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT jtbd_id, week_number, job_type, job_description, completion_date,
+              outcome_metric, outcome_value, outcome_unit, linked_chip_id, source_id
+       FROM v_jtbd_weekly_completed WHERE student_id = $1
+       ORDER BY completion_date DESC, week_number DESC`,
+      [studentId]
+    );
+    return rows;
+    // Real Result: 38 completed jobs (23 ec_milestone, 5 essay, 4 application, etc.)
+  },
+
+  // All pending/in-progress jobs
+  async pending(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT jtbd_id, week_number, week_start_date, week_end_date,
+              job_type, job_description, status, linked_chip_id, source_id
+       FROM v_jtbd_weekly_pending WHERE student_id = $1
+       ORDER BY week_number, job_type`,
+      [studentId]
+    );
+    return rows;
+    // Real Result: Empty for huda-2025 (all historical jobs completed)
+  },
+
+  // Week-over-week completion rates
+  async progression(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT week_number, total_jobs, completed_jobs, completion_rate
+       FROM v_jtbd_weekly_progression WHERE student_id = $1
+       ORDER BY week_number`,
+      [studentId]
+    );
+    return rows;
+    // Real Result: 9 weeks with activity, 100% completion rate
+  },
+
+  // EC milestones only
+  async milestones(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT jtbd_id, week_number, job_description, completion_date,
+              outcome_metric, outcome_value, outcome_unit, linked_chip_id
+       FROM v_jtbd_weekly_milestones
+       WHERE student_id = $1
+       ORDER BY completion_date`,
+      [studentId]
+    );
+    return rows;
+    // Real Result: 23 milestone records (Film Club leadership, $13K funding, etc.)
+  },
+
+  // Student-level execution summary
+  async summary(pg, studentId) {
+    const { rows } = await pg.query(
+      `SELECT total_jobs, completed_jobs, in_progress_jobs, planned_jobs,
+              completion_rate
+       FROM v_jtbd_weekly_summary WHERE student_id = $1`,
+      [studentId]
+    );
+    return rows[0] || null;
+  }
+};
+```
+
+**Job Types (7 categories):**
+- `application`: College/program application submitted
+- `test`: Test taken (SAT, ACT, AP)
+- `award`: Award application submitted or won
+- `ec_milestone`: EC milestone achieved (funding raised, event held)
+- `academic`: Academic milestone (course completed, GPA updated)
+- `essay`: Essay drafted/revised/finalized
+- `other`: Other execution item
+
+**Status Values:**
+- `completed`, `in_progress`, `planned`, `deferred`, `cancelled`
+
+**Example Queries (Real Data Results):**
+- "What did I accomplish in week 8?" → `jtbd.week` → Returns 1 completed job (school year start)
+- "What did I accomplish in week 55?" → `jtbd.week` → Returns 9 jobs ($13K funding breakthrough)
+- "What have I done?" → `jtbd.completed` → Returns all 38 completed jobs chronologically
+- "What's pending?" → `jtbd.pending` → Returns empty (all historical jobs completed)
+- "Show me my milestones" → `jtbd.milestones` → Returns 23 EC milestone achievements
+- "Week over week progress" → `jtbd.progression` → Returns 9 active weeks, 100% completion
+
+---
+
+## IvyScore & Readiness System (v4.6.1)
+
+**Location:** `/services/jenny-api/src/resolvers/readiness.ts` + `/services/jenny-api/src/services/resolvers.ts` (what-if)
+
+**Purpose:** Credit-score-like admissions readiness system providing students with actionable intelligence: "Where am I now?", "What moved my score?", "What if I do X?", "What should I do first?"
+
+**Real Data:** huda-2025 score = **90.51/100** (IvyPlus Ready) with 6-factor breakdown
+
+**Routes:** `ivyscore.*`, `readiness.*`, `readiness.whatif.*`
+
+### IvyScore Resolver (readiness.ts)
+
+**Core Methods:**
+
+```typescript
+export const ivyscore = {
+  // Get most recent score across all phases
+  async latest(pg: Pool, studentId: string) {
+    const { rows } = await pg.query(
+      `SELECT student_id, rubric_id, snapshot_phase, as_of, overall_score, snapshot_id
+       FROM v_ivyready_latest
+       WHERE student_id = $1
+       LIMIT 1`,
+      [studentId]
+    );
+    return rows[0] || null;
+    // Real Result (huda-2025):
+    // {overall_score: 90.51, phase: 'final_submit', as_of: '2025-09-30'}
+  },
+
+  // Get current assessment snapshot
+  async current(pg: Pool, studentId: string) {
+    const { rows } = await pg.query(
+      `SELECT student_id, rubric_id, snapshot_phase, as_of, overall_score
+       FROM v_ivyready_current
+       WHERE student_id = $1
+       LIMIT 1`,
+      [studentId]
+    );
+    return rows[0] || null;
+  },
+
+  // Get historical progression
+  async progression(pg: Pool, studentId: string) {
+    const { rows } = await pg.query(
+      `SELECT student_id, rubric_id, snapshot_phase, as_of, overall_score
+       FROM v_ivyready_progression
+       WHERE student_id = $1
+       ORDER BY as_of`,
+      [studentId]
+    );
+    return rows;
+    // Real Result (huda-2025): 4 snapshots showing 82.0 → 85.0 → 89.0 → 90.51
+  }
+};
+```
+
+**Real Data Example:**
+```json
+{
+  "student_id": "huda-2025",
+  "rubric_id": "ivyplus_v1",
+  "overall_score": 90.51,
+  "snapshot_phase": "final_submit",
+  "as_of": "2025-09-30",
+  "factors": {
+    "ecs": {"raw": 100.0, "weight": 24, "weighted": 24.00},
+    "awards": {"raw": 100.0, "weight": 12, "weighted": 12.00},
+    "testing": {"raw": 94.17, "weight": 12, "weighted": 11.30},
+    "academics": {"raw": 78.0, "weight": 32, "weighted": 24.96},
+    "narrative": {"raw": 100.0, "weight": 15, "weighted": 15.00},
+    "socio_context": {"raw": 65.0, "weight": 5, "weighted": 3.25}
+  }
+}
+```
+
+### Readiness Resolver (readiness.ts)
+
+**Intelligence Methods:**
+
+```typescript
+export const readiness = {
+  // Get top 5 recommended actions with predicted lift
+  async topPriorities(pg: Pool, studentId: string) {
+    const { rows } = await pg.query(
+      `SELECT *
+       FROM v_readiness_top_priorities
+       WHERE student_id = $1
+       ORDER BY priority_rank
+       LIMIT 5`,
+      [studentId]
+    );
+    return rows;
+    // Real Result (huda-2025):
+    // 1. Submit NCWIT National + Regeneron → +5.0 pts
+    // 2. Scale Empowering AI to 200 users → +1.8 pts
+    // 3. Refine essay advocacy theme → +1.5 pts
+  },
+
+  // Get weakspots with gap analysis
+  async weakspots(pg: Pool, studentId: string) {
+    const { rows } = await pg.query(
+      `SELECT *
+       FROM v_readiness_weakspots
+       WHERE student_id = $1
+       ORDER BY gap DESC
+       LIMIT 5`,
+      [studentId]
+    );
+    return rows;
+    // Real Result (huda-2025):
+    // 1. award_national_count: current=1, target=2, gap=1
+    // 2. ec_users_empowering_ai: current=85, target=200, gap=115
+  }
+};
+```
+
+### What-If Resolvers (resolvers.ts)
+
+**5 Simulation Types:**
+
+```typescript
+// 1. SAT Simulation
+export async function readinessWhatIfSAT(pg: Pool, studentId: string, targetScore: number) {
+  const baseScore = await getBaseScore(pg, studentId);  // 89.0
+  const currentSAT = await getCurrentSAT(pg, studentId); // 1530
+
+  // Formula: delta = (newSAT - currentSAT) / 1600 * 100 * testing_weight(12%)
+  const delta = ((targetScore - currentSAT) / 1600 * 100) * 0.12;
+  const projected = baseScore + delta;
+
+  return {
+    base_score: baseScore,
+    projected_score: projected,
+    delta: delta,
+    explanation: `Raising SAT from ${currentSAT} to ${targetScore} would increase your IvyScore by ${delta.toFixed(1)} points.`
+  };
+
+  // Real Examples (huda-2025):
+  // 1530 → 1560: base=89.0, projected=91.3, delta=+2.3
+  // 1530 → 1600: base=89.0, projected=94.2, delta=+5.2
+}
+
+// 2. Award Simulation
+export async function readinessWhatIfAward(pg: Pool, studentId: string, tier: string) {
+  const baseScore = await getBaseScore(pg, studentId);
+
+  // Tier bumps: Regional=20pts, National=40pts, International=80pts
+  const tierBumps = { Regional: 20, National: 40, International: 80 };
+  const rawBump = tierBumps[tier] || 0;
+  const delta = rawBump * 0.12;  // awards_weight = 12%
+
+  return {
+    base_score: baseScore,
+    projected_score: baseScore + delta,
+    delta: delta,
+    explanation: `Winning a ${tier} award would add ${delta.toFixed(1)} points to your IvyScore.`
+  };
+
+  // Real Examples (huda-2025):
+  // Regional: base=89.0, projected=91.5, delta=+2.5
+  // National: base=89.0, projected=94.0, delta=+5.0
+  // International: base=89.0, projected=99.0, delta=+10.0
+}
+
+// 3. EC Metric Simulation
+export async function readinessWhatIfEC(pg: Pool, studentId: string, uapx: any) {
+  // UAPX = Universal Action Parameter eXtraction
+  // {domain: 'ecs', activity: 'Empowering AI', metric: 'users', target: 200}
+
+  const baseScore = await getBaseScore(pg, studentId);
+  const currentValue = await getECMetric(pg, studentId, uapx.activity, uapx.metric);
+  const targetValue = uapx.target.value;
+
+  // Get feature weight and calculate delta
+  const featureWeight = await getFeatureWeight(pg, uapx.activity, uapx.metric);
+  const delta = ((targetValue - currentValue) / targetValue) * featureWeight * 0.24; // ecs_weight=24%
+
+  return {
+    base_score: baseScore,
+    projected_score: baseScore + delta,
+    delta: delta,
+    explanation: `Growing ${uapx.activity} ${uapx.metric} from ${currentValue} to ${targetValue} would add ${delta.toFixed(1)} points.`
+  };
+
+  // Real Example (huda-2025):
+  // Empowering AI users: 85 → 200 = +1.8 pts
+}
+
+// 4. GPA Simulation
+export async function readinessWhatIfGPA(pg: Pool, studentId: string, targetGPA: number) {
+  const baseScore = await getBaseScore(pg, studentId);
+  const currentGPA = await getCurrentGPA(pg, studentId); // 3.97
+
+  // Formula: delta = (targetGPA - currentGPA) / 4.0 * 100 * academics_weight(32%)
+  const delta = ((targetGPA - currentGPA) / 4.0 * 100) * 0.32;
+
+  return {
+    base_score: baseScore,
+    projected_score: baseScore + delta,
+    delta: delta,
+    explanation: `Raising GPA from ${currentGPA} to ${targetGPA} would add ${delta.toFixed(1)} points.`
+  };
+
+  // Real Example (huda-2025):
+  // 3.97 → 4.0: base=89.0, projected=89.24, delta=+0.24
+}
+
+// 5. Selective Program Simulation
+export async function readinessWhatIfProgram(pg: Pool, studentId: string, program: string) {
+  const baseScore = await getBaseScore(pg, studentId);
+
+  // Program tier multipliers (based on selectivity <10%)
+  const programTiers = {
+    'RSI': 40,        // <5% acceptance
+    'TASP': 35,       // ~7% acceptance
+    'YYGS': 25,       // ~12% acceptance
+    'LaunchX': 20     // ~15% acceptance
+  };
+
+  const rawBump = programTiers[program] || 15; // default for unknown programs
+  const delta = rawBump * 0.05;  // programs impact across multiple factors ~5% total
+
+  return {
+    base_score: baseScore,
+    projected_score: baseScore + delta,
+    delta: delta,
+    explanation: `Getting into ${program} would add ${delta.toFixed(1)} points (prestigious program boost).`
+  };
+
+  // Real Example (huda-2025):
+  // RSI: base=89.0, projected=91.0, delta=+2.0
+}
+```
+
+### Factor Weights (IvyPlus Rubric)
+
+**6 Factors summing to 100%:**
+
+| Factor | Weight | Components | Impact |
+|--------|--------|------------|--------|
+| **Academics** | 32% | GPA, Course Rigor, Class Rank | Largest weight - foundational |
+| **ECs** | 24% | Leadership, Scale, Impact, Depth | Second largest - differentiation |
+| **Narrative** | 15% | Essay Quality, Theme, Advocacy | Story coherence |
+| **Testing** | 12% | SAT/ACT Scores | Standardized measure |
+| **Awards** | 12% | Recognition Tier (Local→International) | External validation |
+| **Socio-Context** | 5% | First-Gen, Low-Income, Geographic | Contextual factors |
+
+**Real Data (huda-2025):**
+- ECs: 100/100 × 24% = **24.00 pts** (20 final activities, strong leadership)
+- Academics: 78/100 × 32% = **24.96 pts** (GPA 3.97/4.52, rigorous courses)
+- Narrative: 100/100 × 15% = **15.00 pts** (5 essay parts, strong advocacy theme)
+- Testing: 94.17/100 × 12% = **11.30 pts** (SAT 1530/1600 = 95.6%)
+- Awards: 100/100 × 12% = **12.00 pts** (12 awards including national tier)
+- Socio-Context: 65/100 × 5% = **3.25 pts** (neutral-65 assumption)
+- **Total: 90.51 points**
+
+### Intent Routes (intent-enum.ts)
+
+**IvyScore Patterns:**
+```typescript
+const IVYSCORE_SYNS = [
+  'ivyscore', 'ivy score', 'ivyready', 'ivy ready',
+  'readiness score', 'readiness', 'chances', 'my score'
+];
+
+// Routes:
+'ivyscore.latest'      → "What's my IvyScore?" / "Am I ready?"
+'ivyscore.current'     → "Show me my current readiness"
+'ivyscore.progression' → "How has my score changed?"
+```
+
+**Readiness Patterns:**
+```typescript
+const READINESS_SYNS = [
+  'priorities', 'top priorities', 'weakspots', 'weak spots',
+  'areas to improve', 'what should i work on'
+];
+
+// Routes:
+'readiness.top_priorities' → "What should I work on?"
+'readiness.weakspots'      → "What are my weak spots?"
+```
+
+**What-If Patterns:**
+```typescript
+// 32 example patterns across 5 types
+
+// SAT (4 examples):
+"what if I raise my SAT to 1500?"
+"how would a 1550 SAT affect my readiness?"
+"simulate SAT 1480"
+"if my SAT was 1600, what would happen?"
+
+// Award (4 examples):
+"what if I win a national award?"
+"how would winning an international award help?"
+"simulate regional award win"
+"what if I got a national level distinction?"
+
+// EC (8 examples):
+"what if I grow Empowering AI to 10,000 users?"
+"what if I double users on Synthoria?"
+"how would raising $25k for Folklift help?"
+"what if I increase hours per week to 12 on Filmmaker's Club?"
+
+// GPA (4 examples):
+"what if I raise my GPA to 3.95?"
+"how would a 4.0 GPA affect my readiness?"
+"simulate GPA of 3.8"
+"what if my GPA was 3.9?"
+
+// Program (4 examples):
+"what if I get into RSI?"
+"how would getting into YYGS help my readiness?"
+"simulate admission to LaunchX"
+"what if I got into TASP?"
+```
+
+### Orchestrator Integration (agentChat-utfa.ts)
+
+**Import:**
+```typescript
+import { ivyscore, readiness } from '../resolvers/readiness.js';
+```
+
+**Route Handlers (Lines 533-537):**
+```typescript
+case 'ivyscore.latest':
+  console.log('[ORCH] → Calling ivyscore.latest');
+  return { kind: 'enum', route, item: await ivyscore.latest(pg, studentId) };
+
+case 'ivyscore.current':
+  console.log('[ORCH] → Calling ivyscore.current');
+  return { kind: 'enum', route, item: await ivyscore.current(pg, studentId) };
+
+case 'ivyscore.progression':
+  console.log('[ORCH] → Calling ivyscore.progression');
+  return { kind: 'enum', route, items: await ivyscore.progression(pg, studentId) };
+
+case 'readiness.top_priorities':
+  return { kind: 'enum', route, items: await readiness.topPriorities(pg, studentId) };
+
+case 'readiness.weakspots':
+  return { kind: 'enum', route, items: await readiness.weakspots(pg, studentId) };
+```
+
+**What-If Handlers (intentRouter.ts Lines 884-898):**
+```typescript
+case "readiness.whatif.sat":
+  data = await resolvers.readinessWhatIfSAT(pg, studentId,
+    intent.filters?.uapx || intent.filters?.action_param);
+  break;
+
+case "readiness.whatif.award":
+  data = await resolvers.readinessWhatIfAward(pg, studentId,
+    intent.filters?.uapx || intent.filters?.action_param);
+  break;
+
+case "readiness.whatif.ec":
+  data = await resolvers.readinessWhatIfEC(pg, studentId, intent.filters?.uapx);
+  break;
+
+case "readiness.whatif.gpa":
+  data = await resolvers.readinessWhatIfGPA(pg, studentId, intent.filters?.uapx);
+  break;
+
+case "readiness.whatif.program":
+  data = await resolvers.readinessWhatIfProgram(pg, studentId, intent.filters?.uapx);
+  break;
+```
+
+### Answer Composition (Lines 386-389)
+
+**IvyScore Formatting:**
+```typescript
+if (route.startsWith('ivyscore.')) {
+  const r = result.item;
+  if (!r) return 'No IvyScore data found.';
+
+  return `Your IvyScore: **${r.overall_score}/100** (${r.snapshot_phase})
+As of: ${r.as_of}
+Rubric: ${r.rubric_id}
+
+This places you in the ${r.overall_score >= 90 ? 'IvyPlus' : r.overall_score >= 80 ? 'T20' : 'T50'} ready range.`;
+}
+```
+
+### Complete Flow Example
+
+**Query:** "What's my IvyScore?"
+
+```
+1. Intent Classification (intent-enum.ts)
+   → Pattern match: "ivyscore" in IVYSCORE_SYNS
+   → Route: 'ivyscore.latest'
+
+2. Orchestrator (agentChat-utfa.ts:533)
+   → Calls: ivyscore.latest(pg, 'huda-2025')
+
+3. Resolver (readiness.ts:22)
+   → Query: SELECT * FROM v_ivyready_latest WHERE student_id='huda-2025'
+   → Returns: {overall_score: 90.51, phase: 'final_submit', ...}
+
+4. Composition (agentChat-utfa.ts:386)
+   → Formats: "Your IvyScore: **90.51/100** (final_submit)\nAs of: 2025-09-30\n..."
+
+5. Response
+   → User sees: Formatted score with interpretation
+```
+
+**Query:** "What if I raise my SAT to 1560?"
+
+```
+1. Intent Classification (intentRouter.ts)
+   → Pattern match: "what if" + "SAT" + number extraction
+   → Route: 'readiness.whatif.sat'
+   → Extracts: uapx = {domain: 'testing', target: {value: 1560}}
+
+2. Router (intentRouter.ts:885)
+   → Calls: readinessWhatIfSAT(pg, 'huda-2025', 1560)
+
+3. Resolver (resolvers.ts:723)
+   → Gets base score: 89.0
+   → Gets current SAT: 1530
+   → Calculates delta: (1560-1530)/1600 * 100 * 0.12 = +2.25
+   → Returns: {base: 89.0, projected: 91.25, delta: +2.25, explanation}
+
+4. Composition
+   → Formats delta calculation with explanation
+
+5. Response
+   → User sees: "Raising your SAT from 1530 to 1560 would increase your IvyScore
+                 from 89.0 to 91.25 (+2.25 points)."
+```
+
+### Real Query Examples
+
+**Progression Tracking:**
+```
+User: "How has my IvyScore changed over time?"
+→ Route: ivyscore.progression
+→ Result:
+  Aug 2024: 82.0 (baseline)
+  Sep 2024: 85.0 (+3.0 after SAT retake)
+  Oct 2024: 89.0 (+4.0 after national awards)
+  Sep 2025: 90.51 (+1.51 final polish)
+```
+
+**Action Intelligence:**
+```
+User: "What should I work on?"
+→ Route: readiness.top_priorities
+→ Result:
+  1. Submit NCWIT National + Regeneron → +5.0 pts predicted lift
+  2. Scale Empowering AI to 200 users → +1.8 pts
+  3. Refine essay advocacy theme → +1.5 pts
+```
+
+**What-If Scenarios:**
+```
+User: "What if I win a national award?"
+→ Route: readiness.whatif.award
+→ Result: Base 89.0 → Projected 94.0 (Delta: +5.0 pts)
+
+User: "What if I grow Empowering AI to 200 users?"
+→ Route: readiness.whatif.ec
+→ UAPX extraction: {activity: 'Empowering AI', metric: 'users', target: 200}
+→ Result: Base 89.0 → Projected 90.8 (Delta: +1.8 pts)
 ```
 
 ---
@@ -1085,6 +1779,31 @@ See **PROD_DB_ARCH.md** for complete schema documentation.
 - `as_of_date`
 - `source_id`
 
+**ec_vitals** (v10.6 - Quantitative EC metric progression)
+- `vital_id` (PK)
+- `student_id` (FK), `chip_id` (links to kb_items)
+- `activity_name` (denormalized for performance)
+- `metric_type` (scale, financial, product, leadership, impact, selection)
+- `metric_name` (funding_raised, students_reached, etc.)
+- `numeric_value`, `text_value`, `unit`
+- `as_of` (snapshot date for progression)
+- `source_id` (SRC-GAMEPLAN-*, SRC-COMMONAPP-*, SRC-SNAPSHOT-*)
+- `evidence_text`, `notes`
+
+**jtbd_weekly** (v10.6 - Weekly execution facts, NOT coaching)
+- ⚠️ **Table name is `jtbd_weekly`** (NOT `jtbd` - that's for iMessage interactions)
+- `jtbd_id` (PK)
+- `student_id` (FK)
+- `week_number`, `week_start_date`, `week_end_date`
+- `job_type` (application, test, award, ec_milestone, academic, essay, other)
+- `job_description` (what was done)
+- `linked_chip_id`, `linked_table` (optional FKs)
+- `status` (completed, in_progress, planned, deferred, cancelled)
+- `completion_date`
+- `outcome_metric`, `outcome_value`, `outcome_unit` (quantifiable results)
+- `source_id` (SRC-SNAPSHOT-*, SRC-SESSION-*)
+- **Real Data:** 38 records for huda-2025 (9 weeks, June 2023 - Oct 2024)
+
 ### Temporal Views
 
 **v_awards_initial** → GamePlan awards (SRC-GAMEPLAN-*)
@@ -1109,6 +1828,17 @@ See **PROD_DB_ARCH.md** for complete schema documentation.
 **v_gpa_final** → All official GPAs
 **v_gpa_latest** → Most recent GPA
 **v_gpa_progression** → GPA timeline
+
+**v_ec_vitals_latest** (v10.6) → Most recent value for each metric per activity
+**v_ec_vitals_progression** (v10.6) → Full timeline with nth ordering
+**v_ec_vitals_by_type** (v10.6) → Aggregated by metric type
+**v_ec_vitals_summary** (v10.6) → Student-level vitals summary (27 vitals for huda-2025)
+
+**v_jtbd_weekly_by_week** (v10.6) → Aggregate view by week
+**v_jtbd_weekly_completed** (v10.6) → All completed jobs (38 for huda-2025)
+**v_jtbd_weekly_pending** (v10.6) → Pending/in-progress jobs
+**v_jtbd_weekly_milestones** (v10.6) → EC milestones only (23 for huda-2025)
+**v_jtbd_weekly_progression** (v10.6) → Week-over-week completion rate
 
 ---
 

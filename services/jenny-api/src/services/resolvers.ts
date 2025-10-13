@@ -1,6 +1,8 @@
 // services/jenny-api/src/services/resolvers.ts
 import type { Pool } from 'pg';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
+import { vitals } from '../resolvers/vitals.js';
+import { jtbd } from '../resolvers/jtbd.js';
 
 const log = createLogger('resolvers');
 
@@ -1790,4 +1792,261 @@ export async function collegeCompareReadiness(pg: Pool, studentId: string) {
     ],
     hits: rows
   };
+}
+
+
+// ============================================================================
+// v10.7: EC VITALS WRAPPER FUNCTIONS
+// ============================================================================
+
+export async function vitalsLatest(pg: Pool, studentId: string) {
+  const rows = await vitals.latest(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No EC vitals data found.", chips: [{kind: "evidence", text: "v_ec_vitals_latest"}], hits: [] };
+  }
+  const list = rows.map((r, i) =>
+    `${i+1}. ${r.activity_name} - ${r.metric_name}: ${r.numeric_value || r.text_value}${r.unit ? ` ${r.unit}` : ""}`
+  ).join("\n");
+  return { answer: list, chips: [{kind: "evidence", text: "v_ec_vitals_latest"}], hits: rows };
+}
+
+export async function vitalsProgression(pg: Pool, studentId: string) {
+  const rows = await vitals.progression(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No vitals progression data found.", chips: [{kind: "evidence", text: "v_ec_vitals_progression"}], hits: [] };
+  }
+  return { answer: `Found ${rows.length} vitals progression records.`, chips: [{kind: "evidence", text: "v_ec_vitals_progression"}], hits: rows };
+}
+
+export async function vitalsFundingProgression(pg: Pool, studentId: string) {
+  const rows = await vitals.fundingProgression(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No funding progression data found.", chips: [{kind: "evidence", text: "v_ec_vitals_progression"}], hits: [] };
+  }
+  return { answer: `Found ${rows.length} funding progression records.`, chips: [{kind: "evidence", text: "v_ec_vitals_progression"}], hits: rows };
+}
+
+export async function vitalsScaleProgression(pg: Pool, studentId: string) {
+  const rows = await vitals.scaleProgression(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No scale progression data found.", chips: [{kind: "evidence", text: "v_ec_vitals_progression"}], hits: [] };
+  }
+  return { answer: `Found ${rows.length} scale progression records.`, chips: [{kind: "evidence", text: "v_ec_vitals_progression"}], hits: rows };
+}
+
+export async function vitalsImpactLatest(pg: Pool, studentId: string) {
+  const rows = await vitals.impactMetrics(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No impact metrics found.", chips: [{kind: "evidence", text: "v_ec_vitals_latest"}], hits: [] };
+  }
+  return { answer: `Found ${rows.length} impact metrics.`, chips: [{kind: "evidence", text: "v_ec_vitals_latest"}], hits: rows };
+}
+
+export async function vitalsSummary(pg: Pool, studentId: string) {
+  const summary = await vitals.summary(pg, studentId);
+  if (!summary) {
+    return { answer: "No vitals summary available.", chips: [{kind: "evidence", text: "ec_vitals"}], hits: [] };
+  }
+  return { answer: `EC Vitals Summary: ${summary.total_activities} activities, ${summary.total_metrics} metrics tracked.`, chips: [{kind: "evidence", text: "ec_vitals"}], hits: [summary] };
+}
+
+// ============================================================================
+// v10.7: JTBD WRAPPER FUNCTIONS
+// ============================================================================
+
+export async function jtbdWeek(pg: Pool, studentId: string, weekNumber: number | null) {
+  if (!weekNumber) {
+    return { answer: "Please specify a week number (e.g., 'week 3').", chips: [], hits: [] };
+  }
+  const row = await jtbd.byWeek(pg, studentId, weekNumber);
+  if (!row) {
+    return { answer: `No jobs found for week ${weekNumber}.`, chips: [{kind: "evidence", text: "v_jtbd_weekly_by_week"}], hits: [] };
+  }
+  const answer = `Week ${weekNumber}: ${row.completed_jobs}/${row.total_jobs} jobs completed`;
+  return { answer, chips: [{kind: "evidence", text: "v_jtbd_weekly_by_week"}], hits: [row] };
+}
+
+export async function jtbdCompleted(pg: Pool, studentId: string) {
+  const rows = await jtbd.completed(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No completed jobs found.", chips: [{kind: "evidence", text: "v_jtbd_weekly_completed"}], hits: [] };
+  }
+  return { answer: `${rows.length} jobs completed.`, chips: [{kind: "evidence", text: "v_jtbd_weekly_completed"}], hits: rows };
+}
+
+export async function jtbdPending(pg: Pool, studentId: string) {
+  const rows = await jtbd.pending(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No pending jobs found.", chips: [{kind: "evidence", text: "v_jtbd_weekly_pending"}], hits: [] };
+  }
+  return { answer: `${rows.length} jobs pending.`, chips: [{kind: "evidence", text: "v_jtbd_weekly_pending"}], hits: rows };
+}
+
+export async function jtbdMilestones(pg: Pool, studentId: string) {
+  const rows = await jtbd.milestones(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No EC milestones found.", chips: [{kind: "evidence", text: "v_jtbd_weekly_milestones"}], hits: [] };
+  }
+  return { answer: `${rows.length} EC milestones completed.`, chips: [{kind: "evidence", text: "v_jtbd_weekly_milestones"}], hits: rows };
+}
+
+export async function jtbdProgression(pg: Pool, studentId: string) {
+  const rows = await jtbd.progression(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No progression data found.", chips: [{kind: "evidence", text: "v_jtbd_weekly_progression"}], hits: [] };
+  }
+  return { answer: `Found ${rows.length} weeks of execution data.`, chips: [{kind: "evidence", text: "v_jtbd_weekly_progression"}], hits: rows };
+}
+
+// ============================================================================
+// v10.7: COLLEGE ENHANCED WRAPPER FUNCTIONS
+// ============================================================================
+// UNIVERSAL FIX v10.7.1: Use existing resolver infrastructure + correct schema
+
+export async function collegeAttending(pg: Pool, studentId: string) {
+  // ✅ Use existing collegeList.attending() resolver (uses correct 'attending' boolean column)
+  const { collegeList } = await import('../resolvers/college.js');
+  const row = await collegeList.attending(pg, studentId);
+  if (!row) {
+    return { answer: "No college attendance decision found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  return { answer: `Attending: ${row.college_name}`, chips: [{kind: "evidence", text: "college_list"}], hits: [row] };
+}
+
+export async function collegeAccepted(pg: Pool, studentId: string) {
+  // ✅ Use existing collegeList.accepted() resolver (uses correct 'decision_result' column)
+  const { collegeList } = await import('../resolvers/college.js');
+  const rows = await collegeList.accepted(pg, studentId);
+  if (!rows.length) {
+    return { answer: "No acceptance decisions found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  return { answer: `Accepted to ${rows.length} colleges.`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
+}
+
+export async function collegeEarlyDecision(pg: Pool, studentId: string) {
+  // ✅ Use existing collegeList.byDecisionPlan() resolver
+  const { collegeList } = await import('../resolvers/college.js');
+  const rows = await collegeList.byDecisionPlan(pg, studentId, 'Early Decision');
+  if (!rows.length) {
+    return { answer: "No Early Decision applications found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  const list = rows.map(r => `- ${r.college_name} (${r.bucket_category})${r.decision_result ? ' - ' + r.decision_result : ''}`).join('\n');
+  return { answer: `Applied Early Decision to ${rows.length} college${rows.length > 1 ? 's' : ''}:\n${list}`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
+}
+
+export async function collegeEarlyAction(pg: Pool, studentId: string) {
+  // ✅ Use existing collegeList.byDecisionPlan() resolver
+  const { collegeList } = await import('../resolvers/college.js');
+  const rows = await collegeList.byDecisionPlan(pg, studentId, 'Early Action');
+  if (!rows.length) {
+    return { answer: "No Early Action applications found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  const list = rows.map(r => `- ${r.college_name} (${r.bucket_category})${r.decision_result ? ' - ' + r.decision_result : ''}`).join('\n');
+  return { answer: `Applied Early Action to ${rows.length} college${rows.length > 1 ? 's' : ''}:\n${list}`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
+}
+
+export async function collegeRestrictiveEarlyAction(pg: Pool, studentId: string) {
+  // ✅ Use existing collegeList.byDecisionPlan() resolver
+  const { collegeList } = await import('../resolvers/college.js');
+  const rows = await collegeList.byDecisionPlan(pg, studentId, 'Restrictive Early Action');
+  if (!rows.length) {
+    return { answer: "No Restrictive Early Action applications found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  const list = rows.map(r => `- ${r.college_name} (${r.bucket_category})${r.decision_result ? ' - ' + r.decision_result : ''}`).join('\n');
+  return { answer: `Applied Restrictive Early Action to ${rows.length} college${rows.length > 1 ? 's' : ''}:\n${list}`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
+}
+
+export async function collegeRegularDecision(pg: Pool, studentId: string) {
+  // ✅ Use existing collegeList.byDecisionPlan() resolver
+  const { collegeList } = await import('../resolvers/college.js');
+  const rows = await collegeList.byDecisionPlan(pg, studentId, 'Regular Decision');
+  if (!rows.length) {
+    return { answer: "No Regular Decision applications found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  const list = rows.map(r => `- ${r.college_name} (${r.bucket_category})${r.decision_result ? ' - ' + r.decision_result : ''}`).join('\n');
+  return { answer: `Applied Regular Decision to ${rows.length} college${rows.length > 1 ? 's' : ''}:\n${list}`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
+}
+
+// ============================================================================
+// ECS - BY ROLE (v10.7.1 - Universal attribute filtering)
+// ============================================================================
+
+export async function ecsLeadership(pg: Pool, studentId: string) {
+  // ✅ Use existing ecs.byRolePattern() resolver with "leader" pattern
+  const { ecs } = await import('../resolvers/enums.js');
+  const rows = await ecs.byRolePattern(pg, studentId, 'leader', 'final');
+  if (!rows.length) {
+    return { answer: "No leadership roles found in final activities.", chips: [{kind: "evidence", text: "v_ecs_final"}], hits: [] };
+  }
+  const list = rows.map(r => `- ${r.activity_name}: ${r.role || 'N/A'} (${r.category})`).join('\n');
+  return { answer: `Leadership roles (${rows.length}):\n${list}`, chips: [{kind: "evidence", text: "v_ecs_final"}], hits: rows };
+}
+
+export async function ecsByRole(pg: Pool, studentId: string, role: string) {
+  // ✅ Use existing ecs.byRolePattern() resolver with custom role pattern
+  const { ecs } = await import('../resolvers/enums.js');
+  const rows = await ecs.byRolePattern(pg, studentId, role, 'final');
+  if (!rows.length) {
+    return { answer: `No activities found with role matching "${role}".`, chips: [{kind: "evidence", text: "v_ecs_final"}], hits: [] };
+  }
+  const list = rows.map(r => `- ${r.activity_name}: ${r.role || 'N/A'} (${r.category})`).join('\n');
+  return { answer: `Activities with "${role}" role (${rows.length}):\n${list}`, chips: [{kind: "evidence", text: "v_ecs_final"}], hits: rows };
+}
+
+export async function collegeReach(pg: Pool, studentId: string) {
+  // ✅ FIXED: Use correct column 'bucket_category' (not 'tier')
+  const { rows } = await pg.query(
+    `SELECT * FROM college_list WHERE student_id = $1 AND bucket_category = 'Reach' ORDER BY college_name`,
+    [studentId]
+  );
+  if (!rows.length) {
+    return { answer: "No reach schools found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  return { answer: `${rows.length} reach schools in list.`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
+}
+
+export async function collegeMatch(pg: Pool, studentId: string) {
+  // ✅ FIXED: Use correct column 'bucket_category' (not 'tier')
+  const { rows } = await pg.query(
+    `SELECT * FROM college_list WHERE student_id = $1 AND bucket_category = 'Match' ORDER BY college_name`,
+    [studentId]
+  );
+  if (!rows.length) {
+    return { answer: "No match schools found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  return { answer: `${rows.length} match schools in list.`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
+}
+
+export async function collegeSafety(pg: Pool, studentId: string) {
+  // ✅ FIXED: Use correct column 'bucket_category' (not 'tier')
+  const { rows } = await pg.query(
+    `SELECT * FROM college_list WHERE student_id = $1 AND bucket_category = 'Safety' ORDER BY college_name`,
+    [studentId]
+  );
+  if (!rows.length) {
+    return { answer: "No safety schools found.", chips: [{kind: "evidence", text: "college_list"}], hits: [] };
+  }
+  return { answer: `${rows.length} safety schools in list.`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
+}
+
+// ============================================================================
+// v10.7: READINESS ENHANCED WRAPPER FUNCTIONS
+// ============================================================================
+// UNIVERSAL FIX v10.7.1: Use existing resolver infrastructure + correct schema
+
+export async function readinessTopPriorities(pg: Pool, studentId: string) {
+  // ✅ Use existing readiness.topPriorities() resolver (uses correct 'v_readiness_top_priorities' view)
+  const { readiness } = await import('../resolvers/readiness.js');
+  const rows = await readiness.topPriorities(pg, studentId);
+
+  if (!rows.length) {
+    return { answer: "No readiness priorities found.", chips: [{kind: "evidence", text: "v_readiness_top_priorities"}], hits: [] };
+  }
+
+  // Format: feature_key + gap info + recommended action
+  const list = rows.map((r, i) =>
+    `${i+1}. ${r.feature_key}: ${r.recommended_action} (gap: ${Number(r.gap_weighted).toFixed(1)} pts)`
+  ).join("\n");
+
+  return { answer: list, chips: [{kind: "evidence", text: "v_readiness_top_priorities"}], hits: rows };
 }

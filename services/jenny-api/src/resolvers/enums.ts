@@ -150,6 +150,34 @@ export const ecs = {
     });
 
     return rows;
+  },
+
+  byRolePattern: async (pg: Pool, studentId: string, rolePattern: string, phase: 'initial' | 'final' = 'final') => {
+    const start = Date.now();
+    log.event('ecs.byRolePattern_start', { student_id: studentId, role_pattern: rolePattern, phase });
+
+    const view = phase === 'initial' ? 'v_ecs_initial' : 'v_ecs_final';
+    const dateCol = phase === 'initial' ? 'event_date' : 'submit_date';
+
+    // ✅ Role information is in status_detail column (not 'role')
+    const { rows } = await pg.query(
+      `SELECT activity_name, category, status_detail as role, ${dateCol} as date, source_id, chip_id
+         FROM ${view}
+        WHERE student_id=$1
+          AND status_detail ILIKE $2
+        ORDER BY activity_name`,
+      [studentId, `%${rolePattern}%`]
+    );
+
+    log.event('ecs.byRolePattern_complete', {
+      student_id: studentId,
+      role_pattern: rolePattern,
+      phase,
+      count: rows.length,
+      took_ms: Date.now() - start
+    });
+
+    return rows;
   }
 };
 
