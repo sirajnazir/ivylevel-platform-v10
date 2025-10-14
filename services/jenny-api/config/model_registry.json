@@ -1,0 +1,25 @@
+{
+  "models": {
+    "composer_base": "gpt-4o-mini-2024-07-18",
+    "jenny_v8_adapter": "ft:gpt-4o-mini-2024-07-18:personal:v8-prod:CO8TAkWg",
+    "jenny_v9_eq": "ft:gpt-4o-mini-2024-07-18:personal:jenny-v9-eq:CQMYIrRA",
+    "jenny_v10_eq_combined": "ft:gpt-4o-mini-2024-07-18:personal:jenny-v10-eq-combined:CQUMZfv6"
+  },
+  "config": {
+    "traffic_split": {
+      "jenny_v8_adapter": 0.50,
+      "composer_base": 0.50
+    },
+    "tone_sensitive_intents": [
+      "message_template",
+      "escalation",
+      "mindset",
+      "parent_brief",
+      "deadline_crunch",
+      "rejection_response",
+      "kb_query"
+    ],
+    "adapter_allowlist": ["huda-2025", "test-001"],
+    "canary_eligible_cohorts": ["huda-2025", "test-"]
+  }
+}
