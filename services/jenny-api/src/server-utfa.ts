@@ -162,17 +162,34 @@ app.get('/students/:id/lifecycle', async (req, res) => {
   }
 });
 
-// Agent chat route with GPT-5 Intent Router (v3.7.3)
+// v11.3.2: UNIFIED ENDPOINT - Redirect to unified orchestrator (agentChat-utfa.ts)
+// REPLACES legacy intentRouter (routePrompt) with Priority 0-2 routing: EQ→SQL→KB
 app.post('/agent/chat', async (req, res) => {
   try {
-    const { message, student_id } = req.body;
-    console.log('[GPT5-Intent] Chat request:', { message: message?.slice(0, 80), student_id });
+    const { message, student_id, studentId, session_id, sessionId } = req.body;
+    // Support both snake_case and camelCase for compatibility
+    const finalStudentId = student_id || studentId;
+    const rawSessionId = session_id || sessionId;
 
-    const result = await routePrompt({
-      studentId: student_id,
+    // v11.3.2: Validate session_id is UUID or set to null (let orchestrator generate one)
+    // Test scripts send string IDs like "test-cat3-rejection-stanford" which aren't UUIDs
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const finalSessionId = (rawSessionId && uuidRegex.test(rawSessionId)) ? rawSessionId : null;
+
+    console.log('[Unified-Orchestrator] Chat request:', { message: message?.slice(0, 80), student_id: finalStudentId });
+
+    // v11.3.2 CRITICAL FIX: Use unified orchestrator instead of legacy intentRouter
+    // Priority 0: EQ early-exit (isEQQuery check in agentChat-utfa.ts:587-621)
+    // Priority 1: SQL Facts-First (enumeration resolvers)
+    // Priority 2: KB/RAG fallback
+    const result = await agentChat({
       message,
-      pg: pool
-    });
+      student_id: finalStudentId,
+      session_id: finalSessionId,
+      model: null,  // Let compose.ts decide based on use_ft flag
+      use_ft: true,  // Enable fine-tuned adapter (Category 3)
+      stream: false
+    }, null);
 
     res.json(result);
   } catch (error: any) {

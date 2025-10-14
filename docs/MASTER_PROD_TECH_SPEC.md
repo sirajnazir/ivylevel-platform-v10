@@ -3,7 +3,7 @@
 
 **Document Status:** Production Source of Truth
 **Last Update:** 2025-10-14
-**Version:** v11.3.1 - jenny_v9_eq Explicit Deployment (Rollback from v10)
+**Version:** v11.3.2 - CAT-3 Warmth/Action Injection + Unified Routing Fix
 **Scope:** Production Code ONLY (`/services/jenny-api/`)
 
 ---
