@@ -2,9 +2,9 @@
 **IvyLevel Platform v10 - Jenny Agentic AI**
 
 **Document Status:** Production Source of Truth
-**Last Update:** 2025-10-13
-**Version:** v11.0 - CAT-1 Complete with Schema Corrections
-**Scope:** Production Schema ONLY
+**Last Update:** 2025-10-14
+**Version:** v12.0 - Universal Quality Verification + Jenny Test Lab v4.0
+**Scope:** Production Schema ONLY (No DB schema changes in v12.0 - quality layer is application-level)
 
 ---
 
@@ -17,12 +17,13 @@
 5. [EC Vitals Tables (v10.6)](#ec-vitals-tables-v106)
 6. [JTBD Tables (v10.6)](#jtbd-tables-v106)
 7. [EQ Signals Integration (v10.4)](#eq-signals-integration-v104)
-8. [Temporal Views](#temporal-views)
-9. [Source Gating Pattern](#source-gating-pattern)
-10. [Provenance Tracking](#provenance-tracking)
-11. [Vector Store Configuration (v10.3)](#vector-store-configuration-v103)
-12. [Indexes & Performance](#indexes--performance)
-13. [Data Ingestion (v10.6)](#data-ingestion-v106)
+8. [CAT-2/CAT-3 Tables (v11.1)](#cat-2cat-3-tables-v111)
+9. [Temporal Views](#temporal-views)
+10. [Source Gating Pattern](#source-gating-pattern)
+11. [Provenance Tracking](#provenance-tracking)
+12. [Vector Store Configuration (v10.3)](#vector-store-configuration-v103)
+13. [Indexes & Performance](#indexes--performance)
+14. [Data Ingestion (v10.6)](#data-ingestion-v106)
 
 ---
 
@@ -1473,6 +1474,83 @@ function seedPick(arr: string[], seed: string): string | undefined {
 **Note:** EQ tables already existed from v8.0 (Session-EQ Intelligence System). v10.4 adds **read-only queries** from Humanizer module. **No schema changes required.**
 
 **Migration:** None required - existing tables are sufficient
+
+---
+
+## CAT-2/CAT-3 Tables (v11.1)
+
+**Purpose:** Support v8.0 migration - LLM Adapter, Proof Verification, Cross-Namespace Reasoning, Self-Learning
+
+**🚨 CRITICAL:** These tables are SEPARATE from CAT-1 (Facts-First SQL) tables. Zero overlap.
+
+### Table Categories
+
+**CAT-1 Tables (UNTOUCHABLE - 15 tables):**
+```
+universal_enumerations, universal_outcomes, universal_chips
+academic_terms, academic_courses, academic_grades, academic_gpa
+vitals, gameplan, college_list, students
++ 8 views: v_awards_*, v_ecs_*, v_programs_*, v_academics_*
+```
+
+**CAT-2/CAT-3 Tables (v8.0-v11.1 - 10 tables):**
+```
+kb_chips, kb_embeddings, chat_sessions
+cross_namespace_links, evidence_links
+proof_registry, proof_audit_log
+readiness_forecast_features, readiness_feature_weights
+autonomy_loop_log
+```
+
+### Proof Verification (v11.1)
+
+**Purpose:** Cryptographic verification of CAT-2 (KB) and CAT-3 (EQ) answers with SHA-256 hashing and quality scoring.
+
+**proof_registry**
+```sql
+CREATE TABLE proof_registry (
+  artifact_id       TEXT PRIMARY KEY,
+  chip_id           TEXT,
+  hash              TEXT NOT NULL,
+  verified          BOOLEAN NOT NULL DEFAULT false,
+  score             FLOAT NOT NULL,
+  artifact_type     TEXT NOT NULL,
+  metadata          JSONB,
+  timestamp         TIMESTAMPTZ DEFAULT now(),
+  updated_at        TIMESTAMPTZ DEFAULT now(),
+
+  CONSTRAINT valid_score CHECK (score >= 0.0 AND score <= 1.0)
+);
+
+CREATE INDEX idx_proof_registry_chip_id ON proof_registry(chip_id);
+CREATE INDEX idx_proof_registry_verified ON proof_registry(verified);
+CREATE INDEX idx_proof_registry_score ON proof_registry(score DESC);
+CREATE INDEX idx_proof_registry_type ON proof_registry(artifact_type);
+CREATE INDEX idx_proof_registry_timestamp ON proof_registry(timestamp DESC);
+```
+
+**proof_audit_log**
+```sql
+CREATE TABLE proof_audit_log (
+  id                SERIAL PRIMARY KEY,
+  artifact_id       TEXT NOT NULL,
+  action            TEXT NOT NULL,
+  actor             TEXT NOT NULL,
+  old_score         FLOAT,
+  new_score         FLOAT,
+  reason            TEXT,
+  metadata          JSONB,
+  timestamp         TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX idx_proof_audit_log_artifact ON proof_audit_log(artifact_id);
+CREATE INDEX idx_proof_audit_log_action ON proof_audit_log(action);
+CREATE INDEX idx_proof_audit_log_timestamp ON proof_audit_log(timestamp DESC);
+```
+
+**Integration:** `services/jenny-api/src/services/proof/verifier.ts:140-196`
+
+**Complete Documentation:** See [CAT2_COMPLETE_TECH_SPEC.md](guides/CAT2_COMPLETE_TECH_SPEC.md) and [CAT3_COMPLETE_TECH_SPEC.md](guides/CAT3_COMPLETE_TECH_SPEC.md)
 
 ---
 

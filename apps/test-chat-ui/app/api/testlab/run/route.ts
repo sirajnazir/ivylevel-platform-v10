@@ -38,10 +38,10 @@ export async function POST(req: NextRequest) {
       includeTrace: true
     };
 
-    // Execute query
+    // Execute query (v11.3: Use /agent/chat/gpt5 for EQ Priority 0 routing)
     const t0 = Date.now();
     const baseUrl = process.env.NEXT_PUBLIC_UI_BASE || "http://localhost:8787";
-    const resp = await fetch(`${baseUrl}/agent/chat`, {
+    const resp = await fetch(`${baseUrl}/agent/chat/gpt5`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(kbReq)
@@ -96,7 +96,10 @@ export async function POST(req: NextRequest) {
           warmth: detectWarmth(data.answer ?? ""),
           action: detectAction(data.answer ?? "")
         },
-        trace: data.__trace ?? data.debug?.trace ?? null
+        trace: data.__trace ?? data.debug?.trace ?? null,
+        // v11.4: Pass through quality and adapter debug info
+        quality: data.debug?.quality ?? null,
+        adapter: data.debug?.adapter ?? null
       },
       metrics: {
         latency: {

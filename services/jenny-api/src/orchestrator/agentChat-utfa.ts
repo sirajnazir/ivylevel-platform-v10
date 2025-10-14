@@ -28,6 +28,8 @@ import { createLogger } from '../../../../packages/observability/dist/unified-lo
 import { pool } from '../db/pool.js';
 // v10.4: Humanizer v2.1 - Jenny's Real Voice across all categories
 import { humanize, type HumanizeOutput } from '../lib/humanizer.js';
+// v11.1: Proof verification service (CAT-2/CAT-3 only, not CAT-1)
+import { registerProof } from '../services/proof/verifier.js';
 import { HUMANIZER_ENABLED } from '../config/env.js';
 
 const log = createLogger('orchestrator-utfa');
@@ -582,7 +584,83 @@ function extractWeekNumber(q: string): number {
 export async function agentChat(req: any, res?: any) {
   const orchestrationStart = Date.now();
 
-  // FIRST: Check universal enumerations (Awards, ECs, Narrative, Programs)
+  // PRIORITY 0 (v11.4): Check for emotional/coaching queries FIRST
+  // These bypass fact routing entirely and go straight to EQ composer
+  // This prevents "rejected from Stanford" from routing to SQL college list
+  // v11.4: Added universal quality verification and self-healing
+  const { isEQQuery } = await import('../intent/extractors/eq-classifier.js');
+  const { composeEQResponse } = await import('../compose/compose-eq.js');
+  const { healResponse } = await import('../quality/response-healer.js');
+
+  if (isEQQuery(req.message)) {
+    log.event('orchestration.eq_early_exit', {
+      message_preview: req.message.slice(0, 80),
+      student_id: req.student_id
+    });
+
+    const sessionId = await ensureSession(req.session_id, req.student_id);
+
+    const eqResponse = await composeEQResponse({
+      message: req.message,
+      studentId: req.student_id,
+      sessionId,
+      stream: req.stream,
+      res
+    });
+
+    // v11.4: Apply universal quality verification and healing
+    const healed = await healResponse(
+      req.message,
+      eqResponse.answer,
+      'eq',
+      req.student_id,
+      {
+        category: 'emotional',
+        expectedTone: 'empathetic'
+      }
+    );
+
+    const finalResponse = {
+      ...eqResponse,
+      answer: healed.finalResponse,
+      debug: {
+        ...eqResponse.debug,
+        quality: {
+          healed: healed.healed,
+          attempts: healed.attempts,
+          before_score: healed.improvements.before.scores.overall,
+          after_score: healed.improvements.after.scores.overall,
+          warmth_before: healed.improvements.before.scores.warmth,
+          warmth_after: healed.improvements.after.scores.warmth,
+          action_before: healed.improvements.before.scores.action,
+          action_after: healed.improvements.after.scores.action
+        },
+        // v11.4: Use verified tone from quality layer
+        tone: {
+          warmth: healed.improvements.after.standards.warmth,
+          action: healed.improvements.after.standards.action
+        }
+      }
+    };
+
+    // Store conversation messages
+    await storeMessage(sessionId, { role: 'user', content: req.message });
+    await storeMessage(sessionId, { role: 'assistant', content: finalResponse.answer });
+
+    log.event('orchestration_complete', {
+      duration_ms: Date.now() - orchestrationStart,
+      type: 'eq_response',
+      adapter_used: eqResponse.debug?.adapter?.isAdapter || false,
+      quality_healed: healed.healed,
+      quality_score: healed.improvements.after.scores.overall
+    });
+
+    if (!req.stream) return finalResponse;
+    return; // Streaming already handled by composeEQResponse
+  }
+
+  // PRIORITY 1: Check universal enumerations (Awards, ECs, Narrative, Programs)
+  // Only reached if NOT an emotional query
   const enumResult = await maybeEnumAnswer(pool, req.student_id, req.message);
   if (enumResult) {
     log.event('intent.detected', { route: enumResult.route, class: 'enumeration' });
@@ -666,6 +744,8 @@ export async function agentChat(req: any, res?: any) {
       hits: [],
       vitals: await fetchVitals(req.student_id),
       chips,
+      // v11.2.2: Add top-level source field for provenance tracking
+      source: 'sql', // Facts-first SQL response from enumeration resolver
       trace: {
         enumeration: {
           route: enumResult.route,
@@ -849,6 +929,8 @@ export async function agentChat(req: any, res?: any) {
         hits: [], // No RAG needed for pure temporal facts
         vitals: await fetchVitals(req.student_id),
         chips,
+        // v11.2.2: Add top-level source field for provenance tracking
+        source: 'sql', // UTFA temporal facts use SQL views
         trace,
         debug: {
           humanizer: {
@@ -919,6 +1001,12 @@ export async function agentChat(req: any, res?: any) {
     If the user asks for specific facts, tell them to ask directly for that fact.`
   };
   
+  // v11.1: Determine route BEFORE compose for adapter routing
+  // Cat-2: KB/RAG if hits > 0 (evidence-driven)
+  // Cat-3: FT/EQ if using fine-tuned model OR no hits (coaching/warmth)
+  const hasEvidence = hits?.length > 0;
+  const route = hasEvidence ? 'kb' : 'eq';
+
   const composed = await composeAnswer({
     message: req.message,
     vitals,
@@ -928,18 +1016,15 @@ export async function agentChat(req: any, res?: any) {
     use_ft: req.use_ft,
     stream: req.stream,
     res,
-    systemContext
+    systemContext,
+    // v11.1: Pass adapter parameters for CAT-2/CAT-3 model selection
+    intent: 'kb_query',
+    studentId: req.student_id,
+    route
   });
 
   // Apply deduplication to LLM-generated answers too
   const dedupedAnswer = deduplicateAnswer(composed.answer);
-
-  // v10.4: Determine route for humanizer (Cat-2 KB/RAG vs Cat-3 FT/EQ)
-  // Cat-2: KB/RAG if hits > 0 (evidence-driven)
-  // Cat-3: FT/EQ if using fine-tuned model OR no hits (coaching/warmth)
-  const isFinetuned = composed.model?.includes('ft:') || req.use_ft;
-  const hasEvidence = hits?.length > 0;
-  const route = hasEvidence ? 'kb' : (isFinetuned ? 'llm' : 'kb');
 
   // v10.4: Apply humanizer (Cat-2/Cat-3) with feature flag
   const humanized = HUMANIZER_ENABLED
@@ -955,20 +1040,78 @@ export async function agentChat(req: any, res?: any) {
   await storeMessage(sessionId, { role: 'user', content: req.message });
   await storeMessage(sessionId, { role: 'assistant', content: humanized.text });
 
+  // v11.1: Register proof for CAT-2/CAT-3 answers (NOT CAT-1 SQL)
+  // CAT-1 (SQL) responses are fact-verified by design, no proof needed
+  // CAT-2 (KB/RAG): register with chip_id linkage if available
+  // CAT-3 (EQ): register coaching/warmth artifacts
+  let proofRecord = null;
+  const traceId = `rag-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+  try {
+    if (route === 'kb' || route === 'eq') {
+      const chipIds = hits?.map((h: any) => h.chip_id).filter(Boolean) || [];
+
+      proofRecord = await registerProof({
+        artifact_id: traceId,
+        chip_id: chipIds.length > 0 ? chipIds[0] : undefined, // Use first chip as primary proof
+        content: humanized.text,
+        artifact_type: route === 'kb' ? 'kb_answer' : 'eq_answer',
+        metadata: {
+          route,
+          session_id: sessionId,
+          student_id: req.student_id,
+          intent: 'kb_query',
+          chip_count: chipIds.length,
+          chip_ids: chipIds,
+          timestamp: new Date().toISOString(),
+          source_id: hits?.[0]?.source,
+          citation: hits?.[0]?.text?.substring(0, 100) // First 100 chars as citation
+        }
+      });
+
+      log.event('proof_registered_for_answer', {
+        artifact_id: traceId,
+        route,
+        score: proofRecord.score,
+        verified: proofRecord.verified,
+        chip_count: chipIds.length
+      });
+    }
+  } catch (proofErr) {
+    // Don't fail the request if proof registration fails
+    log.error('proof_registration_failed_non_blocking', {
+      error: String(proofErr),
+      route
+    });
+  }
+
   const payload = {
     answer: humanized.text,
     session_id: sessionId,
     hits,
     vitals,
+    // v11.2.2: Add top-level source field for provenance tracking
+    source: route, // 'kb' or 'eq' based on evidence availability
     debug: {
       route,
       humanizer: {
         applied: humanized.applied,
         plan: humanized.plan
-      }
+      },
+      // v11.1: Include adapter metadata for observability
+      adapter: composed.__adapter,
+      // v11.1: Include proof metadata if registered
+      proof: proofRecord ? {
+        score: proofRecord.score,
+        verified: proofRecord.verified,
+        hash: proofRecord.hash,
+        artifact_id: proofRecord.artifact_id
+      } : undefined
     },
-    trace_id: `rag-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    model: composed.model
+    trace_id: traceId,
+    model: composed.model,
+    // v11.1: Model badge for UI display
+    model_badge: composed.__adapter?.badge
   };
 
   log.event('orchestration_complete', {

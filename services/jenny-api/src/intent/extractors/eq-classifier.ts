@@ -27,26 +27,27 @@ const EQ_PATTERNS = {
     'stress', 'stressed', 'anxious', 'anxiety', 'overwhelm', 'overwhelmed',
     'panic', 'panicking', 'breakdown', 'feeling', 'scared', 'worried',
     'nervous', 'tired', 'exhausted', 'frustrated', 'angry', 'sad', 'depressed',
-    'can\'t handle', 'too much', 'can\'t do this'
+    'can\'t handle', 'too much', 'can\'t do this', 'haven\'t started', 'behind',
+    'so many', 'too many', 'can\'t focus', 'can\'t breathe', 'heart is racing', 'help'
   ],
 
   // Rejections and disappointments
   rejection: [
     'rejected', 'didn\'t get in', 'didn\'t make it', 'waitlisted',
-    'deferred', 'denied', 'turned down', 'not accepted'
+    'deferred', 'denied', 'turned down', 'not accepted', 'don\'t know what to do'
   ],
 
   // Self-doubt and imposter syndrome
   self_doubt: [
     'not good enough', 'imposter', 'don\'t belong', 'don\'t deserve',
     'everyone else', 'smarter than me', 'not smart enough', 'feel behind',
-    'everyone seems', 'can\'t compete'
+    'everyone seems', 'can\'t compete', 'too low', 'don\'t think i\'m'
   ],
 
   // Celebration and wins
   celebration: [
     'got in!', 'accepted!', 'got into', 'won ', 'won!', 'accepted to',
-    'made it', 'i got accepted', 'just got in'
+    'made it', 'i got accepted', 'just got in', 'scholarship', 'full ride', 'got a scholarship'
   ],
 
   // Permissioning (seeking validation)
@@ -59,7 +60,8 @@ const EQ_PATTERNS = {
   time_planning: [
     'help me plan', 'what should i do', 'first 60 minutes', 'daily plan',
     'how do i organize', 'prioritize', 'running out of time',
-    'deadline', 'due tomorrow', 'essays due'
+    'deadline', 'due tomorrow', 'essays due', 'due next week', 'apps due',
+    'haven\'t started any', 'need to start', 'where do i start', 'text to counselor'
   ],
 
   // Motivation and passion
@@ -114,6 +116,20 @@ export function isEQQuery(query: string): boolean {
         return true;
       }
     }
+  }
+
+  // v11.4: Fallback detection for emotional queries without explicit keywords
+  // If query contains personal pronouns + emotional/distress indicators, classify as EQ
+  const hasPersonalPronoun = /\b(i|my|i'm|i've|me|myself)\b/i.test(lowerQuery);
+  const hasEmotionalIndicator = /\b(feel|feeling|can't|cannot|won't|don't|haven't|need|want|help|worried|scared|afraid|behind|lost)\b/i.test(lowerQuery);
+  const hasDistressIndicator = /\b(breakdown|crisis|panic|anxious|stressed|overwhelmed|worried)\b/i.test(lowerQuery);
+
+  if (hasPersonalPronoun && (hasEmotionalIndicator || hasDistressIndicator)) {
+    log.event('eq_classifier.fallback_match', {
+      method: 'pronoun+emotional',
+      query_preview: query.slice(0, 80)
+    });
+    return true;
   }
 
   // Not an emotional query - proceed to fact routing

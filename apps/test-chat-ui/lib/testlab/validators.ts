@@ -179,7 +179,8 @@ export function validateEQ(r: RunResult): GateResult[] {
   });
 
   // Gate 4: Model mix (adapter considered for tone intents)
-  const adapterUsed = r.modelBadge === "🔶" || r.modelBadge === "adapter";
+  // v11.4: Check debug.adapter.used field directly (set by orchestrator/composer)
+  const adapterUsed = r.debug?.adapter?.used ?? false;
   const adapterConsidered = adapterUsed || r.debug?.trace?.routerDecision?.includes("adapter");
 
   gates.push({

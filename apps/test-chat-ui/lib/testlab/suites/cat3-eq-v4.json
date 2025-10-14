@@ -1,0 +1,537 @@
+{
+  "id": "cat3-eq-v4",
+  "label": "CAT-3: EQ/LLM v4.0 (jenny_v9_eq - 2025-10-13)",
+  "category": "eq",
+  "version": "4.0",
+  "description": "Comprehensive CAT-3 validation for jenny_v9_eq fine-tuned model. 35 test scenarios covering emotional intelligence, warmth, action guidance, and JSON artifact elimination. Expected: 90%+ pass rate, 85%+ warmth, 0% artifacts.",
+  "tests": [
+    {
+      "id": "cat3-v4-001",
+      "label": "[BASELINE] Rejection - Stanford",
+      "category": "eq",
+      "prompt": "I got rejected from Stanford",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["sorry", "understand", "hear you"],
+        "proofScore": "0.25-0.40"
+      }
+    },
+    {
+      "id": "cat3-v4-002",
+      "label": "[BASELINE] Stress - Essays",
+      "category": "eq",
+      "prompt": "I'm so stressed about my essays",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["understand", "break", "step"],
+        "proofScore": "0.25-0.40"
+      }
+    },
+    {
+      "id": "cat3-v4-003",
+      "label": "[BASELINE] Celebration - USC Acceptance",
+      "category": "eq",
+      "prompt": "I just got into USC!",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["congrat", "amazing", "proud"],
+        "proofScore": "0.25-0.40"
+      }
+    },
+    {
+      "id": "cat3-v4-004",
+      "label": "Rejection - MIT",
+      "category": "eq",
+      "prompt": "MIT rejected me and I don't know what to do",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["normal", "feel", "next"]
+      }
+    },
+    {
+      "id": "cat3-v4-005",
+      "label": "Rejection - Deferred from Yale",
+      "category": "eq",
+      "prompt": "I got deferred from Yale early action",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["update", "letter"]
+      }
+    },
+    {
+      "id": "cat3-v4-006",
+      "label": "Overwhelm - General Stress",
+      "category": "eq",
+      "prompt": "I'm feeling overwhelmed with college apps",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["break", "step", "one thing"]
+      }
+    },
+    {
+      "id": "cat3-v4-007",
+      "label": "Overwhelm - Can't Focus",
+      "category": "eq",
+      "prompt": "I'm overwhelmed and can't focus on anything",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["breathe", "one thing", "start"]
+      }
+    },
+    {
+      "id": "cat3-v4-008",
+      "label": "Overwhelm - Too Many Deadlines",
+      "category": "eq",
+        "prompt": "I have 5 apps due next week and I haven't started any of them",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["prioritize", "focus", "one"]
+      }
+    },
+    {
+      "id": "cat3-v4-009",
+      "label": "Deadline Crunch - 3 Essays Tomorrow",
+      "category": "eq",
+      "prompt": "I have 3 essays due tomorrow and I'm panicking",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["prioritize", "focus", "hour"]
+      }
+    },
+    {
+      "id": "cat3-v4-010",
+      "label": "Deadline Crunch - Text Template Request",
+      "category": "eq",
+      "prompt": "Deadline crunch text to counselor for Fri 3pm",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["template", "text", "message"]
+      }
+    },
+    {
+      "id": "cat3-v4-011",
+      "label": "Parent Conflict - Wasting Time",
+      "category": "eq",
+      "prompt": "Parents say I'm wasting time on college apps",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["understand", "talk", "explain"]
+      }
+    },
+    {
+      "id": "cat3-v4-012",
+      "label": "Parent Conflict - College Choice Disagreement",
+      "category": "eq",
+      "prompt": "My parents want me to go to a different school than I want",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["choice", "discuss", "reasons"]
+      }
+    },
+    {
+      "id": "cat3-v4-013",
+      "label": "Celebration - Science Fair Win",
+      "category": "eq",
+      "prompt": "I won the science fair!",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["congrat", "amazing", "proud"]
+      }
+    },
+    {
+      "id": "cat3-v4-014",
+      "label": "Celebration - Stanford Acceptance (Dream School)",
+      "category": "eq",
+      "prompt": "I got into Stanford!",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["incredible", "celebrate", "amazing"]
+      }
+    },
+    {
+      "id": "cat3-v4-015",
+      "label": "Celebration - Full Scholarship",
+      "category": "eq",
+      "prompt": "I got a full scholarship to UCLA!",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["incredible", "amazing", "congratulations"]
+      }
+    },
+    {
+      "id": "cat3-v4-016",
+      "label": "Self-Doubt - Not Good Enough",
+      "category": "eq",
+      "prompt": "I don't think I'm good enough for top schools",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["you are", "capable", "deserve"]
+      }
+    },
+    {
+      "id": "cat3-v4-017",
+      "label": "Self-Doubt - Imposter Syndrome",
+      "category": "eq",
+      "prompt": "Everyone else seems smarter than me",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["normal", "unique", "compare"]
+      }
+    },
+    {
+      "id": "cat3-v4-018",
+      "label": "Self-Doubt - Test Scores Too Low",
+      "category": "eq",
+      "prompt": "My SAT scores are too low for the schools I want",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["holistic", "more than", "essays"]
+      }
+    },
+    {
+      "id": "cat3-v4-019",
+      "label": "Normalization - Everyone Ahead",
+      "category": "eq",
+      "prompt": "Everyone else seems to have their essays done already",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["not alone", "pace", "own"]
+      }
+    },
+    {
+      "id": "cat3-v4-020",
+      "label": "Normalization - Behind Schedule",
+      "category": "eq",
+      "prompt": "I feel like I'm behind on everything",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["catch up", "step", "start"]
+      }
+    },
+    {
+      "id": "cat3-v4-021",
+      "label": "Permissioning - Take Break",
+      "category": "eq",
+      "prompt": "Can I take a break from college apps this weekend?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["yes", "rest", "recharge"]
+      }
+    },
+    {
+      "id": "cat3-v4-022",
+      "label": "Permissioning - Skip Activity for Essays",
+      "category": "eq",
+      "prompt": "Is it okay to skip an EC to focus on essays?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["prioritize", "balance", "okay"]
+      }
+    },
+    {
+      "id": "cat3-v4-023",
+      "label": "Future Pacing - After Submission",
+      "category": "eq",
+      "prompt": "What will happen after I submit my apps?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["wait", "hear back", "timeline"]
+      }
+    },
+    {
+      "id": "cat3-v4-024",
+      "label": "Future Pacing - College Life Preview",
+      "category": "eq",
+      "prompt": "What will college be like?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["exciting", "new", "different"]
+      }
+    },
+    {
+      "id": "cat3-v4-025",
+      "label": "Time-Boxing - First 60 Minutes",
+      "category": "eq",
+      "prompt": "I feel behind—what should I do first 60 minutes today?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["focus", "one task", "start"]
+      }
+    },
+    {
+      "id": "cat3-v4-026",
+      "label": "Time-Boxing - Daily Plan",
+      "category": "eq",
+      "prompt": "Help me plan my day today",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["plan", "prioritize", "list"]
+      }
+    },
+    {
+      "id": "cat3-v4-027",
+      "label": "Motivation - Staying Motivated",
+      "category": "eq",
+      "prompt": "How do I stay motivated when things get hard?",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["why", "goal", "remember"]
+      }
+    },
+    {
+      "id": "cat3-v4-028",
+      "label": "Motivation - Lost Passion",
+      "category": "eq",
+      "prompt": "I've lost passion for college apps",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["normal", "reconnect", "why"]
+      }
+    },
+    {
+      "id": "cat3-v4-029",
+      "label": "Crisis - Total Breakdown",
+      "category": "eq",
+      "prompt": "I'm having a total breakdown and can't do this anymore",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["breathe", "support", "help"]
+      }
+    },
+    {
+      "id": "cat3-v4-030",
+      "label": "Crisis - Panic Attack Symptoms",
+      "category": "eq",
+      "prompt": "I can't breathe and my heart is racing thinking about apps",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["breathe", "slowly", "adult"]
+      }
+    },
+    {
+      "id": "cat3-v4-031",
+      "label": "Financial Aid - Worried About Cost",
+      "category": "eq",
+      "prompt": "I'm worried my family can't afford college",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["aid", "scholarships", "options"]
+      }
+    },
+    {
+      "id": "cat3-v4-032",
+      "label": "Comparison - Friend Got In, I Didn't",
+      "category": "eq",
+      "prompt": "My friend got into Harvard but I didn't",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["valid", "own path", "not"]
+      }
+    },
+    {
+      "id": "cat3-v4-033",
+      "label": "Writer's Block - Essay Stuck",
+      "category": "eq",
+      "prompt": "I've been staring at my essay for 2 hours and can't write anything",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "mustContain": ["break", "free write", "bullet"]
+      }
+    },
+    {
+      "id": "cat3-v4-034",
+      "label": "JSON Artifact Detection - Edge Case 1",
+      "category": "eq",
+      "prompt": "I'm stressed",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "checkForJSONMetadata": true
+      }
+    },
+    {
+      "id": "cat3-v4-035",
+      "label": "JSON Artifact Detection - Edge Case 2",
+      "category": "eq",
+      "prompt": "Help",
+      "studentId": "huda-2025",
+      "expected": {
+        "route": "eq",
+        "model": "jenny_v9_eq",
+        "warmth": true,
+        "action": true,
+        "noJSONArtifacts": true,
+        "checkForJSONMetadata": true
+      }
+    }
+  ]
+}

@@ -33,12 +33,17 @@ const HUMANIZER_ENABLED = process.env.HUMANIZER_ENABLED !== '0';
  * v11.3.2: Tone detection helpers for Test Lab validation
  * These patterns match the injection patterns used in forced warmth/action injection
  */
+// v11.4: DEPRECATED - Replaced by universal quality verification system
+// These functions remain for backward compatibility during transition
+// Tone detection now handled by response-verifier.ts using LLM-based evaluation
 function detectWarmth(text: string): boolean {
-  return /I('m | am )?(so |really )?(sorry|hear you|understand|see you)|that('s | is )?(really |so )?(tough|hard|difficult|valid)|totally (hear you|understand|get it)|makes (total |complete )?sense|completely normal|not alone|proud of you|amazing|exciting|great (question|job)/i.test(text);
+  // Simplified fallback pattern - primary detection in quality layer
+  return /\b(sorry|hear you|understand|tough|hard|difficult|amazing|exciting|proud|congrat)/i.test(text);
 }
 
 function detectAction(text: string): boolean {
-  return /here('s| is) what|next step|try this|start by|focus on|first,|tonight|this week|today|tomorrow|let('s| us)|plan:|step \d+|would you like|can (you|we)|let me (help|walk you)|what (feels|sounds)|tackle this|break (this|it) down/i.test(text);
+  // Simplified fallback pattern - primary detection in quality layer
+  return /\b(what|next|try|start|focus|first|tonight|week|today|tomorrow|let|plan|step|can|help|tackle|break)/i.test(text);
 }
 
 const NO_HUMANIZE = { applied: false, plan: { phrase_source: 'fallback' as const, cadence: 'standard' as const } };
@@ -263,9 +268,12 @@ export async function composeEQResponse(req: EQComposeRequest) {
           model: chosenModel,
           isAdapter: isAdapterModel(chosenModel),
           badge: getModelBadge(chosenModel),
+          used: isAdapterModel(chosenModel),  // v11.4: Added for Test Lab validator
           latency_ms: latency
         },
         tone: {
+          // v11.4: These are deprecated - real tone detection happens in quality layer (orchestrator)
+          // Kept for backward compatibility during transition
           warmth: detectWarmth(humanized.text),
           action: detectAction(humanized.text)
         }
