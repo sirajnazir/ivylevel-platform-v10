@@ -39,11 +39,13 @@
    # Then create new file
    ```
 
-### RULE 2: MANDATORY DOCUMENTATION UPDATES
+### RULE 2: MANDATORY DOCUMENTATION + GIT SYNC
 
-**AFTER EVERY CODE/FEATURE/INTEGRATION CHANGE:**
+**🚨 CRITICAL: Master Specs, Code, and Git MUST ALWAYS BE IN SYNC 🚨**
 
-You MUST update ALL of these (not optional):
+**AFTER EVERY CODE/FEATURE/INTEGRATION CHANGE, you MUST complete this FULL SEQUENCE:**
+
+#### Step 1: Update All Master Specs (not optional)
 
 1. **docs/MASTER_PROD_TECH_SPEC.md** - If architecture/flow/components changed
    - Update version number (e.g., v10.1 → v10.2)
@@ -66,6 +68,61 @@ You MUST update ALL of these (not optional):
 4. **CHANGELOG.md** - ALWAYS update (create if missing)
    - Add entry with exact timestamp
    - Format: `- [YYYY-MM-DD HH:MM] Description with file:line references`
+
+#### Step 2: MANDATORY Git Commit (immediately after spec updates)
+
+**🚨 YOU MUST COMMIT TO GIT IMMEDIATELY AFTER UPDATING SPECS 🚨**
+
+```bash
+# MANDATORY sequence - DO NOT skip
+git add services/jenny-api/src/path/to/changed/files
+git add docs/MASTER_PROD_TECH_SPEC.md
+git add docs/PROD_DB_ARCH.md  # if DB changed
+git add docs/PROD_FEATURE_RELEASE_DETAILS.md
+git add CHANGELOG.md
+git commit -m "vX.Y: Feature Name
+
+- Added: Feature in file.ts:123-456
+- Updated: MASTER_PROD_TECH_SPEC.md (Section N)
+- Updated: PROD_FEATURE_RELEASE_DETAILS.md (vX.Y)
+
+Closes #issue (if applicable)
+"
+```
+
+#### Step 3: Verify Git+Specs Sync
+
+**BEFORE proceeding with ANY new work, VERIFY:**
+
+```bash
+# Check git log matches master specs version
+git log -1 --oneline
+# Should show: "vX.Y: Feature Name"
+
+# Check master specs show same version
+head -5 docs/PROD_FEATURE_RELEASE_DETAILS.md
+# Should show: "Current Version: vX.Y"
+
+# If MISMATCH detected:
+# ❌ STOP ALL WORK
+# ❌ Fix sync issue first
+# ❌ Never proceed with out-of-sync code+specs
+```
+
+#### ANTI-PATTERN: Out-of-Sync Specs (NEVER DO THIS)
+
+```bash
+# ❌ BAD: Update specs but don't commit
+vim docs/MASTER_PROD_TECH_SPEC.md  # Updated to v10.2
+# ... continue working on v10.3 ...
+# Result: Specs claim v10.2, git shows v10.1, code is v10.3 - CHAOS!
+
+# ✅ GOOD: Update specs → commit immediately → then continue
+vim docs/MASTER_PROD_TECH_SPEC.md  # Updated to v10.2
+git add docs/ services/jenny-api/src/
+git commit -m "v10.2: Feature complete"
+# Now start v10.3 work with clean baseline
+```
 
 **Template for version updates:**
 ```markdown
