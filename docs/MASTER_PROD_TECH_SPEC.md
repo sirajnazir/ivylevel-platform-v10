@@ -3,7 +3,7 @@
 
 **Document Status:** Production Source of Truth
 **Last Update:** 2025-10-14
-**Version:** v11.3 - CAT-3 EQ Infrastructure (compose-eq + Enhanced Prompts)
+**Version:** v11.3.1 - jenny_v9_eq Explicit Deployment (Rollback from v10)
 **Scope:** Production Code ONLY (`/services/jenny-api/`)
 
 ---

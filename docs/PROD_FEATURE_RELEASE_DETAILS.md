@@ -3,14 +3,15 @@
 
 **Document Status:** Production Source of Truth
 **Last Update:** 2025-10-14
-**Current Version:** v11.3 - CAT-3 EQ Infrastructure (compose-eq + Enhanced Prompts)
+**Current Version:** v11.3.1 - jenny_v9_eq Explicit Deployment (Rollback from v10)
 **Scope:** Production Code ONLY (`/services/jenny-api/`)
 
 ---
 
 ## Table of Contents
 
-1. [v11.3 - CAT-3 EQ Infrastructure (compose-eq + Enhanced Prompts)](#v113---cat-3-eq-infrastructure-compose-eq--enhanced-prompts-2025-10-14)
+1. [v11.3.1 - jenny_v9_eq Explicit Deployment (Rollback from v10)](#v1131---jenny_v9_eq-explicit-deployment-rollback-from-v10-2025-10-14)
+2. [v11.3 - CAT-3 EQ Infrastructure (compose-eq + Enhanced Prompts)](#v113---cat-3-eq-infrastructure-compose-eq--enhanced-prompts-2025-10-14)
 2. [v11.2.2 - KB Content Retrieval Restoration](#v1122---kb-content-retrieval-restoration-2025-10-13)
 3. [v11.2.1 - Confidence Threshold Humanization](#v1121---confidence-threshold-humanization-2025-10-13)
 2. [v11.2 - Test Lab v3.0 Complete](#v112---test-lab-v30-complete-2025-10-13)
@@ -37,6 +38,77 @@
 ---
 
 **Project Structure:** For complete project organization, see [MASTER_PROD_TECH_SPEC.md](MASTER_PROD_TECH_SPEC.md#project-structure) or [PROJECT_STRUCTURE.md](guides/PROJECT_STRUCTURE.md).
+
+---
+
+## v11.3.1 - jenny_v9_eq Explicit Deployment (Rollback from v10) (2025-10-14)
+
+**Focus:** Explicit documentation of jenny_v9_eq deployment status and jenny_v10_eq_combined failure
+
+### Summary
+
+This release clarifies the **actual deployed state** of CAT-3 EQ models after jenny_v10_eq_combined training failure. **jenny_v9_eq is DEPLOYED** (46.3% CAT-3 pass rate baseline), while jenny_v10_eq_combined was trained but FAILED testing (0% pass rate, NOT deployed). Enhanced system prompts (350+ lines in compose-eq.ts) and humanizer layer compensate for jenny_v9_eq's warmth gap (1.4% warmth coverage in training data). Code comments updated to reflect actual deployment state, removing references to future v12.0 and jenny_v10_eq.
+
+### Key Changes
+
+1. **Code Comments Updated** (`services/jenny-api/src/compose/compose-eq.ts:91-98`)
+   - Changed from "v12.0: Use jenny_v10_eq..." to "v11.3: Use jenny_v9_eq (DEPLOYED - 46.3% baseline)"
+   - Added: "jenny_v10_eq_combined was trained but FAILED (0% pass rate, not deployed)"
+   - Documented training data: 690 examples, technical coaching focus, warmth gap
+   - Clarified: Enhanced system prompts compensate for warmth gap
+
+2. **Humanizer Strategy Clarified** (`services/jenny-api/src/compose/compose-eq.ts:136-140`)
+   - Changed from "v12.0: Disable humanizer for fine-tuned models" to "v11.3: jenny_v9_eq has warmth gap (1.4%), so humanizer ENABLED"
+   - Added: Future consideration for disabling humanizer if we retrain with warmth coverage
+
+### Deployment Status (Environment Variables)
+
+```bash
+JENNY_V9_EQ_MODEL=ft:gpt-4o-mini-2024-07-18:personal:jenny-v9-eq:CQMYIrRA  ✅ DEPLOYED
+JENNY_V10_EQ_MODEL=NOT_SET  ❌ NOT DEPLOYED (trained but failed testing)
+```
+
+### Performance Metrics
+
+**jenny_v9_eq (DEPLOYED):**
+- Overall Pass Rate: 46.3% (323/690)
+- Warmth: 1.4% (10/690) - CRITICAL GAP
+- Action: 42.6% (294/690)
+- Training: 690 examples (technical coaching focus)
+
+**jenny_v10_eq_combined (NOT DEPLOYED):**
+- Overall Pass Rate: 0.0% (0/35) - COMPLETE FAILURE
+- Warmth: 5.7% (2/35)
+- Action: 25.7% (9/35)
+- Training: 4,498 examples (690 v9 + 3,808 contaminated session transcripts)
+- Root Cause: Training data contamination, session transcripts were conversational filler
+
+### Strategy
+
+**Current Approach (v11.3.1):**
+1. Deploy jenny_v9_eq with enhanced system prompts (350+ lines of warmth/action guidance)
+2. Enable humanizer layer to compensate for jenny_v9_eq warmth gap
+3. Target: 55-65% CAT-3 pass rate with prompt engineering
+
+**Future Approach (if needed):**
+1. Create 100-150 manual synthetic examples with high warmth coverage
+2. Train jenny_v9.2_eq_manual on curated dataset
+3. Target: 70-80% CAT-3 pass rate with clean training data
+
+### Files Modified
+
+- `services/jenny-api/src/compose/compose-eq.ts:91-98` (deployment comments)
+- `services/jenny-api/src/compose/compose-eq.ts:136-140` (humanizer strategy)
+- `docs/MASTER_PROD_TECH_SPEC.md` (version → v11.3.1)
+- `docs/PROD_FEATURE_RELEASE_DETAILS.md` (this section)
+- `CHANGELOG.md` (v11.3.1 entry)
+
+### Impact
+
+- **CRITICAL CLARITY**: Specs now match actual deployed code (jenny_v9_eq, not jenny_v10_eq)
+- Rollback from jenny_v10_eq_combined to jenny_v9_eq explicitly documented
+- Enhanced prompts + humanizer strategy clarified
+- Foundation ready for CAT-3 testing with enhanced prompts
 
 ---
 

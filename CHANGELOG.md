@@ -1,5 +1,21 @@
 # Changelog
 
+## [2025-10-14 18:15] v11.3.1: Explicit jenny_v9_eq Deployment Documentation
+
+### Modified
+- `services/jenny-api/src/compose/compose-eq.ts:91-98` - Updated comments to reflect jenny_v9_eq deployment (not v10)
+- `services/jenny-api/src/compose/compose-eq.ts:136-140` - Clarified humanizer strategy for jenny_v9_eq warmth gap
+
+### Documentation
+- Updated `docs/MASTER_PROD_TECH_SPEC.md` to v11.3.1
+- Updated `docs/PROD_FEATURE_RELEASE_DETAILS.md` with explicit deployment status
+
+### Impact
+- **CRITICAL CLARIFICATION**: jenny_v9_eq is DEPLOYED (46.3% baseline)
+- jenny_v10_eq_combined was trained but FAILED (0% pass rate, NOT deployed)
+- Enhanced system prompts (350+ lines) + humanizer compensate for jenny_v9_eq warmth gap (1.4%)
+- Rollback from v10 to v9 documented explicitly
+
 ## [2025-10-14 18:00] v11.3: CAT-3 EQ Infrastructure
 
 ### Added

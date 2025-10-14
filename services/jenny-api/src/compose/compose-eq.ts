@@ -88,10 +88,11 @@ export async function composeEQResponse(req: EQComposeRequest) {
     has_context: (hits?.length || 0) > 0
   });
 
-  // v12.0: Use jenny_v10_eq fine-tuned model with complete conversational units
-  // Training: ~900 examples with full context (2-3 msgs before + action follow-ups)
-  // Warmth/action baked into training data (80-90% coverage expected)
-  // Humanizer DISABLED for fine-tuned models (warmth/action at source)
+  // v11.3: Use jenny_v9_eq fine-tuned model (DEPLOYED - 46.3% baseline)
+  // jenny_v10_eq_combined was trained but FAILED (0% pass rate, not deployed)
+  // Training: 690 examples (technical coaching focus, warmth gap)
+  // Enhanced system prompts (350+ lines) compensate for warmth gap
+  // Humanizer layer adds additional warmth/action reinforcement
   const chosenModel = process.env.JENNY_V10_EQ_MODEL ||
     process.env.JENNY_V9_EQ_MODEL ||
     'ft:gpt-4o-mini-2024-07-18:personal:jenny-v9-eq:CQMYIrRA';
@@ -133,8 +134,9 @@ export async function composeEQResponse(req: EQComposeRequest) {
     }
 
     // Apply humanizer for warmth + action (CAT-3)
-    // v12.0: Disable humanizer for fine-tuned models (warmth/action baked in at training)
-    // Only apply humanizer for base model fallback
+    // v11.3: jenny_v9_eq has warmth gap (1.4%), so humanizer ENABLED to compensate
+    // Base model fallback also uses humanizer
+    // Future: If we retrain with warmth coverage, can disable humanizer
     const shouldHumanize = HUMANIZER_ENABLED && !isFineTunedModel;
 
     const humanized = shouldHumanize
