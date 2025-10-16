@@ -358,6 +358,78 @@ export const getSummerProgramsCatalogTool: ChatCompletionTool = {
   }
 };
 
+/**
+ * Tool: Search Essay Examples (DS6)
+ * Category: Knowledge Moat
+ */
+export const searchEssayExamplesTool: ChatCompletionTool = {
+  type: 'function',
+  function: {
+    name: 'search_essay_examples',
+    description: 'Search for successful college essay examples from admitted students. Filter by college, prompt type, or themes. Use this to show students what strong essays look like.',
+    parameters: {
+      type: 'object',
+      properties: {
+        college_name: {
+          type: 'string',
+          description: 'College name to filter by (e.g., "Stanford University", "MIT")'
+        },
+        prompt_type: {
+          type: 'string',
+          enum: ['common_app', 'supplemental', 'uc_piq', 'coalition'],
+          description: 'Type of essay prompt'
+        },
+        themes: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Themes to search for (e.g., ["resilience", "leadership", "community"])'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of essays to return (default: 3)'
+        }
+      },
+      required: []
+    }
+  }
+};
+
+/**
+ * Tool: Get AO Perspectives (DS7)
+ * Category: Knowledge Moat
+ */
+export const getAOPerspectivesTool: ChatCompletionTool = {
+  type: 'function',
+  function: {
+    name: 'get_ao_perspectives',
+    description: 'Get admissions officer perspectives and insights about what colleges really look for. Filter by college, topic (essays, extracurriculars, holistic_review), or selectivity.',
+    parameters: {
+      type: 'object',
+      properties: {
+        college_name: {
+          type: 'string',
+          description: 'College name to filter by (e.g., "Stanford University", "Harvard")'
+        },
+        topic: {
+          type: 'string',
+          enum: ['essays', 'extracurriculars', 'academics', 'interviews', 'holistic_review'],
+          description: 'Topic of AO perspective'
+        },
+        selectivity: {
+          type: 'string',
+          enum: ['highly_selective', 'selective', 'moderately_selective'],
+          description: 'College selectivity level'
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of perspectives to return (default: 3)'
+        }
+      },
+      required: []
+    }
+  }
+};
+
 // ==============================================================================
 // Tool Execution Functions
 // ==============================================================================
@@ -454,6 +526,42 @@ export async function executeResolverTool(
         hits: programs
       };
 
+    case 'search_essay_examples':
+      const essays = await knowledgeMoat.searchEssayExamples({
+        collegeName: args.college_name,
+        promptType: args.prompt_type,
+        themes: args.themes,
+        limit: args.limit || 3
+      });
+      return {
+        answer: essays.length > 0
+          ? essays.map((e, i) => {
+              const themesStr = e.themes ? e.themes.join(', ') : '';
+              return `${i + 1}. ${e.college_name} - ${e.prompt_type} (${e.writing_quality})\nThemes: ${themesStr}\nExcerpt: ${e.essay_text.substring(0, 150)}...`;
+            }).join('\n\n')
+          : 'No essay examples found',
+        chips: [{ kind: 'evidence', text: 'moat_essay_examples' }],
+        hits: essays
+      };
+
+    case 'get_ao_perspectives':
+      const perspectives = await knowledgeMoat.getAOPerspectives({
+        collegeName: args.college_name,
+        topic: args.topic,
+        selectivity: args.selectivity,
+        limit: args.limit || 3
+      });
+      return {
+        answer: perspectives.length > 0
+          ? perspectives.map((p, i) => {
+              const keyPoints = p.key_points ? p.key_points.join('; ') : '';
+              return `${i + 1}. ${p.college_name} ${p.ao_role} on ${p.topic}:\n"${p.question}"\n\nKey Points: ${keyPoints}\n\n${p.perspective_text.substring(0, 200)}...`;
+            }).join('\n\n---\n\n')
+          : 'No AO perspectives found',
+        chips: [{ kind: 'evidence', text: 'moat_ao_perspectives' }],
+        hits: perspectives
+      };
+
     default:
       throw new Error(`Unknown tool: ${toolName}`);
   }
@@ -480,12 +588,14 @@ export const ALL_RESOLVER_TOOLS: ChatCompletionTool[] = [
   getPlacementHistoryTool,
   findSimilarProfilesTool,
   getSummerProgramsCatalogTool,
+  searchEssayExamplesTool,
+  getAOPerspectivesTool,
 ];
 
 /**
  * Get tools for a specific agent based on its domain
  */
-export function getToolsForAgent(agentType: 'gameplan' | 'ecs' | 'awards' | 'programs' | 'college' | 'all'): ChatCompletionTool[] {
+export function getToolsForAgent(agentType: 'gameplan' | 'ecs' | 'awards' | 'programs' | 'college' | 'essay' | 'admissions' | 'all'): ChatCompletionTool[] {
   switch (agentType) {
     case 'gameplan':
       return [getGamePlanTool, getVitalsTool, getECsListTool, getAwardsListTool, getSummerProgramsListTool];
@@ -508,6 +618,20 @@ export function getToolsForAgent(agentType: 'gameplan' | 'ecs' | 'awards' | 'pro
         getVitalsTool,
         getSATScoresTool,
         getGPATool
+      ];
+
+    case 'essay':
+      return [
+        searchEssayExamplesTool,
+        getAOPerspectivesTool,
+        getVitalsTool
+      ];
+
+    case 'admissions':
+      return [
+        getAOPerspectivesTool,
+        getCollegeRubricTool,
+        getVitalsTool
       ];
 
     case 'all':

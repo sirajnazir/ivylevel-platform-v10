@@ -393,6 +393,84 @@ export class KnowledgeMoatRepository {
     if (sat >= 1350) return '1350-1400';
     return '1300-1350';
   }
+
+  // ==========================================================================
+  // DS6: Essay Examples
+  // ==========================================================================
+
+  async searchEssayExamples(filters: {
+    collegeName?: string;
+    promptType?: string;
+    themes?: string[];
+    limit?: number;
+  }): Promise<any[]> {
+    let query = 'SELECT * FROM moat_essay_examples WHERE 1=1';
+    const params: any[] = [];
+    let paramCount = 1;
+
+    if (filters.collegeName) {
+      query += ` AND college_name = $${paramCount}`;
+      params.push(filters.collegeName);
+      paramCount++;
+    }
+
+    if (filters.promptType) {
+      query += ` AND prompt_type = $${paramCount}`;
+      params.push(filters.promptType);
+      paramCount++;
+    }
+
+    if (filters.themes && filters.themes.length > 0) {
+      query += ` AND themes ?| $${paramCount}`;
+      params.push(filters.themes);
+      paramCount++;
+    }
+
+    query += ` ORDER BY admission_year DESC LIMIT $${paramCount}`;
+    params.push(filters.limit || 3);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  }
+
+  // ==========================================================================
+  // DS7: Admissions Officer Perspectives
+  // ==========================================================================
+
+  async getAOPerspectives(filters: {
+    collegeName?: string;
+    topic?: string;
+    selectivity?: string;
+    limit?: number;
+  }): Promise<any[]> {
+    let query = 'SELECT * FROM moat_ao_perspectives WHERE 1=1';
+    const params: any[] = [];
+    let paramCount = 1;
+
+    if (filters.collegeName) {
+      query += ` AND college_name = $${paramCount}`;
+      params.push(filters.collegeName);
+      paramCount++;
+    }
+
+    if (filters.topic) {
+      query += ` AND topic = $${paramCount}`;
+      params.push(filters.topic);
+      paramCount++;
+    }
+
+    if (filters.selectivity) {
+      query += ` AND selectivity = $${paramCount}`;
+      params.push(filters.selectivity);
+      paramCount++;
+    }
+
+    query += ` ORDER BY college_name, topic LIMIT $${paramCount}`;
+    params.push(filters.limit || 3);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  }
 }
 
 // Singleton instance
