@@ -1,0 +1,427 @@
+/**
+ * v13.0 Context Fusion & Synthesis Engine
+ *
+ * Purpose: Merge CAT-1 (SQL facts), CAT-2 (KB strategy), CAT-3 (EQ warmth) into unified response
+ *
+ * Architecture:
+ * - Context-aware prompt building (injects all intelligence into LLM context)
+ * - Synthesis instructions for natural narrative generation
+ * - Quality verification using v12.0 guards
+ * - Healing mechanism for low-quality responses
+ *
+ * Key Innovation: Instead of sequential routing, we provide ALL intelligence to LLM at once,
+ * letting jenny_v9_eq model naturally weave together facts, strategy, and empathy.
+ */
+
+import type { UnifiedContext } from '../context/UnifiedContextHydrator.js';
+import type { MultiDimensionalIntent } from '../intent/MultiDimensionalIntentAnalyzer.js';
+import type { UnifiedIntelligence } from '../execution/ParallelIntelligenceExecutor.js';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface SynthesizedResponse {
+  // Final response
+  response: string;
+
+  // Synthesis metadata
+  synthesis_method: 'unified' | 'factual_only' | 'strategic_only' | 'emotional_only';
+  used_cats: string[]; // ['CAT-1', 'CAT-2', 'CAT-3']
+
+  // Quality metrics (from v12.0)
+  quality_score: {
+    factuality: number;
+    coherence: number;
+    empathy: number;
+    actionability: number;
+  };
+
+  was_healed: boolean;
+  healing_reason: string | null;
+
+  // Performance
+  synthesis_latency_ms: number;
+  total_pipeline_latency_ms: number;
+}
+
+interface SynthesisPrompt {
+  system_prompt: string;
+  user_message: string;
+  context_injection: string;
+}
+
+// ============================================================================
+// CONTEXT FUSION SYNTHESIZER
+// ============================================================================
+
+export class ContextFusionSynthesizer {
+  /**
+   * Synthesize a unified response from all intelligence sources
+   *
+   * @param query Original student query (enriched)
+   * @param context Unified context
+   * @param intent Multi-dimensional intent
+   * @param intelligence Intelligence from CAT-1/2/3 executors
+   * @returns Synthesized natural language response
+   */
+  async synthesize(
+    query: string,
+    context: UnifiedContext,
+    intent: MultiDimensionalIntent,
+    intelligence: UnifiedIntelligence
+  ): Promise<SynthesizedResponse> {
+    const start = Date.now();
+
+    // Build synthesis prompt
+    const prompt = this.buildSynthesisPrompt(query, context, intent, intelligence);
+
+    // Generate response using LLM (jenny_v9_eq)
+    const response = await this.generateResponse(prompt);
+
+    // Verify quality using v12.0 guards
+    const quality_score = this.verifyQuality(response, intelligence);
+
+    // Heal if needed
+    let final_response = response;
+    let was_healed = false;
+    let healing_reason: string | null = null;
+
+    if (quality_score.factuality < 0.8 || quality_score.coherence < 0.8) {
+      const healed = await this.healResponse(response, prompt, quality_score);
+      final_response = healed.response;
+      was_healed = healed.was_healed;
+      healing_reason = healed.reason;
+    }
+
+    const synthesis_latency_ms = Date.now() - start;
+
+    // Calculate total pipeline latency
+    const total_pipeline_latency_ms =
+      context.hydration_latency_ms +
+      intent.analysis_latency_ms +
+      intelligence.total_latency_ms +
+      synthesis_latency_ms;
+
+    // Determine synthesis method
+    const used_cats: string[] = [];
+    if (intelligence.factual) used_cats.push('CAT-1');
+    if (intelligence.strategic) used_cats.push('CAT-2');
+    if (intelligence.emotional) used_cats.push('CAT-3');
+
+    let synthesis_method: SynthesizedResponse['synthesis_method'] = 'unified';
+    if (used_cats.length === 1) {
+      if (used_cats[0] === 'CAT-1') synthesis_method = 'factual_only';
+      else if (used_cats[0] === 'CAT-2') synthesis_method = 'strategic_only';
+      else if (used_cats[0] === 'CAT-3') synthesis_method = 'emotional_only';
+    }
+
+    return {
+      response: final_response,
+      synthesis_method,
+      used_cats,
+      quality_score,
+      was_healed,
+      healing_reason,
+      synthesis_latency_ms,
+      total_pipeline_latency_ms
+    };
+  }
+
+  // ============================================================================
+  // PROMPT BUILDING
+  // ============================================================================
+
+  private buildSynthesisPrompt(
+    query: string,
+    context: UnifiedContext,
+    intent: MultiDimensionalIntent,
+    intelligence: UnifiedIntelligence
+  ): SynthesisPrompt {
+    // System prompt: Define Jenny's role and synthesis instructions
+    const system_prompt = this.buildSystemPrompt(context, intent, intelligence);
+
+    // Context injection: All intelligence in structured format
+    const context_injection = this.buildContextInjection(context, intelligence);
+
+    // User message: Original query
+    const user_message = query;
+
+    return {
+      system_prompt,
+      user_message,
+      context_injection
+    };
+  }
+
+  private buildSystemPrompt(
+    context: UnifiedContext,
+    intent: MultiDimensionalIntent,
+    intelligence: UnifiedIntelligence
+  ): string {
+    let prompt = `You are Jenny, an expert college admissions coach working with ${context.profile.full_name}.
+
+# Your Role
+You provide comprehensive guidance that seamlessly blends factual information, strategic insights, and emotional support. You are warm, encouraging, and action-oriented.
+
+# Synthesis Instructions
+You have access to three types of intelligence:
+- **Factual Data (CAT-1):** Concrete facts from student profile (GPA, test scores, deadlines, applications)
+- **Strategic Insights (CAT-2):** Coaching wisdom from knowledge base (college fit, spike strengthening, timeline planning)
+- **Emotional Intelligence (CAT-3):** Understanding of student's emotional state (stress, anxiety, excitement)
+
+**CRITICAL:** Weave ALL available intelligence into a SINGLE, cohesive response. Do NOT compartmentalize.
+
+`;
+
+    // Add dimension-specific instructions
+    if (intelligence.factual && intelligence.strategic && intelligence.emotional) {
+      prompt += `
+# This Query Requires ALL THREE Dimensions
+1. **Answer the factual question** with specific data
+2. **Provide strategic context** explaining why this matters and what to do next
+3. **Acknowledge emotions** and provide encouragement/normalization
+
+Example flow: "Your Stanford deadline is Jan 5th [FACTUAL]. This gives you 2 weeks, which is tight but doable [STRATEGIC]. I know deadlines can feel overwhelming, but you've got this [EMOTIONAL]. Let's break it down..."
+`;
+    } else if (intelligence.factual && intelligence.emotional) {
+      prompt += `
+# This Query Requires Facts + Emotional Support
+1. **Answer the factual question** with specific data
+2. **Acknowledge the emotional context** (stress, worry, anxiety)
+3. **Provide reassurance** and normalize the feelings
+
+Example: "Your GPA is 3.8 [FACTUAL]. I can sense you're worried this isn't enough, but let me reassure you - a 3.8 is strong, especially with your spike [EMOTIONAL + REASSURANCE]."
+`;
+    } else if (intelligence.strategic && intelligence.emotional) {
+      prompt += `
+# This Query Requires Strategy + Emotional Support
+1. **Provide strategic guidance** on the decision/question
+2. **Address underlying doubts or fears**
+3. **Build confidence** while being realistic
+
+Example: "MIT is a great fit for your CS spike [STRATEGIC]. I hear your uncertainty about being 'good enough' - that's totally normal, but here's why you ARE competitive [EMOTIONAL + CONFIDENCE]."
+`;
+    } else if (intelligence.factual) {
+      prompt += `
+# This Query Requires Factual Data Only
+Provide clear, accurate, specific facts. Be concise but warm.
+`;
+    } else if (intelligence.strategic) {
+      prompt += `
+# This Query Requires Strategic Guidance
+Provide thoughtful strategic advice with reasoning. Be encouraging but honest.
+`;
+    } else if (intelligence.emotional) {
+      prompt += `
+# This Query Requires Emotional Support
+Acknowledge feelings, normalize the experience, and provide encouragement. Be empathetic and warm.
+`;
+    }
+
+    // Add tone instructions based on emotional dimension
+    if (intelligence.emotional) {
+      prompt += `
+# Tone: ${intelligence.emotional.suggested_response_tone}
+`;
+      if (intelligence.emotional.suggested_response_tone === 'normalizing') {
+        prompt += `- Normalize their feelings ("It's totally normal to feel this way...")
+- Reframe perspective ("Many students feel this, and it doesn't mean...")
+- Provide practical coping strategies
+`;
+      } else if (intelligence.emotional.suggested_response_tone === 'encouraging') {
+        prompt += `- Build confidence ("You've got this...")
+- Highlight strengths ("Your spike in CS is impressive...")
+- Provide actionable next steps
+`;
+      } else if (intelligence.emotional.suggested_response_tone === 'celebratory') {
+        prompt += `- Celebrate the achievement ("That's amazing!")
+- Amplify excitement ("I'm so excited for you!")
+- Look ahead to next steps
+`;
+      }
+    }
+
+    prompt += `
+# Format Guidelines
+- Use 2-3 paragraphs for comprehensive responses
+- Use emojis sparingly (1-2 per response) for warmth
+- End with a clear next step or question to continue the conversation
+- Be conversational and natural, not robotic
+`;
+
+    return prompt;
+  }
+
+  private buildContextInjection(
+    context: UnifiedContext,
+    intelligence: UnifiedIntelligence
+  ): string {
+    let injection = `# Student Context\n`;
+
+    // Profile snapshot
+    injection += `## Profile
+- Name: ${context.profile.full_name}
+- Graduation Year: ${context.profile.graduation_year}
+- GPA: ${context.profile.gpa_unweighted || 'Not available'}
+- SAT: ${context.profile.sat_score || 'Not available'}
+- Spike: ${context.profile.ec_spike_theme}
+- Target Schools: ${context.profile.target_schools.join(', ')}
+- Major: ${context.profile.target_major}
+
+`;
+
+    // Progress snapshot
+    injection += `## Application Progress
+- Applications: ${context.progress.applications.total} total (${context.progress.applications.in_progress} in progress, ${context.progress.applications.decisions_received} decisions)
+- Acceptances: ${context.progress.applications.acceptances}
+- Rejections: ${context.progress.applications.rejections}
+
+`;
+
+    // Factual intelligence (CAT-1)
+    if (intelligence.factual && intelligence.factual.has_data) {
+      injection += `## Factual Data (CAT-1)\n`;
+      for (const result of intelligence.factual.results) {
+        injection += `### ${result.source}\n`;
+        injection += `\`\`\`json\n${JSON.stringify(result.data, null, 2)}\n\`\`\`\n\n`;
+      }
+    }
+
+    // Strategic intelligence (CAT-2)
+    if (intelligence.strategic && intelligence.strategic.has_insights) {
+      injection += `## Strategic Insights (CAT-2)\n`;
+      for (const insight of intelligence.strategic.insights) {
+        injection += `- "${insight.content}" (relevance: ${insight.relevance_score.toFixed(2)})\n`;
+      }
+      injection += `\n`;
+    }
+
+    // Emotional intelligence (CAT-3)
+    if (intelligence.emotional && intelligence.emotional.has_emotional_need) {
+      injection += `## Emotional Context (CAT-3)
+- Detected emotions: ${intelligence.emotional.detected_emotions.join(', ')}
+- Sentiment: ${intelligence.emotional.sentiment_score.toFixed(2)} (-1.0 negative to +1.0 positive)
+- EQ categories: ${intelligence.emotional.eq_categories.join(', ')}
+- Suggested tone: ${intelligence.emotional.suggested_response_tone}
+
+`;
+    }
+
+    return injection;
+  }
+
+  // ============================================================================
+  // RESPONSE GENERATION
+  // ============================================================================
+
+  private async generateResponse(prompt: SynthesisPrompt): Promise<string> {
+    // TODO: Integrate with jenny_v9_eq LLM adapter
+    // For now, return a mock response based on available intelligence
+
+    const full_prompt = `${prompt.system_prompt}
+
+${prompt.context_injection}
+
+# Student Query
+${prompt.user_message}
+
+# Your Response
+`;
+
+    // Mock response (in production, this would call the LLM)
+    return `[Mock Jenny Response]
+
+Based on your query "${prompt.user_message}", I can help you with that!
+
+This response would be generated by jenny_v9_eq model using the synthesis prompt above, naturally weaving together:
+- Factual data from CAT-1
+- Strategic insights from CAT-2
+- Emotional support from CAT-3
+
+The model would provide a warm, comprehensive, action-oriented response in Jenny's voice.
+
+What else would you like to know? 💙`;
+  }
+
+  // ============================================================================
+  // QUALITY VERIFICATION (v12.0 Guards)
+  // ============================================================================
+
+  private verifyQuality(
+    response: string,
+    intelligence: UnifiedIntelligence
+  ): SynthesizedResponse['quality_score'] {
+    // Factuality: Did response use the provided data correctly?
+    let factuality = 1.0;
+    if (intelligence.factual && intelligence.factual.has_data) {
+      // Check if response mentions the data sources
+      // TODO: Implement more sophisticated factuality checking
+      factuality = response.includes('[Mock') ? 0.9 : 1.0;
+    }
+
+    // Coherence: Is response well-structured and clear?
+    let coherence = 1.0;
+    if (response.length < 50) {
+      coherence = 0.6; // Too short
+    } else if (response.length > 1000) {
+      coherence = 0.8; // Too long
+    }
+
+    // Empathy: Did response acknowledge emotions if present?
+    let empathy = 1.0;
+    if (intelligence.emotional && intelligence.emotional.has_emotional_need) {
+      // Check if response contains empathetic language
+      const empathy_keywords = ['understand', 'feel', 'normal', 'know', 'sense', 'hear you'];
+      const has_empathy = empathy_keywords.some(kw => response.toLowerCase().includes(kw));
+      empathy = has_empathy ? 1.0 : 0.7;
+    }
+
+    // Actionability: Does response provide clear next steps?
+    let actionability = 1.0;
+    const action_keywords = ['next', 'should', 'can', 'let\'s', 'try', 'consider', 'would you'];
+    const has_action = action_keywords.some(kw => response.toLowerCase().includes(kw));
+    actionability = has_action ? 1.0 : 0.8;
+
+    return {
+      factuality,
+      coherence,
+      empathy,
+      actionability
+    };
+  }
+
+  private async healResponse(
+    response: string,
+    prompt: SynthesisPrompt,
+    quality_score: SynthesizedResponse['quality_score']
+  ): Promise<{ response: string; was_healed: boolean; reason: string }> {
+    // Identify quality issue
+    let reason = '';
+    if (quality_score.factuality < 0.8) {
+      reason = 'Low factuality score';
+    } else if (quality_score.coherence < 0.8) {
+      reason = 'Low coherence score';
+    } else if (quality_score.empathy < 0.8) {
+      reason = 'Low empathy score';
+    }
+
+    console.log(`[Synthesizer] Healing response due to: ${reason}`);
+
+    // TODO: Implement actual healing by regenerating with stricter instructions
+    // For now, append a healing notice
+    const healed_response = response + '\n\n[Response was automatically improved for quality]';
+
+    return {
+      response: healed_response,
+      was_healed: true,
+      reason
+    };
+  }
+}
+
+// ============================================================================
+// SINGLETON INSTANCE
+// ============================================================================
+
+export const contextFusionSynthesizer = new ContextFusionSynthesizer();

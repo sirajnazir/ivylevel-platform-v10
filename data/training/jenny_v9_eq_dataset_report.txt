@@ -1,0 +1,10 @@
+Jenny v9 EQ Training Dataset Report
+================================================================================
+
+Training Examples: 690
+Validation Examples: 77
+Total: 767
+
+Files:
+  - /Users/snazir/ivylevel-platform-v10/data/training/jenny_v9_eq_training.jsonl
+  - /Users/snazir/ivylevel-platform-v10/data/training/jenny_v9_eq_validation.jsonl

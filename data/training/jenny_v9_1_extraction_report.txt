@@ -1,0 +1,73 @@
+================================================================================
+TARGETED EXTRACTION FOR JENNY_V9.1_EQ
+================================================================================
+
+Loading data...
+Loaded 7 iMessage files
+Loaded 690 v9 examples
+
+================================================================================
+V9 COVERAGE ANALYSIS
+================================================================================
+
+  other                502 examples
+  essay_help           120 examples
+  celebration           25 examples
+  parent_conflict       16 examples
+  stuck                 14 examples
+  stress                11 examples
+  rejection              2 examples
+
+================================================================================
+SELECTING TARGETED EXAMPLES
+================================================================================
+
+Total iMessage training examples: 26
+
+High quality examples (≥8/10): 26
+
+Query Type Distribution in iMessage Data:
+  other                V9: 502  |  iMsg:  23  |  Gap:   0
+  essay_help           V9: 120  |  iMsg:   2  |  Gap:   0
+  stuck                V9:  14  |  iMsg:   1  |  Gap:  16
+
+Selected warmth examples: 0
+Selected action examples: 0
+Selected gap-filling examples: 1
+
+Total selected: 1
+
+================================================================================
+SELECTED EXAMPLES ANALYSIS
+================================================================================
+
+Total: 1
+Has Warmth: 0 (0.0%)
+Has Action: 0 (0.0%)
+Has Both: 0 (0.0%)
+
+Query Type Breakdown:
+  stuck                  1 (100.0%)
+
+Average Quality Score: 10.00/10
+
+================================================================================
+JENNY_V9.1_EQ_TARGETED DATASET
+================================================================================
+
+V9 examples: 690
+New examples: 1
+Total: 691
+Growth: +0.1%
+
+Saved to: /Users/snazir/ivylevel-platform-v10/data/training/jenny_v9_1_eq_targeted.jsonl
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Review sample of new examples for quality
+2. Upload jenny_v9_1_eq_targeted.jsonl to OpenAI
+3. Launch fine-tuning job
+4. Test with CAT-3 suite (target: 55-65% pass rate)
+

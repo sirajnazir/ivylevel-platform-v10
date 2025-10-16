@@ -1,0 +1,204 @@
+/**
+ * Test script for ContextFusionSynthesizer
+ *
+ * Usage: tsx src/synthesis/test-context-fusion.ts
+ */
+
+import { contextFusionSynthesizer } from './ContextFusionSynthesizer.js';
+import { parallelIntelligenceExecutor } from '../execution/ParallelIntelligenceExecutor.js';
+import { multiDimensionalIntentAnalyzer } from '../intent/MultiDimensionalIntentAnalyzer.js';
+import { unifiedContextHydrator } from '../context/UnifiedContextHydrator.js';
+
+async function runTests() {
+  console.log('');
+  console.log('╔' + '═'.repeat(78) + '╗');
+  console.log('║' + ' '.repeat(18) + 'v13.0 Context Fusion Synthesizer Tests' + ' '.repeat(21) + '║');
+  console.log('╚' + '═'.repeat(78) + '╝');
+  console.log('');
+
+  const test_queries = [
+    // Pure factual
+    {
+      query: "What's my GPA?",
+      expected_cats: ['CAT-1'],
+      expected_synthesis_method: 'factual_only',
+      description: 'Pure factual query - Should use CAT-1 only'
+    },
+
+    // Pure strategic
+    {
+      query: "Should I apply to MIT?",
+      expected_cats: ['CAT-2'],
+      expected_synthesis_method: 'strategic_only',
+      description: 'Pure strategic query - Should use CAT-2 only'
+    },
+
+    // Pure emotional
+    {
+      query: "I'm feeling really stressed about applications.",
+      expected_cats: ['CAT-3'],
+      expected_synthesis_method: 'emotional_only',
+      description: 'Pure emotional query - Should use CAT-3 only'
+    },
+
+    // Factual + Emotional (hybrid)
+    {
+      query: "What's the Stanford deadline? I'm so stressed about it!",
+      expected_cats: ['CAT-1', 'CAT-3'],
+      expected_synthesis_method: 'unified',
+      description: 'Factual + Emotional - Should blend facts with emotional support'
+    },
+
+    // Factual + Strategic (parallel)
+    {
+      query: "What's my GPA and should I apply to Stanford?",
+      expected_cats: ['CAT-1', 'CAT-2'],
+      expected_synthesis_method: 'unified',
+      description: 'Factual + Strategic - Should blend facts with strategy'
+    },
+
+    // All three (parallel)
+    {
+      query: "When is the Stanford deadline? Should I even apply? I'm so overwhelmed!",
+      expected_cats: ['CAT-1', 'CAT-2', 'CAT-3'],
+      expected_synthesis_method: 'unified',
+      description: 'All three dimensions - Should blend facts, strategy, and emotional support'
+    },
+  ];
+
+  let passed = 0;
+  let failed = 0;
+
+  for (const test_case of test_queries) {
+    console.log('='.repeat(80));
+    console.log(`Test: ${test_case.description}`);
+    console.log('='.repeat(80));
+    console.log(`Query: "${test_case.query}"`);
+    console.log('');
+
+    try {
+      // Step 1: Hydrate context
+      const context = await unifiedContextHydrator.hydrate('huda-2025', null);
+      console.log(`✓ Context hydrated in ${context.hydration_latency_ms}ms`);
+
+      // Step 2: Analyze intent
+      const intent = await multiDimensionalIntentAnalyzer.analyze(test_case.query, context);
+      console.log(`✓ Intent analyzed in ${intent.analysis_latency_ms}ms`);
+      console.log(`  Mode: ${intent.execution.mode}`);
+
+      // Step 3: Execute intelligence gathering
+      const intelligence = await parallelIntelligenceExecutor.execute(test_case.query, context, intent);
+      console.log(`✓ Intelligence executed in ${intelligence.total_latency_ms}ms`);
+
+      // Step 4: Synthesize response
+      const synthesized = await contextFusionSynthesizer.synthesize(
+        test_case.query,
+        context,
+        intent,
+        intelligence
+      );
+      console.log(`✓ Response synthesized in ${synthesized.synthesis_latency_ms}ms`);
+      console.log('');
+
+      // Display synthesis results
+      console.log('Synthesis Results:');
+      console.log(`  Method: ${synthesized.synthesis_method}`);
+      console.log(`  Used CATs: ${synthesized.used_cats.join(', ')}`);
+      console.log(`  Was healed: ${synthesized.was_healed}`);
+      if (synthesized.healing_reason) {
+        console.log(`  Healing reason: ${synthesized.healing_reason}`);
+      }
+      console.log('');
+
+      // Display quality scores
+      console.log('Quality Scores:');
+      console.log(`  Factuality:    ${synthesized.quality_score.factuality.toFixed(2)}`);
+      console.log(`  Coherence:     ${synthesized.quality_score.coherence.toFixed(2)}`);
+      console.log(`  Empathy:       ${synthesized.quality_score.empathy.toFixed(2)}`);
+      console.log(`  Actionability: ${synthesized.quality_score.actionability.toFixed(2)}`);
+      console.log('');
+
+      // Display response (truncated)
+      console.log('Generated Response:');
+      const response_preview = synthesized.response.substring(0, 200);
+      console.log(`  ${response_preview}${synthesized.response.length > 200 ? '...' : ''}`);
+      console.log('');
+
+      // Display full pipeline latency
+      console.log('Pipeline Performance:');
+      console.log(`  Context hydration: ${context.hydration_latency_ms}ms`);
+      console.log(`  Intent analysis:   ${intent.analysis_latency_ms}ms`);
+      console.log(`  Intelligence exec: ${intelligence.total_latency_ms}ms`);
+      console.log(`  Synthesis:         ${synthesized.synthesis_latency_ms}ms`);
+      console.log(`  TOTAL:             ${synthesized.total_pipeline_latency_ms}ms`);
+      console.log('');
+
+      // Validate expectations
+      const cats_match = test_case.expected_cats.every(cat => synthesized.used_cats.includes(cat)) &&
+                         synthesized.used_cats.length === test_case.expected_cats.length;
+
+      const method_match = synthesized.synthesis_method === test_case.expected_synthesis_method;
+
+      const quality_acceptable = synthesized.quality_score.factuality >= 0.7 &&
+                                 synthesized.quality_score.coherence >= 0.7 &&
+                                 synthesized.quality_score.empathy >= 0.7 &&
+                                 synthesized.quality_score.actionability >= 0.7;
+
+      const response_not_empty = synthesized.response.length > 50;
+
+      const test_passed = cats_match && method_match && quality_acceptable && response_not_empty;
+
+      if (test_passed) {
+        console.log('✓ PASS');
+        passed++;
+      } else {
+        console.log('✗ FAIL');
+        console.log('Expected:');
+        console.log(`  CATs: ${test_case.expected_cats.join(', ')}`);
+        console.log(`  Method: ${test_case.expected_synthesis_method}`);
+        console.log('Got:');
+        console.log(`  CATs: ${synthesized.used_cats.join(', ')}`);
+        console.log(`  Method: ${synthesized.synthesis_method}`);
+        console.log(`  Quality acceptable: ${quality_acceptable}`);
+        console.log(`  Response not empty: ${response_not_empty}`);
+        failed++;
+      }
+
+      console.log('');
+
+    } catch (err) {
+      console.error('✗ Test failed with error:', err);
+      failed++;
+      console.log('');
+    }
+  }
+
+  // Summary
+  console.log('='.repeat(80));
+  console.log('Summary');
+  console.log('='.repeat(80));
+  console.log(`Total: ${test_queries.length} test cases`);
+  console.log(`Passed: ${passed}`);
+  console.log(`Failed: ${failed}`);
+  console.log('');
+
+  if (failed === 0) {
+    console.log('✓ All tests passed!');
+    console.log('');
+    console.log('Context Fusion Synthesizer is ready for integration.');
+    console.log('');
+    console.log('╔' + '═'.repeat(78) + '╗');
+    console.log('║' + ' '.repeat(20) + 'v13.0 Phase 2 Complete: Synthesis Engine' + ' '.repeat(18) + '║');
+    console.log('╚' + '═'.repeat(78) + '╝');
+    console.log('');
+    console.log('Next Step: Integrate into agentChat-utfa.ts and test with real queries.');
+    console.log('');
+    process.exit(0);
+  } else {
+    console.log('✗ Some tests failed.');
+    console.log('');
+    process.exit(1);
+  }
+}
+
+runTests();
