@@ -2,11 +2,13 @@
  * SessionManager.ts
  * Manages agent sessions with student context
  * Created: 2025-10-16 (Phase 1, Week 2)
+ * Updated: 2025-10-16 (Week 10 - Added conversation persistence)
  */
 
 import type { IvyLevelSession, StudentContext } from './types.js';
 import { pool } from '../db/pool.js';
 import { vitals } from '../resolvers/vitals.js';
+import { ConversationRepository } from '../repositories/ConversationRepository.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 
 const log = createLogger('session-manager');
@@ -17,14 +19,20 @@ const log = createLogger('session-manager');
  * - Create new sessions
  * - Load student context
  * - Store/retrieve sessions (in-memory for now, can add Redis later)
+ * - Persist conversations to database for replay and analytics
  */
 export class SessionManager {
   private sessions: Map<string, IvyLevelSession> = new Map();
+  private conversationRepo: ConversationRepository;
+
+  constructor() {
+    this.conversationRepo = new ConversationRepository(pool);
+  }
 
   /**
    * Create a new session for a student
    */
-  async createSession(studentId: string): Promise<IvyLevelSession> {
+  async createSession(studentId: string, category?: string): Promise<IvyLevelSession> {
     const sessionId = `sess_${studentId}_${Date.now()}`;
 
     log.event('session.create', { session_id: sessionId, student_id: studentId });
@@ -44,6 +52,15 @@ export class SessionManager {
     };
 
     this.sessions.set(sessionId, session);
+
+    // Persist session to database
+    try {
+      await this.conversationRepo.createSession(sessionId, studentId, context, category);
+      log.event('session.persisted', { session_id: sessionId });
+    } catch (error: any) {
+      log.error('session.persist_error', error, { session_id: sessionId });
+      // Continue even if persistence fails - session is still in memory
+    }
 
     return session;
   }
@@ -103,6 +120,13 @@ export class SessionManager {
       session_id: session.session_id,
       turn_count: session.turn_count,
     });
+  }
+
+  /**
+   * Get conversation repository for direct access
+   */
+  getConversationRepo(): ConversationRepository {
+    return this.conversationRepo;
   }
 
   /**

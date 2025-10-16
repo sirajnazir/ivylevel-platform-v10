@@ -90,11 +90,22 @@ router.post('/chat', async (req, res) => {
       agent_manifest: agent.getManifest(),
     };
 
-    // Execute agent
-    const result = await agent.execute(context);
+    // Execute agent (pass registry for handoff detection)
+    const result = await agent.execute(context, agentRegistry);
 
-    // Update session
+    // Update session in memory
     sessionManager.updateSession(result.session);
+
+    // Persist conversation turn to database
+    try {
+      const conversationRepo = sessionManager.getConversationRepo();
+      await conversationRepo.recordTurn(session, message, result, agent.getManifest());
+    } catch (error: any) {
+      log.error('agents.persist_turn_error', error, {
+        session_id: result.session.session_id,
+      });
+      // Continue even if persistence fails
+    }
 
     // Return response
     res.json({
@@ -209,6 +220,223 @@ router.post('/sessions/cleanup', (req, res) => {
     cleared_count: cleared,
     max_age_ms,
   });
+});
+
+// ==============================================================================
+// Conversation History & Replay Endpoints
+// ==============================================================================
+
+/**
+ * GET /api/agents/sessions/:student_id
+ * Get conversation history for a student
+ */
+router.get('/sessions/:student_id', async (req, res) => {
+  try {
+    const { student_id } = req.params;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    const conversationRepo = sessionManager.getConversationRepo();
+    const sessions = await conversationRepo.getStudentSessions(student_id, limit, offset);
+
+    res.json({
+      sessions,
+      student_id,
+      limit,
+      offset,
+      count: sessions.length,
+    });
+
+    log.event('agents.sessions_retrieved', {
+      student_id,
+      count: sessions.length,
+    });
+  } catch (error: any) {
+    log.error('agents.sessions_error', error, {
+      student_id: req.params.student_id,
+    });
+
+    res.status(500).json({
+      error: error.message || 'Failed to retrieve sessions',
+    });
+  }
+});
+
+/**
+ * GET /api/agents/replay/:session_id
+ * Get full conversation replay
+ */
+router.get('/replay/:session_id', async (req, res) => {
+  try {
+    const { session_id } = req.params;
+
+    const conversationRepo = sessionManager.getConversationRepo();
+    const replay = await conversationRepo.getConversationReplay(session_id);
+
+    if (!replay) {
+      return res.status(404).json({
+        error: `Session not found: ${session_id}`,
+      });
+    }
+
+    res.json({
+      session_id,
+      replay,
+    });
+
+    log.event('agents.replay_retrieved', {
+      session_id,
+      turn_count: replay.turns.length,
+    });
+  } catch (error: any) {
+    log.error('agents.replay_error', error, {
+      session_id: req.params.session_id,
+    });
+
+    res.status(500).json({
+      error: error.message || 'Failed to retrieve replay',
+    });
+  }
+});
+
+/**
+ * GET /api/agents/analytics/:session_id
+ * Get conversation analytics
+ */
+router.get('/analytics/:session_id', async (req, res) => {
+  try {
+    const { session_id } = req.params;
+
+    const conversationRepo = sessionManager.getConversationRepo();
+    const analytics = await conversationRepo.getConversationAnalytics(session_id);
+
+    if (!analytics) {
+      return res.status(404).json({
+        error: `Session not found: ${session_id}`,
+      });
+    }
+
+    res.json({
+      session_id,
+      analytics,
+    });
+
+    log.event('agents.analytics_retrieved', {
+      session_id,
+    });
+  } catch (error: any) {
+    log.error('agents.analytics_error', error, {
+      session_id: req.params.session_id,
+    });
+
+    res.status(500).json({
+      error: error.message || 'Failed to retrieve analytics',
+    });
+  }
+});
+
+/**
+ * GET /api/agents/performance
+ * Get agent performance metrics
+ */
+router.get('/performance', async (req, res) => {
+  try {
+    const conversationRepo = sessionManager.getConversationRepo();
+    const metrics = await conversationRepo.getAgentPerformanceMetrics();
+
+    res.json({
+      metrics,
+      count: metrics.length,
+    });
+
+    log.event('agents.performance_retrieved', {
+      count: metrics.length,
+    });
+  } catch (error: any) {
+    log.error('agents.performance_error', error);
+
+    res.status(500).json({
+      error: error.message || 'Failed to retrieve performance metrics',
+    });
+  }
+});
+
+/**
+ * POST /api/agents/sessions/:session_id/rate
+ * Add satisfaction rating to session
+ */
+router.post('/sessions/:session_id/rate', async (req, res) => {
+  try {
+    const { session_id } = req.params;
+    const { rating } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        error: 'Rating must be between 1 and 5',
+      });
+    }
+
+    const conversationRepo = sessionManager.getConversationRepo();
+    await conversationRepo.addSatisfactionRating(session_id, rating);
+
+    res.json({
+      session_id,
+      rating,
+      success: true,
+    });
+
+    log.event('agents.rating_added', {
+      session_id,
+      rating,
+    });
+  } catch (error: any) {
+    log.error('agents.rating_error', error, {
+      session_id: req.params.session_id,
+    });
+
+    res.status(500).json({
+      error: error.message || 'Failed to add rating',
+    });
+  }
+});
+
+/**
+ * POST /api/agents/sessions/:session_id/status
+ * Update session status
+ */
+router.post('/sessions/:session_id/status', async (req, res) => {
+  try {
+    const { session_id } = req.params;
+    const { status } = req.body;
+
+    if (!['active', 'resolved', 'abandoned', 'escalated'].includes(status)) {
+      return res.status(400).json({
+        error: 'Invalid status. Must be: active, resolved, abandoned, or escalated',
+      });
+    }
+
+    const conversationRepo = sessionManager.getConversationRepo();
+    await conversationRepo.updateSessionStatus(session_id, status);
+
+    res.json({
+      session_id,
+      status,
+      success: true,
+    });
+
+    log.event('agents.status_updated', {
+      session_id,
+      status,
+    });
+  } catch (error: any) {
+    log.error('agents.status_error', error, {
+      session_id: req.params.session_id,
+    });
+
+    res.status(500).json({
+      error: error.message || 'Failed to update status',
+    });
+  }
 });
 
 export default router;

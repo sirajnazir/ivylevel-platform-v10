@@ -56,7 +56,7 @@ export abstract class BaseAgent {
    * Execute agent with user message
    * Main entry point for agent execution
    */
-  async execute(context: AgentExecutionContext): Promise<AgentExecutionResult> {
+  async execute(context: AgentExecutionContext, registry?: any): Promise<AgentExecutionResult> {
     const startTime = Date.now();
 
     log.event('agent.execute_start', {
@@ -80,11 +80,15 @@ export abstract class BaseAgent {
       const toolCalls: ToolCall[] = [];
       let finalResponse = await this.callOpenAI(messages, toolCalls);
 
+      // Detect if handoff is needed
+      const handoff = this.detectHandoff(context.user_message, registry);
+
       // Build agent response
       const response: AgentResponse = {
         answer: finalResponse,
         chips: this.extractChips(toolCalls),
         hits: this.extractHits(toolCalls),
+        handoff,
         debug: {
           agent_id: this.manifest.agent_id,
           tools_called: toolCalls.map((t) => t.tool_name),
@@ -100,6 +104,7 @@ export abstract class BaseAgent {
         agent_id: this.manifest.agent_id,
         tools_called: toolCalls.length,
         took_ms: Date.now() - startTime,
+        handoff_suggested: handoff ? handoff.to_agent : null,
       });
 
       return {
@@ -126,6 +131,94 @@ export abstract class BaseAgent {
         tokens_used: 0,
       };
     }
+  }
+
+  /**
+   * Detect if user query should be handed off to different agent
+   * Uses AgentRegistry to determine best agent for query
+   *
+   * Strategy: Only suggest handoff if suggested agent is MORE SPECIFIC than current agent
+   * - GamePlan agent is the least specific (general strategy)
+   * - Specialized agents (ECs, Awards, Programs, College) are more specific
+   * - Only handoff FROM less specific TO more specific
+   */
+  protected detectHandoff(
+    userMessage: string,
+    registry?: any
+  ): { to_agent: string; reason: string } | undefined {
+    if (!registry) return undefined;
+
+    try {
+      // First, check if current agent has patterns that match this query
+      const currentAgentMatches = this.matchesOwnPatterns(userMessage);
+
+      // Use registry to route the query
+      const suggestedAgent = registry.routeQuery(userMessage);
+
+      // If suggested agent is different from current agent
+      if (suggestedAgent && suggestedAgent.getManifest().agent_id !== this.manifest.agent_id) {
+        const targetManifest = suggestedAgent.getManifest();
+
+        // Agent specificity hierarchy (higher number = more specific)
+        const specificity: Record<string, number> = {
+          'gameplan-agent': 1,  // Least specific (general strategy)
+          'ecs-agent': 2,
+          'awards-agent': 2,
+          'programs-agent': 2,
+          'college-agent': 2,   // Most specific (specialized)
+        };
+
+        const currentSpecificity = specificity[this.manifest.agent_id] || 0;
+        const targetSpecificity = specificity[targetManifest.agent_id] || 0;
+
+        // Handoff decision logic:
+        // 1. If current agent matches the query AND target is less/equally specific → NO handoff
+        // 2. If current agent matches AND target is MORE specific → Handoff
+        // 3. If current agent doesn't match AND target is more specific → Handoff
+        //4. If current agent doesn't match AND target is less/equally specific → NO handoff (stay with current)
+
+        const shouldHandoff =
+          currentAgentMatches
+            ? targetSpecificity > currentSpecificity  // Only handoff to MORE specific agent
+            : targetSpecificity >= currentSpecificity;  // Only handoff to equally/more specific agent
+
+        if (shouldHandoff) {
+          log.event('agent.handoff_detected', {
+            from_agent: this.manifest.agent_id,
+            to_agent: targetManifest.agent_id,
+            query_preview: userMessage.substring(0, 100),
+            current_matches: currentAgentMatches,
+            specificity_delta: targetSpecificity - currentSpecificity,
+          });
+
+          return {
+            to_agent: targetManifest.agent_id,
+            reason: `This question is better suited for ${targetManifest.display_name}`,
+          };
+        }
+      }
+    } catch (error: any) {
+      log.error('agent.handoff_detection_error', error);
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Check if user message matches any of current agent's intent patterns
+   */
+  protected matchesOwnPatterns(userMessage: string): boolean {
+    const queryLower = userMessage.toLowerCase();
+
+    for (const intent of this.manifest.intents) {
+      for (const pattern of intent.patterns) {
+        if (queryLower.includes(pattern.toLowerCase())) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
