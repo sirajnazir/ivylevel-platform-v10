@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import type { TestCase } from "@/lib/testlab/schema";
-import factsSuite from "@/lib/testlab/suites/facts.json";
-import kbSuite from "@/lib/testlab/suites/kb.json";
-import eqSuite from "@/lib/testlab/suites/eq.json";
+// v4.0: Latest comprehensive test suites (v11.3.2 - jenny_v9_eq)
+import cat1v4 from "@/lib/testlab/suites/cat1-facts-v4.json";
+import cat2v4 from "@/lib/testlab/suites/cat2-kb-v4.json";
+import cat3v4 from "@/lib/testlab/suites/cat3-eq-v4.json";
 
 interface ScenarioBuilderProps {
   onRunSingle: (test: TestCase) => void;
@@ -12,13 +13,22 @@ interface ScenarioBuilderProps {
   running: boolean;
 }
 
+type SuiteType = "cat1-facts-v4" | "cat2-kb-v4" | "cat3-eq-v4";
+
 export function ScenarioBuilder({ onRunSingle, onRunSuite, running }: ScenarioBuilderProps) {
   const [category, setCategory] = useState<"facts" | "kb" | "eq">("facts");
   const [prompt, setPrompt] = useState("");
   const [studentId, setStudentId] = useState("huda-2025");
   const [intentOverride, setIntentOverride] = useState("");
-  const [selectedSuite, setSelectedSuite] = useState<"facts" | "kb" | "eq" | null>(null);
+  const [selectedSuite, setSelectedSuite] = useState<SuiteType | null>(null);
   const [selectedTests, setSelectedTests] = useState<Set<string>>(new Set());
+
+  // v4.0: Suite registry (v11.3.2 - jenny_v9_eq deployment)
+  const suiteRegistry = {
+    "cat1-facts-v4": cat1v4,
+    "cat2-kb-v4": cat2v4,
+    "cat3-eq-v4": cat3v4
+  };
 
   const handleRunSingle = () => {
     if (!prompt.trim()) {
@@ -44,7 +54,7 @@ export function ScenarioBuilder({ onRunSingle, onRunSuite, running }: ScenarioBu
       return;
     }
 
-    const suiteData = selectedSuite === "facts" ? factsSuite : selectedSuite === "kb" ? kbSuite : eqSuite;
+    const suiteData = suiteRegistry[selectedSuite];
     const testsToRun = selectedTests.size > 0
       ? suiteData.tests.filter(t => selectedTests.has(t.id))
       : suiteData.tests;
@@ -57,7 +67,7 @@ export function ScenarioBuilder({ onRunSingle, onRunSuite, running }: ScenarioBu
     onRunSuite(suiteData.id, suiteData.label, suiteData.category, testsToRun as TestCase[]);
   };
 
-  const handleSelectSuite = (suite: "facts" | "kb" | "eq") => {
+  const handleSelectSuite = (suite: SuiteType) => {
     setSelectedSuite(suite);
     setSelectedTests(new Set());
   };
@@ -72,7 +82,7 @@ export function ScenarioBuilder({ onRunSingle, onRunSuite, running }: ScenarioBu
     setSelectedTests(newSelected);
   };
 
-  const selectedSuiteData = selectedSuite === "facts" ? factsSuite : selectedSuite === "kb" ? kbSuite : selectedSuite === "eq" ? eqSuite : null;
+  const selectedSuiteData = selectedSuite ? suiteRegistry[selectedSuite] : null;
 
   return (
     <div className="bg-white rounded-lg shadow p-6 space-y-6">
@@ -154,39 +164,42 @@ export function ScenarioBuilder({ onRunSingle, onRunSuite, running }: ScenarioBu
 
         <div className="space-y-2 mb-4">
           <button
-            onClick={() => handleSelectSuite("facts")}
-            className={`w-full text-left px-4 py-2 rounded-md border ${
-              selectedSuite === "facts"
-                ? "bg-blue-50 border-blue-500 text-blue-700"
-                : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+            onClick={() => handleSelectSuite("cat1-facts-v4")}
+            className={`w-full text-left px-4 py-3 rounded-md border-2 ${
+              selectedSuite === "cat1-facts-v4"
+                ? "bg-purple-50 border-purple-600 text-purple-900"
+                : "bg-white border-purple-300 text-gray-700 hover:bg-purple-50 hover:border-purple-400"
             }`}
             disabled={running}
           >
-            Facts Suite v2.0 (50 tests - Complete Cat-1)
+            <div className="font-semibold">🔷 CAT-1: Facts/SQL v4.0 (30 tests)</div>
+            <div className="text-xs mt-1 opacity-75">Universal Enumeration Coverage | UTFA Temporal Resolution</div>
           </button>
 
           <button
-            onClick={() => handleSelectSuite("kb")}
-            className={`w-full text-left px-4 py-2 rounded-md border ${
-              selectedSuite === "kb"
-                ? "bg-blue-50 border-blue-500 text-blue-700"
-                : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+            onClick={() => handleSelectSuite("cat2-kb-v4")}
+            className={`w-full text-left px-4 py-3 rounded-md border-2 ${
+              selectedSuite === "cat2-kb-v4"
+                ? "bg-blue-50 border-blue-600 text-blue-900"
+                : "bg-white border-blue-300 text-gray-700 hover:bg-blue-50 hover:border-blue-400"
             }`}
             disabled={running}
           >
-            KB Suite (8 tests)
+            <div className="font-semibold">🔷 CAT-2: KB/RAG v4.0 (25 tests)</div>
+            <div className="text-xs mt-1 opacity-75">KBv6 Vector Retrieval | 3 Namespaces | Hybrid SQL+RAG</div>
           </button>
 
           <button
-            onClick={() => handleSelectSuite("eq")}
-            className={`w-full text-left px-4 py-2 rounded-md border ${
-              selectedSuite === "eq"
-                ? "bg-blue-50 border-blue-500 text-blue-700"
-                : "bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+            onClick={() => handleSelectSuite("cat3-eq-v4")}
+            className={`w-full text-left px-4 py-3 rounded-md border-2 ${
+              selectedSuite === "cat3-eq-v4"
+                ? "bg-green-50 border-green-600 text-green-900"
+                : "bg-white border-green-300 text-gray-700 hover:bg-green-50 hover:border-green-400"
             }`}
             disabled={running}
           >
-            EQ Suite (10 tests)
+            <div className="font-semibold">⭐ CAT-3: EQ/LLM v4.0 (35 tests) [jenny_v9_eq]</div>
+            <div className="text-xs mt-1 opacity-75">Fine-Tuned 2025-10-13 | 0% JSON Artifacts | 90%+ Pass Target</div>
           </button>
         </div>
 

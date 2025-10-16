@@ -32,7 +32,8 @@ export async function hybridSearch(q: string, studentId: string) {
   const globalFallback = scoped.length ? [] : await lexicalSearch(null, q, cfg.lexical_topk);
 
   // Extract text content from various possible field names
-  const getText = (m: any) => m.text || m.content || m.body || m.chunk || m.snippet || '';
+  // CRITICAL: KBv6 chips store content in 'insight_vector' field (v11.2.2 fix)
+  const getText = (m: any) => m.text || m.content || m.insight_vector || m.body || m.chunk || m.snippet || '';
 
   const merged = [...jtbd, ...inter, ...assess, ...scoped, ...globalFallback]
     .map(m => ({ ...m, _text: getText(m) }))

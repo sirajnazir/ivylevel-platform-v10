@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
     const baseUrl = "http://localhost:3000";
 
     // Run tests (parallel or sequential)
+    // NOTE: Sequential mode adds 7s delay between tests to respect Cohere API rate limit (10 calls/min)
     let results: TestRunResponse[];
     if (parallel) {
       results = await Promise.all(
@@ -40,9 +41,17 @@ export async function POST(req: NextRequest) {
       );
     } else {
       results = [];
-      for (const test of tests) {
+      for (let i = 0; i < tests.length; i++) {
+        const test = tests[i];
         const result = await runSingleTest(baseUrl, test);
         results.push(result);
+
+        // Add 7-second delay between tests (respects Cohere 10 calls/min limit)
+        // Skip delay after last test
+        if (i < tests.length - 1) {
+          console.log(`[Suite] Rate limiting: waiting 7s before next test (${i + 1}/${tests.length} complete)...`);
+          await new Promise(resolve => setTimeout(resolve, 7000));
+        }
       }
     }
 

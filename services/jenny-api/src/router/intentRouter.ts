@@ -9,8 +9,9 @@ import type { Domain } from '../intent/schema.js';
 import { extractCollegeFiltersGuardrail, extractScholarshipFiltersGuardrail } from '../intent/extractors/guardrails.js';
 
 const log = createLogger('intent-router');
-const ROUTE_THRESHOLD = Number(process.env.INTENT_ROUTE_THRESHOLD ?? "0.62"); // Route if confidence >= 0.62
-const CLARIFY_THRESHOLD = Number(process.env.INTENT_CLARIFY_THRESHOLD ?? "0.45"); // Ask clarifying question if 0.45-0.62
+const ROUTE_THRESHOLD = Number(process.env.INTENT_ROUTE_THRESHOLD ?? "0.62"); // High confidence: Route immediately
+const MEDIUM_CONFIDENCE_THRESHOLD = Number(process.env.INTENT_MEDIUM_THRESHOLD ?? "0.50"); // Medium confidence: Execute with best-effort
+const CLARIFY_THRESHOLD = Number(process.env.INTENT_CLARIFY_THRESHOLD ?? "0.45"); // Low confidence: Ask for clarification
 
 // ============================================================================
 // GPT-5 Intent Classifier (inlined to avoid module issues)
@@ -1001,21 +1002,21 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       });
     }
 
-    // Confidence-based routing with tiered responses
+    // Confidence-based routing with three-tier system (v11.2 fix)
     if (intent.confidence < CLARIFY_THRESHOLD) {
-      // Very low confidence (< 0.45): Suggest trying specific queries
+      // Very low confidence (< 0.45): Ask for clarification with Jenny's warm style
       log.event('intent.very_low_confidence', { trace_id: traceId, confidence: intent.confidence, query: message.slice(0, 50) });
       return {
-        answer: `I'm not quite sure what you're asking for. Try asking for something specific like:\n• "final EC list"\n• "initial awards list"\n• "what awards did I win?"\n• "what was my first SAT score?"`,
+        answer: `Hmm, I'm not totally sure what you're asking—could you rephrase that? A few things I *can* help with:\n\n• Your final EC list or awards\n• Game plan vs what actually happened\n• Readiness score or what-if scenarios\n• SAT progression or GPA breakdown\n\nTry asking in your own words—I'll figure it out!`,
         chips: [{kind:"notice", text:`confidence: ${(intent.confidence*100).toFixed(0)}%`}],
         traceId,
         intent,
       };
     }
 
-    if (intent.confidence < ROUTE_THRESHOLD) {
-      // Medium confidence (0.45-0.62): Ask clarifying question with best guess
-      log.event('intent.mid_confidence', { trace_id: traceId, confidence: intent.confidence });
+    if (intent.confidence < MEDIUM_CONFIDENCE_THRESHOLD) {
+      // Low-medium confidence (0.45-0.50): Ask clarifying question with Jenny's style
+      log.event('intent.low_mid_confidence', { trace_id: traceId, confidence: intent.confidence });
 
       const phaseLabel = intent.phase === "initial" ? "initial" : intent.phase === "final" ? "final" : "";
       const objectLabel = intent.object === "ec" ? "ECs"
@@ -1026,7 +1027,7 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       const suggestion = phaseLabel ? `${phaseLabel} ${objectLabel}` : objectLabel;
 
       return {
-        answer: `I think you want **${suggestion}**—should I pull that? (${(intent.confidence*100).toFixed(0)}% confident)\n\nOr try rephrasing your question for better accuracy.`,
+        answer: `I *think* you're asking about your **${suggestion}**—is that right?\n\nIf so, just say "yes" and I'll pull it up. Or rephrase your question and I'll try again!`,
         chips: [
           {kind:"notice", text:`inferred: ${intent.intent}`},
           {kind:"notice", text:`confidence: ${(intent.confidence*100).toFixed(0)}%`}
@@ -1036,7 +1037,13 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       };
     }
 
-    // High confidence (>= 0.62): Route to resolver
+    if (intent.confidence < ROUTE_THRESHOLD) {
+      // Medium confidence (0.50-0.62): Execute with best-effort flag (v11.2 NEW)
+      log.event('intent.medium_confidence_execute', { trace_id: traceId, confidence: intent.confidence, intent: intent.intent });
+      // FALL THROUGH to resolver execution below (no early return)
+    }
+
+    // High confidence (>= 0.62) OR medium confidence (0.50-0.62): Route to resolver
     // v10.5.2 DEBUG: Log intent routing
     console.log('[INTENT-ROUTER] 🎯 Routing intent:', {
       intent: intent.intent,

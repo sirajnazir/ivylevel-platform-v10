@@ -1,4 +1,6 @@
 import { openai, moderate } from '../ai/openai';
+// v11.1: LLM Adapter v2 integration (CAT-2/CAT-3 only, not CAT-1)
+import { chooseModel, isAdapterModel, getModelBadge } from '../llm/adapter.js';
 
 // v10.1: Meta-leakage stripping helper
 // Removes internal metadata from user-facing answers
@@ -30,7 +32,7 @@ function stripMetadata(text: string): string {
     .trim();
 }
 
-export async function composeAnswer({ message, vitals, hits, memory, model, use_ft, stream, res }: any){
+export async function composeAnswer({ message, vitals, hits, memory, model, use_ft, stream, res, intent, studentId, route }: any){
   const mod = await moderate(message);
   if(mod?.flagged) return { answer: "I can't help with that.", model: 'moderation_block' };
 
@@ -47,16 +49,39 @@ export async function composeAnswer({ message, vitals, hits, memory, model, use_
     { role:'user', content: message }
   ];
 
-  const chosenModel = model || (use_ft ? process.env.JENNY_MODEL_ID : 'gpt-4o-mini');
+  // v11.1: Use adapter routing for CAT-2/CAT-3, always base for CAT-1 SQL
+  // If model explicitly provided, use it (legacy behavior)
+  // Otherwise, use adapter logic based on intent + cohort
+  const chosenModel = model
+    ? model
+    : (intent && studentId !== undefined && route !== undefined)
+      ? chooseModel(intent, studentId, route)
+      : (use_ft ? process.env.JENNY_MODEL_ID : 'gpt-4o-mini');
 
   if(!stream){
+    const t0 = Date.now();
     const resp = await openai.chat.completions.create({ model: chosenModel!, messages: msgs });
     const rawAnswer = resp.choices?.[0]?.message?.content || '';
     const cleanAnswer = stripMetadata(rawAnswer);
-    return { answer: cleanAnswer, model: chosenModel, usage: resp.usage };
+
+    // v11.1: Attach adapter metadata for observability
+    return {
+      answer: cleanAnswer,
+      model: chosenModel,
+      usage: resp.usage,
+      __adapter: {
+        model: chosenModel,
+        isAdapter: isAdapterModel(chosenModel!),
+        badge: getModelBadge(chosenModel!),
+        latency_ms: Date.now() - t0,
+        intent: intent ?? 'unknown',
+        route: route ?? 'unknown'
+      }
+    };
   }
 
   // SSE
+  const t0 = Date.now();
   res.writeHead(200, {'Content-Type':'text/event-stream','Cache-Control':'no-cache',Connection:'keep-alive'});
   const streamResp = await openai.chat.completions.create({ model: chosenModel!, messages: msgs, stream:true });
   let acc = '';
@@ -70,5 +95,18 @@ export async function composeAnswer({ message, vitals, hits, memory, model, use_
 
   // Apply metadata stripping to streaming response too
   const cleanAnswer = stripMetadata(acc);
-  return { answer: cleanAnswer, model: chosenModel };
+
+  // v11.1: Attach adapter metadata for streaming too
+  return {
+    answer: cleanAnswer,
+    model: chosenModel,
+    __adapter: {
+      model: chosenModel,
+      isAdapter: isAdapterModel(chosenModel!),
+      badge: getModelBadge(chosenModel!),
+      latency_ms: Date.now() - t0,
+      intent: intent ?? 'unknown',
+      route: route ?? 'unknown'
+    }
+  };
 }

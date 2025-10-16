@@ -14,6 +14,7 @@ process.env.SERVICE_NAME = 'jenny-api-utfa';
 
 import express from 'express';
 import { agentChat } from './orchestrator/agentChat-utfa.js';
+import { UnifiedMultiDimensionalOrchestrator } from './orchestrator/UnifiedMultiDimensionalOrchestrator.js';
 import { fetchVitals, getStudentFactValidation } from './services/facts-canonical.js';
 import { fetchLifecycle } from './services/lifecycle.js';
 import { resolveTemporalFact } from './services/temporalFacts.js';
@@ -162,8 +163,10 @@ app.get('/students/:id/lifecycle', async (req, res) => {
   }
 });
 
-// v11.3.2: UNIFIED ENDPOINT - Redirect to unified orchestrator (agentChat-utfa.ts)
-// REPLACES legacy intentRouter (routePrompt) with Priority 0-2 routing: EQ→SQL→KB
+// v13.0: MULTI-DIMENSIONAL ENDPOINT - Uses v13.0 parallel execution pipeline
+// Replaces v11.3.2 with true multi-dimensional architecture (CAT-1/2/3 parallel)
+const v13Orchestrator = new UnifiedMultiDimensionalOrchestrator();
+
 app.post('/agent/chat', async (req, res) => {
   try {
     const { message, student_id, studentId, session_id, sessionId } = req.body;
@@ -176,24 +179,22 @@ app.post('/agent/chat', async (req, res) => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     const finalSessionId = (rawSessionId && uuidRegex.test(rawSessionId)) ? rawSessionId : null;
 
-    console.log('[Unified-Orchestrator] Chat request:', { message: message?.slice(0, 80), student_id: finalStudentId });
+    console.log('[v13-Pipeline] Chat request:', { message: message?.slice(0, 80), student_id: finalStudentId });
 
-    // v11.3.2 CRITICAL FIX: Use unified orchestrator instead of legacy intentRouter
-    // Priority 0: EQ early-exit (isEQQuery check in agentChat-utfa.ts:587-621)
-    // Priority 1: SQL Facts-First (enumeration resolvers)
-    // Priority 2: KB/RAG fallback
-    const result = await agentChat({
+    // v13.0: Use multi-dimensional orchestrator
+    // 1. Context Hydration (student profile)
+    // 2. Multi-Dimensional Intent Analysis (CAT-1/2/3 detection)
+    // 3. Parallel Intelligence Execution (SQL + Pinecone + EQ in parallel)
+    // 4. Context Fusion Synthesis (LLM blending with quality verification)
+    const result = await v13Orchestrator.orchestrate({
       message,
       student_id: finalStudentId,
-      session_id: finalSessionId,
-      model: null,  // Let compose.ts decide based on use_ft flag
-      use_ft: true,  // Enable fine-tuned adapter (Category 3)
-      stream: false
-    }, null);
+      session_id: finalSessionId
+    });
 
     res.json(result);
   } catch (error: any) {
-    console.error('Chat error:', error);
+    console.error('[v13-Pipeline] Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
