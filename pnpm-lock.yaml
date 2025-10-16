@@ -244,8 +244,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       openai:
-        specifier: ^4.56.0
-        version: 4.104.0(encoding@0.1.13)(zod@3.25.76)
+        specifier: ^6.4.0
+        version: 6.4.0(zod@3.25.76)
       pg:
         specifier: ^8.11.3
         version: 8.16.3
@@ -3092,6 +3092,18 @@ packages:
     peerDependencies:
       ws: ^8.18.0
       zod: ^3.23.8
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
+  openai@6.4.0:
+    resolution: {integrity: sha512-vSoVBRTPMgg3oSaoHIGfbYM2zwGN0D4F2aiNHMeu1lZHFOwfJMAF0X110HDdedYvcsIo578ujQ11WL5kP687Cw==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
     peerDependenciesMeta:
       ws:
         optional: true
@@ -7519,6 +7531,10 @@ snapshots:
       zod: 3.25.76
     transitivePeerDependencies:
       - encoding
+
+  openai@6.4.0(zod@3.25.76):
+    optionalDependencies:
+      zod: 3.25.76
 
   option@0.2.4: {}
 
