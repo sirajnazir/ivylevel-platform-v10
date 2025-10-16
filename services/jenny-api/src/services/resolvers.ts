@@ -282,11 +282,64 @@ export async function academicsSummary(pg: Pool, studentId: string, phase: strin
   };
 }
 
-export async function kbSearch(_pg: Pool, _studentId: string, _q: string) {
+/**
+ * KB Search Resolver (CAT-2) - v11.1 Implementation
+ *
+ * Performs hybrid search (vector + lexical) across KBv6 namespaces and returns
+ * retrieved evidence with a helpful search summary.
+ *
+ * NOTE: This resolver does NOT compose the final LLM answer - it returns the raw
+ * search hits. The orchestrator/intentRouter will handle LLM composition if needed.
+ *
+ * For full LLM-composed answers with KB context, queries should go through the
+ * agentChat orchestrator's "unknown" intent path which calls hybridSearch + composeAnswer.
+ */
+export async function kbSearch(pg: Pool, studentId: string, q: string, filters?: any) {
+  const start = Date.now();
+  log.event('resolver.kb_search_start', {
+    student_id: studentId,
+    query: q.substring(0, 100),
+    filters
+  });
+
+  // Import hybridSearch dynamically to avoid circular dependency
+  const { hybridSearch } = await import('../retrieval/hybrid.js');
+
+  // Perform hybrid search across KBv6 namespaces
+  const hits = await hybridSearch(q, studentId);
+
+  log.event('resolver.kb_search_complete', {
+    student_id: studentId,
+    hit_count: hits.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!hits || hits.length === 0) {
+    return {
+      answer: "I searched your knowledge base but didn't find any relevant coaching moments or insights for that query. Try asking about specific awards, activities, or strategies we discussed.",
+      chips: [{kind: "kb", text: "no results"}],
+      hits: []
+    };
+  }
+
+  // Format a summary of search results
+  const topHits = hits.slice(0, 5);
+  const summary = `Found ${hits.length} relevant coaching moments and insights from your journey. Here are the top results:\n\n` +
+    topHits.map((hit: any, i: number) => {
+      const ns = hit.namespace || 'unknown';
+      const score = hit.score ? ` (score: ${hit.score.toFixed(2)})` : '';
+      const text = hit._text || hit.text || hit.content || '';
+      const preview = text.substring(0, 150) + (text.length > 150 ? '...' : '');
+      return `${i+1}. [${ns}]${score}\n   ${preview}`;
+    }).join('\n\n');
+
   return {
-    answer: "I can search your knowledge base if you want, but for accuracy I recommend asking for a specific list (e.g., 'final awards list').",
-    chips:[{kind:"notice", text:"facts-first"}],
-    hits:[]
+    answer: summary,
+    chips: [
+      {kind: "kb", text: `${hits.length} hits`},
+      {kind: "evidence", text: "KBv6 hybrid search"}
+    ],
+    hits
   };
 }
 
@@ -1899,6 +1952,103 @@ export async function jtbdProgression(pg: Pool, studentId: string) {
 }
 
 // ============================================================================
+// v13.1: JOURNEY TIMELINE (Temporal View of JTBD Data)
+// ============================================================================
+// ADDITIVE ENHANCEMENT: Uses existing jtbdCompleted() resolver, adds formatted timeline
+
+export async function journeyTimeline(pg: Pool, studentId: string) {
+  const start = Date.now();
+  console.log('[RESOLVER:journeyTimeline] 🗓️  Called with:', { studentId });
+
+  try {
+    // Reuse existing jtbdCompleted() resolver (follows guardrail: don't break foundation)
+    const rows = await jtbd.completed(pg, studentId);
+
+    if (!rows.length) {
+      return {
+        answer: "No completed milestones found in your journey timeline.",
+        chips: [{kind: "evidence", text: "v_jtbd_weekly_completed"}],
+        hits: []
+      };
+    }
+
+    // Group by month/year for timeline presentation
+    const timeline: Record<string, any[]> = {};
+
+    rows.forEach((job: any) => {
+      if (!job.completion_date) return;
+
+      const date = new Date(job.completion_date);
+      const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+      if (!timeline[monthYear]) {
+        timeline[monthYear] = [];
+      }
+
+      timeline[monthYear].push({
+        date: job.completion_date,
+        week: job.week_number,
+        type: job.job_type,
+        description: job.job_description,
+        outcome_metric: job.outcome_metric,
+        outcome_value: job.outcome_value,
+        outcome_unit: job.outcome_unit
+      });
+    });
+
+    // Format timeline answer
+    const parts: string[] = [];
+    parts.push(`### Your Application Journey Timeline`);
+    parts.push(`**Total Milestones:** ${rows.length} completed across ${Object.keys(timeline).length} months\n`);
+
+    // Sort months chronologically
+    const sortedMonths = Object.keys(timeline).sort();
+
+    sortedMonths.forEach((monthYear, idx) => {
+      const [year, month] = monthYear.split('-');
+      const monthName = new Date(parseInt(year), parseInt(month) - 1, 1).toLocaleString('default', { month: 'long' });
+      const jobs = timeline[monthYear];
+
+      parts.push(`**${monthName} ${year}** (${jobs.length} milestone${jobs.length > 1 ? 's' : ''})`);
+
+      jobs.forEach((job: any) => {
+        const dateStr = new Date(job.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        let line = `  • ${dateStr}: ${job.description}`;
+
+        // Add outcome if available
+        if (job.outcome_metric && job.outcome_value) {
+          line += ` (${job.outcome_metric}: ${job.outcome_value}${job.outcome_unit ? ' ' + job.outcome_unit : ''})`;
+        }
+
+        parts.push(line);
+      });
+
+      if (idx < sortedMonths.length - 1) {
+        parts.push(''); // Blank line between months
+      }
+    });
+
+    const answer = parts.join('\n');
+
+    console.log(`[RESOLVER:journeyTimeline] ✅ Success in ${Date.now() - start}ms, ${rows.length} milestones`);
+
+    return {
+      answer,
+      chips: [{kind: "evidence", text: "v_jtbd_weekly_completed"}],
+      hits: rows
+    };
+
+  } catch (error) {
+    console.error('[RESOLVER:journeyTimeline] ❌ Error:', error);
+    return {
+      answer: "Unable to retrieve journey timeline.",
+      chips: [],
+      hits: []
+    };
+  }
+}
+
+// ============================================================================
 // v10.7: COLLEGE ENHANCED WRAPPER FUNCTIONS
 // ============================================================================
 // UNIVERSAL FIX v10.7.1: Use existing resolver infrastructure + correct schema
@@ -2049,4 +2199,264 @@ export async function readinessTopPriorities(pg: Pool, studentId: string) {
   ).join("\n");
 
   return { answer: list, chips: [{kind: "evidence", text: "v_readiness_top_priorities"}], hits: rows };
+}
+
+// ============================================================================
+// v13.0: Comprehensive Profile Summary
+// ============================================================================
+
+/**
+ * profileSummary - Complete student profile with IvyScore + Academics + Awards + ECs + Vitals
+ *
+ * Designed to answer: "Tell me about my entire profile", "Help me understand where I stand", etc.
+ *
+ * Returns comprehensive snapshot including:
+ * - IvyScore/Readiness (overall + factor breakdown)
+ * - Academics (GPA + SAT/ACT + Transcript)
+ * - Awards (count by tier)
+ * - ECs (count + leadership + key vitals)
+ * - Narrative (if available)
+ * - GamePlan vs Execution vs Submitted
+ */
+export async function profileSummary(pg: Pool, studentId: string) {
+  const start = Date.now();
+  console.log('[RESOLVER:profileSummary] 🎯 Called with:', { studentId });
+  log.event('resolver.sql_start', { resolver: 'profileSummary', student_id: studentId });
+
+  const parts: string[] = [];
+  const chips: any[] = [];
+  const allHits: any = {};
+
+  // 1. IvyScore/Readiness (Overall + Factor Breakdown)
+  try {
+    const ivyScoreResult = await ivyReadyScore(pg, studentId, 'final');
+    if (ivyScoreResult.hits && ivyScoreResult.hits.length > 0) {
+      const score = ivyScoreResult.hits[0];
+      parts.push(`### IvyScore Readiness`);
+      parts.push(`**Overall Score:** ${Math.round(score.ivyready_score * 10) / 10}/100`);
+
+      // Factor breakdown
+      const factorScores = score.factor_scores || {};
+      const factorKeys = Object.keys(factorScores).sort((a, b) => factorScores[b] - factorScores[a]);
+      if (factorKeys.length > 0) {
+        parts.push(`**Factor Breakdown:**`);
+        factorKeys.forEach(factor => {
+          parts.push(`  • ${factor}: ${factorScores[factor]}/100`);
+        });
+      }
+
+      allHits.ivyscore = score;
+      chips.push({kind: "evidence", text: "v_rubric_scores_phase_latest"});
+    }
+  } catch (err) {
+    console.log('[RESOLVER:profileSummary] IvyScore unavailable:', err);
+  }
+
+  // 2. Academics (GPA + SAT + Transcript summary)
+  try {
+    // GPA
+    const gpaResult = await academicsGPA(pg, studentId, 'latest', {});
+    if (gpaResult.hits && gpaResult.hits.length > 0) {
+      const gpa = gpaResult.hits[0];
+      parts.push(`\n### Academics`);
+      parts.push(`**GPA:** ${gpa.gpa_unweighted} unweighted, ${gpa.gpa_weighted} weighted`);
+      allHits.gpa = gpa;
+    }
+
+    // SAT
+    const satResult = await academicsSAT(pg, studentId, 'latest', {});
+    if (satResult.hits && satResult.hits.length > 0) {
+      const sat = satResult.hits[0];
+      parts.push(`**SAT:** ${sat.sat_total} (${sat.sat_ebrw} EBRW, ${sat.sat_math} Math)`);
+      allHits.sat = sat;
+    }
+
+    // Transcript summary
+    const transcriptResult = await academicsTranscript(pg, studentId, 'final');
+    if (transcriptResult.hits && transcriptResult.hits.length > 0) {
+      const courses = transcriptResult.hits;
+      const apCount = courses.filter((c: any) => c.course_level === 'AP').length;
+      const honorsCount = courses.filter((c: any) => c.course_level === 'Honors').length;
+      parts.push(`**Transcript:** ${courses.length} courses (${apCount} AP, ${honorsCount} Honors)`);
+      allHits.transcript = courses;
+    }
+
+    chips.push({kind: "evidence", text: "academics"});
+  } catch (err) {
+    console.log('[RESOLVER:profileSummary] Academics unavailable:', err);
+  }
+
+  // 3. Awards (count by tier)
+  try {
+    const awardsResult = await awardsList(pg, studentId, 'final');
+    if (awardsResult.hits && awardsResult.hits.length > 0) {
+      const awards = awardsResult.hits;
+      const international = awards.filter((a: any) => a.tier === 'International').length;
+      const national = awards.filter((a: any) => a.tier === 'National').length;
+      const regional = awards.filter((a: any) => a.tier === 'Regional').length;
+      const school = awards.filter((a: any) => a.tier === 'School').length;
+
+      parts.push(`\n### Awards`);
+      parts.push(`**Total:** ${awards.length} awards`);
+      if (international > 0) parts.push(`  • International: ${international}`);
+      if (national > 0) parts.push(`  • National: ${national}`);
+      if (regional > 0) parts.push(`  • Regional: ${regional}`);
+      if (school > 0) parts.push(`  • School: ${school}`);
+
+      allHits.awards = awards;
+      chips.push({kind: "evidence", text: "v_awards_won"});
+    }
+  } catch (err) {
+    console.log('[RESOLVER:profileSummary] Awards unavailable:', err);
+  }
+
+  // 4. ECs (count + leadership + key vitals)
+  try {
+    const ecsResult = await ecsList(pg, studentId, 'final');
+    if (ecsResult.hits && ecsResult.hits.length > 0) {
+      const ecs = ecsResult.hits;
+      const leadershipRoles = ecs.filter((ec: any) =>
+        ec.position_title && (
+          ec.position_title.toLowerCase().includes('president') ||
+          ec.position_title.toLowerCase().includes('founder') ||
+          ec.position_title.toLowerCase().includes('captain') ||
+          ec.position_title.toLowerCase().includes('leader')
+        )
+      ).length;
+
+      parts.push(`\n### Extracurricular Activities`);
+      parts.push(`**Total:** ${ecs.length} activities`);
+      if (leadershipRoles > 0) parts.push(`**Leadership Positions:** ${leadershipRoles}`);
+
+      allHits.ecs = ecs;
+      chips.push({kind: "evidence", text: "v_ecs_final"});
+    }
+
+    // EC Vitals summary
+    const vitalsResult = await vitalsSummary(pg, studentId);
+    if (vitalsResult.hits && vitalsResult.hits.length > 0) {
+      const summary = vitalsResult.hits[0];
+      parts.push(`**Metrics Tracked:** ${summary.distinct_metrics} metrics across ${summary.activities_tracked} activities`);
+      allHits.vitals_summary = summary;
+      chips.push({kind: "evidence", text: "v_ec_vitals_summary"});
+    }
+  } catch (err) {
+    console.log('[RESOLVER:profileSummary] ECs unavailable:', err);
+  }
+
+  // 5. Summer Programs
+  try {
+    const programsResult = await programsList(pg, studentId, 'final');
+    if (programsResult.hits && programsResult.hits.length > 0) {
+      parts.push(`\n### Summer Programs`);
+      parts.push(`**Total:** ${programsResult.hits.length} programs`);
+      allHits.programs = programsResult.hits;
+      chips.push({kind: "evidence", text: "v_programs_final"});
+    }
+  } catch (err) {
+    console.log('[RESOLVER:profileSummary] Programs unavailable:', err);
+  }
+
+  log.event('resolver.sql_complete', {
+    resolver: 'profileSummary',
+    sections_included: Object.keys(allHits).length,
+    took_ms: Date.now() - start
+  });
+
+  if (parts.length === 0) {
+    return {
+      answer: "No profile data available.",
+      chips: [{kind: "evidence", text: "profile_summary"}],
+      hits: []
+    };
+  }
+
+  return {
+    answer: parts.join('\n'),
+    chips,
+    hits: [allHits]
+  };
+}
+
+// ============================================================================
+// v13.0: College Deadlines Resolver
+// ============================================================================
+
+/**
+ * collegeDeadlines - Get application deadlines for colleges
+ * Note: Currently returns placeholder data - needs college_list.deadline column
+ */
+export async function collegeDeadlines(pg: Pool, studentId: string, collegeName?: string) {
+  const start = Date.now();
+  console.log('[RESOLVER:collegeDeadlines] 🎯 Called with:', { studentId, collegeName });
+  log.event('resolver.sql_start', { resolver: 'collegeDeadlines', student_id: studentId, college_name: collegeName });
+
+  // TODO: Add deadline column to college_list table
+  // For now, return standard deadlines based on decision_plan
+  const query = collegeName
+    ? `SELECT college_name, decision_plan FROM college_list WHERE student_id=$1 AND college_name ILIKE $2`
+    : `SELECT college_name, decision_plan FROM college_list WHERE student_id=$1 ORDER BY college_name`;
+
+  const params = collegeName ? [studentId, `%${collegeName}%`] : [studentId];
+  const { rows } = await pg.query(query, params);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'collegeDeadlines',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  if (!rows.length) {
+    return {
+      answer: collegeName
+        ? `No colleges found matching "${collegeName}".`
+        : "No colleges in application list.",
+      chips: [{kind: "evidence", text: "college_list"}],
+      hits: []
+    };
+  }
+
+  // Check if we have actual deadline data in the database
+  // For now, acknowledge that specific deadlines are not available
+  const answer = `I don't have the specific application deadlines for your colleges stored yet. Here are the colleges on your list (${rows.length} total):\n\n` +
+    rows.map((r: any, i: number) => `${i+1}. ${r.college_name} (${r.decision_plan})`).join('\n') +
+    `\n\nNote: Typical deadlines are November 1 for Early Decision/Action and January 1 for Regular Decision, but please verify the exact dates for each school.`;
+
+  return {
+    answer,
+    chips: [{kind: "evidence", text: "college_list"}],
+    hits: rows
+  };
+}
+
+// ============================================================================
+// v13.0: College Comparison Resolver
+// ============================================================================
+
+/**
+ * collegeComparison - Compare colleges (strategic, not factual)
+ * Note: This should be strategic (CAT-2) not factual (CAT-1)
+ * Returns list of colleges for strategic KB retrieval
+ */
+export async function collegeComparison(pg: Pool, studentId: string, collegeNames: string[]) {
+  const start = Date.now();
+  console.log('[RESOLVER:collegeComparison] 🎯 Called with:', { studentId, colleges: collegeNames });
+  log.event('resolver.sql_start', { resolver: 'collegeComparison', student_id: studentId, college_count: collegeNames.length });
+
+  // Return basic college data from college_list for context
+  // Real comparison should happen in strategic layer (CAT-2) via KB retrieval
+  const query = `SELECT * FROM college_list WHERE student_id=$1 ORDER BY college_name`;
+  const { rows } = await pg.query(query, [studentId]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'collegeComparison',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  return {
+    answer: `Found ${rows.length} colleges in application list for comparison context.`,
+    chips: [{kind: "evidence", text: "college_list"}],
+    hits: rows
+  };
 }
