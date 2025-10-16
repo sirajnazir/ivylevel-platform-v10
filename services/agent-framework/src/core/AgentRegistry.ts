@@ -40,37 +40,64 @@ export class AgentRegistry {
   private initializeAgents(): void {
     log.event('registry.init_start');
 
-    // Create agent instances
-    const agents: BaseAgent[] = [
-      new GamePlanAgent(),
-      new ExtracurricularsAgent(),
-      new AwardsAgent(),
-      new SummerProgramsAgent(),
-      new CollegeListAgent(),
-      new EssayAgent(),           // Week 11: Essay strategy and writing guidance
-      new AdmissionsAgent(),      // Week 11: AO perspectives and insights
+    // Create agent instances with debug logging
+    const agentConstructors = [
+      { name: 'GamePlanAgent', constructor: GamePlanAgent },
+      { name: 'ExtracurricularsAgent', constructor: ExtracurricularsAgent },
+      { name: 'AwardsAgent', constructor: AwardsAgent },
+      { name: 'SummerProgramsAgent', constructor: SummerProgramsAgent },
+      { name: 'CollegeListAgent', constructor: CollegeListAgent },
+      { name: 'EssayAgent', constructor: EssayAgent },           // Week 11: Essay strategy
+      { name: 'AdmissionsAgent', constructor: AdmissionsAgent }, // Week 11: AO perspectives
     ];
+
+    const agents: BaseAgent[] = [];
+    for (const { name, constructor } of agentConstructors) {
+      try {
+        log.event('registry.agent_constructing', { agent_name: name });
+        const agent = new constructor();
+        agents.push(agent);
+        log.event('registry.agent_constructed', {
+          agent_name: name,
+          agent_id: agent.getManifest().agent_id
+        });
+      } catch (error: any) {
+        log.error('registry.agent_construction_error', {
+          agent_name: name,
+          error: error.message,
+          stack: error.stack
+        });
+      }
+    }
 
     // Register each agent
     for (const agent of agents) {
-      const manifest = agent.getManifest();
-      this.agents.set(manifest.agent_id, {
-        manifest,
-        instance: agent,
-        status: 'active',
-        last_used: new Date(),
-        request_count: 0,
-      });
+      try {
+        const manifest = agent.getManifest();
+        this.agents.set(manifest.agent_id, {
+          manifest,
+          instance: agent,
+          status: 'active',
+          last_used: new Date(),
+          request_count: 0,
+        });
 
-      log.event('registry.agent_registered', {
-        agent_id: manifest.agent_id,
-        category: manifest.category,
-        tools_count: manifest.tools.length,
-      });
+        log.event('registry.agent_registered', {
+          agent_id: manifest.agent_id,
+          category: manifest.category,
+          tools_count: manifest.tools.length,
+        });
+      } catch (error: any) {
+        log.error('registry.agent_registration_error', {
+          error: error.message,
+          stack: error.stack
+        });
+      }
     }
 
     log.event('registry.init_complete', {
       agents_count: this.agents.size,
+      agent_ids: Array.from(this.agents.keys())
     });
   }
 
