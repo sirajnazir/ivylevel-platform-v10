@@ -86,7 +86,7 @@ export class AwardsAgent extends BaseAgent {
         student:
           'I want to understand my award profile strength and identify the right competitions to pursue',
         parent:
-          'I want to see my child's academic recognition and ensure they're pursuing prestigious opportunities',
+          'I want to see my child academic recognition and ensure they are pursuing prestigious opportunities',
         success_metric: 'Student has clear award strategy with specific targets and preparation plans',
       },
 

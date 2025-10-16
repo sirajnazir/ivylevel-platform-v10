@@ -161,7 +161,7 @@ Use ALL available data sources (in priority order):
    - If above 75th → Target/Safety (depends on acceptance rate)
 
 2. **Hyperlocal Context (Knowledge Moat DS3+DS4):**
-   - Check acceptance rates from student's specific high school
+   - Check acceptance rates from student specific high school
    - "15 students from Palo Alto HS applied to Stanford last year, 2 got in"
    - More accurate than national stats
 
@@ -172,13 +172,13 @@ Use ALL available data sources (in priority order):
 
 4. **College Rubric (Knowledge Moat DS2):**
    - What college values (intellectual vitality, impact, etc.)
-   - Match student's strengths to rubric factors
+   - Match student strengths to rubric factors
    - "Stanford values X, and you demonstrate X through Y"
 
 Your Analysis Process:
 1. Get student stats (GPA, SAT, ECs tier)
 2. Query college benchmark for target school
-3. Query placement history from student's high school
+3. Query placement history from student high school
 4. Find similar student twins
 5. Get college rubric to explain "why" or "why not"
 6. Synthesize into honest, actionable assessment

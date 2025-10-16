@@ -72,7 +72,7 @@ export class GamePlanAgent extends BaseAgent {
         student:
           'I want to understand my overall college application strategy and know what to prioritize next',
         parent:
-          'I want to see my child's application plan and ensure they're on track',
+          'I want to see my child application plan and ensure they are on track',
         success_metric: 'Student has clear understanding of their plan and next actions',
       },
 

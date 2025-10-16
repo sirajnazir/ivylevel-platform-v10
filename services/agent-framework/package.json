@@ -8,7 +8,9 @@
     "dev:traced": "tsx src/server-traced.ts",
     "dev:temporal": "tsx src/server-temporal.ts",
     "dev:utfa": "tsx src/server-utfa.ts",
+    "dev:agents": "tsx src/server-agents.ts",
     "test:utfa": "tsx src/tests/utfa-golden-tests.ts",
+    "test:agents": "tsx src/tests/test-agents.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "reindex": "tsx scripts/reindex.ts"

@@ -87,7 +87,7 @@ export class ExtracurricularsAgent extends BaseAgent {
         student:
           'I want to understand how my extracurricular activities position me for college admissions and what I can do to strengthen them',
         parent:
-          'I want to see my child's extracurricular involvement and ensure they're developing meaningful impact',
+          'I want to see my child extracurricular involvement and ensure they are developing meaningful impact',
         success_metric: 'Student has clear understanding of EC strengths, gaps, and next steps',
       },
 
