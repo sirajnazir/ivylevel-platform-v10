@@ -2,6 +2,7 @@
  * AgentRegistry.ts
  * Central registry for all agents with routing capabilities
  * Created: 2025-10-16 (Phase 1, Week 3)
+ * Updated: 2025-10-16 (Week 11 - Added Essay & Admissions agents)
  */
 
 import type { RegisteredAgent, AgentCategory } from './types.js';
@@ -11,6 +12,8 @@ import { ExtracurricularsAgent } from '../agents/ExtracurricularsAgent.js';
 import { AwardsAgent } from '../agents/AwardsAgent.js';
 import { SummerProgramsAgent } from '../agents/SummerProgramsAgent.js';
 import { CollegeListAgent } from '../agents/CollegeListAgent.js';
+import { EssayAgent } from '../agents/EssayAgent.js';
+import { AdmissionsAgent } from '../agents/AdmissionsAgent.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 
 const log = createLogger('agent-registry');
@@ -44,6 +47,8 @@ export class AgentRegistry {
       new AwardsAgent(),
       new SummerProgramsAgent(),
       new CollegeListAgent(),
+      new EssayAgent(),           // Week 11: Essay strategy and writing guidance
+      new AdmissionsAgent(),      // Week 11: AO perspectives and insights
     ];
 
     // Register each agent
