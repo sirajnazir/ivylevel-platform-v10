@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 // Override with correct index
 process.env.PINECONE_INDEX = 'jenny-v3-3072-093025';
-process.env.SERVICE_NAME = 'jenny-api-temporal';
+process.env.SERVICE_NAME = 'agent-framework-temporal';
 
 import express from 'express';
 import { agentChat } from './orchestrator/agentChat-temporal.js';

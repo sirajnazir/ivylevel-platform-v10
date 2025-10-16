@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 // Override with correct index
 process.env.PINECONE_INDEX = 'jenny-v3-3072-093025';
-process.env.SERVICE_NAME = 'jenny-api-traced';
+process.env.SERVICE_NAME = 'agent-framework-traced';
 
 import express from 'express';
 import { agentChatTraced } from './orchestrator/agentChat-traced.js';

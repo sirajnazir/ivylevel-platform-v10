@@ -31,7 +31,7 @@ export const CFG = {
 
   // Server
   PORT: Number(process.env.PORT || 8787),
-  SERVICE_NAME: process.env.SERVICE_NAME || 'jenny-api-utfa',
+  SERVICE_NAME: process.env.SERVICE_NAME || 'agent-framework-utfa',
 };
 
 // Validate critical environment variables

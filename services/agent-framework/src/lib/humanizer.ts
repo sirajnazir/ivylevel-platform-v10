@@ -1,4 +1,4 @@
-// services/jenny-api/src/lib/humanizer.ts
+// services/agent-framework/src/lib/humanizer.ts
 // Humanizer v2.1 - Jenny's Real Voice Layer
 // Makes every reply feel like "Jenny" across all categories (SQL, KB/RAG, FT/EQ)
 // while preserving factual integrity (never edits Cat-1 facts).

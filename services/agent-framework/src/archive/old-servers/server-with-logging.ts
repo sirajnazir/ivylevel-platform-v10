@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 // Set environment for logging
 process.env.PINECONE_INDEX = 'jenny-v3-3072-093025';
-process.env.SERVICE_NAME = 'jenny-api';
+process.env.SERVICE_NAME = 'agent-framework';
 process.env.LOG_JSON_PATH = '/tmp/jenny-unified.log';
 process.env.LOG_LEVEL = 'info';
 

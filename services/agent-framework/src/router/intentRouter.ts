@@ -1,4 +1,4 @@
-// services/jenny-api/src/router/intentRouter.ts
+// services/agent-framework/src/router/intentRouter.ts
 import OpenAI from "openai";
 import { z } from "zod";
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';

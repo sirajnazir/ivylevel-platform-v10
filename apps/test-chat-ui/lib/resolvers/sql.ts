@@ -12,7 +12,7 @@ import type { Pool } from "pg";
 
 // NOTE: Direct import of jenny-api resolvers doesn't work in Next.js runtime
 // Temporarily using HTTP adapter until we set up proper module sharing
-// import * as jennyResolvers from "../../../../services/jenny-api/src/services/resolvers.js";
+// import * as jennyResolvers from "../../../../services/agent-framework/src/services/resolvers.js";
 
 /**
  * SQL Resolver Request

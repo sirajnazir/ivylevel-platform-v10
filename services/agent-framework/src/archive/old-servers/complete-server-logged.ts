@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 // Override index
 process.env.PINECONE_INDEX = 'jenny-v3-3072-093025';
-process.env.SERVICE_NAME = 'jenny-api';
+process.env.SERVICE_NAME = 'agent-framework';
 
 import express from 'express';
 import { requestContext } from '../../../packages/observability/express-mw.js';

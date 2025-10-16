@@ -4,13 +4,13 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// Load from jenny-api/.env.local first, then root .env as fallback
+// Load from agent-framework/.env.local first, then root .env as fallback
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 // Override with correct index
 process.env.PINECONE_INDEX = 'jenny-v3-3072-093025';
-process.env.SERVICE_NAME = 'jenny-api-utfa';
+process.env.SERVICE_NAME = 'agent-framework-utfa';
 
 import express from 'express';
 import { agentChat } from './orchestrator/agentChat-utfa.js';

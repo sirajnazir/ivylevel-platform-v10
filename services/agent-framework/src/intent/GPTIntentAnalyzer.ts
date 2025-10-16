@@ -4,7 +4,7 @@
  * ARCHITECTURE PRINCIPLE: Use proven GPT-4o-mini structured JSON from v12.0,
  * NOT regex patterns. This ensures accurate multi-dimensional intent detection.
  *
- * Based on: /services/jenny-api/src/router/intentRouter.ts:683-722
+ * Based on: /services/agent-framework/src/router/intentRouter.ts:683-722
  * Proven in production v12.0 with 48 few-shot examples
  */
 

@@ -12,7 +12,7 @@
  *
  * Replaces:
  * - apps/test-chat-ui/app/api/kb-chat/route.ts (KB-only)
- * - Direct calls to services/jenny-api (fact-only)
+ * - Direct calls to services/agent-framework (fact-only)
  */
 
 import { NextRequest, NextResponse } from "next/server";

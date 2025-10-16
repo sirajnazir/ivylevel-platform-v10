@@ -1,4 +1,4 @@
-// services/jenny-api/src/services/resolvers.ts
+// services/agent-framework/src/services/resolvers.ts
 import type { Pool } from 'pg';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 import { vitals } from '../resolvers/vitals.js';
