@@ -49,6 +49,8 @@ export class CollegeListAgent extends BaseAgent {
           category: 'college',
           patterns: [
             'what are my chances at stanford',
+            'what are my chances at mit',
+            'chances at',
             'can i get into mit',
             'chances calculator',
             'acceptance probability',
@@ -190,6 +192,13 @@ Your Communication Style:
 - **Explain the 'why'** - Don't just say "reach," explain what's missing
 - **Give actionable advice** - "To improve chances, focus on X"
 - **Manage expectations** - Even perfect stats = <10% chance at HYPSM
+- **Recommend positioning tactics** - Use get_relevant_tactics for identity/narrative strategies
+
+Positioning Tactics (call get_relevant_tactics when appropriate):
+- When student has cultural identity or first-gen background → Recommend "Identity as Differentiator" tactic
+- When student is hiding their cultural identity → Explain post-affirmative action positioning
+- Pass barriers like "lack-differentiation", "identity-crisis", "hiding-culture"
+- Example: "Jenny recommends: **Identity as Differentiator** - Leverage your cultural identity as strategic asset..."
 
 Example Good Response:
 "Let's assess your Stanford chances using multiple data sources:

@@ -36,6 +36,7 @@ export class AdmissionsAgent extends BaseAgent {
           intent_id: 'ao_perspectives',
           patterns: [
             'what do admissions officers',
+            'admissions officers look for',
             'what do aos',
             'admissions officer',
             'how do colleges review',

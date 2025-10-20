@@ -97,7 +97,8 @@ export class ConversationRepository {
     sessionId: string,
     studentId: string,
     studentContext: any,
-    category?: string
+    category?: string,
+    coachId: string = 'jenny'
   ): Promise<ConversationSession> {
     const query = `
       INSERT INTO agent_conversation_sessions (
@@ -106,10 +107,11 @@ export class ConversationRepository {
         student_context,
         category,
         resolution_status,
+        coach_id,
         started_at,
-        last_active
+        last_active_at
       )
-      VALUES ($1, $2, $3, $4, 'active', NOW(), NOW())
+      VALUES ($1, $2, $3, $4, 'active', $5, NOW(), NOW())
       RETURNING *
     `;
 
@@ -118,12 +120,14 @@ export class ConversationRepository {
       studentId,
       JSON.stringify(studentContext),
       category,
+      coachId,
     ]);
 
     log.event('conversation.session_created', {
       session_id: sessionId,
       student_id: studentId,
       category,
+      coach_id: coachId,
     });
 
     return result.rows[0];
@@ -136,7 +140,8 @@ export class ConversationRepository {
     session: IvyLevelSession,
     userMessage: string,
     result: AgentExecutionResult,
-    agentManifest: any
+    agentManifest: any,
+    coachId: string = 'jenny'
   ): Promise<ConversationTurn> {
     const turnId = `turn_${uuidv4()}`;
     const turnNumber = session.turn_count;
@@ -163,10 +168,11 @@ export class ConversationRepository {
         tokens_used,
         model_used,
         error_occurred,
-        error_message
+        error_message,
+        coach_id
       )
       VALUES (
-        $1, $2, $3, NOW(), $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20
+        $1, $2, $3, NOW(), $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
       )
       RETURNING *
     `;
@@ -195,6 +201,7 @@ export class ConversationRepository {
       result.response.debug?.model,
       false,  // error_occurred
       null,   // error_message
+      coachId,
     ];
 
     const turnResult = await this.pool.query(query, values);

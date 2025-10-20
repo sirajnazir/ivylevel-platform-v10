@@ -471,6 +471,798 @@ export class KnowledgeMoatRepository {
     const result = await pool.query(query, params);
     return result.rows;
   }
+
+  // ==========================================================================
+  // DS-T1: Tactic Chips (Coaching Intelligence)
+  // Added: 2025-10-16 (Week 12 - Knowledge Moat Implementation)
+  // ==========================================================================
+
+  /**
+   * Search for relevant tactic chips based on student barriers and archetypes
+   * Used by agents to recommend proven coaching tactics
+   */
+  async searchTacticChips(filters: {
+    barriers?: string[];
+    archetypes?: string[];
+    category?: string;
+    minQualityScore?: number;
+    limit?: number;
+  }): Promise<any[]> {
+    let query = `
+      SELECT
+        tactic_id,
+        tactic_name,
+        tactic_slug,
+        tactic_category,
+        domain,
+        student_archetypes,
+        barriers_addressed,
+        core_principle,
+        description,
+        micro_actions,
+        typical_outcomes,
+        estimated_duration,
+        difficulty_level,
+        quality_score,
+        confidence_score,
+        success_rate,
+        times_applied,
+        created_by_coach
+      FROM moat_tactic_chips
+      WHERE validation_status IN ('approved', 'featured')
+    `;
+    const params: any[] = [];
+    let paramCount = 1;
+
+    // Filter by barriers addressed (student needs specific help with time-crisis, essay-generic, etc.)
+    if (filters.barriers && filters.barriers.length > 0) {
+      query += ` AND barriers_addressed && $${paramCount}::text[]`;
+      params.push(filters.barriers);
+      paramCount++;
+    }
+
+    // Filter by student archetypes (first-gen-immigrant, STEM-female, etc.)
+    if (filters.archetypes && filters.archetypes.length > 0) {
+      query += ` AND student_archetypes && $${paramCount}::text[]`;
+      params.push(filters.archetypes);
+      paramCount++;
+    }
+
+    // Filter by tactic category (Time Management, Essay Strategy, etc.)
+    if (filters.category) {
+      query += ` AND tactic_category = $${paramCount}`;
+      params.push(filters.category);
+      paramCount++;
+    }
+
+    // Filter by minimum quality score
+    if (filters.minQualityScore !== undefined) {
+      query += ` AND quality_score >= $${paramCount}`;
+      params.push(filters.minQualityScore);
+      paramCount++;
+    }
+
+    // Order by quality score descending, success rate descending
+    query += ` ORDER BY quality_score DESC, success_rate DESC NULLS LAST LIMIT $${paramCount}`;
+    params.push(filters.limit || 5);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  }
+
+  /**
+   * Get a specific tactic chip by slug
+   */
+  async getTacticBySlug(tacticSlug: string): Promise<any | null> {
+    const result = await pool.query(
+      `SELECT
+        tactic_id,
+        tactic_name,
+        tactic_slug,
+        tactic_category,
+        domain,
+        student_archetypes,
+        barriers_addressed,
+        core_principle,
+        description,
+        micro_actions,
+        typical_outcomes,
+        estimated_duration,
+        difficulty_level,
+        quality_score,
+        confidence_score,
+        success_rate,
+        times_applied,
+        times_succeeded,
+        created_by_coach
+      FROM moat_tactic_chips
+      WHERE tactic_slug = $1 AND validation_status IN ('approved', 'featured')
+      ORDER BY version DESC
+      LIMIT 1`,
+      [tacticSlug]
+    );
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Get related tactics based on tactic relationships (builds_on, pairs_with)
+   */
+  async getRelatedTactics(tacticId: string, limit: number = 3): Promise<any[]> {
+    const result = await pool.query(
+      `SELECT
+        t2.tactic_id,
+        t2.tactic_name,
+        t2.tactic_slug,
+        t2.tactic_category,
+        t2.core_principle,
+        t2.quality_score
+      FROM moat_tactic_chips t1
+      JOIN moat_tactic_chips t2 ON (
+        t2.tactic_slug = ANY(t1.pairs_with) OR
+        t2.tactic_slug = ANY(t1.builds_on)
+      )
+      WHERE t1.tactic_id = $1
+        AND t2.validation_status IN ('approved', 'featured')
+      ORDER BY t2.quality_score DESC
+      LIMIT $2`,
+      [tacticId, limit]
+    );
+    return result.rows;
+  }
+
+  /**
+   * Get top tactics by category
+   */
+  async getTopTacticsByCategory(category: string, limit: number = 5): Promise<any[]> {
+    const result = await pool.query(
+      `SELECT
+        tactic_id,
+        tactic_name,
+        tactic_slug,
+        core_principle,
+        description,
+        quality_score,
+        success_rate,
+        times_applied
+      FROM moat_tactic_chips
+      WHERE tactic_category = $1
+        AND validation_status IN ('approved', 'featured')
+      ORDER BY quality_score DESC, success_rate DESC NULLS LAST
+      LIMIT $2`,
+      [category, limit]
+    );
+    return result.rows;
+  }
+
+  /**
+   * Record tactic retrieval (for analytics)
+   */
+  async incrementTacticRetrieval(tacticId: string): Promise<void> {
+    await pool.query(
+      `UPDATE moat_tactic_chips
+       SET times_retrieved = times_retrieved + 1
+       WHERE tactic_id = $1`,
+      [tacticId]
+    );
+  }
+
+  // ==========================================================================
+  // DS-T2: Success Patterns (Student Journey Intelligence)
+  // Added: 2025-10-16 (Week 13 - Knowledge Moat Implementation)
+  // ==========================================================================
+
+  /**
+   * Search for relevant success patterns based on student archetype, barriers, and desired outcomes
+   * Used by agents to show students "journeys like yours" and provide proven pathway examples
+   */
+  async searchSuccessPatterns(filters: {
+    archetypeTags?: string[];
+    barriers?: string[];
+    outcomeCategory?: string;
+    tacticsUsed?: string[];
+    minQualityScore?: number;
+    minHelpfulVotes?: number;
+    limit?: number;
+  }): Promise<any[]> {
+    let query = `
+      SELECT
+        pattern_id,
+        title,
+        pattern_slug,
+        outcome_category,
+        student_archetype,
+        archetype_tags,
+        start_date,
+        breakthrough_date,
+        outcome_date,
+        total_duration_days,
+        starting_stats,
+        barriers_faced,
+        initial_challenges,
+        tactics_used,
+        tactic_sequence,
+        most_impactful,
+        key_turning_points,
+        what_clicked,
+        final_outcomes,
+        measurable_results,
+        what_worked,
+        what_was_hard,
+        what_would_change,
+        advice_to_similar,
+        quality_score,
+        helpful_votes,
+        unhelpful_votes,
+        times_shown,
+        validation_status,
+        created_at
+      FROM moat_student_success_patterns
+      WHERE validation_status IN ('verified', 'featured')
+    `;
+    const params: any[] = [];
+    let paramCount = 1;
+
+    // Filter by archetype tags (student demographics/profile matching)
+    if (filters.archetypeTags && filters.archetypeTags.length > 0) {
+      query += ` AND archetype_tags && $${paramCount}::text[]`;
+      params.push(filters.archetypeTags);
+      paramCount++;
+    }
+
+    // Filter by barriers faced (student needs help with similar challenges)
+    if (filters.barriers && filters.barriers.length > 0) {
+      query += ` AND barriers_faced && $${paramCount}::text[]`;
+      params.push(filters.barriers);
+      paramCount++;
+    }
+
+    // Filter by outcome category (student wants to achieve similar outcome)
+    if (filters.outcomeCategory) {
+      query += ` AND outcome_category = $${paramCount}`;
+      params.push(filters.outcomeCategory);
+      paramCount++;
+    }
+
+    // Filter by tactics used (student wants to see patterns using specific tactics)
+    if (filters.tacticsUsed && filters.tacticsUsed.length > 0) {
+      query += ` AND tactics_used && $${paramCount}::text[]`;
+      params.push(filters.tacticsUsed);
+      paramCount++;
+    }
+
+    // Filter by minimum quality score
+    if (filters.minQualityScore !== undefined) {
+      query += ` AND quality_score >= $${paramCount}`;
+      params.push(filters.minQualityScore);
+      paramCount++;
+    }
+
+    // Filter by minimum helpful votes (community validation)
+    if (filters.minHelpfulVotes !== undefined) {
+      query += ` AND helpful_votes >= $${paramCount}`;
+      params.push(filters.minHelpfulVotes);
+      paramCount++;
+    }
+
+    // Order by quality score descending, helpful votes descending
+    query += ` ORDER BY quality_score DESC, (helpful_votes - unhelpful_votes) DESC, times_shown DESC LIMIT $${paramCount}`;
+    params.push(filters.limit || 5);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  }
+
+  /**
+   * Get a specific success pattern by slug
+   */
+  async getSuccessPatternBySlug(patternSlug: string): Promise<any | null> {
+    const result = await pool.query(
+      `SELECT
+        pattern_id,
+        contributor_type,
+        contributor_id,
+        student_id,
+        coach_id,
+        title,
+        pattern_slug,
+        outcome_category,
+        student_archetype,
+        archetype_tags,
+        start_date,
+        breakthrough_date,
+        outcome_date,
+        total_duration_days,
+        starting_stats,
+        barriers_faced,
+        initial_challenges,
+        tactics_used,
+        tactic_sequence,
+        most_impactful,
+        key_turning_points,
+        what_clicked,
+        final_outcomes,
+        measurable_results,
+        proof_type,
+        proof_links,
+        what_worked,
+        what_was_hard,
+        what_would_change,
+        advice_to_similar,
+        data_completeness,
+        validation_status,
+        validated_by,
+        quality_score,
+        times_shown,
+        helpful_votes,
+        unhelpful_votes,
+        comments_count,
+        similar_patterns,
+        contrasting_paths,
+        created_at,
+        updated_at
+      FROM moat_student_success_patterns
+      WHERE pattern_slug = $1 AND validation_status IN ('verified', 'featured')
+      LIMIT 1`,
+      [patternSlug]
+    );
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Get success patterns by outcome category
+   * E.g., "National Award Win", "Essay Transformation", "GPA Boost"
+   */
+  async getSuccessPatternsByOutcome(outcomeCategory: string, limit: number = 5): Promise<any[]> {
+    const result = await pool.query(
+      `SELECT
+        pattern_id,
+        title,
+        pattern_slug,
+        outcome_category,
+        archetype_tags,
+        starting_stats,
+        barriers_faced,
+        final_outcomes,
+        measurable_results,
+        what_worked,
+        advice_to_similar,
+        quality_score,
+        helpful_votes,
+        times_shown
+      FROM moat_student_success_patterns
+      WHERE outcome_category = $1
+        AND validation_status IN ('verified', 'featured')
+      ORDER BY quality_score DESC, helpful_votes DESC
+      LIMIT $2`,
+      [outcomeCategory, limit]
+    );
+    return result.rows;
+  }
+
+  /**
+   * Find similar success patterns based on archetype overlap
+   * Used to show "students like you who succeeded"
+   */
+  async findSimilarSuccessPatterns(
+    archetypeTags: string[],
+    excludePatternId?: string,
+    limit: number = 3
+  ): Promise<any[]> {
+    let query = `
+      SELECT
+        pattern_id,
+        title,
+        pattern_slug,
+        outcome_category,
+        archetype_tags,
+        starting_stats,
+        barriers_faced,
+        final_outcomes,
+        measurable_results,
+        what_worked,
+        advice_to_similar,
+        quality_score,
+        helpful_votes,
+        (SELECT COUNT(*) FROM unnest(archetype_tags) tag WHERE tag = ANY($1::text[])) as tag_match_count
+      FROM moat_student_success_patterns
+      WHERE validation_status IN ('verified', 'featured')
+        AND archetype_tags && $1::text[]
+    `;
+    const params: any[] = [archetypeTags];
+    let paramCount = 2;
+
+    if (excludePatternId) {
+      query += ` AND pattern_id != $${paramCount}::uuid`;
+      params.push(excludePatternId);
+      paramCount++;
+    }
+
+    query += ` ORDER BY tag_match_count DESC, quality_score DESC, helpful_votes DESC LIMIT $${paramCount}`;
+    params.push(limit);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  }
+
+  /**
+   * Get top success patterns overall (featured/highest quality)
+   */
+  async getTopSuccessPatterns(limit: number = 10): Promise<any[]> {
+    const result = await pool.query(
+      `SELECT
+        pattern_id,
+        title,
+        pattern_slug,
+        outcome_category,
+        archetype_tags,
+        starting_stats,
+        barriers_faced,
+        final_outcomes,
+        measurable_results,
+        what_worked,
+        advice_to_similar,
+        quality_score,
+        helpful_votes,
+        unhelpful_votes,
+        times_shown,
+        validation_status
+      FROM moat_student_success_patterns
+      WHERE validation_status IN ('verified', 'featured')
+      ORDER BY
+        CASE validation_status
+          WHEN 'featured' THEN 1
+          WHEN 'verified' THEN 2
+          ELSE 3
+        END,
+        quality_score DESC,
+        (helpful_votes - unhelpful_votes) DESC,
+        times_shown DESC
+      LIMIT $1`,
+      [limit]
+    );
+    return result.rows;
+  }
+
+  /**
+   * Get success patterns that used specific tactics
+   * Used to show "here's how others used this tactic successfully"
+   */
+  async getSuccessPatternsUsingTactic(tacticSlug: string, limit: number = 5): Promise<any[]> {
+    const result = await pool.query(
+      `SELECT
+        pattern_id,
+        title,
+        pattern_slug,
+        outcome_category,
+        archetype_tags,
+        barriers_faced,
+        tactics_used,
+        most_impactful,
+        final_outcomes,
+        measurable_results,
+        what_worked,
+        quality_score,
+        helpful_votes
+      FROM moat_student_success_patterns
+      WHERE validation_status IN ('verified', 'featured')
+        AND $1 = ANY(tactics_used)
+      ORDER BY
+        CASE WHEN $1 = ANY(most_impactful) THEN 1 ELSE 2 END,
+        quality_score DESC,
+        helpful_votes DESC
+      LIMIT $2`,
+      [tacticSlug, limit]
+    );
+    return result.rows;
+  }
+
+  /**
+   * Get breakthrough insights from success patterns
+   * Extract "what clicked" moments for inspiring students
+   */
+  async getBreakthroughInsights(filters: {
+    outcomeCategory?: string;
+    archetypeTags?: string[];
+    limit?: number;
+  }): Promise<any[]> {
+    let query = `
+      SELECT
+        pattern_id,
+        title,
+        pattern_slug,
+        outcome_category,
+        archetype_tags,
+        breakthrough_date,
+        key_turning_points,
+        what_clicked,
+        most_impactful,
+        quality_score
+      FROM moat_student_success_patterns
+      WHERE validation_status IN ('verified', 'featured')
+        AND what_clicked IS NOT NULL
+        AND what_clicked != ''
+    `;
+    const params: any[] = [];
+    let paramCount = 1;
+
+    if (filters.outcomeCategory) {
+      query += ` AND outcome_category = $${paramCount}`;
+      params.push(filters.outcomeCategory);
+      paramCount++;
+    }
+
+    if (filters.archetypeTags && filters.archetypeTags.length > 0) {
+      query += ` AND archetype_tags && $${paramCount}::text[]`;
+      params.push(filters.archetypeTags);
+      paramCount++;
+    }
+
+    query += ` ORDER BY quality_score DESC, helpful_votes DESC LIMIT $${paramCount}`;
+    params.push(filters.limit || 5);
+
+    const result = await pool.query(query, params);
+    return result.rows;
+  }
+
+  /**
+   * Record success pattern view (for analytics)
+   */
+  async incrementPatternView(patternId: string): Promise<void> {
+    await pool.query(
+      `UPDATE moat_student_success_patterns
+       SET times_shown = times_shown + 1,
+           last_viewed_at = now()
+       WHERE pattern_id = $1`,
+      [patternId]
+    );
+  }
+
+  /**
+   * Get success patterns for a specific student (their own journey patterns)
+   */
+  async getStudentSuccessPatterns(studentId: string): Promise<any[]> {
+    const result = await pool.query(
+      `SELECT
+        pattern_id,
+        title,
+        pattern_slug,
+        outcome_category,
+        archetype_tags,
+        start_date,
+        breakthrough_date,
+        outcome_date,
+        total_duration_days,
+        starting_stats,
+        barriers_faced,
+        tactics_used,
+        final_outcomes,
+        measurable_results,
+        what_worked,
+        what_was_hard,
+        what_would_change,
+        quality_score,
+        validation_status,
+        created_at
+      FROM moat_student_success_patterns
+      WHERE student_id = $1
+      ORDER BY created_at DESC`,
+      [studentId]
+    );
+    return result.rows;
+  }
+
+  // ==============================================================================
+  // DS6: Essay Examples
+  // ==============================================================================
+
+  /**
+   * Get essay examples with flexible filtering
+   */
+  async getEssayExamples(filters: {
+    collegeName?: string;
+    promptType?: string;
+    themes?: string[];
+    admittedOnly?: boolean;
+    minWordCount?: number;
+    maxWordCount?: number;
+    writingQuality?: string;
+    limit?: number;
+  } = {}): Promise<any[]> {
+    const conditions: string[] = [];
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (filters.collegeName) {
+      conditions.push(`college_name = $${paramIndex++}`);
+      params.push(filters.collegeName);
+    }
+
+    if (filters.promptType) {
+      conditions.push(`prompt_type = $${paramIndex++}`);
+      params.push(filters.promptType);
+    }
+
+    if (filters.themes && filters.themes.length > 0) {
+      conditions.push(`themes && $${paramIndex++}::text[]`);
+      params.push(filters.themes);
+    }
+
+    if (filters.admittedOnly) {
+      conditions.push(`student_admitted = true`);
+    }
+
+    if (filters.minWordCount) {
+      conditions.push(`word_count >= $${paramIndex++}`);
+      params.push(filters.minWordCount);
+    }
+
+    if (filters.maxWordCount) {
+      conditions.push(`word_count <= $${paramIndex++}`);
+      params.push(filters.maxWordCount);
+    }
+
+    if (filters.writingQuality) {
+      conditions.push(`writing_quality = $${paramIndex++}`);
+      params.push(filters.writingQuality);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const limit = filters.limit || 10;
+
+    const result = await pool.query(
+      `SELECT
+        id,
+        student_id,
+        college_name,
+        prompt_type,
+        admission_year,
+        essay_text,
+        themes,
+        writing_quality,
+        word_count,
+        student_admitted,
+        student_enrolled,
+        analysis_notes,
+        key_takeaways,
+        created_at
+      FROM moat_essay_examples
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT $${paramIndex}`,
+      [...params, limit]
+    );
+
+    return result.rows;
+  }
+
+  /**
+   * Record tactic application (when student starts using a tactic)
+   */
+  async recordTacticApplication(data: {
+    student_id: string;
+    coach_id: string;
+    tactic_id: number;
+    applied_at: Date;
+    application_context: any;
+    status: string;
+  }): Promise<number> {
+    const result = await pool.query(
+      `INSERT INTO moat_tactic_applications
+       (student_id, coach_id, tactic_id, applied_at, application_context, status)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING application_id`,
+      [
+        data.student_id,
+        data.coach_id,
+        data.tactic_id,
+        data.applied_at,
+        JSON.stringify(data.application_context),
+        data.status,
+      ]
+    );
+
+    // Increment times_applied counter
+    await this.incrementTacticCounters(data.tactic_id, { times_applied: 1 });
+
+    return result.rows[0].application_id;
+  }
+
+  /**
+   * Complete tactic application (mark as succeeded/partial/abandoned)
+   */
+  async completeTacticApplication(data: {
+    application_id: number;
+    completed_at: Date;
+    status: string;
+    outcome_reflection?: string;
+    measured_results?: any;
+  }): Promise<void> {
+    await pool.query(
+      `UPDATE moat_tactic_applications
+       SET completed_at = $1,
+           status = $2,
+           outcome_reflection = $3,
+           measured_results = $4
+       WHERE application_id = $5`,
+      [
+        data.completed_at,
+        data.status,
+        data.outcome_reflection || null,
+        data.measured_results ? JSON.stringify(data.measured_results) : null,
+        data.application_id,
+      ]
+    );
+  }
+
+  /**
+   * Get tactic application by ID
+   */
+  async getTacticApplication(applicationId: number): Promise<any> {
+    const result = await pool.query(
+      `SELECT * FROM moat_tactic_applications WHERE application_id = $1`,
+      [applicationId]
+    );
+    return result.rows[0];
+  }
+
+  /**
+   * Increment tactic counters (times_applied, times_succeeded)
+   */
+  async incrementTacticCounters(
+    tacticId: number,
+    counters: { times_applied?: number; times_succeeded?: number }
+  ): Promise<void> {
+    const updates: string[] = [];
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (counters.times_applied !== undefined) {
+      updates.push(`times_applied = times_applied + $${paramIndex++}`);
+      params.push(counters.times_applied);
+    }
+
+    if (counters.times_succeeded !== undefined) {
+      updates.push(`times_succeeded = times_succeeded + $${paramIndex++}`);
+      params.push(counters.times_succeeded);
+
+      // Recalculate success_rate
+      updates.push(`success_rate = CASE
+        WHEN times_applied > 0
+        THEN (times_succeeded::float / times_applied::float)
+        ELSE 0
+      END`);
+    }
+
+    if (updates.length > 0) {
+      params.push(tacticId);
+      await pool.query(
+        `UPDATE moat_tactic_chips
+         SET ${updates.join(', ')}
+         WHERE tactic_id = $${paramIndex}`,
+        params
+      );
+    }
+  }
+
+  /**
+   * Get all tactic applications for a student
+   */
+  async getStudentTacticApplications(studentId: string): Promise<any[]> {
+    const result = await pool.query(
+      `SELECT
+        ta.*,
+        tc.tactic_name,
+        tc.tactic_slug,
+        tc.tactic_category,
+        tc.estimated_duration
+       FROM moat_tactic_applications ta
+       JOIN moat_tactic_chips tc ON ta.tactic_id = tc.tactic_id
+       WHERE ta.student_id = $1
+       ORDER BY ta.applied_at DESC`,
+      [studentId]
+    );
+    return result.rows;
+  }
 }
 
 // Singleton instance

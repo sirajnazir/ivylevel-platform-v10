@@ -1,0 +1,362 @@
+/* Ivylevel Design System */
+
+:root {
+  /* Brand Colors */
+  --ivy-primary: #FF4A23;
+  --ivy-primary-light: #ff6b4a;
+  --ivy-primary-dark: #e6391a;
+  --ivy-secondary: #641432;
+  --ivy-secondary-light: #8a1d45;
+  --ivy-secondary-dark: #4a0f24;
+  
+  /* Semantic Colors */
+  --ivy-success: #16a34a;
+  --ivy-success-light: #22c55e;
+  --ivy-success-dark: #15803d;
+  --ivy-warning: #d97706;
+  --ivy-warning-light: #f59e0b;
+  --ivy-warning-dark: #b45309;
+  --ivy-error: #dc2626;
+  --ivy-error-light: #ef4444;
+  --ivy-error-dark: #b91c1c;
+  --ivy-info: #3b82f6;
+  --ivy-info-light: #60a5fa;
+  --ivy-info-dark: #2563eb;
+  
+  /* Gray Scale */
+  --ivy-gray-50: #f9fafb;
+  --ivy-gray-100: #f3f4f6;
+  --ivy-gray-200: #e5e7eb;
+  --ivy-gray-300: #d1d5db;
+  --ivy-gray-400: #9ca3af;
+  --ivy-gray-500: #6b7280;
+  --ivy-gray-600: #4b5563;
+  --ivy-gray-700: #374151;
+  --ivy-gray-800: #1f2937;
+  --ivy-gray-900: #111827;
+  
+  /* Background Colors */
+  --ivy-bg-primary: #ffffff;
+  --ivy-bg-secondary: #f9fafb;
+  --ivy-bg-tertiary: #f3f4f6;
+  --ivy-bg-dark: #1f2937;
+  
+  /* Text Colors */
+  --ivy-text-primary: #111827;
+  --ivy-text-secondary: #4b5563;
+  --ivy-text-tertiary: #6b7280;
+  --ivy-text-inverse: #ffffff;
+  
+  /* Border Colors */
+  --ivy-border-light: #e5e7eb;
+  --ivy-border-medium: #d1d5db;
+  --ivy-border-dark: #9ca3af;
+  
+  /* Shadow System */
+  --ivy-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --ivy-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --ivy-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --ivy-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Spacing System */
+  --ivy-space-xs: 0.25rem;
+  --ivy-space-sm: 0.5rem;
+  --ivy-space-md: 1rem;
+  --ivy-space-lg: 1.5rem;
+  --ivy-space-xl: 2rem;
+  --ivy-space-2xl: 3rem;
+  --ivy-space-3xl: 4rem;
+  
+  /* Border Radius */
+  --ivy-radius-sm: 0.25rem;
+  --ivy-radius-md: 0.375rem;
+  --ivy-radius-lg: 0.5rem;
+  --ivy-radius-xl: 0.75rem;
+  --ivy-radius-2xl: 1rem;
+  --ivy-radius-full: 9999px;
+  
+  /* Typography */
+  --ivy-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --ivy-font-size-xs: 0.75rem;
+  --ivy-font-size-sm: 0.875rem;
+  --ivy-font-size-base: 1rem;
+  --ivy-font-size-lg: 1.125rem;
+  --ivy-font-size-xl: 1.25rem;
+  --ivy-font-size-2xl: 1.5rem;
+  --ivy-font-size-3xl: 1.875rem;
+  --ivy-font-size-4xl: 2.25rem;
+  
+  /* Font Weights */
+  --ivy-font-light: 300;
+  --ivy-font-normal: 400;
+  --ivy-font-medium: 500;
+  --ivy-font-semibold: 600;
+  --ivy-font-bold: 700;
+  
+  /* Line Heights */
+  --ivy-leading-tight: 1.25;
+  --ivy-leading-snug: 1.375;
+  --ivy-leading-normal: 1.5;
+  --ivy-leading-relaxed: 1.625;
+  --ivy-leading-loose: 2;
+  
+  /* Transitions */
+  --ivy-transition-fast: 150ms ease-in-out;
+  --ivy-transition-normal: 250ms ease-in-out;
+  --ivy-transition-slow: 350ms ease-in-out;
+  
+  /* Glassmorphism Light Mode */
+  --ivy-glass-bg: rgba(255, 255, 255, 0.7);
+  --ivy-glass-bg-hover: rgba(255, 255, 255, 0.85);
+  --ivy-glass-border: rgba(255, 255, 255, 0.2);
+  --ivy-glass-border-hover: rgba(255, 255, 255, 0.4);
+  --ivy-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --ivy-glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --ivy-glass-blur: blur(20px);
+  --ivy-glass-backdrop: rgba(255, 255, 255, 0.9);
+  
+  /* Glass Effects with Brand Colors */
+  --ivy-glass-primary: rgba(255, 74, 35, 0.1);
+  --ivy-glass-primary-border: rgba(255, 74, 35, 0.2);
+  --ivy-glass-secondary: rgba(100, 20, 50, 0.1);
+  --ivy-glass-secondary-border: rgba(100, 20, 50, 0.2);
+  
+  /* Light Mode Background Gradients */
+  --ivy-bg-gradient: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  --ivy-card-gradient: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+  
+  /* Theme-aware variables (will be updated by ThemeContext) */
+  --theme-bg-primary: #ffffff;
+  --theme-bg-secondary: #f9fafb;
+  --theme-bg-tertiary: #f3f4f6;
+  --theme-bg-glass: rgba(255, 255, 255, 0.7);
+  --theme-bg-glass-hover: rgba(255, 255, 255, 0.85);
+  --theme-bg-overlay: rgba(255, 255, 255, 0.9);
+  --theme-text-primary: #111827;
+  --theme-text-secondary: #4b5563;
+  --theme-text-muted: #6b7280;
+  --theme-text-disabled: #9ca3af;
+  --theme-border-glass: rgba(255, 255, 255, 0.2);
+  --theme-border-hover: rgba(255, 255, 255, 0.4);
+  --theme-shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --theme-overlay-heavy: rgba(0, 0, 0, 0.8);
+  --theme-skeleton-gradient: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+}
+
+/* Typography Classes */
+.ivy-text-xs { font-size: var(--ivy-font-size-xs); }
+.ivy-text-sm { font-size: var(--ivy-font-size-sm); }
+.ivy-text-base { font-size: var(--ivy-font-size-base); }
+.ivy-text-lg { font-size: var(--ivy-font-size-lg); }
+.ivy-text-xl { font-size: var(--ivy-font-size-xl); }
+.ivy-text-2xl { font-size: var(--ivy-font-size-2xl); }
+.ivy-text-3xl { font-size: var(--ivy-font-size-3xl); }
+.ivy-text-4xl { font-size: var(--ivy-font-size-4xl); }
+
+.ivy-font-light { font-weight: var(--ivy-font-light); }
+.ivy-font-normal { font-weight: var(--ivy-font-normal); }
+.ivy-font-medium { font-weight: var(--ivy-font-medium); }
+.ivy-font-semibold { font-weight: var(--ivy-font-semibold); }
+.ivy-font-bold { font-weight: var(--ivy-font-bold); }
+
+.ivy-leading-tight { line-height: var(--ivy-leading-tight); }
+.ivy-leading-snug { line-height: var(--ivy-leading-snug); }
+.ivy-leading-normal { line-height: var(--ivy-leading-normal); }
+.ivy-leading-relaxed { line-height: var(--ivy-leading-relaxed); }
+.ivy-leading-loose { line-height: var(--ivy-leading-loose); }
+
+/* Color Classes */
+.ivy-text-primary { color: var(--ivy-text-primary); }
+.ivy-text-secondary { color: var(--ivy-text-secondary); }
+.ivy-text-tertiary { color: var(--ivy-text-tertiary); }
+.ivy-text-inverse { color: var(--ivy-text-inverse); }
+
+.ivy-bg-primary { background-color: var(--ivy-bg-primary); }
+.ivy-bg-secondary { background-color: var(--ivy-bg-secondary); }
+.ivy-bg-tertiary { background-color: var(--ivy-bg-tertiary); }
+.ivy-bg-dark { background-color: var(--ivy-bg-dark); }
+
+/* Component Base Styles */
+.ivy-card {
+  background: var(--ivy-bg-primary);
+  border: 1px solid var(--ivy-border-light);
+  border-radius: var(--ivy-radius-lg);
+  box-shadow: var(--ivy-shadow-sm);
+  transition: var(--ivy-transition-normal);
+}
+
+.ivy-card:hover {
+  box-shadow: var(--ivy-shadow-md);
+  transform: translateY(-1px);
+}
+
+.ivy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ivy-space-sm) var(--ivy-space-lg);
+  border-radius: var(--ivy-radius-md);
+  font-weight: var(--ivy-font-medium);
+  font-size: var(--ivy-font-size-sm);
+  line-height: var(--ivy-leading-normal);
+  transition: var(--ivy-transition-fast);
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.ivy-button-primary {
+  background-color: var(--ivy-primary);
+  color: var(--ivy-text-inverse);
+}
+
+.ivy-button-primary:hover {
+  background-color: var(--ivy-primary-dark);
+}
+
+.ivy-button-secondary {
+  background-color: var(--ivy-secondary);
+  color: var(--ivy-text-inverse);
+}
+
+.ivy-button-secondary:hover {
+  background-color: var(--ivy-secondary-dark);
+}
+
+.ivy-button-outline {
+  background-color: transparent;
+  color: var(--ivy-primary);
+  border: 1px solid var(--ivy-primary);
+}
+
+.ivy-button-outline:hover {
+  background-color: var(--ivy-primary);
+  color: var(--ivy-text-inverse);
+}
+
+/* Layout Utilities */
+.ivy-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--ivy-space-lg);
+}
+
+.ivy-grid {
+  display: grid;
+  gap: var(--ivy-space-lg);
+}
+
+.ivy-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.ivy-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.ivy-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 768px) {
+  .ivy-grid-2,
+  .ivy-grid-3,
+  .ivy-grid-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animation Classes */
+.ivy-fade-in {
+  animation: ivyFadeIn 0.3s ease-in-out;
+}
+
+.ivy-slide-up {
+  animation: ivySlideUp 0.3s ease-out;
+}
+
+@keyframes ivyFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ivySlideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glassmorphism Effect Classes */
+.ivy-glass-card {
+  background: var(--theme-bg-glass);
+  backdrop-filter: var(--ivy-glass-blur);
+  border: 1px solid var(--theme-border-glass);
+  box-shadow: var(--theme-shadow-glass);
+  transition: all var(--ivy-transition-normal);
+  position: relative;
+}
+
+.ivy-glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(to right, 
+    hsla(0, 0%, 100%, 0.4), 
+    hsla(0, 0%, 100%, 0.1), 
+    hsla(0, 0%, 100%, 0.4)
+  );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  padding: 1px;
+  pointer-events: none;
+}
+
+.ivy-glass-card:hover {
+  background: var(--theme-bg-glass-hover);
+  border-color: var(--theme-border-hover);
+  box-shadow: var(--ivy-glass-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.ivy-glass-overlay {
+  background: var(--theme-bg-overlay);
+  backdrop-filter: var(--ivy-glass-blur);
+  border: 1px solid var(--theme-border-glass);
+}
+
+.ivy-glass-primary {
+  background: var(--ivy-glass-primary);
+  border: 1px solid var(--ivy-glass-primary-border);
+  backdrop-filter: var(--ivy-glass-blur);
+}
+
+.ivy-glass-secondary {
+  background: var(--ivy-glass-secondary);
+  border: 1px solid var(--ivy-glass-secondary-border);
+  backdrop-filter: var(--ivy-glass-blur);
+}
+
+/* Brand Color Variants */
+.ivy-primary-glass {
+  background: linear-gradient(135deg, 
+    rgba(255, 74, 35, 0.1) 0%, 
+    rgba(255, 74, 35, 0.05) 100%
+  );
+  border: 1px solid rgba(255, 74, 35, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(255, 74, 35, 0.1);
+}
+
+.ivy-secondary-glass {
+  background: linear-gradient(135deg, 
+    rgba(100, 20, 50, 0.1) 0%, 
+    rgba(100, 20, 50, 0.05) 100%
+  );
+  border: 1px solid rgba(100, 20, 50, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(100, 20, 50, 0.1);
+}
+

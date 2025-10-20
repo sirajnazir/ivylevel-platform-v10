@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isCoach() {
+      return isSignedIn() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'coach';
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow create: if isAdmin();
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Students collection
+    match /students/{studentId} {
+      allow read: if isSignedIn() && (isAdmin() || 
+        (isCoach() && resource.data.assignedCoachId == request.auth.uid));
+      allow write: if isAdmin();
+    }
+    
+    // Resources collection
+    match /resources/{resourceId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    
+    // CoachResources collection
+    match /coachResources/{docId} {
+      allow read: if isSignedIn() && 
+        (isAdmin() || resource.data.coachId == request.auth.uid);
+      allow create: if isAdmin();
+      allow update: if isAdmin() || 
+        (resource.data.coachId == request.auth.uid && 
+         request.resource.data.diff(resource.data).affectedKeys()
+         .hasOnly(['rating', 'feedback', 'wasHelpful', 'lastAccessedAt', 'accessCount']));
+      allow delete: if isAdmin();
+    }
+    
+    // Sessions collection
+    match /sessions/{sessionId} {
+      allow read: if isSignedIn() && 
+        (isAdmin() || resource.data.coachId == request.auth.uid);
+      allow write: if isAdmin() || 
+        (isCoach() && resource.data.coachId == request.auth.uid);
+    }
+    
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['isRead', 'readAt']);
+      allow create, delete: if isAdmin();
+    }
+    
+    // Analytics collection
+    match /analytics/{analyticsId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if false; // Analytics should be immutable
+    }
+    
+    // Email templates
+    match /emailTemplates/{templateId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Resource templates
+    match /resourceTemplates/{templateId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -2073,6 +2073,9 @@ export async function collegeAccepted(pg: Pool, studentId: string) {
   return { answer: `Accepted to ${rows.length} colleges.`, chips: [{kind: "evidence", text: "college_list"}], hits: rows };
 }
 
+// Alias for v1.0 agents
+export const collegeAcceptances = collegeAccepted;
+
 export async function collegeEarlyDecision(pg: Pool, studentId: string) {
   // ✅ Use existing collegeList.byDecisionPlan() resolver
   const { collegeList } = await import('../resolvers/college.js');

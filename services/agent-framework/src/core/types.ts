@@ -54,6 +54,7 @@ export interface IvyLevelSession {
   session_id: string;
   student_id: string;
   student_name?: string;
+  coach_id?: string;  // Coach/tenant ID for multi-coach support
 
   // Student context (loaded once per session)
   context: StudentContext;

@@ -1,0 +1,207 @@
+/* Import Ivylevel Design System */
+@import './styles/design-system.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Login Container Styles */
+.login-container {
+  display: flex;
+  gap: 48px;
+  align-items: stretch;
+  max-width: 1200px;
+  width: 100%;
+  min-height: 600px;
+}
+
+.login-form-section {
+  flex: 1;
+  background: white;
+  border-radius: 16px;
+  padding: 48px;
+  box-shadow: 0 20px 40px rgba(100,20,50,0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.marketing-section {
+  flex: 1;
+  padding: 48px;
+  color: #641432;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.portal-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .login-container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .login-container {
+    flex-direction: column;
+    gap: 32px;
+    padding: 16px;
+    min-height: auto;
+  }
+  
+  .login-form-section {
+    flex: none;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: auto;
+  }
+  
+  .marketing-section {
+    flex: none;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    min-height: auto;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 12px;
+    gap: 24px;
+  }
+  
+  .login-form-section {
+    padding: 32px 24px;
+  }
+  
+  .marketing-section {
+    padding: 24px 16px;
+  }
+  
+  .portal-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    padding: 8px;
+    gap: 16px;
+  }
+  
+  .login-form-section {
+    padding: 24px 16px;
+  }
+  
+  .marketing-section {
+    padding: 20px 12px;
+  }
+  
+  .portal-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Additional responsive fixes */
+@media (max-width: 900px) {
+  .login-container {
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  .login-form-section,
+  .marketing-section {
+    flex: none;
+    width: 100%;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Additional utility classes */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

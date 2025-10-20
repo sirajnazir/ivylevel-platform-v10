@@ -1,0 +1,71 @@
+{
+  "name": "ivylevel-coach-training",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "firebase": "^11.8.1",
+    "firebase-admin": "^11.10.1",
+    "googleapis": "^105.0.0",
+    "lucide-react": "^0.511.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-scripts": "5.0.1",
+    "recharts": "^3.1.2",
+    "serve": "^14.2.0",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "start:prod": "PORT=3002 react-scripts start",
+    "start:ai": "./start-ai.sh",
+    "start:basic": "react-scripts start",
+    "build": "react-scripts build",
+    "build:analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "deploy": "./scripts/deploy.sh",
+    "init:firestore": "node scripts/initializeFirestore.js",
+    "init:testdata": "node scripts/createTestData.js",
+    "test:integration": "node scripts/testIntegration.js",
+    "setup": "npm run init:firestore && npm run init:testdata",
+    "check:setup": "node scripts/checkClientSetup.js",
+    "index:videos": "node scripts/robustVideoIndexer.js",
+    "index:recommendations": "node scripts/smartRecommendations.js",
+    "patches:test": "node scripts/managePatchesAndTest.js test",
+    "patches:add": "node scripts/managePatchesAndTest.js add",
+    "patches:list": "node scripts/managePatchesAndTest.js list",
+    "quality:report": "node scripts/monitorDataQuality.js",
+    "quality:patches": "node scripts/monitorDataQuality.js patches",
+    "critical:batch": "node scripts/criticalSessionIdentifier.js batch",
+    "critical:student": "node scripts/criticalSessionIdentifier.js student",
+    "critical:onboard": "node scripts/criticalSessionIdentifier.js onboard"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17"
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-01-13",
+  "description": "Patches for handling naming inconsistencies in video files",
+  "patches": [
+    {
+      "name": "Fix Coaching_B pattern",
+      "type": "file-pattern", 
+      "pattern": "^Coaching_B_([^_]+)_([^_]+)_Wk(\\d+)_(\\d{4}-\\d{2}-\\d{2})_M_(.+)",
+      "flags": "i",
+      "description": "Handle Coaching_B format with proper week extraction"
+    },
+    {
+      "name": "Fix standard Coaching_A pattern",
+      "type": "file-pattern",
+      "pattern": "^Coaching_A_([^_]+)_([^_]+)_Wk(\\d+)_(\\d{4}-\\d{2}-\\d{2})_M_([^_]+)U_(.+)",
+      "flags": "i", 
+      "description": "Handle Coaching_A format with proper week extraction"
+    },
+    {
+      "name": "Additional coach variations",
+      "type": "coach-variation",
+      "coach": "jamie",
+      "variations": ["jaime", "jimmy"],
+      "description": "Handle common misspellings of Jamie"
+    },
+    {
+      "name": "Ivylevel admin variations",
+      "type": "coach-variation", 
+      "coach": "ivylevel",
+      "variations": ["ivylevel", "ivy", "admin", "system"],
+      "description": "Various ways admin/system is labeled"
+    },
+    {
+      "name": "Rishi coach variations",
+      "type": "coach-variation",
+      "coach": "rishi",
+      "variations": ["rishi"],
+      "description": "Handle Rishi coach name"
+    },
+    {
+      "name": "Aditi coach variations",
+      "type": "coach-variation",
+      "coach": "aditi",
+      "variations": ["aditi"],
+      "description": "Handle Aditi coach name"
+    },
+    {
+      "name": "Siraj coach variations",
+      "type": "coach-variation",
+      "coach": "siraj",
+      "variations": ["siraj"],
+      "description": "Handle Siraj coach name"
+    },
+    {
+      "name": "Marissa coach variations",
+      "type": "coach-variation",
+      "coach": "marissa",
+      "variations": ["marrisa"],
+      "description": "Handle Marissa name variations"
+    },
+    {
+      "name": "Steven coach variations",
+      "type": "coach-variation",
+      "coach": "steven",
+      "variations": ["steven", "steve"],
+      "description": "Handle Steven coach name"
+    },
+    {
+      "name": "Andrew coach variations",
+      "type": "coach-variation",
+      "coach": "andrew",
+      "variations": ["andrew", "andy"],
+      "description": "Handle Andrew coach name"
+    },
+    {
+      "name": "Jenny coach variations",
+      "type": "coach-variation",
+      "coach": "jenny",
+      "variations": ["jennifer"],
+      "description": "Handle Jenny name variations"
+    },
+    {
+      "name": "Noor coach variations",
+      "type": "coach-variation",
+      "coach": "noor",
+      "variations": ["noorpatel", "patel"],
+      "description": "Handle Noor name variations"
+    },
+    {
+      "name": "Kelvin coach variations",
+      "type": "coach-variation",
+      "coach": "kelvin",
+      "variations": ["chen", "kelvinchen"],
+      "description": "Handle Kelvin name variations"
+    },
+    {
+      "name": "Juli coach variations",
+      "type": "coach-variation",
+      "coach": "juli",
+      "variations": ["julie", "julia"],
+      "description": "Handle Juli name variations"
+    },
+    {
+      "name": "Iqra coach variations",
+      "type": "coach-variation",
+      "coach": "iqra",
+      "variations": ["iqrah"],
+      "description": "Handle Iqra name variations"
+    },
+    {
+      "name": "Alan coach variations",
+      "type": "coach-variation",
+      "coach": "alan",
+      "variations": ["alan"],
+      "description": "Handle Alan coach name"
+    },
+    {
+      "name": "Student name corrections",
+      "type": "student-correction",
+      "corrections": {
+        "unknow": null,
+        "unkown": null,
+        "n/a": null,
+        "na": null,
+        "test": null,
+        "demo": null
+      },
+      "description": "Common typos and placeholder names to ignore"
+    },
+    {
+      "name": "Alternative date format",
+      "type": "file-pattern",
+      "pattern": "^(.+?)_(\\d{2})(\\d{2})(\\d{4})_(.+)",
+      "flags": "i",
+      "description": "Handle MMDDYYYY date format"
+    },
+    {
+      "name": "Test prep sessions",
+      "type": "session-type",
+      "pattern": "SAT|ACT|AP\\s*Exam|Test\\s*Prep",
+      "sessionType": "test-prep",
+      "description": "Identify test preparation sessions"
+    },
+    {
+      "name": "College application sessions",
+      "type": "session-type",
+      "pattern": "college\\s*app|essay|common\\s*app|supplement",
+      "sessionType": "college-apps",
+      "description": "Identify college application sessions"
+    },
+    {
+      "name": "Medical track subjects",
+      "type": "subject-rule",
+      "pattern": "pre[\\s-]?health|nursing|dental|pharma",
+      "subject": "pre-health",
+      "description": "Broader medical track detection"
+    },
+    {
+      "name": "Engineering subjects",
+      "type": "subject-rule",
+      "pattern": "engineer|robotics|mechanical|electrical",
+      "subject": "engineering",
+      "description": "Engineering track detection"
+    }
+  ],
+  "notes": [
+    "Add new patches as you discover naming patterns",
+    "Patches are applied in order, so put more specific patterns first",
+    "Use null in corrections to mark for manual review",
+    "Regular expressions in patterns support standard JS regex syntax"
+  ]
+}

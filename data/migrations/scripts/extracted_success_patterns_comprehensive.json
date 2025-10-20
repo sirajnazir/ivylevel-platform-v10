@@ -1,0 +1,5112 @@
+{
+  "extraction_date": "2025-10-16T15:05:40.238793",
+  "total_chips": 219,
+  "patterns_by_category": {
+    "national_award_win": [
+      {
+        "chip_id": "W001-INSIGHT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-TACTIC-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-TRUST-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RESULT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RELATABILITY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-INSIGHT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-STRATEGY-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-RESULT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-CHANNEL-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-STRATEGY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RESULT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-CHANNEL-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-INSIGHT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-STRATEGY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-TACTIC-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-ADAPTATION-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RESULT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-INSIGHT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-STRATEGY-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-RELATABILITY-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-SILVER-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-STRATEGY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-TACTIC-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-FRAMEWORK-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-RESULT-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-SILVER-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-FRAMEWORK-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-TACTIC-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-TRUST-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-FRAMEWORK-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RESULT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-CHANNEL-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RELATABILITY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-SILVER-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W009-STRATEGY-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-CHANNEL-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-RELATABILITY-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W010-TACTIC-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RESULT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W011-INSIGHT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-FRAMEWORK-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-RESULT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-RELATABILITY-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W012-RELATABILITY-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W014-STRATEGY-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-RESULT-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W015-RESULT-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W017-FRAMEWORK-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-RESULT-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-CHANNEL-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W018-TACTIC-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W020-FRAMEWORK-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W021-FRAMEWORK-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-RESULT-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-CHANNEL-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W023-FRAMEWORK-001",
+        "week": "W023"
+      }
+    ],
+    "gpa_boost": [
+      {
+        "chip_id": "W001-INSIGHT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-TACTIC-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RESULT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-RESULT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-STRATEGY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RESULT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-FRAMEWORK-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RESULT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-STRATEGY-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-TACTIC-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-RESULT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-FRAMEWORK-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-RESULT-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W010-STRATEGY-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W014-SILVER-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W018-INSIGHT-001",
+        "week": "W018"
+      }
+    ],
+    "test_score_boost": [
+      {
+        "chip_id": "W001-INSIGHT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-TACTIC-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-FRAMEWORK-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-CHANNEL-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RELATABILITY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-INSIGHT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-STRATEGY-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-TACTIC-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-FRAMEWORK-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-RESULT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-CHANNEL-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-SILVER-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-INSIGHT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-STRATEGY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-TACTIC-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-ADAPTATION-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RESULT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-CHANNEL-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RELATABILITY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-SILVER-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-INSIGHT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-STRATEGY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-TACTIC-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-ADAPTATION-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RELATABILITY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-INSIGHT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-TACTIC-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-ADAPTATION-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-FRAMEWORK-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-RESULT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-CHANNEL-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-SILVER-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-INSIGHT-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-STRATEGY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-TACTIC-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-ADAPTATION-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-FRAMEWORK-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-RESULT-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-CHANNEL-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-RELATABILITY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-SILVER-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-STRATEGY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-TACTIC-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-ADAPTATION-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-FRAMEWORK-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-RESULT-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-CHANNEL-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-RELATABILITY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-SILVER-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-INSIGHT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-TACTIC-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-TRUST-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-FRAMEWORK-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RESULT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-CHANNEL-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-SILVER-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W009-INSIGHT-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-TACTIC-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-TRUST-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-ADAPTATION-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-FRAMEWORK-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-RESULT-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-CHANNEL-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-RELATABILITY-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-SILVER-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W010-STRATEGY-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-TACTIC-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-TRUST-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-ADAPTATION-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-FRAMEWORK-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RELATABILITY-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W011-STRATEGY-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-ADAPTATION-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-FRAMEWORK-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-RESULT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-SILVER-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W012-FRAMEWORK-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-RESULT-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-SILVER-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W013-INSIGHT-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W013-STRATEGY-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W013-TACTIC-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W013-RESULT-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W013-SILVER-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W014-INSIGHT-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-TACTIC-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-ADAPTATION-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-RESULT-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-RELATABILITY-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-SILVER-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W015-INSIGHT-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-STRATEGY-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-TACTIC-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-ADAPTATION-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-FRAMEWORK-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-RESULT-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-RELATABILITY-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-SILVER-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W016-TACTIC-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W016-ADAPTATION-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W016-RESULT-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W017-INSIGHT-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-STRATEGY-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-TACTIC-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-SILVER-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W018-TACTIC-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W018-ADAPTATION-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W018-RESULT-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W019-INSIGHT-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W019-TACTIC-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W019-TRUST-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W019-ADAPTATION-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W019-FRAMEWORK-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W020-STRATEGY-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-TACTIC-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-CHANNEL-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-SILVER-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W021-INSIGHT-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-TACTIC-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-SILVER-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W022-INSIGHT-001",
+        "week": "W022"
+      },
+      {
+        "chip_id": "W022-TACTIC-001",
+        "week": "W022"
+      },
+      {
+        "chip_id": "W022-ADAPTATION-001",
+        "week": "W022"
+      },
+      {
+        "chip_id": "W022-FRAMEWORK-001",
+        "week": "W022"
+      },
+      {
+        "chip_id": "W023-INSIGHT-001",
+        "week": "W023"
+      },
+      {
+        "chip_id": "W023-ADAPTATION-001",
+        "week": "W023"
+      },
+      {
+        "chip_id": "W023-RELATABILITY-001",
+        "week": "W023"
+      },
+      {
+        "chip_id": "W023-SILVER-001",
+        "week": "W023"
+      }
+    ],
+    "community_impact_scale": [
+      {
+        "chip_id": "W001-INSIGHT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-ADAPTATION-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-FRAMEWORK-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RESULT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-INSIGHT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-STRATEGY-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-TACTIC-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-TRUST-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-FRAMEWORK-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-SILVER-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-INSIGHT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-STRATEGY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-TACTIC-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-TACTIC-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-FRAMEWORK-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-STRATEGY-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-TACTIC-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-ADAPTATION-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-RESULT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-CHANNEL-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-SILVER-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W007-INSIGHT-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-STRATEGY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-TACTIC-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-SILVER-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W009-ADAPTATION-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-FRAMEWORK-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-CHANNEL-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W010-FRAMEWORK-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RESULT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W013-ADAPTATION-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W014-TRUST-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W015-ADAPTATION-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W019-ADAPTATION-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W019-SILVER-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W020-ADAPTATION-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-RESULT-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-SILVER-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W022-STRATEGY-001",
+        "week": "W022"
+      }
+    ],
+    "ec_funding": [
+      {
+        "chip_id": "W001-STRATEGY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-ADAPTATION-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-SILVER-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-RESULT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W004-RESULT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W008-RELATABILITY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W011-INSIGHT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W014-FRAMEWORK-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-RELATABILITY-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W018-TACTIC-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W020-SILVER-001",
+        "week": "W020"
+      }
+    ],
+    "time_management_breakthrough": [
+      {
+        "chip_id": "W001-STRATEGY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-FRAMEWORK-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-CHANNEL-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-TACTIC-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-ADAPTATION-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-FRAMEWORK-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-RESULT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-CHANNEL-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-SILVER-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-STRATEGY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-TACTIC-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-TRUST-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-ADAPTATION-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RESULT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-CHANNEL-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RELATABILITY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-STRATEGY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-TACTIC-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-TRUST-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-FRAMEWORK-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RELATABILITY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-SILVER-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-TACTIC-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-ADAPTATION-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-FRAMEWORK-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-RESULT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-SILVER-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-TACTIC-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-ADAPTATION-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-FRAMEWORK-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-CHANNEL-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-STRATEGY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-TACTIC-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-ADAPTATION-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-FRAMEWORK-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-CHANNEL-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-RELATABILITY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-SILVER-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-INSIGHT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-TACTIC-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-ADAPTATION-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-FRAMEWORK-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RESULT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-CHANNEL-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W009-INSIGHT-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-TACTIC-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-FRAMEWORK-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-RESULT-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-SILVER-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W010-INSIGHT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-TACTIC-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-FRAMEWORK-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W011-RESULT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W012-RESULT-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W013-RESULT-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W014-INSIGHT-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W016-TACTIC-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W016-CHANNEL-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W016-SILVER-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W017-FRAMEWORK-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W018-TRUST-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W018-RESULT-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W020-STRATEGY-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-SILVER-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W021-FRAMEWORK-001",
+        "week": "W021"
+      }
+    ],
+    "essay_transformation": [
+      {
+        "chip_id": "W001-STRATEGY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-TACTIC-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-STRATEGY-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-STRATEGY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-INSIGHT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-STRATEGY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-TACTIC-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-TRUST-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-ADAPTATION-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RESULT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-CHANNEL-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-SILVER-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-STRATEGY-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-TRUST-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-FRAMEWORK-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-SILVER-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-STRATEGY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-TRUST-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-RELATABILITY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-STRATEGY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-FRAMEWORK-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-TRUST-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-ADAPTATION-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-FRAMEWORK-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RESULT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-CHANNEL-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RELATABILITY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-SILVER-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W010-INSIGHT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-TACTIC-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-ADAPTATION-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RESULT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-CHANNEL-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W011-INSIGHT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-STRATEGY-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-FRAMEWORK-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-RESULT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-CHANNEL-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W012-INSIGHT-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-TRUST-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-ADAPTATION-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-FRAMEWORK-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-RESULT-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-RELATABILITY-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-SILVER-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W014-RESULT-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-CHANNEL-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W015-TACTIC-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-RESULT-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-CHANNEL-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W017-INSIGHT-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-ADAPTATION-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-FRAMEWORK-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-RESULT-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-CHANNEL-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-SILVER-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W018-FRAMEWORK-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W018-SILVER-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W019-CHANNEL-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W020-FRAMEWORK-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-RESULT-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-CHANNEL-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W021-INSIGHT-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-ADAPTATION-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-FRAMEWORK-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-RESULT-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-CHANNEL-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-SILVER-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W022-INSIGHT-001",
+        "week": "W022"
+      },
+      {
+        "chip_id": "W022-TACTIC-001",
+        "week": "W022"
+      },
+      {
+        "chip_id": "W022-FRAMEWORK-001",
+        "week": "W022"
+      }
+    ],
+    "identity_clarity": [
+      {
+        "chip_id": "W001-STRATEGY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-TRUST-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RESULT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-INSIGHT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-STRATEGY-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-TRUST-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-ADAPTATION-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-RESULT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-SILVER-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-INSIGHT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-STRATEGY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-TRUST-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RESULT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RELATABILITY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-INSIGHT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-STRATEGY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-TRUST-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-FRAMEWORK-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RESULT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RELATABILITY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-INSIGHT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-STRATEGY-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-ADAPTATION-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-FRAMEWORK-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-SILVER-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-STRATEGY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-TRUST-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-RELATABILITY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-INSIGHT-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-STRATEGY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-ADAPTATION-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-FRAMEWORK-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-RESULT-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-SILVER-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-INSIGHT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-ADAPTATION-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RESULT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-SILVER-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W009-RELATABILITY-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W010-INSIGHT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-STRATEGY-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-TRUST-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-ADAPTATION-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-FRAMEWORK-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RELATABILITY-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-SILVER-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W014-INSIGHT-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-TRUST-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W017-RESULT-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-RELATABILITY-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W018-FRAMEWORK-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W021-ADAPTATION-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-RESULT-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W022-ADAPTATION-001",
+        "week": "W022"
+      }
+    ],
+    "technical_skill_development": [
+      {
+        "chip_id": "W001-STRATEGY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-FRAMEWORK-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-CHANNEL-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-ADAPTATION-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-FRAMEWORK-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-CHANNEL-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-SILVER-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-INSIGHT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-TACTIC-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-FRAMEWORK-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-INSIGHT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-TACTIC-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-FRAMEWORK-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-SILVER-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-STRATEGY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-CHANNEL-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-STRATEGY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-ADAPTATION-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-FRAMEWORK-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W009-STRATEGY-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-TRUST-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-FRAMEWORK-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-RELATABILITY-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W011-RESULT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W012-RELATABILITY-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W015-ADAPTATION-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W016-TRUST-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W016-FRAMEWORK-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W017-RELATABILITY-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W019-TRUST-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W023-FRAMEWORK-001",
+        "week": "W023"
+      }
+    ],
+    "barrier_breakthrough": [
+      {
+        "chip_id": "W001-STRATEGY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-ADAPTATION-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-SILVER-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-STRATEGY-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-STRATEGY-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W006-RELATABILITY-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-ADAPTATION-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-INSIGHT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-ADAPTATION-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RESULT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-SILVER-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W010-INSIGHT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-STRATEGY-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-TRUST-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RESULT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-CHANNEL-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-SILVER-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W011-STRATEGY-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W011-RESULT-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W013-INSIGHT-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W014-INSIGHT-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W015-INSIGHT-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-TRUST-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-RESULT-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-CHANNEL-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-RELATABILITY-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-SILVER-001",
+        "week": "W015"
+      }
+    ],
+    "regional_award_win": [
+      {
+        "chip_id": "W001-TACTIC-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RESULT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W006-INSIGHT-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-ADAPTATION-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W008-FRAMEWORK-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W019-RESULT-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W019-RELATABILITY-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W022-TACTIC-001",
+        "week": "W022"
+      }
+    ],
+    "ec_user_scale": [
+      {
+        "chip_id": "W001-TACTIC-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-ADAPTATION-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RESULT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W004-TACTIC-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-FRAMEWORK-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-TACTIC-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-ADAPTATION-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-RESULT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-CHANNEL-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W017-FRAMEWORK-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-CHANNEL-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W019-TACTIC-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W020-STRATEGY-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-SILVER-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W023-STRATEGY-001",
+        "week": "W023"
+      },
+      {
+        "chip_id": "W023-ADAPTATION-001",
+        "week": "W023"
+      },
+      {
+        "chip_id": "W023-SILVER-001",
+        "week": "W023"
+      }
+    ],
+    "portfolio_showcase": [
+      {
+        "chip_id": "W001-TACTIC-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-TRUST-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-ADAPTATION-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-FRAMEWORK-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RESULT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-CHANNEL-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RELATABILITY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-STRATEGY-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-TACTIC-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-ADAPTATION-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-FRAMEWORK-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-CHANNEL-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-INSIGHT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-TACTIC-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-TRUST-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-ADAPTATION-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-CHANNEL-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-SILVER-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-TACTIC-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-ADAPTATION-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-FRAMEWORK-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RELATABILITY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-INSIGHT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-ADAPTATION-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-FRAMEWORK-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-CHANNEL-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-TACTIC-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-TRUST-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-ADAPTATION-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-FRAMEWORK-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-CHANNEL-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-INSIGHT-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-TACTIC-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-ADAPTATION-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-RELATABILITY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-SILVER-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-TACTIC-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-ADAPTATION-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-FRAMEWORK-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W009-INSIGHT-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-STRATEGY-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-TACTIC-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-TRUST-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-FRAMEWORK-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-RESULT-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-CHANNEL-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-SILVER-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W010-FRAMEWORK-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RELATABILITY-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W011-STRATEGY-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W012-STRATEGY-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W012-SILVER-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W013-STRATEGY-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W013-CHANNEL-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W014-INSIGHT-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W014-TRUST-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W017-FRAMEWORK-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W018-FRAMEWORK-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W023-INSIGHT-001",
+        "week": "W023"
+      },
+      {
+        "chip_id": "W023-FRAMEWORK-001",
+        "week": "W023"
+      }
+    ],
+    "trust_building": [
+      {
+        "chip_id": "W001-TRUST-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-RESULT-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-TRUST-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-INSIGHT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-TRUST-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RESULT-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-CHANNEL-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-SILVER-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-TRUST-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RESULT-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W005-TRUST-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-FRAMEWORK-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W005-RESULT-001",
+        "week": "W005"
+      },
+      {
+        "chip_id": "W006-INSIGHT-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-TRUST-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W006-CHANNEL-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-TRUST-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-RESULT-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-TRUST-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W009-INSIGHT-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-STRATEGY-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-TRUST-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-RESULT-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W009-SILVER-001",
+        "week": "W009"
+      },
+      {
+        "chip_id": "W010-TRUST-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RESULT-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-RELATABILITY-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W011-TRUST-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W012-TRUST-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W013-TRUST-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W013-RELATABILITY-001",
+        "week": "W013"
+      },
+      {
+        "chip_id": "W014-TRUST-001",
+        "week": "W014"
+      },
+      {
+        "chip_id": "W015-TRUST-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-FRAMEWORK-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-SILVER-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W016-TRUST-001",
+        "week": "W016"
+      },
+      {
+        "chip_id": "W017-TRUST-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W018-TRUST-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W019-TRUST-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W020-TRUST-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W021-TRUST-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W023-TRUST-001",
+        "week": "W023"
+      }
+    ],
+    "ec_leadership_role": [
+      {
+        "chip_id": "W001-RELATABILITY-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W001-SILVER-001",
+        "week": "W001"
+      },
+      {
+        "chip_id": "W002-INSIGHT-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-ADAPTATION-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W002-FRAMEWORK-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W004-FRAMEWORK-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W004-RELATABILITY-001",
+        "week": "W004"
+      },
+      {
+        "chip_id": "W006-ADAPTATION-001",
+        "week": "W006"
+      },
+      {
+        "chip_id": "W007-INSIGHT-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-TACTIC-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-ADAPTATION-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W007-RELATABILITY-001",
+        "week": "W007"
+      },
+      {
+        "chip_id": "W008-INSIGHT-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-STRATEGY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-ADAPTATION-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W008-RELATABILITY-001",
+        "week": "W008"
+      },
+      {
+        "chip_id": "W010-ADAPTATION-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W010-SILVER-001",
+        "week": "W010"
+      },
+      {
+        "chip_id": "W011-SILVER-001",
+        "week": "W011"
+      },
+      {
+        "chip_id": "W012-STRATEGY-001",
+        "week": "W012"
+      },
+      {
+        "chip_id": "W015-STRATEGY-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W015-RESULT-001",
+        "week": "W015"
+      },
+      {
+        "chip_id": "W017-INSIGHT-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-STRATEGY-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-RESULT-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W017-SILVER-001",
+        "week": "W017"
+      },
+      {
+        "chip_id": "W018-CHANNEL-001",
+        "week": "W018"
+      },
+      {
+        "chip_id": "W019-SILVER-001",
+        "week": "W019"
+      },
+      {
+        "chip_id": "W020-TRUST-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W020-ADAPTATION-001",
+        "week": "W020"
+      },
+      {
+        "chip_id": "W021-INSIGHT-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-STRATEGY-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-RESULT-001",
+        "week": "W021"
+      },
+      {
+        "chip_id": "W021-SILVER-001",
+        "week": "W021"
+      }
+    ],
+    "activity_output_surge": [
+      {
+        "chip_id": "W002-FRAMEWORK-001",
+        "week": "W002"
+      },
+      {
+        "chip_id": "W003-FRAMEWORK-001",
+        "week": "W003"
+      },
+      {
+        "chip_id": "W003-RESULT-001",
+        "week": "W003"
+      }
+    ]
+  },
+  "aggregated_patterns": {
+    "national_award_win": {
+      "category": "national_award_win",
+      "category_name": "National Award Win",
+      "chip_count": 58,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W023",
+      "end_date": "2023-12-17",
+      "duration_weeks": 19,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.95,
+        0.92,
+        0.94,
+        0.9,
+        0.89,
+        0.96,
+        0.97,
+        0.91,
+        0.89,
+        0.96,
+        0.94,
+        0.92,
+        0.88,
+        0.97,
+        0.98,
+        0.95,
+        0.93,
+        0.92,
+        0.96,
+        0.97,
+        0.9,
+        0.96,
+        0.97,
+        0.94,
+        0.96,
+        0.91,
+        0.96,
+        0.96,
+        0.98,
+        0.95,
+        0.94,
+        0.96,
+        0.92,
+        0.91,
+        0.9,
+        0.97,
+        0.97,
+        0.91,
+        0.9,
+        0.95,
+        0.92,
+        0.95,
+        0.95,
+        0.93,
+        0.94,
+        0.93,
+        0.95,
+        0.93,
+        0.94,
+        0.95,
+        0.94,
+        0.93,
+        0.95,
+        0.95,
+        0.95,
+        0.94,
+        0.93,
+        0.95
+      ],
+      "avg_quality": 0.9389655172413793,
+      "tactics_used": [
+        "W001-TACTIC-001",
+        "W004-TACTIC-001",
+        "W006-TACTIC-001",
+        "W008-TACTIC-001",
+        "W010-TACTIC-001",
+        "W018-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W005",
+          "what": "The Naviance Revelation uses school's own data to show exact positioning needed creating concrete measurable goals. The Geographic Expansion systematically broadens radius (Mountain House\u2192Dublin\u2192East "
+        },
+        {
+          "week": "W006",
+          "what": "The Complete Inventory Demand triggered by hidden activity discovery: 'Send me a list of everything you're involved in' ensures no strategic blind spots. The Go Hard or Go Home philosophy eliminates m"
+        },
+        {
+          "week": "W008",
+          "what": "Eight transformative techniques deployed: The Mini Application Practice treats every opportunity as college prep. The Vulnerability Narrative emphasizes struggles over achievements: 'Background + Barr"
+        }
+      ],
+      "measurable_results": {
+        "academic": "GPA improvement detected",
+        "recognition": "Award won",
+        "ec_impact": "Scale growth detected",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "ec_funding": "Funding acquired"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-INSIGHT-001",
+          "week": "W001",
+          "content": "Jenny deploys rapid multi-dimensional profiling to uncover Huda's hidden profile: a 4.3 GPA student coding since age 8 with dual film-CS passion, but "
+        },
+        {
+          "chip_id": "W001-TACTIC-001",
+          "week": "W001",
+          "content": "Jenny breaks down the Small Business Stories project into executable steps: create demo video, build website with map interface, launch social media, "
+        },
+        {
+          "chip_id": "W001-TRUST-001",
+          "week": "W001",
+          "content": "Jenny establishes trust through layered credibility: Stanford student status, documentary experience matching Huda's interests, NCWIT dual winner cred"
+        },
+        {
+          "chip_id": "W001-RESULT-001",
+          "week": "W001",
+          "content": "Session establishes concrete measurable outcomes across multiple dimensions. Awards targets: NCWIT, Young Arts, National History Day. Program applicat"
+        },
+        {
+          "chip_id": "W001-RELATABILITY-001",
+          "week": "W001",
+          "content": "Jenny deploys hyper-relatability through shared experience layers: Stanford student for immediate credibility, documentary maker matching Huda's film "
+        },
+        {
+          "chip_id": "W002-INSIGHT-001",
+          "week": "W002",
+          "content": "Jenny's rapid assessment uncovers critical time misallocation: Huda spends 4 hours daily (28 hours/week) on social media while claiming no time for ac"
+        },
+        {
+          "chip_id": "W002-STRATEGY-001",
+          "week": "W002",
+          "content": "Strategic breakthrough occurs through identity repositioning: Machine Learning Club pivots to Women in AI Club for advocacy angle without changing con"
+        },
+        {
+          "chip_id": "W002-RESULT-001",
+          "week": "W002",
+          "content": "Measurable goals established: Academic - all A's both semesters (currently gets B's first); SAT - 1550+ requiring 190-point increase; PSAT - 1500+ for"
+        },
+        {
+          "chip_id": "W002-CHANNEL-001",
+          "week": "W002",
+          "content": "Multi-channel ecosystem deployed: Google Sheets for awards/programs tracking with checkboxes; Google Docs for session notes and task lists; Chat for r"
+        },
+        {
+          "chip_id": "W003-STRATEGY-001",
+          "week": "W003",
+          "content": "Goal architecture established with numeric precision: All A's both semesters to break B pattern, 1550+ SAT from 1360 baseline, 1500+ PSAT for National"
+        }
+      ],
+      "key_insights": [
+        "Rapid diagnostic reveals 4.3 GPA student has only 2 hours daily for impact; missing community service and awards despite coding since age 8",
+        "Tactical breakdown: Small Business Stories steps, NCWIT reframe, 6 program links, 100+ users and 30-state coverage targets",
+        "Trust via Stanford credential, NCWIT wins, vulnerability sharing, parent buy-in achieved: 'music to my ears'",
+        "Outcomes: NCWIT/Young Arts/NHD awards, 100+ users, 30 states, 4.0+ GPA, 4 weeks saved from Launch X redirect",
+        "Relatability via Stanford status, NCWIT wins, sister reference, platform fluency, challenge questions vs commands"
+      ]
+    },
+    "gpa_boost": {
+      "category": "gpa_boost",
+      "category_name": "GPA/Grade Improvement",
+      "chip_count": 16,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W018",
+      "end_date": "2023-11-16",
+      "duration_weeks": 9,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.95,
+        0.92,
+        0.9,
+        0.91,
+        0.96,
+        0.92,
+        0.96,
+        0.92,
+        0.97,
+        0.94,
+        0.91,
+        0.96,
+        0.91,
+        0.98,
+        0.97,
+        0.97
+      ],
+      "avg_quality": 0.940625,
+      "tactics_used": [
+        "W001-TACTIC-001",
+        "W005-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W014",
+          "what": "Link annotation formula established: 'URL (description in parentheses)' with technology details. Example: 'Job board I developed for unemployment using React.' Warning: 'No dashes might copy-paste inc"
+        }
+      ],
+      "measurable_results": {
+        "academic": "GPA improvement detected",
+        "recognition": "Award won",
+        "ec_impact": "Scale growth detected",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "ec_funding": "Funding acquired"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-INSIGHT-001",
+          "week": "W001",
+          "content": "Jenny deploys rapid multi-dimensional profiling to uncover Huda's hidden profile: a 4.3 GPA student coding since age 8 with dual film-CS passion, but "
+        },
+        {
+          "chip_id": "W001-TACTIC-001",
+          "week": "W001",
+          "content": "Jenny breaks down the Small Business Stories project into executable steps: create demo video, build website with map interface, launch social media, "
+        },
+        {
+          "chip_id": "W001-RESULT-001",
+          "week": "W001",
+          "content": "Session establishes concrete measurable outcomes across multiple dimensions. Awards targets: NCWIT, Young Arts, National History Day. Program applicat"
+        },
+        {
+          "chip_id": "W002-RESULT-001",
+          "week": "W002",
+          "content": "Measurable goals established: Academic - all A's both semesters (currently gets B's first); SAT - 1550+ requiring 190-point increase; PSAT - 1500+ for"
+        },
+        {
+          "chip_id": "W003-STRATEGY-001",
+          "week": "W003",
+          "content": "Goal architecture established with numeric precision: All A's both semesters to break B pattern, 1550+ SAT from 1360 baseline, 1500+ PSAT for National"
+        },
+        {
+          "chip_id": "W003-RESULT-001",
+          "week": "W003",
+          "content": "Success metrics established across timeframes: Short-term - 7 tasks Week 3 completion; Medium-term - All A's by semester end; Long-term - 1550+ SAT, 3"
+        },
+        {
+          "chip_id": "W004-FRAMEWORK-001",
+          "week": "W004",
+          "content": "Holistic profile architecture integrates five dimensions: academic foundation (4.3 GPA+11 APs), creative spike (film portfolio+festivals+YouTube), tec"
+        },
+        {
+          "chip_id": "W004-RESULT-001",
+          "week": "W004",
+          "content": "Measurable targets established: maintain 4.3+ weighted GPA, expand 8\u219211 APs through self-study, acquire 3-5 film/creative awards, apply to 15-20 schoo"
+        },
+        {
+          "chip_id": "W005-STRATEGY-001",
+          "week": "W005",
+          "content": "Non-competitive school reframed as strategic advantage: easier to stand out versus fighting 50 students at Gunn. GPA maximization becomes urgent prior"
+        },
+        {
+          "chip_id": "W005-TACTIC-001",
+          "week": "W005",
+          "content": "Naviance data mining process: Advanced college search\u2192specific school\u2192scroll to middle 50% GPA/SAT ranges and scattergrams. Club member acquisition fo"
+        }
+      ],
+      "key_insights": [
+        "Rapid diagnostic reveals 4.3 GPA student has only 2 hours daily for impact; missing community service and awards despite coding since age 8",
+        "Tactical breakdown: Small Business Stories steps, NCWIT reframe, 6 program links, 100+ users and 30-state coverage targets",
+        "Outcomes: NCWIT/Young Arts/NHD awards, 100+ users, 30 states, 4.0+ GPA, 4 weeks saved from Launch X redirect",
+        "Goals: 1550+ SAT (+190pts), 3-4 awards, all A's; Wins: 21hrs/week recovered, daily schedule live, club pivot defined",
+        "Goals: All A's, 1550+ SAT, 3-4 awards; Muslim tech pioneer narrative; Stanford/MIT targeting with cultural fit"
+      ]
+    },
+    "test_score_boost": {
+      "category": "test_score_boost",
+      "category_name": "Test Score Breakthrough",
+      "chip_count": 130,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W023",
+      "end_date": "2023-12-17",
+      "duration_weeks": 23,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.95,
+        0.92,
+        0.96,
+        0.88,
+        0.89,
+        0.96,
+        0.97,
+        0.94,
+        0.95,
+        0.91,
+        0.89,
+        0.96,
+        0.94,
+        0.96,
+        0.93,
+        0.91,
+        0.94,
+        0.92,
+        0.88,
+        0.9,
+        0.95,
+        0.97,
+        0.98,
+        0.95,
+        0.93,
+        0.91,
+        0.96,
+        0.94,
+        0.92,
+        0.95,
+        0.91,
+        0.89,
+        0.96,
+        0.95,
+        0.97,
+        0.94,
+        0.92,
+        0.96,
+        0.91,
+        0.9,
+        0.89,
+        0.96,
+        0.98,
+        0.95,
+        0.93,
+        0.96,
+        0.92,
+        0.91,
+        0.9,
+        0.97,
+        0.96,
+        0.98,
+        0.95,
+        0.94,
+        0.96,
+        0.92,
+        0.91,
+        0.97,
+        0.96,
+        0.95,
+        0.94,
+        0.93,
+        0.96,
+        0.92,
+        0.91,
+        0.9,
+        0.96,
+        0.98,
+        0.95,
+        0.94,
+        0.93,
+        0.96,
+        0.9,
+        0.94,
+        0.94,
+        0.95,
+        0.93,
+        0.97,
+        0.95,
+        0.93,
+        0.97,
+        0.95,
+        0.94,
+        0.96,
+        0.93,
+        0.97,
+        0.96,
+        0.95,
+        0.94,
+        0.93,
+        0.94,
+        0.97,
+        0.96,
+        0.95,
+        0.96,
+        0.93,
+        0.95,
+        0.94,
+        0.94,
+        0.97,
+        0.95,
+        0.94,
+        0.94,
+        0.97,
+        0.96,
+        0.95,
+        0.97,
+        0.95,
+        0.94,
+        0.94,
+        0.96,
+        0.94,
+        0.94,
+        0.95,
+        0.95,
+        0.96,
+        0.95,
+        0.93,
+        0.97,
+        0.97,
+        0.95,
+        0.97,
+        0.97,
+        0.96,
+        0.95,
+        0.95,
+        0.97,
+        0.95,
+        0.94,
+        0.97
+      ],
+      "avg_quality": 0.9431538461538461,
+      "tactics_used": [
+        "W001-TACTIC-001",
+        "W002-TACTIC-001",
+        "W003-TACTIC-001",
+        "W004-TACTIC-001",
+        "W005-TACTIC-001",
+        "W007-TACTIC-001",
+        "W006-TACTIC-001",
+        "W008-TACTIC-001",
+        "W009-TACTIC-001",
+        "W010-TACTIC-001",
+        "W013-TACTIC-001",
+        "W016-TACTIC-001",
+        "W014-TACTIC-001",
+        "W015-TACTIC-001",
+        "W019-TACTIC-001",
+        "W020-TACTIC-001",
+        "W018-TACTIC-001",
+        "W017-TACTIC-001",
+        "W021-TACTIC-001",
+        "W022-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W002",
+          "what": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts commitments revealing 26 hours for passions. The S"
+        },
+        {
+          "week": "W003",
+          "what": "The Game Demo Moment creates massive investment through early work showcase: 'Show me your game! Wow!' The Grade Normalization reduces anxiety while maintaining standards: 'B's first semester while ad"
+        },
+        {
+          "week": "W005",
+          "what": "The Naviance Revelation uses school's own data to show exact positioning needed creating concrete measurable goals. The Geographic Expansion systematically broadens radius (Mountain House\u2192Dublin\u2192East "
+        },
+        {
+          "week": "W007",
+          "what": "The Backwards Time Audit starts with 168 hours total, subtracts fixed commitments, reveals 49 hours for excellence - abundance not scarcity. The Permission to be Bad validates strategic shortcuts: 'Ba"
+        },
+        {
+          "week": "W006",
+          "what": "The Complete Inventory Demand triggered by hidden activity discovery: 'Send me a list of everything you're involved in' ensures no strategic blind spots. The Go Hard or Go Home philosophy eliminates m"
+        },
+        {
+          "week": "W008",
+          "what": "Eight transformative techniques deployed: The Mini Application Practice treats every opportunity as college prep. The Vulnerability Narrative emphasizes struggles over achievements: 'Background + Barr"
+        },
+        {
+          "week": "W011",
+          "what": "Comprehensive activity documentation transforms profile: 7 tech activities (game design, nonprofit, YouTube, freelance), 5 languages (Python, JavaScript, HTML, CSS, Unity), multiple leadership roles. "
+        },
+        {
+          "week": "W009",
+          "what": "Four powerful techniques emerge: The Overflow Technique assigns more tasks than expected creating productive pressure without paralysis. The Sibling Leverage engages Omar to increase family investment"
+        },
+        {
+          "week": "W012",
+          "what": "Parent story extraction technique: 'While inspiring, doesn't showcase you.' Acknowledge value but relocate to 2 sentences max. Student agency throughout narrative. Transforms weak parent-dependent ess"
+        },
+        {
+          "week": "W013",
+          "what": "Simplification principle crystallized: 'Whenever feel doing too much work, you probably are.' All SAT information purposeful: 'They wouldn't give u+t=5 if didn't want you use it.' Transforms test from"
+        },
+        {
+          "week": "W014",
+          "what": "Link annotation formula established: 'URL (description in parentheses)' with technology details. Example: 'Job board I developed for unemployment using React.' Warning: 'No dashes might copy-paste inc"
+        },
+        {
+          "week": "W015",
+          "what": "Test-optional strategic awareness introduced: 'ACT or go test optional' plus 'UC schools don't look at tests regardless' plus 'There's always a solution.' Creates comprehensive backup architecture dur"
+        },
+        {
+          "week": "W020",
+          "what": "Community Impact Layers revealed: Individual (direct tutoring) \u2192 Organizational (resource systems) \u2192 Policy (legislative advocacy) \u2192 Systemic (education funding reform). Each layer exponentially incre"
+        },
+        {
+          "week": "W017",
+          "what": "Leadership quality extraction protocol: 'What are YOUR leadership qualities?' leads to 'Initiative, unifying people, making own path.' These become lens for mother's story. Seeds/trees metaphor: 'From"
+        },
+        {
+          "week": "W021",
+          "what": "Leadership quality extraction protocol: 'What are YOUR leadership qualities?' yields initiative, unifying people, making own path. These become lens for viewing mother's story. Seeds/trees metaphor so"
+        },
+        {
+          "week": "W023",
+          "what": "Neural Network Gamification: Detective levels teach AI concepts through gameplay. Simple shapes progress to complex challenges representing neural network layers. Makes abstract AI tangible. 'Maximizi"
+        }
+      ],
+      "measurable_results": {
+        "academic": "GPA improvement detected",
+        "recognition": "Award won",
+        "ec_impact": "Scale growth detected",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "ec_funding": "Funding acquired"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-INSIGHT-001",
+          "week": "W001",
+          "content": "Jenny deploys rapid multi-dimensional profiling to uncover Huda's hidden profile: a 4.3 GPA student coding since age 8 with dual film-CS passion, but "
+        },
+        {
+          "chip_id": "W001-TACTIC-001",
+          "week": "W001",
+          "content": "Jenny breaks down the Small Business Stories project into executable steps: create demo video, build website with map interface, launch social media, "
+        },
+        {
+          "chip_id": "W001-FRAMEWORK-001",
+          "week": "W001",
+          "content": "Jenny introduces the transformative 168-hour framework, breaking down Huda's week to reveal only 2 hours daily for impact activities after school (8h)"
+        },
+        {
+          "chip_id": "W001-CHANNEL-001",
+          "week": "W001",
+          "content": "Multi-channel orchestration deployed: Zoom for deep strategy sessions, chat for rapid resource deployment with 6 program links shared in real-time, em"
+        },
+        {
+          "chip_id": "W001-RELATABILITY-001",
+          "week": "W001",
+          "content": "Jenny deploys hyper-relatability through shared experience layers: Stanford student for immediate credibility, documentary maker matching Huda's film "
+        },
+        {
+          "chip_id": "W002-INSIGHT-001",
+          "week": "W002",
+          "content": "Jenny's rapid assessment uncovers critical time misallocation: Huda spends 4 hours daily (28 hours/week) on social media while claiming no time for ac"
+        },
+        {
+          "chip_id": "W002-STRATEGY-001",
+          "week": "W002",
+          "content": "Strategic breakthrough occurs through identity repositioning: Machine Learning Club pivots to Women in AI Club for advocacy angle without changing con"
+        },
+        {
+          "chip_id": "W002-TACTIC-001",
+          "week": "W002",
+          "content": "168-hour framework implementation reveals 26 hours/week available for passion projects after optimizing: Sleep 56hrs, School 37.5hrs, Transport 4.5hrs"
+        },
+        {
+          "chip_id": "W002-FRAMEWORK-001",
+          "week": "W002",
+          "content": "168-hour framework becomes system architecture: Total 168hrs minus fixed commitments equals opportunity space. Time optimization strategies: Do readin"
+        },
+        {
+          "chip_id": "W002-RESULT-001",
+          "week": "W002",
+          "content": "Measurable goals established: Academic - all A's both semesters (currently gets B's first); SAT - 1550+ requiring 190-point increase; PSAT - 1500+ for"
+        }
+      ],
+      "key_insights": [
+        "Rapid diagnostic reveals 4.3 GPA student has only 2 hours daily for impact; missing community service and awards despite coding since age 8",
+        "Tactical breakdown: Small Business Stories steps, NCWIT reframe, 6 program links, 100+ users and 30-state coverage targets",
+        "168-hour framework reveals 2-hour constraint; portfolio architecture connects all projects with community service layer",
+        "Zoom for strategy, chat for resources, email for actions; future: LinkedIn networking, Discord/Slack communities",
+        "Relatability via Stanford status, NCWIT wins, sister reference, platform fluency, challenge questions vs commands"
+      ]
+    },
+    "community_impact_scale": {
+      "category": "community_impact_scale",
+      "category_name": "Community Impact Growth",
+      "chip_count": 40,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W022",
+      "end_date": "2023-12-11",
+      "duration_weeks": 14,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.95,
+        0.91,
+        0.96,
+        0.9,
+        0.96,
+        0.97,
+        0.94,
+        0.93,
+        0.95,
+        0.96,
+        0.94,
+        0.96,
+        0.93,
+        0.94,
+        0.95,
+        0.96,
+        0.97,
+        0.94,
+        0.92,
+        0.91,
+        0.89,
+        0.96,
+        0.97,
+        0.98,
+        0.95,
+        0.97,
+        0.93,
+        0.96,
+        0.91,
+        0.96,
+        0.92,
+        0.94,
+        0.94,
+        0.93,
+        0.95,
+        0.97,
+        0.94,
+        0.94,
+        0.97,
+        0.96
+      ],
+      "avg_quality": 0.94475,
+      "tactics_used": [
+        "W002-TACTIC-001",
+        "W003-TACTIC-001",
+        "W004-TACTIC-001",
+        "W005-TACTIC-001",
+        "W007-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W002",
+          "what": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts commitments revealing 26 hours for passions. The S"
+        },
+        {
+          "week": "W005",
+          "what": "The Naviance Revelation uses school's own data to show exact positioning needed creating concrete measurable goals. The Geographic Expansion systematically broadens radius (Mountain House\u2192Dublin\u2192East "
+        },
+        {
+          "week": "W007",
+          "what": "The Backwards Time Audit starts with 168 hours total, subtracts fixed commitments, reveals 49 hours for excellence - abundance not scarcity. The Permission to be Bad validates strategic shortcuts: 'Ba"
+        },
+        {
+          "week": "W019",
+          "what": "Socratic geometry teaching deployed: 'What type of triangle is this?' leads student to discover 45-45-90 properties themselves. Self-discovered knowledge sticks better than told information. Bicycle p"
+        },
+        {
+          "week": "W020",
+          "what": "Community Impact Layers revealed: Individual (direct tutoring) \u2192 Organizational (resource systems) \u2192 Policy (legislative advocacy) \u2192 Systemic (education funding reform). Each layer exponentially incre"
+        }
+      ],
+      "measurable_results": {
+        "academic": "GPA improvement detected",
+        "recognition": "Award won",
+        "ec_funding": "Funding acquired",
+        "productivity": "Time management improvement",
+        "ec_impact": "Scale growth detected",
+        "test_scores": "SAT improvement detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-INSIGHT-001",
+          "week": "W001",
+          "content": "Jenny deploys rapid multi-dimensional profiling to uncover Huda's hidden profile: a 4.3 GPA student coding since age 8 with dual film-CS passion, but "
+        },
+        {
+          "chip_id": "W001-ADAPTATION-001",
+          "week": "W001",
+          "content": "Jenny demonstrates real-time adaptive intelligence through strategic pivots. When Huda mentions reaching out to community college professors, Jenny di"
+        },
+        {
+          "chip_id": "W001-FRAMEWORK-001",
+          "week": "W001",
+          "content": "Jenny introduces the transformative 168-hour framework, breaking down Huda's week to reveal only 2 hours daily for impact activities after school (8h)"
+        },
+        {
+          "chip_id": "W001-RESULT-001",
+          "week": "W001",
+          "content": "Session establishes concrete measurable outcomes across multiple dimensions. Awards targets: NCWIT, Young Arts, National History Day. Program applicat"
+        },
+        {
+          "chip_id": "W002-INSIGHT-001",
+          "week": "W002",
+          "content": "Jenny's rapid assessment uncovers critical time misallocation: Huda spends 4 hours daily (28 hours/week) on social media while claiming no time for ac"
+        },
+        {
+          "chip_id": "W002-STRATEGY-001",
+          "week": "W002",
+          "content": "Strategic breakthrough occurs through identity repositioning: Machine Learning Club pivots to Women in AI Club for advocacy angle without changing con"
+        },
+        {
+          "chip_id": "W002-TACTIC-001",
+          "week": "W002",
+          "content": "168-hour framework implementation reveals 26 hours/week available for passion projects after optimizing: Sleep 56hrs, School 37.5hrs, Transport 4.5hrs"
+        },
+        {
+          "chip_id": "W002-TRUST-001",
+          "week": "W002",
+          "content": "Jenny builds trust through immediate vulnerability: 'I'm spending... you don't even want to know how much time' creates safe space for Huda's social m"
+        },
+        {
+          "chip_id": "W002-FRAMEWORK-001",
+          "week": "W002",
+          "content": "168-hour framework becomes system architecture: Total 168hrs minus fixed commitments equals opportunity space. Time optimization strategies: Do readin"
+        },
+        {
+          "chip_id": "W002-SILVER-001",
+          "week": "W002",
+          "content": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts "
+        }
+      ],
+      "key_insights": [
+        "Rapid diagnostic reveals 4.3 GPA student has only 2 hours daily for impact; missing community service and awards despite coding since age 8",
+        "Real-time pivots: community college\u2192research unis; film festivals\u2192science competitions; calibrated program matching",
+        "168-hour framework reveals 2-hour constraint; portfolio architecture connects all projects with community service layer",
+        "Outcomes: NCWIT/Young Arts/NHD awards, 100+ users, 30 states, 4.0+ GPA, 4 weeks saved from Launch X redirect",
+        "Time audit reveals 28hr/week social media waste; SAT at 1360 needs 190pt gain; Muslim identity hidden strength; zero awards critical gap"
+      ]
+    },
+    "ec_funding": {
+      "category": "ec_funding",
+      "category_name": "EC Funding & Resources",
+      "chip_count": 11,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W018",
+      "end_date": "2023-11-16",
+      "duration_weeks": 8,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.98,
+        0.91,
+        0.97,
+        0.91,
+        0.92,
+        0.9,
+        0.95,
+        0.95,
+        0.94,
+        0.95,
+        0.97
+      ],
+      "avg_quality": 0.9409090909090909,
+      "tactics_used": [
+        "W018-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W001",
+          "what": "The Challenge Question technique emerges as breakthrough pattern: 'Do you have to go to an entrepreneurship program to be a leader? Just be one.' This single question saves 4 weeks of summer. Pattern "
+        },
+        {
+          "week": "W020",
+          "what": "Community Impact Layers revealed: Individual (direct tutoring) \u2192 Organizational (resource systems) \u2192 Policy (legislative advocacy) \u2192 Systemic (education funding reform). Each layer exponentially incre"
+        }
+      ],
+      "measurable_results": {
+        "ec_funding": "Funding acquired",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "academic": "GPA improvement detected",
+        "recognition": "Award won",
+        "ec_impact": "Scale growth detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-STRATEGY-001",
+          "week": "W001",
+          "content": "The strategic breakthrough occurs when Jenny synthesizes Huda's separate film and CS interests into a unified 'digital storyteller' identity. 'I see t"
+        },
+        {
+          "chip_id": "W001-ADAPTATION-001",
+          "week": "W001",
+          "content": "Jenny demonstrates real-time adaptive intelligence through strategic pivots. When Huda mentions reaching out to community college professors, Jenny di"
+        },
+        {
+          "chip_id": "W001-SILVER-001",
+          "week": "W001",
+          "content": "The Challenge Question technique emerges as breakthrough pattern: 'Do you have to go to an entrepreneurship program to be a leader? Just be one.' This"
+        },
+        {
+          "chip_id": "W002-RESULT-001",
+          "week": "W002",
+          "content": "Measurable goals established: Academic - all A's both semesters (currently gets B's first); SAT - 1550+ requiring 190-point increase; PSAT - 1500+ for"
+        },
+        {
+          "chip_id": "W004-RESULT-001",
+          "week": "W004",
+          "content": "Measurable targets established: maintain 4.3+ weighted GPA, expand 8\u219211 APs through self-study, acquire 3-5 film/creative awards, apply to 15-20 schoo"
+        },
+        {
+          "chip_id": "W008-RELATABILITY-001",
+          "week": "W008",
+          "content": "Personal vulnerability modeled: 'This is pretty personal to me' before sharing essay about dad with $200, only girl at meetings leading to national aw"
+        },
+        {
+          "chip_id": "W011-INSIGHT-001",
+          "week": "W011",
+          "content": "Mother's journey discovery transforms NCWIT narrative: Housewife self-taught coding via YouTube, now Wells Fargo developer. Jenny instantly recognizes"
+        },
+        {
+          "chip_id": "W014-FRAMEWORK-001",
+          "week": "W014",
+          "content": "117 followers lesson framework: Game with tiny following raised $8,000, proving consistency beats virality. Instagram algorithm insight: 'Just need to"
+        },
+        {
+          "chip_id": "W014-RELATABILITY-001",
+          "week": "W014",
+          "content": "Local journalism connection: 'I did something similar in high school, neighborhood had own magazine.' Makes path accessible through personal experienc"
+        },
+        {
+          "chip_id": "W018-TACTIC-001",
+          "week": "W018",
+          "content": "Proof of Work Formula revealed: 'Activities list with concrete numbers - 100 people in club, raised $30,000, built 5 XYZ.' Letters of rec and awards v"
+        }
+      ],
+      "key_insights": [
+        "Film+CS synthesis creates digital storyteller identity; aligns with Stanford AI ethics funding for strategic positioning",
+        "Real-time pivots: community college\u2192research unis; film festivals\u2192science competitions; calibrated program matching",
+        "Challenge Question saves 4 weeks; Time Math creates urgency; Intel Drop reveals Stanford AI ethics; Redirect Gift returns time",
+        "Goals: 1550+ SAT (+190pts), 3-4 awards, all A's; Wins: 21hrs/week recovered, daily schedule live, club pivot defined",
+        "Targets: 11 APs, 3-5 awards, 15-20 schools; MUNA app immediate; YouTube+festivals medium; Berkeley ultimate goal"
+      ]
+    },
+    "time_management_breakthrough": {
+      "category": "time_management_breakthrough",
+      "category_name": "Time Management System",
+      "chip_count": 67,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W021",
+      "end_date": "2023-12-10",
+      "duration_weeks": 19,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.98,
+        0.96,
+        0.88,
+        0.94,
+        0.92,
+        0.95,
+        0.91,
+        0.89,
+        0.96,
+        0.96,
+        0.93,
+        0.95,
+        0.91,
+        0.94,
+        0.92,
+        0.88,
+        0.9,
+        0.98,
+        0.95,
+        0.94,
+        0.96,
+        0.91,
+        0.97,
+        0.94,
+        0.92,
+        0.95,
+        0.91,
+        0.96,
+        0.94,
+        0.92,
+        0.96,
+        0.9,
+        0.98,
+        0.95,
+        0.93,
+        0.96,
+        0.91,
+        0.9,
+        0.97,
+        0.96,
+        0.98,
+        0.95,
+        0.93,
+        0.96,
+        0.92,
+        0.91,
+        0.96,
+        0.95,
+        0.96,
+        0.92,
+        0.96,
+        0.97,
+        0.95,
+        0.96,
+        0.93,
+        0.93,
+        0.93,
+        0.96,
+        0.95,
+        0.92,
+        0.97,
+        0.95,
+        0.96,
+        0.94,
+        0.96,
+        0.97,
+        0.95
+      ],
+      "avg_quality": 0.941044776119403,
+      "tactics_used": [
+        "W002-TACTIC-001",
+        "W003-TACTIC-001",
+        "W004-TACTIC-001",
+        "W005-TACTIC-001",
+        "W007-TACTIC-001",
+        "W006-TACTIC-001",
+        "W008-TACTIC-001",
+        "W009-TACTIC-001",
+        "W010-TACTIC-001",
+        "W016-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W002",
+          "what": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts commitments revealing 26 hours for passions. The S"
+        },
+        {
+          "week": "W004",
+          "what": "The Stranger Test (21 things strangers wouldn't know) bypasses performative self-presentation revealing authentic quirks. The Competitive Audit explicit comparison (13-14 APs vs your 8) creates urgenc"
+        },
+        {
+          "week": "W005",
+          "what": "The Naviance Revelation uses school's own data to show exact positioning needed creating concrete measurable goals. The Geographic Expansion systematically broadens radius (Mountain House\u2192Dublin\u2192East "
+        },
+        {
+          "week": "W007",
+          "what": "The Backwards Time Audit starts with 168 hours total, subtracts fixed commitments, reveals 49 hours for excellence - abundance not scarcity. The Permission to be Bad validates strategic shortcuts: 'Ba"
+        },
+        {
+          "week": "W009",
+          "what": "Four powerful techniques emerge: The Overflow Technique assigns more tasks than expected creating productive pressure without paralysis. The Sibling Leverage engages Omar to increase family investment"
+        },
+        {
+          "week": "W016",
+          "what": "Time management protocol established: '10 to 12 min per passage' with physical watch or desk timer requirement. No smart watches allowed (can't connect to internet, can't make noise). Creates testing "
+        },
+        {
+          "week": "W020",
+          "what": "Community Impact Layers revealed: Individual (direct tutoring) \u2192 Organizational (resource systems) \u2192 Policy (legislative advocacy) \u2192 Systemic (education funding reform). Each layer exponentially incre"
+        }
+      ],
+      "measurable_results": {
+        "ec_funding": "Funding acquired",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "academic": "GPA improvement detected",
+        "recognition": "Award won",
+        "ec_impact": "Scale growth detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-STRATEGY-001",
+          "week": "W001",
+          "content": "The strategic breakthrough occurs when Jenny synthesizes Huda's separate film and CS interests into a unified 'digital storyteller' identity. 'I see t"
+        },
+        {
+          "chip_id": "W001-FRAMEWORK-001",
+          "week": "W001",
+          "content": "Jenny introduces the transformative 168-hour framework, breaking down Huda's week to reveal only 2 hours daily for impact activities after school (8h)"
+        },
+        {
+          "chip_id": "W001-CHANNEL-001",
+          "week": "W001",
+          "content": "Multi-channel orchestration deployed: Zoom for deep strategy sessions, chat for rapid resource deployment with 6 program links shared in real-time, em"
+        },
+        {
+          "chip_id": "W002-TACTIC-001",
+          "week": "W002",
+          "content": "168-hour framework implementation reveals 26 hours/week available for passion projects after optimizing: Sleep 56hrs, School 37.5hrs, Transport 4.5hrs"
+        },
+        {
+          "chip_id": "W002-ADAPTATION-001",
+          "week": "W002",
+          "content": "Real-time pivots demonstrate adaptive mastery: Club strategy cascades from Women in AI\u2192CS for Social Good\u2192Encode Justice if leadership blocked. Video "
+        },
+        {
+          "chip_id": "W002-FRAMEWORK-001",
+          "week": "W002",
+          "content": "168-hour framework becomes system architecture: Total 168hrs minus fixed commitments equals opportunity space. Time optimization strategies: Do readin"
+        },
+        {
+          "chip_id": "W002-RESULT-001",
+          "week": "W002",
+          "content": "Measurable goals established: Academic - all A's both semesters (currently gets B's first); SAT - 1550+ requiring 190-point increase; PSAT - 1500+ for"
+        },
+        {
+          "chip_id": "W002-CHANNEL-001",
+          "week": "W002",
+          "content": "Multi-channel ecosystem deployed: Google Sheets for awards/programs tracking with checkboxes; Google Docs for session notes and task lists; Chat for r"
+        },
+        {
+          "chip_id": "W002-SILVER-001",
+          "week": "W002",
+          "content": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts "
+        },
+        {
+          "chip_id": "W003-STRATEGY-001",
+          "week": "W003",
+          "content": "Goal architecture established with numeric precision: All A's both semesters to break B pattern, 1550+ SAT from 1360 baseline, 1500+ PSAT for National"
+        }
+      ],
+      "key_insights": [
+        "Film+CS synthesis creates digital storyteller identity; aligns with Stanford AI ethics funding for strategic positioning",
+        "168-hour framework reveals 2-hour constraint; portfolio architecture connects all projects with community service layer",
+        "Zoom for strategy, chat for resources, email for actions; future: LinkedIn networking, Discord/Slack communities",
+        "168hr audit recovers 21hrs/week from social media; daily schedule blocks passion projects 7:15-10:30pm; 7 immediate action items",
+        "Adaptive cascades: Women in AI\u2192CS for Good\u2192Encode Justice; Muslim business pivot; 2-week trial periods; create new orgs vs fight old"
+      ]
+    },
+    "essay_transformation": {
+      "category": "essay_transformation",
+      "category_name": "Essay Quality Transformation",
+      "chip_count": 73,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W022",
+      "end_date": "2023-12-11",
+      "duration_weeks": 19,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.98,
+        0.92,
+        0.97,
+        0.96,
+        0.94,
+        0.97,
+        0.98,
+        0.95,
+        0.94,
+        0.93,
+        0.92,
+        0.9,
+        0.97,
+        0.97,
+        0.93,
+        0.95,
+        0.96,
+        0.97,
+        0.93,
+        0.89,
+        0.98,
+        0.96,
+        0.98,
+        0.94,
+        0.93,
+        0.96,
+        0.92,
+        0.91,
+        0.9,
+        0.97,
+        0.97,
+        0.95,
+        0.93,
+        0.92,
+        0.91,
+        0.95,
+        0.94,
+        0.95,
+        0.93,
+        0.92,
+        0.96,
+        0.94,
+        0.94,
+        0.95,
+        0.93,
+        0.93,
+        0.97,
+        0.93,
+        0.92,
+        0.96,
+        0.94,
+        0.93,
+        0.97,
+        0.94,
+        0.95,
+        0.94,
+        0.93,
+        0.97,
+        0.95,
+        0.97,
+        0.93,
+        0.95,
+        0.94,
+        0.93,
+        0.97,
+        0.94,
+        0.95,
+        0.94,
+        0.93,
+        0.97,
+        0.97,
+        0.96,
+        0.95
+      ],
+      "avg_quality": 0.9452054794520548,
+      "tactics_used": [
+        "W001-TACTIC-001",
+        "W004-TACTIC-001",
+        "W010-TACTIC-001",
+        "W015-TACTIC-001",
+        "W022-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W004",
+          "what": "The Stranger Test (21 things strangers wouldn't know) bypasses performative self-presentation revealing authentic quirks. The Competitive Audit explicit comparison (13-14 APs vs your 8) creates urgenc"
+        },
+        {
+          "week": "W005",
+          "what": "The Naviance Revelation uses school's own data to show exact positioning needed creating concrete measurable goals. The Geographic Expansion systematically broadens radius (Mountain House\u2192Dublin\u2192East "
+        },
+        {
+          "week": "W008",
+          "what": "Eight transformative techniques deployed: The Mini Application Practice treats every opportunity as college prep. The Vulnerability Narrative emphasizes struggles over achievements: 'Background + Barr"
+        },
+        {
+          "week": "W012",
+          "what": "Parent story extraction technique: 'While inspiring, doesn't showcase you.' Acknowledge value but relocate to 2 sentences max. Student agency throughout narrative. Transforms weak parent-dependent ess"
+        },
+        {
+          "week": "W018",
+          "what": "Narrative Over Achievement revealed: 'Most people who make it are not the smartest... they're people who can express their work the best.' Hard truth that presentation beats talent. The scaling refram"
+        },
+        {
+          "week": "W017",
+          "what": "Leadership quality extraction protocol: 'What are YOUR leadership qualities?' leads to 'Initiative, unifying people, making own path.' These become lens for mother's story. Seeds/trees metaphor: 'From"
+        },
+        {
+          "week": "W021",
+          "what": "Leadership quality extraction protocol: 'What are YOUR leadership qualities?' yields initiative, unifying people, making own path. These become lens for viewing mother's story. Seeds/trees metaphor so"
+        }
+      ],
+      "measurable_results": {
+        "ec_funding": "Funding acquired",
+        "academic": "GPA improvement detected",
+        "ec_impact": "Scale growth detected",
+        "recognition": "Award won",
+        "test_scores": "SAT improvement detected",
+        "productivity": "Time management improvement"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-STRATEGY-001",
+          "week": "W001",
+          "content": "The strategic breakthrough occurs when Jenny synthesizes Huda's separate film and CS interests into a unified 'digital storyteller' identity. 'I see t"
+        },
+        {
+          "chip_id": "W001-TACTIC-001",
+          "week": "W001",
+          "content": "Jenny breaks down the Small Business Stories project into executable steps: create demo video, build website with map interface, launch social media, "
+        },
+        {
+          "chip_id": "W002-STRATEGY-001",
+          "week": "W002",
+          "content": "Strategic breakthrough occurs through identity repositioning: Machine Learning Club pivots to Women in AI Club for advocacy angle without changing con"
+        },
+        {
+          "chip_id": "W003-STRATEGY-001",
+          "week": "W003",
+          "content": "Goal architecture established with numeric precision: All A's both semesters to break B pattern, 1550+ SAT from 1360 baseline, 1500+ PSAT for National"
+        },
+        {
+          "chip_id": "W003-FRAMEWORK-001",
+          "week": "W003",
+          "content": "Systems architecture creates compound effects: Game project yields CS skills+portfolio+awards+essays simultaneously. Video series generates service+cu"
+        },
+        {
+          "chip_id": "W004-INSIGHT-001",
+          "week": "W004",
+          "content": "Comprehensive assessment reveals brutal competitive reality: Asian in CS equals explicit disadvantage, 8 APs vs 13-14 competitor average creates gap, "
+        },
+        {
+          "chip_id": "W004-STRATEGY-001",
+          "week": "W004",
+          "content": "Major strategy revolution: Both/And approach - do film AND CS regardless of application major, just shift emphasis 60/40 based on school. UC system ea"
+        },
+        {
+          "chip_id": "W004-TACTIC-001",
+          "week": "W004",
+          "content": "AP exam hack deployed: self-study for tests without classes to reach 10-11 total from 8. Community college strategy refined: take unique film courses "
+        },
+        {
+          "chip_id": "W004-TRUST-001",
+          "week": "W004",
+          "content": "Trust architecture through dual-coach specialization: Jenny for strategic data-driven parent-inclusive planning, jenny for creative student-centered e"
+        },
+        {
+          "chip_id": "W004-ADAPTATION-001",
+          "week": "W004",
+          "content": "Real-time pivots demonstrate mastery: essay shifts from obstacles to gaming metaphor when uniqueness emerges, award focus changes from academic to ext"
+        }
+      ],
+      "key_insights": [
+        "Film+CS synthesis creates digital storyteller identity; aligns with Stanford AI ethics funding for strategic positioning",
+        "Tactical breakdown: Small Business Stories steps, NCWIT reframe, 6 program links, 100+ users and 30-state coverage targets",
+        "ML Club\u2192Women in AI pivot adds advocacy; Muslim identity becomes differentiator not liability; coherent narrative through cultural lens",
+        "Goals: All A's, 1550+ SAT, 3-4 awards; Muslim tech pioneer narrative; Stanford/MIT targeting with cultural fit",
+        "Compound benefits: game=skills+awards+essays; optimization via delegation+batching; feedback loops every Tue/Sat"
+      ]
+    },
+    "identity_clarity": {
+      "category": "identity_clarity",
+      "category_name": "Identity & Positioning Clarity",
+      "chip_count": 55,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W022",
+      "end_date": "2023-12-11",
+      "duration_weeks": 15,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.98,
+        0.94,
+        0.9,
+        0.96,
+        0.97,
+        0.93,
+        0.92,
+        0.91,
+        0.96,
+        0.94,
+        0.96,
+        0.95,
+        0.92,
+        0.9,
+        0.97,
+        0.98,
+        0.94,
+        0.96,
+        0.92,
+        0.91,
+        0.96,
+        0.97,
+        0.92,
+        0.95,
+        0.96,
+        0.97,
+        0.93,
+        0.89,
+        0.97,
+        0.98,
+        0.93,
+        0.96,
+        0.92,
+        0.97,
+        0.96,
+        0.98,
+        0.93,
+        0.92,
+        0.97,
+        0.9,
+        0.97,
+        0.98,
+        0.94,
+        0.93,
+        0.96,
+        0.9,
+        0.97,
+        0.96,
+        0.94,
+        0.94,
+        0.94,
+        0.95,
+        0.94,
+        0.94,
+        0.95
+      ],
+      "avg_quality": 0.9449090909090909,
+      "tactics_used": [],
+      "breakthrough_moments": [
+        {
+          "week": "W002",
+          "what": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts commitments revealing 26 hours for passions. The S"
+        },
+        {
+          "week": "W005",
+          "what": "The Naviance Revelation uses school's own data to show exact positioning needed creating concrete measurable goals. The Geographic Expansion systematically broadens radius (Mountain House\u2192Dublin\u2192East "
+        },
+        {
+          "week": "W007",
+          "what": "The Backwards Time Audit starts with 168 hours total, subtracts fixed commitments, reveals 49 hours for excellence - abundance not scarcity. The Permission to be Bad validates strategic shortcuts: 'Ba"
+        },
+        {
+          "week": "W008",
+          "what": "Eight transformative techniques deployed: The Mini Application Practice treats every opportunity as college prep. The Vulnerability Narrative emphasizes struggles over achievements: 'Background + Barr"
+        },
+        {
+          "week": "W010",
+          "what": "Five transformative techniques deployed: The Crisis Alchemy Protocol transforms MSA exclusion into Muslim Girls Club founder opportunity, victim to creator in single session. The Talk-First-Write-Seco"
+        }
+      ],
+      "measurable_results": {
+        "ec_funding": "Funding acquired",
+        "recognition": "Award won",
+        "academic": "GPA improvement detected",
+        "ec_impact": "Scale growth detected",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-STRATEGY-001",
+          "week": "W001",
+          "content": "The strategic breakthrough occurs when Jenny synthesizes Huda's separate film and CS interests into a unified 'digital storyteller' identity. 'I see t"
+        },
+        {
+          "chip_id": "W001-TRUST-001",
+          "week": "W001",
+          "content": "Jenny establishes trust through layered credibility: Stanford student status, documentary experience matching Huda's interests, NCWIT dual winner cred"
+        },
+        {
+          "chip_id": "W001-RESULT-001",
+          "week": "W001",
+          "content": "Session establishes concrete measurable outcomes across multiple dimensions. Awards targets: NCWIT, Young Arts, National History Day. Program applicat"
+        },
+        {
+          "chip_id": "W002-INSIGHT-001",
+          "week": "W002",
+          "content": "Jenny's rapid assessment uncovers critical time misallocation: Huda spends 4 hours daily (28 hours/week) on social media while claiming no time for ac"
+        },
+        {
+          "chip_id": "W002-STRATEGY-001",
+          "week": "W002",
+          "content": "Strategic breakthrough occurs through identity repositioning: Machine Learning Club pivots to Women in AI Club for advocacy angle without changing con"
+        },
+        {
+          "chip_id": "W002-TRUST-001",
+          "week": "W002",
+          "content": "Jenny builds trust through immediate vulnerability: 'I'm spending... you don't even want to know how much time' creates safe space for Huda's social m"
+        },
+        {
+          "chip_id": "W002-ADAPTATION-001",
+          "week": "W002",
+          "content": "Real-time pivots demonstrate adaptive mastery: Club strategy cascades from Women in AI\u2192CS for Social Good\u2192Encode Justice if leadership blocked. Video "
+        },
+        {
+          "chip_id": "W002-RESULT-001",
+          "week": "W002",
+          "content": "Measurable goals established: Academic - all A's both semesters (currently gets B's first); SAT - 1550+ requiring 190-point increase; PSAT - 1500+ for"
+        },
+        {
+          "chip_id": "W002-SILVER-001",
+          "week": "W002",
+          "content": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts "
+        },
+        {
+          "chip_id": "W003-INSIGHT-001",
+          "week": "W003",
+          "content": "Deep assessment reveals B-to-A grade pattern: Huda consistently gets B's first semester while adjusting, then A's second semester. Game demonstration "
+        }
+      ],
+      "key_insights": [
+        "Film+CS synthesis creates digital storyteller identity; aligns with Stanford AI ethics funding for strategic positioning",
+        "Trust via Stanford credential, NCWIT wins, vulnerability sharing, parent buy-in achieved: 'music to my ears'",
+        "Outcomes: NCWIT/Young Arts/NHD awards, 100+ users, 30 states, 4.0+ GPA, 4 weeks saved from Launch X redirect",
+        "Time audit reveals 28hr/week social media waste; SAT at 1360 needs 190pt gain; Muslim identity hidden strength; zero awards critical gap",
+        "ML Club\u2192Women in AI pivot adds advocacy; Muslim identity becomes differentiator not liability; coherent narrative through cultural lens"
+      ]
+    },
+    "technical_skill_development": {
+      "category": "technical_skill_development",
+      "category_name": "Technical Skill Mastery",
+      "chip_count": 33,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W023",
+      "end_date": "2023-12-17",
+      "duration_weeks": 16,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.98,
+        0.96,
+        0.88,
+        0.92,
+        0.95,
+        0.89,
+        0.96,
+        0.94,
+        0.94,
+        0.95,
+        0.96,
+        0.96,
+        0.94,
+        0.95,
+        0.96,
+        0.97,
+        0.9,
+        0.98,
+        0.93,
+        0.98,
+        0.96,
+        0.97,
+        0.94,
+        0.96,
+        0.9,
+        0.93,
+        0.93,
+        0.93,
+        0.93,
+        0.96,
+        0.94,
+        0.94,
+        0.95
+      ],
+      "avg_quality": 0.9436363636363636,
+      "tactics_used": [
+        "W004-TACTIC-001",
+        "W005-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W002",
+          "what": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts commitments revealing 26 hours for passions. The S"
+        },
+        {
+          "week": "W005",
+          "what": "The Naviance Revelation uses school's own data to show exact positioning needed creating concrete measurable goals. The Geographic Expansion systematically broadens radius (Mountain House\u2192Dublin\u2192East "
+        }
+      ],
+      "measurable_results": {
+        "ec_funding": "Funding acquired",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "recognition": "Award won",
+        "academic": "GPA improvement detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-STRATEGY-001",
+          "week": "W001",
+          "content": "The strategic breakthrough occurs when Jenny synthesizes Huda's separate film and CS interests into a unified 'digital storyteller' identity. 'I see t"
+        },
+        {
+          "chip_id": "W001-FRAMEWORK-001",
+          "week": "W001",
+          "content": "Jenny introduces the transformative 168-hour framework, breaking down Huda's week to reveal only 2 hours daily for impact activities after school (8h)"
+        },
+        {
+          "chip_id": "W001-CHANNEL-001",
+          "week": "W001",
+          "content": "Multi-channel orchestration deployed: Zoom for deep strategy sessions, chat for rapid resource deployment with 6 program links shared in real-time, em"
+        },
+        {
+          "chip_id": "W002-ADAPTATION-001",
+          "week": "W002",
+          "content": "Real-time pivots demonstrate adaptive mastery: Club strategy cascades from Women in AI\u2192CS for Social Good\u2192Encode Justice if leadership blocked. Video "
+        },
+        {
+          "chip_id": "W002-FRAMEWORK-001",
+          "week": "W002",
+          "content": "168-hour framework becomes system architecture: Total 168hrs minus fixed commitments equals opportunity space. Time optimization strategies: Do readin"
+        },
+        {
+          "chip_id": "W002-CHANNEL-001",
+          "week": "W002",
+          "content": "Multi-channel ecosystem deployed: Google Sheets for awards/programs tracking with checkboxes; Google Docs for session notes and task lists; Chat for r"
+        },
+        {
+          "chip_id": "W002-SILVER-001",
+          "week": "W002",
+          "content": "The 168-Hour Audit technique transforms abstract time into tangible opportunity: 'Do you know how many hours are in a week?' systematically subtracts "
+        },
+        {
+          "chip_id": "W003-INSIGHT-001",
+          "week": "W003",
+          "content": "Deep assessment reveals B-to-A grade pattern: Huda consistently gets B's first semester while adjusting, then A's second semester. Game demonstration "
+        },
+        {
+          "chip_id": "W003-FRAMEWORK-001",
+          "week": "W003",
+          "content": "Systems architecture creates compound effects: Game project yields CS skills+portfolio+awards+essays simultaneously. Video series generates service+cu"
+        },
+        {
+          "chip_id": "W004-TACTIC-001",
+          "week": "W004",
+          "content": "AP exam hack deployed: self-study for tests without classes to reach 10-11 total from 8. Community college strategy refined: take unique film courses "
+        }
+      ],
+      "key_insights": [
+        "Film+CS synthesis creates digital storyteller identity; aligns with Stanford AI ethics funding for strategic positioning",
+        "168-hour framework reveals 2-hour constraint; portfolio architecture connects all projects with community service layer",
+        "Zoom for strategy, chat for resources, email for actions; future: LinkedIn networking, Discord/Slack communities",
+        "Adaptive cascades: Women in AI\u2192CS for Good\u2192Encode Justice; Muslim business pivot; 2-week trial periods; create new orgs vs fight old",
+        "168hr system reveals opportunity space; delegation+consolidation maximize impact; portfolio web creates multiplicative value"
+      ]
+    },
+    "barrier_breakthrough": {
+      "category": "barrier_breakthrough",
+      "category_name": "Barrier Breaking Moment",
+      "chip_count": 28,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W015",
+      "end_date": "2023-10-23",
+      "duration_weeks": 11,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.98,
+        0.91,
+        0.97,
+        0.97,
+        0.96,
+        0.89,
+        0.93,
+        0.96,
+        0.98,
+        0.93,
+        0.92,
+        0.97,
+        0.97,
+        0.98,
+        0.94,
+        0.92,
+        0.91,
+        0.97,
+        0.94,
+        0.93,
+        0.95,
+        0.96,
+        0.96,
+        0.94,
+        0.94,
+        0.93,
+        0.94,
+        0.97
+      ],
+      "avg_quality": 0.9471428571428572,
+      "tactics_used": [],
+      "breakthrough_moments": [
+        {
+          "week": "W001",
+          "what": "The Challenge Question technique emerges as breakthrough pattern: 'Do you have to go to an entrepreneurship program to be a leader? Just be one.' This single question saves 4 weeks of summer. Pattern "
+        },
+        {
+          "week": "W008",
+          "what": "Eight transformative techniques deployed: The Mini Application Practice treats every opportunity as college prep. The Vulnerability Narrative emphasizes struggles over achievements: 'Background + Barr"
+        },
+        {
+          "week": "W010",
+          "what": "Five transformative techniques deployed: The Crisis Alchemy Protocol transforms MSA exclusion into Muslim Girls Club founder opportunity, victim to creator in single session. The Talk-First-Write-Seco"
+        },
+        {
+          "week": "W015",
+          "what": "Test-optional strategic awareness introduced: 'ACT or go test optional' plus 'UC schools don't look at tests regardless' plus 'There's always a solution.' Creates comprehensive backup architecture dur"
+        }
+      ],
+      "measurable_results": {
+        "ec_funding": "Funding acquired",
+        "productivity": "Time management improvement",
+        "recognition": "Award won",
+        "test_scores": "SAT improvement detected",
+        "academic": "GPA improvement detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-STRATEGY-001",
+          "week": "W001",
+          "content": "The strategic breakthrough occurs when Jenny synthesizes Huda's separate film and CS interests into a unified 'digital storyteller' identity. 'I see t"
+        },
+        {
+          "chip_id": "W001-ADAPTATION-001",
+          "week": "W001",
+          "content": "Jenny demonstrates real-time adaptive intelligence through strategic pivots. When Huda mentions reaching out to community college professors, Jenny di"
+        },
+        {
+          "chip_id": "W001-SILVER-001",
+          "week": "W001",
+          "content": "The Challenge Question technique emerges as breakthrough pattern: 'Do you have to go to an entrepreneurship program to be a leader? Just be one.' This"
+        },
+        {
+          "chip_id": "W002-STRATEGY-001",
+          "week": "W002",
+          "content": "Strategic breakthrough occurs through identity repositioning: Machine Learning Club pivots to Women in AI Club for advocacy angle without changing con"
+        },
+        {
+          "chip_id": "W003-STRATEGY-001",
+          "week": "W003",
+          "content": "Goal architecture established with numeric precision: All A's both semesters to break B pattern, 1550+ SAT from 1360 baseline, 1500+ PSAT for National"
+        },
+        {
+          "chip_id": "W006-RELATABILITY-001",
+          "week": "W006",
+          "content": "College transition sharing: 'Just moved into new dorm on campus' maintains current student perspective. SAT struggle normalization addresses dad's 'me"
+        },
+        {
+          "chip_id": "W007-ADAPTATION-001",
+          "week": "W007",
+          "content": "Club cascade strategy deploys 4-tier backup: Women in AI if president, CS for Social Good if co-president, Develop for Good if new advisor, Encode Jus"
+        },
+        {
+          "chip_id": "W008-INSIGHT-001",
+          "week": "W008",
+          "content": "Energy crisis diagnosis reveals heat exhaustion pattern: tired after school leads to game development prioritization over studying, resulting in quiz "
+        },
+        {
+          "chip_id": "W008-STRATEGY-001",
+          "week": "W008",
+          "content": "Vulnerability storytelling revolution: 'How much you struggle to get where you are' becomes core narrative strategy. Scholarship-as-award reframe tran"
+        },
+        {
+          "chip_id": "W008-ADAPTATION-001",
+          "week": "W008",
+          "content": "Heat exhaustion adaptation: 30-minute nap allocation added to schedule recognizing physical limits. Project priority shift executed mid-session: game "
+        }
+      ],
+      "key_insights": [
+        "Film+CS synthesis creates digital storyteller identity; aligns with Stanford AI ethics funding for strategic positioning",
+        "Real-time pivots: community college\u2192research unis; film festivals\u2192science competitions; calibrated program matching",
+        "Challenge Question saves 4 weeks; Time Math creates urgency; Intel Drop reveals Stanford AI ethics; Redirect Gift returns time",
+        "ML Club\u2192Women in AI pivot adds advocacy; Muslim identity becomes differentiator not liability; coherent narrative through cultural lens",
+        "Goals: All A's, 1550+ SAT, 3-4 awards; Muslim tech pioneer narrative; Stanford/MIT targeting with cultural fit"
+      ]
+    },
+    "regional_award_win": {
+      "category": "regional_award_win",
+      "category_name": "Regional/State Award",
+      "chip_count": 8,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W022",
+      "end_date": "2023-12-11",
+      "duration_weeks": 5,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.92,
+        0.9,
+        0.95,
+        0.92,
+        0.96,
+        0.94,
+        0.94,
+        0.96
+      ],
+      "avg_quality": 0.93625,
+      "tactics_used": [
+        "W001-TACTIC-001",
+        "W022-TACTIC-001"
+      ],
+      "breakthrough_moments": [],
+      "measurable_results": {
+        "academic": "GPA improvement detected",
+        "ec_impact": "Scale growth detected",
+        "recognition": "Award won",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-TACTIC-001",
+          "week": "W001",
+          "content": "Jenny breaks down the Small Business Stories project into executable steps: create demo video, build website with map interface, launch social media, "
+        },
+        {
+          "chip_id": "W001-RESULT-001",
+          "week": "W001",
+          "content": "Session establishes concrete measurable outcomes across multiple dimensions. Awards targets: NCWIT, Young Arts, National History Day. Program applicat"
+        },
+        {
+          "chip_id": "W006-INSIGHT-001",
+          "week": "W006",
+          "content": "First week assessment reveals hidden activity: speech and debate with regional second place finish never mentioned initially. SAT progression shows 11"
+        },
+        {
+          "chip_id": "W006-ADAPTATION-001",
+          "week": "W006",
+          "content": "Speech debate pivot executed mid-session: discovery of hidden activity leads to immediate deprioritization despite regional success. SAT schedule flex"
+        },
+        {
+          "chip_id": "W008-FRAMEWORK-001",
+          "week": "W008",
+          "content": "Summer program ecosystem architected: sophomore summer (current) building portfolio, junior summer stacking 2-3 programs, senior summer celebrating. A"
+        },
+        {
+          "chip_id": "W019-RESULT-001",
+          "week": "W019",
+          "content": "Session deliverables: Median calculation method mastered, inscribed figure relationships understood, 20+ problems solved collaboratively, Bank of Amer"
+        },
+        {
+          "chip_id": "W019-RELATABILITY-001",
+          "week": "W019",
+          "content": "Opening efficiency shows maturity: 'I think we get straight into it.' Skips pleasantries comfortably. Strategic transparency: 'Only choose about 2 peo"
+        },
+        {
+          "chip_id": "W022-TACTIC-001",
+          "week": "W022",
+          "content": "Essay Compression Protocol mastered: 1407 to 987 characters (30% reduction). Cut analogies to direct statements ('derivative of arctan pi' \u2192 'solve fo"
+        }
+      ],
+      "key_insights": [
+        "Tactical breakdown: Small Business Stories steps, NCWIT reframe, 6 program links, 100+ users and 30-state coverage targets",
+        "Outcomes: NCWIT/Young Arts/NHD awards, 100+ users, 30 states, 4.0+ GPA, 4 weeks saved from Launch X redirect",
+        "Hidden speech/debate discovered; SAT 1367\u21921550 gap; game 2.5-3hrs daily; minimal homework creates opportunity",
+        "Speech\u2192USACO pivot despite success; SAT schedule adaptable; club time\u2192SAT prep dynamic reallocation",
+        "Summer stacking strategy; application pipeline Sept-May; 6-month recommendation cultivation; Feel Don't Tell framework"
+      ]
+    },
+    "ec_user_scale": {
+      "category": "ec_user_scale",
+      "category_name": "EC User/Impact Scale Growth",
+      "chip_count": 17,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W023",
+      "end_date": "2023-12-17",
+      "duration_weeks": 7,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.92,
+        0.91,
+        0.9,
+        0.95,
+        0.96,
+        0.94,
+        0.92,
+        0.91,
+        0.89,
+        0.95,
+        0.93,
+        0.94,
+        0.96,
+        0.97,
+        0.96,
+        0.95,
+        0.97
+      ],
+      "avg_quality": 0.9370588235294117,
+      "tactics_used": [
+        "W001-TACTIC-001",
+        "W004-TACTIC-001",
+        "W005-TACTIC-001",
+        "W019-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W020",
+          "what": "Community Impact Layers revealed: Individual (direct tutoring) \u2192 Organizational (resource systems) \u2192 Policy (legislative advocacy) \u2192 Systemic (education funding reform). Each layer exponentially incre"
+        },
+        {
+          "week": "W023",
+          "what": "Neural Network Gamification: Detective levels teach AI concepts through gameplay. Simple shapes progress to complex challenges representing neural network layers. Makes abstract AI tangible. 'Maximizi"
+        }
+      ],
+      "measurable_results": {
+        "academic": "GPA improvement detected",
+        "ec_impact": "Scale growth detected",
+        "recognition": "Award won",
+        "ec_funding": "Funding acquired",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-TACTIC-001",
+          "week": "W001",
+          "content": "Jenny breaks down the Small Business Stories project into executable steps: create demo video, build website with map interface, launch social media, "
+        },
+        {
+          "chip_id": "W001-ADAPTATION-001",
+          "week": "W001",
+          "content": "Jenny demonstrates real-time adaptive intelligence through strategic pivots. When Huda mentions reaching out to community college professors, Jenny di"
+        },
+        {
+          "chip_id": "W001-RESULT-001",
+          "week": "W001",
+          "content": "Session establishes concrete measurable outcomes across multiple dimensions. Awards targets: NCWIT, Young Arts, National History Day. Program applicat"
+        },
+        {
+          "chip_id": "W004-TACTIC-001",
+          "week": "W004",
+          "content": "AP exam hack deployed: self-study for tests without classes to reach 10-11 total from 8. Community college strategy refined: take unique film courses "
+        },
+        {
+          "chip_id": "W004-FRAMEWORK-001",
+          "week": "W004",
+          "content": "Holistic profile architecture integrates five dimensions: academic foundation (4.3 GPA+11 APs), creative spike (film portfolio+festivals+YouTube), tec"
+        },
+        {
+          "chip_id": "W005-TACTIC-001",
+          "week": "W005",
+          "content": "Naviance data mining process: Advanced college search\u2192specific school\u2192scroll to middle 50% GPA/SAT ranges and scattergrams. Club member acquisition fo"
+        },
+        {
+          "chip_id": "W005-ADAPTATION-001",
+          "week": "W005",
+          "content": "Muslim to Indian business pivot resistance: maintain Muslim focus for diversity while expanding geography to Dublin/Tracy. Film club virtual adaptatio"
+        },
+        {
+          "chip_id": "W005-RESULT-001",
+          "week": "W005",
+          "content": "Quantified progress: film club 70 members achieved, SAT 1430 practice test, community college access gained, complete Naviance analysis done. Strategi"
+        },
+        {
+          "chip_id": "W005-CHANNEL-001",
+          "week": "W005",
+          "content": "Zoom session with echo troubleshooting, parent active participation, screen sharing for Naviance walkthrough demonstration. Platform coordination acro"
+        },
+        {
+          "chip_id": "W017-FRAMEWORK-001",
+          "week": "W017",
+          "content": "Finals week project ecosystem maintained: Film festival award won, 44 game players achieved, Empowering AI announced. APUSH needs 2 essays for A. Jenn"
+        }
+      ],
+      "key_insights": [
+        "Tactical breakdown: Small Business Stories steps, NCWIT reframe, 6 program links, 100+ users and 30-state coverage targets",
+        "Real-time pivots: community college\u2192research unis; film festivals\u2192science competitions; calibrated program matching",
+        "Outcomes: NCWIT/Young Arts/NHD awards, 100+ users, 30 states, 4.0+ GPA, 4 weeks saved from Launch X redirect",
+        "Self-study APs to reach 11; CC for unique film courses; specificity push 80s fashion; reverse engineer essay from gaming story",
+        "5-dimension profile: academic+creative+tech+culture+leadership; tiered application strategy; concurrent film/CS development"
+      ]
+    },
+    "portfolio_showcase": {
+      "category": "portfolio_showcase",
+      "category_name": "Portfolio & Showcase Creation",
+      "chip_count": 62,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W023",
+      "end_date": "2023-12-17",
+      "duration_weeks": 17,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.92,
+        0.94,
+        0.91,
+        0.96,
+        0.9,
+        0.88,
+        0.89,
+        0.97,
+        0.94,
+        0.92,
+        0.95,
+        0.89,
+        0.94,
+        0.93,
+        0.95,
+        0.91,
+        0.94,
+        0.88,
+        0.95,
+        0.95,
+        0.93,
+        0.96,
+        0.91,
+        0.96,
+        0.92,
+        0.95,
+        0.89,
+        0.94,
+        0.93,
+        0.92,
+        0.96,
+        0.9,
+        0.97,
+        0.95,
+        0.93,
+        0.9,
+        0.97,
+        0.98,
+        0.95,
+        0.93,
+        0.96,
+        0.96,
+        0.97,
+        0.95,
+        0.94,
+        0.96,
+        0.92,
+        0.91,
+        0.96,
+        0.96,
+        0.9,
+        0.94,
+        0.95,
+        0.97,
+        0.94,
+        0.92,
+        0.96,
+        0.94,
+        0.95,
+        0.95,
+        0.97,
+        0.95
+      ],
+      "avg_quality": 0.9370967741935484,
+      "tactics_used": [
+        "W001-TACTIC-001",
+        "W002-TACTIC-001",
+        "W003-TACTIC-001",
+        "W004-TACTIC-001",
+        "W007-TACTIC-001",
+        "W006-TACTIC-001",
+        "W008-TACTIC-001",
+        "W009-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W003",
+          "what": "The Game Demo Moment creates massive investment through early work showcase: 'Show me your game! Wow!' The Grade Normalization reduces anxiety while maintaining standards: 'B's first semester while ad"
+        },
+        {
+          "week": "W007",
+          "what": "The Backwards Time Audit starts with 168 hours total, subtracts fixed commitments, reveals 49 hours for excellence - abundance not scarcity. The Permission to be Bad validates strategic shortcuts: 'Ba"
+        },
+        {
+          "week": "W009",
+          "what": "Four powerful techniques emerge: The Overflow Technique assigns more tasks than expected creating productive pressure without paralysis. The Sibling Leverage engages Omar to increase family investment"
+        },
+        {
+          "week": "W012",
+          "what": "Parent story extraction technique: 'While inspiring, doesn't showcase you.' Acknowledge value but relocate to 2 sentences max. Student agency throughout narrative. Transforms weak parent-dependent ess"
+        }
+      ],
+      "measurable_results": {
+        "academic": "GPA improvement detected",
+        "ec_impact": "Scale growth detected",
+        "recognition": "Award won",
+        "ec_funding": "Funding acquired",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-TACTIC-001",
+          "week": "W001",
+          "content": "Jenny breaks down the Small Business Stories project into executable steps: create demo video, build website with map interface, launch social media, "
+        },
+        {
+          "chip_id": "W001-TRUST-001",
+          "week": "W001",
+          "content": "Jenny establishes trust through layered credibility: Stanford student status, documentary experience matching Huda's interests, NCWIT dual winner cred"
+        },
+        {
+          "chip_id": "W001-ADAPTATION-001",
+          "week": "W001",
+          "content": "Jenny demonstrates real-time adaptive intelligence through strategic pivots. When Huda mentions reaching out to community college professors, Jenny di"
+        },
+        {
+          "chip_id": "W001-FRAMEWORK-001",
+          "week": "W001",
+          "content": "Jenny introduces the transformative 168-hour framework, breaking down Huda's week to reveal only 2 hours daily for impact activities after school (8h)"
+        },
+        {
+          "chip_id": "W001-RESULT-001",
+          "week": "W001",
+          "content": "Session establishes concrete measurable outcomes across multiple dimensions. Awards targets: NCWIT, Young Arts, National History Day. Program applicat"
+        },
+        {
+          "chip_id": "W001-CHANNEL-001",
+          "week": "W001",
+          "content": "Multi-channel orchestration deployed: Zoom for deep strategy sessions, chat for rapid resource deployment with 6 program links shared in real-time, em"
+        },
+        {
+          "chip_id": "W001-RELATABILITY-001",
+          "week": "W001",
+          "content": "Jenny deploys hyper-relatability through shared experience layers: Stanford student for immediate credibility, documentary maker matching Huda's film "
+        },
+        {
+          "chip_id": "W002-STRATEGY-001",
+          "week": "W002",
+          "content": "Strategic breakthrough occurs through identity repositioning: Machine Learning Club pivots to Women in AI Club for advocacy angle without changing con"
+        },
+        {
+          "chip_id": "W002-TACTIC-001",
+          "week": "W002",
+          "content": "168-hour framework implementation reveals 26 hours/week available for passion projects after optimizing: Sleep 56hrs, School 37.5hrs, Transport 4.5hrs"
+        },
+        {
+          "chip_id": "W002-ADAPTATION-001",
+          "week": "W002",
+          "content": "Real-time pivots demonstrate adaptive mastery: Club strategy cascades from Women in AI\u2192CS for Social Good\u2192Encode Justice if leadership blocked. Video "
+        }
+      ],
+      "key_insights": [
+        "Tactical breakdown: Small Business Stories steps, NCWIT reframe, 6 program links, 100+ users and 30-state coverage targets",
+        "Trust via Stanford credential, NCWIT wins, vulnerability sharing, parent buy-in achieved: 'music to my ears'",
+        "Real-time pivots: community college\u2192research unis; film festivals\u2192science competitions; calibrated program matching",
+        "168-hour framework reveals 2-hour constraint; portfolio architecture connects all projects with community service layer",
+        "Outcomes: NCWIT/Young Arts/NHD awards, 100+ users, 30 states, 4.0+ GPA, 4 weeks saved from Launch X redirect"
+      ]
+    },
+    "trust_building": {
+      "category": "trust_building",
+      "category_name": "Coach-Student Trust Building",
+      "chip_count": 42,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W023",
+      "end_date": "2023-12-17",
+      "duration_weeks": 22,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.94,
+        0.9,
+        0.93,
+        0.94,
+        0.95,
+        0.92,
+        0.88,
+        0.95,
+        0.94,
+        0.92,
+        0.93,
+        0.95,
+        0.91,
+        0.95,
+        0.93,
+        0.9,
+        0.94,
+        0.92,
+        0.94,
+        0.96,
+        0.97,
+        0.94,
+        0.92,
+        0.96,
+        0.94,
+        0.92,
+        0.9,
+        0.93,
+        0.94,
+        0.93,
+        0.94,
+        0.94,
+        0.94,
+        0.95,
+        0.97,
+        0.93,
+        0.95,
+        0.96,
+        0.94,
+        0.94,
+        0.95,
+        0.94
+      ],
+      "avg_quality": 0.9357142857142856,
+      "tactics_used": [],
+      "breakthrough_moments": [
+        {
+          "week": "W003",
+          "what": "The Game Demo Moment creates massive investment through early work showcase: 'Show me your game! Wow!' The Grade Normalization reduces anxiety while maintaining standards: 'B's first semester while ad"
+        },
+        {
+          "week": "W009",
+          "what": "Four powerful techniques emerge: The Overflow Technique assigns more tasks than expected creating productive pressure without paralysis. The Sibling Leverage engages Omar to increase family investment"
+        },
+        {
+          "week": "W015",
+          "what": "Test-optional strategic awareness introduced: 'ACT or go test optional' plus 'UC schools don't look at tests regardless' plus 'There's always a solution.' Creates comprehensive backup architecture dur"
+        }
+      ],
+      "measurable_results": {
+        "recognition": "Award won",
+        "academic": "GPA improvement detected",
+        "ec_impact": "Scale growth detected",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "ec_funding": "Funding acquired"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-TRUST-001",
+          "week": "W001",
+          "content": "Jenny establishes trust through layered credibility: Stanford student status, documentary experience matching Huda's interests, NCWIT dual winner cred"
+        },
+        {
+          "chip_id": "W001-RESULT-001",
+          "week": "W001",
+          "content": "Session establishes concrete measurable outcomes across multiple dimensions. Awards targets: NCWIT, Young Arts, National History Day. Program applicat"
+        },
+        {
+          "chip_id": "W002-TRUST-001",
+          "week": "W002",
+          "content": "Jenny builds trust through immediate vulnerability: 'I'm spending... you don't even want to know how much time' creates safe space for Huda's social m"
+        },
+        {
+          "chip_id": "W003-INSIGHT-001",
+          "week": "W003",
+          "content": "Deep assessment reveals B-to-A grade pattern: Huda consistently gets B's first semester while adjusting, then A's second semester. Game demonstration "
+        },
+        {
+          "chip_id": "W003-TRUST-001",
+          "week": "W003",
+          "content": "Trust explosion through game demonstration: 'Wow! This is so cool! I love it!' creates massive confidence boost and investment. Identity validation de"
+        },
+        {
+          "chip_id": "W003-RESULT-001",
+          "week": "W003",
+          "content": "Success metrics established across timeframes: Short-term - 7 tasks Week 3 completion; Medium-term - All A's by semester end; Long-term - 1550+ SAT, 3"
+        },
+        {
+          "chip_id": "W003-CHANNEL-001",
+          "week": "W003",
+          "content": "Tool ecosystem established: Google Calendar for time blocks, Sheets for awards/applications tracking with checkboxes, Figma for website mockups, email"
+        },
+        {
+          "chip_id": "W003-SILVER-001",
+          "week": "W003",
+          "content": "The Game Demo Moment creates massive investment through early work showcase: 'Show me your game! Wow!' The Grade Normalization reduces anxiety while m"
+        },
+        {
+          "chip_id": "W004-TRUST-001",
+          "week": "W004",
+          "content": "Trust architecture through dual-coach specialization: Jenny for strategic data-driven parent-inclusive planning, jenny for creative student-centered e"
+        },
+        {
+          "chip_id": "W004-RESULT-001",
+          "week": "W004",
+          "content": "Measurable targets established: maintain 4.3+ weighted GPA, expand 8\u219211 APs through self-study, acquire 3-5 film/creative awards, apply to 15-20 schoo"
+        }
+      ],
+      "key_insights": [
+        "Trust via Stanford credential, NCWIT wins, vulnerability sharing, parent buy-in achieved: 'music to my ears'",
+        "Outcomes: NCWIT/Young Arts/NHD awards, 100+ users, 30 states, 4.0+ GPA, 4 weeks saved from Launch X redirect",
+        "Trust via vulnerability sharing about time waste; parent collaboration on screen limits; cultural validation; permission to iterate",
+        "B\u2192A grade pattern shows adjustment need; game reveals sophisticated tech skills; dad involvement balanced with autonomy",
+        "Game demo creates confidence explosion; Muslim identity validated as asset; B's normalized; collaborative not directive"
+      ]
+    },
+    "ec_leadership_role": {
+      "category": "ec_leadership_role",
+      "category_name": "EC Leadership Acquisition",
+      "chip_count": 35,
+      "start_week": "W001",
+      "start_date": "2023-06-21",
+      "end_week": "W021",
+      "end_date": "2023-12-10",
+      "duration_weeks": 16,
+      "phases_covered": [
+        "P1-FOUNDATION",
+        "P2-BUILDING"
+      ],
+      "quality_scores": [
+        0.89,
+        0.97,
+        0.96,
+        0.92,
+        0.95,
+        0.94,
+        0.96,
+        0.91,
+        0.92,
+        0.97,
+        0.95,
+        0.93,
+        0.9,
+        0.96,
+        0.98,
+        0.93,
+        0.9,
+        0.93,
+        0.97,
+        0.97,
+        0.95,
+        0.95,
+        0.94,
+        0.97,
+        0.96,
+        0.94,
+        0.97,
+        0.93,
+        0.97,
+        0.94,
+        0.94,
+        0.97,
+        0.96,
+        0.94,
+        0.97
+      ],
+      "avg_quality": 0.946,
+      "tactics_used": [
+        "W007-TACTIC-001"
+      ],
+      "breakthrough_moments": [
+        {
+          "week": "W001",
+          "what": "The Challenge Question technique emerges as breakthrough pattern: 'Do you have to go to an entrepreneurship program to be a leader? Just be one.' This single question saves 4 weeks of summer. Pattern "
+        },
+        {
+          "week": "W011",
+          "what": "Comprehensive activity documentation transforms profile: 7 tech activities (game design, nonprofit, YouTube, freelance), 5 languages (Python, JavaScript, HTML, CSS, Unity), multiple leadership roles. "
+        },
+        {
+          "week": "W010",
+          "what": "Five transformative techniques deployed: The Crisis Alchemy Protocol transforms MSA exclusion into Muslim Girls Club founder opportunity, victim to creator in single session. The Talk-First-Write-Seco"
+        },
+        {
+          "week": "W019",
+          "what": "Socratic geometry teaching deployed: 'What type of triangle is this?' leads student to discover 45-45-90 properties themselves. Self-discovered knowledge sticks better than told information. Bicycle p"
+        },
+        {
+          "week": "W017",
+          "what": "Leadership quality extraction protocol: 'What are YOUR leadership qualities?' leads to 'Initiative, unifying people, making own path.' These become lens for mother's story. Seeds/trees metaphor: 'From"
+        },
+        {
+          "week": "W021",
+          "what": "Leadership quality extraction protocol: 'What are YOUR leadership qualities?' yields initiative, unifying people, making own path. These become lens for viewing mother's story. Seeds/trees metaphor so"
+        }
+      ],
+      "measurable_results": {
+        "recognition": "Award won",
+        "ec_funding": "Funding acquired",
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "academic": "GPA improvement detected"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W001-RELATABILITY-001",
+          "week": "W001",
+          "content": "Jenny deploys hyper-relatability through shared experience layers: Stanford student for immediate credibility, documentary maker matching Huda's film "
+        },
+        {
+          "chip_id": "W001-SILVER-001",
+          "week": "W001",
+          "content": "The Challenge Question technique emerges as breakthrough pattern: 'Do you have to go to an entrepreneurship program to be a leader? Just be one.' This"
+        },
+        {
+          "chip_id": "W002-INSIGHT-001",
+          "week": "W002",
+          "content": "Jenny's rapid assessment uncovers critical time misallocation: Huda spends 4 hours daily (28 hours/week) on social media while claiming no time for ac"
+        },
+        {
+          "chip_id": "W002-ADAPTATION-001",
+          "week": "W002",
+          "content": "Real-time pivots demonstrate adaptive mastery: Club strategy cascades from Women in AI\u2192CS for Social Good\u2192Encode Justice if leadership blocked. Video "
+        },
+        {
+          "chip_id": "W002-FRAMEWORK-001",
+          "week": "W002",
+          "content": "168-hour framework becomes system architecture: Total 168hrs minus fixed commitments equals opportunity space. Time optimization strategies: Do readin"
+        },
+        {
+          "chip_id": "W003-FRAMEWORK-001",
+          "week": "W003",
+          "content": "Systems architecture creates compound effects: Game project yields CS skills+portfolio+awards+essays simultaneously. Video series generates service+cu"
+        },
+        {
+          "chip_id": "W004-FRAMEWORK-001",
+          "week": "W004",
+          "content": "Holistic profile architecture integrates five dimensions: academic foundation (4.3 GPA+11 APs), creative spike (film portfolio+festivals+YouTube), tec"
+        },
+        {
+          "chip_id": "W004-RELATABILITY-001",
+          "week": "W004",
+          "content": "Shared experience creates instant connection: Google intern where founders worked, Stanford student with recent admission success, public school same "
+        },
+        {
+          "chip_id": "W006-ADAPTATION-001",
+          "week": "W006",
+          "content": "Speech debate pivot executed mid-session: discovery of hidden activity leads to immediate deprioritization despite regional success. SAT schedule flex"
+        },
+        {
+          "chip_id": "W007-INSIGHT-001",
+          "week": "W007",
+          "content": "Social media audit reveals shocking reality: 4 hours daily consumption equals 28 hours weekly, essentially a part-time job worth of time. Last-minute "
+        }
+      ],
+      "key_insights": [
+        "Relatability via Stanford status, NCWIT wins, sister reference, platform fluency, challenge questions vs commands",
+        "Challenge Question saves 4 weeks; Time Math creates urgency; Intel Drop reveals Stanford AI ethics; Redirect Gift returns time",
+        "Time audit reveals 28hr/week social media waste; SAT at 1360 needs 190pt gain; Muslim identity hidden strength; zero awards critical gap",
+        "Adaptive cascades: Women in AI\u2192CS for Good\u2192Encode Justice; Muslim business pivot; 2-week trial periods; create new orgs vs fight old",
+        "168hr system reveals opportunity space; delegation+consolidation maximize impact; portfolio web creates multiplicative value"
+      ]
+    },
+    "activity_output_surge": {
+      "category": "activity_output_surge",
+      "category_name": "Activity Output Acceleration",
+      "chip_count": 3,
+      "start_week": "W002",
+      "start_date": "2023-06-26",
+      "end_week": "W003",
+      "end_date": "2023-06-26",
+      "duration_weeks": 2,
+      "phases_covered": [
+        "P1-FOUNDATION"
+      ],
+      "quality_scores": [
+        0.95,
+        0.94,
+        0.92
+      ],
+      "avg_quality": 0.9366666666666666,
+      "tactics_used": [],
+      "breakthrough_moments": [],
+      "measurable_results": {
+        "productivity": "Time management improvement",
+        "test_scores": "SAT improvement detected",
+        "academic": "GPA improvement detected",
+        "recognition": "Award won"
+      },
+      "all_chips": [
+        {
+          "chip_id": "W002-FRAMEWORK-001",
+          "week": "W002",
+          "content": "168-hour framework becomes system architecture: Total 168hrs minus fixed commitments equals opportunity space. Time optimization strategies: Do readin"
+        },
+        {
+          "chip_id": "W003-FRAMEWORK-001",
+          "week": "W003",
+          "content": "Systems architecture creates compound effects: Game project yields CS skills+portfolio+awards+essays simultaneously. Video series generates service+cu"
+        },
+        {
+          "chip_id": "W003-RESULT-001",
+          "week": "W003",
+          "content": "Success metrics established across timeframes: Short-term - 7 tasks Week 3 completion; Medium-term - All A's by semester end; Long-term - 1550+ SAT, 3"
+        }
+      ],
+      "key_insights": [
+        "168hr system reveals opportunity space; delegation+consolidation maximize impact; portfolio web creates multiplicative value",
+        "Compound benefits: game=skills+awards+essays; optimization via delegation+batching; feedback loops every Tue/Sat",
+        "Metrics: 7 tasks W3, all A's, 1550+ SAT, 3-4 awards; tracking behavior+academic+extracurricular+identity progress"
+      ]
+    }
+  }
+}

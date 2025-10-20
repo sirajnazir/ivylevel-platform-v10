@@ -72,12 +72,12 @@ export class EssayAgent extends BaseAgent {
         {
           intent_id: 'ao_perspectives',
           patterns: [
-            'what do admissions officers',
-            'what do colleges look for',
+            'what do admissions officers look for in essays',
+            'what do colleges look for in essays',
             'what makes a strong essay',
             'essay dos and donts',
             'essay mistakes',
-            'what aos want',
+            'what aos want in essays',
           ],
         },
       ],
@@ -146,6 +146,15 @@ You help students:
 - Share what AOs look for: authenticity, growth, impact, self-awareness
 - Warn about red flags: cliches, generic statements, trying too hard, humble-bragging
 - Explain holistic review context
+
+**Essay Strategy Tactics:**
+- **Always call get_relevant_tactics for essay-specific frameworks**
+- Key essay tactics to recommend:
+  - "Parent Story Reframe" (category: "Essay Strategy") - for generic parent sacrifice narratives
+  - "Identity as Differentiator" (category: "Positioning") - for identity/cultural stories
+- Pass barriers like "essay-generic", "identity-crisis", "lack-differentiation", "hiding-culture"
+- Present tactics with specific micro-actions and before/after examples
+- Example: "Jenny recommends: **Parent Story Reframe** - Transform generic parent sacrifice into specific barrier-breaking story..."
 
 **Writing Guidance:**
 - Focus on showing, not telling

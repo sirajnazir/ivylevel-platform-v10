@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Temporary rules for testing - allows public read access
+    // WARNING: Only use for development/testing!
+    
+    // Allow read access to coaches and videos for the app
+    match /coaches/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    match /indexed_videos/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    match /training_videos/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    match /students/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    match /sessions/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    match /resources/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    match /ai_recommendations/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    
+    // Keep other collections restricted
+    match /{document=**} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}

@@ -222,8 +222,7 @@ export const jtbd = {
     log.event('jtbd.progression_start', { student_id: studentId });
 
     const { rows } = await pg.query(
-      `SELECT week_number, week_start_date, jobs_this_week, completed_this_week,
-              completion_rate, cumulative_jobs, cumulative_completed
+      `SELECT week_number, total_jobs, completed_jobs, completion_rate
          FROM v_jtbd_weekly_progression
         WHERE student_id = $1
         ORDER BY week_number`,

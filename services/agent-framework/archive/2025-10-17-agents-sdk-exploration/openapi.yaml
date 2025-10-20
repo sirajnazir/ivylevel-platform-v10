@@ -1,0 +1,292 @@
+openapi: 3.0.0
+info:
+  title: IvyLevel Agents API
+  version: 1.0.0
+  description: |
+    IvyLevel multi-agent API using OpenAI Responses API + Agents SDK.
+
+    ## Architecture
+    - **Primary path**: Responses API + Agents SDK (no Assistants API regression)
+    - **Legacy path**: Assistants compatibility wrapper (REST-based)
+
+    ## Agents
+    - GamePlan Agent: Strategic planning and timeline creation
+    - College List Agent: College research and recommendations
+    - Essay Agent: Essay guidance and feedback
+    - Admissions Agent: Application strategy
+
+    ## Feature Flags
+    - `USE_AGENTS_SDK=true` (default): Use Agents SDK
+    - `ASSISTANTS_COMPAT=true`: Enable legacy Assistants REST wrapper
+
+  contact:
+    name: IvyLevel Platform Team
+    url: https://ivylevel.com
+
+servers:
+  - url: http://localhost:8788
+    description: Local development
+  - url: https://api-staging.ivylevel.com
+    description: Staging
+  - url: https://api.ivylevel.com
+    description: Production
+
+paths:
+  /v1/agent/run:
+    post:
+      summary: Run multi-agent workflow
+      description: |
+        Executes multi-agent workflow (GamePlan, Grader, etc.) using Agents SDK.
+        Returns agent response with tool calls and trace information.
+      operationId: runAgent
+      tags:
+        - Agents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - input
+                - student_id
+                - coach_id
+              properties:
+                input:
+                  type: string
+                  description: User input message
+                  example: "What should I focus on for my Stanford application?"
+                student_id:
+                  type: string
+                  description: Student ID
+                  example: "huda-2025"
+                coach_id:
+                  type: string
+                  description: Coach ID
+                  example: "jenny-coach-1"
+                context:
+                  type: object
+                  description: Student context (optional)
+                  properties:
+                    grade:
+                      type: integer
+                      example: 12
+                    gpa:
+                      type: number
+                      example: 4.3
+                    sat:
+                      type: integer
+                      example: 1360
+                    intended_major:
+                      type: string
+                      example: "Computer Science"
+                    ecs_count:
+                      type: integer
+                      example: 20
+                    awards_count:
+                      type: integer
+                      example: 6
+      responses:
+        "200":
+          description: Agent run completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentRunResult"
+        "400":
+          description: Bad request (missing required fields)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /v1/assistants/submit-tool-outputs:
+    post:
+      summary: Submit tool outputs (Assistants compat)
+      description: |
+        Legacy Assistants API compatibility wrapper.
+        Submits tool outputs via REST API to work around Node SDK regression.
+
+        **Only use for existing Assistants threads.**
+        New workflows should use `/v1/agent/run` instead.
+      operationId: submitToolOutputsCompat
+      tags:
+        - Assistants (Legacy)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - threadId
+                - runId
+                - tool_outputs
+              properties:
+                threadId:
+                  type: string
+                  description: Thread ID from Assistants API
+                  example: "thread_abc123"
+                runId:
+                  type: string
+                  description: Run ID from Assistants API
+                  example: "run_xyz789"
+                tool_outputs:
+                  type: array
+                  description: Tool outputs to submit
+                  items:
+                    type: object
+                    required:
+                      - tool_call_id
+                      - output
+                    properties:
+                      tool_call_id:
+                        type: string
+                        example: "call_abc123"
+                      output:
+                        type: string
+                        description: Tool output as JSON string
+                        example: '{"result": "success"}'
+      responses:
+        "200":
+          description: Tool outputs submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantsRunResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /health:
+    get:
+      summary: Health check
+      description: Returns service health status
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  flags:
+                    type: object
+                    properties:
+                      use_agents_sdk:
+                        type: boolean
+                      assistants_compat:
+                        type: boolean
+                      enable_tracing:
+                        type: boolean
+
+components:
+  schemas:
+    AgentRunResult:
+      type: object
+      properties:
+        response:
+          type: string
+          description: Agent response text
+          example: "Based on your profile, here's your game plan..."
+        agent_name:
+          type: string
+          description: Agent that generated response
+          example: "gameplan"
+        tool_calls:
+          type: array
+          description: Tools called during agent run
+          items:
+            $ref: "#/components/schemas/ToolCallResult"
+        tokens_used:
+          type: integer
+          description: Total tokens used
+          example: 1234
+        latency_ms:
+          type: integer
+          description: Total latency in milliseconds
+          example: 2500
+        trace_id:
+          type: string
+          description: OpenTelemetry trace ID
+          example: "abcd1234efgh5678"
+
+    ToolCallResult:
+      type: object
+      properties:
+        tool_name:
+          type: string
+          example: "gameplan_initial"
+        tool_args:
+          type: object
+          example: { "studentId": "huda-2025" }
+        tool_result:
+          type: object
+          example: { "narrative_items": 5, "award_targets": 9 }
+        latency_ms:
+          type: integer
+          example: 150
+
+    AssistantsRunResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "run_xyz789"
+        object:
+          type: string
+          example: "thread.run"
+        status:
+          type: string
+          enum:
+            - queued
+            - in_progress
+            - requires_action
+            - completed
+            - failed
+            - cancelled
+            - expired
+          example: "completed"
+        thread_id:
+          type: string
+          example: "thread_abc123"
+        assistant_id:
+          type: string
+          example: "asst_xyz789"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Missing required field: student_id"
+        code:
+          type: string
+          description: Error code
+          example: "VALIDATION_ERROR"
+        trace_id:
+          type: string
+          description: Trace ID for debugging
+          example: "abcd1234"

@@ -1,0 +1,81 @@
+.app {
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2c3e50;
+  padding: 1rem;
+}
+
+.nav-logo {
+  color: white;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.nav-links a {
+  color: white;
+  margin: 0 1rem;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  color: #3498db;
+}
+
+.container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+h1, h2, h3 {
+  color: #2c3e50;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+.completed {
+  color: green;
+}
+
+.pending {
+  color: blue;
+}
+
+.chat {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.chat p {
+  margin: 0.5rem 0;
+}
+
+.chat .agent {
+  color: #e74c3c;
+}
+
+.chat .coach {
+  color: #27ae60;
+}

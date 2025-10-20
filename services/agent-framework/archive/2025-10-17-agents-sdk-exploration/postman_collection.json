@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "IvyLevel Agents + Compat",
+    "description": "Multi-agent API using OpenAI Responses API + Agents SDK, with Assistants compatibility wrapper",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "ivylevel-agents-v1"
+  },
+  "variable": [
+    {
+      "key": "gateway",
+      "value": "http://localhost:8788",
+      "type": "string"
+    },
+    {
+      "key": "student_id",
+      "value": "huda-2025",
+      "type": "string"
+    },
+    {
+      "key": "coach_id",
+      "value": "jenny-coach-1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Agents API",
+      "item": [
+        {
+          "name": "Run GamePlan Agent (Primary Path)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{gateway}}/v1/agent/run",
+              "host": ["{{gateway}}"],
+              "path": ["v1", "agent", "run"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input\": \"What should I focus on for my Stanford application?\",\n  \"student_id\": \"{{student_id}}\",\n  \"coach_id\": \"{{coach_id}}\",\n  \"context\": {\n    \"grade\": 12,\n    \"gpa\": 4.3,\n    \"sat\": 1360,\n    \"intended_major\": \"Computer Science\",\n    \"ecs_count\": 20,\n    \"awards_count\": 6\n  }\n}"
+            },
+            "description": "Run multi-agent workflow using Agents SDK (primary path). Returns agent response with tool calls and trace information."
+          },
+          "response": []
+        },
+        {
+          "name": "Run GamePlan Agent - Timeline Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{gateway}}/v1/agent/run",
+              "host": ["{{gateway}}"],
+              "path": ["v1", "agent", "run"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input\": \"Create a timeline for my college applications for the next 2 months\",\n  \"student_id\": \"{{student_id}}\",\n  \"coach_id\": \"{{coach_id}}\",\n  \"context\": {\n    \"grade\": 12,\n    \"gpa\": 4.3,\n    \"sat\": 1360,\n    \"intended_major\": \"Computer Science\",\n    \"ecs_count\": 20,\n    \"awards_count\": 6\n  }\n}"
+            },
+            "description": "Request timeline planning from GamePlan agent"
+          },
+          "response": []
+        },
+        {
+          "name": "Run GamePlan Agent - Awards Focus",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{gateway}}/v1/agent/run",
+              "host": ["{{gateway}}"],
+              "path": ["v1", "agent", "run"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"input\": \"Which awards should I apply for next? I want to maximize my chances.\",\n  \"student_id\": \"{{student_id}}\",\n  \"coach_id\": \"{{coach_id}}\",\n  \"context\": {\n    \"grade\": 12,\n    \"gpa\": 4.3,\n    \"sat\": 1360,\n    \"intended_major\": \"Computer Science\",\n    \"ecs_count\": 20,\n    \"awards_count\": 6\n  }\n}"
+            },
+            "description": "Request award recommendations from GamePlan agent"
+          },
+          "response": []
+        }
+      ],
+      "description": "Primary path using Responses API + Agents SDK"
+    },
+    {
+      "name": "Assistants Compat (Legacy)",
+      "item": [
+        {
+          "name": "Submit Tool Outputs (REST Wrapper)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{gateway}}/v1/assistants/submit-tool-outputs",
+              "host": ["{{gateway}}"],
+              "path": ["v1", "assistants", "submit-tool-outputs"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"threadId\": \"thread_abc123\",\n  \"runId\": \"run_xyz789\",\n  \"tool_outputs\": [\n    {\n      \"tool_call_id\": \"call_1\",\n      \"output\": \"{\\\"narrative_items\\\": 5, \\\"award_targets\\\": 9}\"\n    }\n  ]\n}"
+            },
+            "description": "Legacy Assistants API compatibility wrapper. Uses REST API to work around Node SDK submitToolOutputs regression. Enable with ASSISTANTS_COMPAT=true."
+          },
+          "response": []
+        }
+      ],
+      "description": "Legacy Assistants API compatibility (REST wrapper for SDK regression)"
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/health",
+              "host": ["{{gateway}}"],
+              "path": ["health"]
+            },
+            "description": "Check service health and feature flags status"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

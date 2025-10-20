@@ -1,0 +1,25 @@
+{
+    "patches": [
+      {
+        "id": "patch-1",
+        "description": "Add resourceHubProgress state to StudentMasteryModule",
+        "action": "replace",
+        "search_pattern": "const StudentMasteryModule = ({ student, onComplete }) => {\n  const [currentSection, setCurrentSection] = useState(0);\n  const [quizAnswers, setQuizAnswers] = useState({});\n  const [scenarioResponses, setScenarioResponses] = useState({});\n  const [masteryScore, setMasteryScore] = useState(0);\n  const [showFeedback, setShowFeedback] = useState(false);",
+        "new_content": "const StudentMasteryModule = ({ student, onComplete }) => {\n  const [currentSection, setCurrentSection] = useState(0);\n  const [quizAnswers, setQuizAnswers] = useState({});\n  const [scenarioResponses, setScenarioResponses] = useState({});\n  const [masteryScore, setMasteryScore] = useState(0);\n  const [showFeedback, setShowFeedback] = useState(false);\n  const [resourceHubProgress, setResourceHubProgress] = useState(0);"
+      },
+      {
+        "id": "patch-2",
+        "description": "Add resource-hub section to sections array",
+        "action": "replace",
+        "search_pattern": "    },\n    {\n      id: 'comprehension-check',\n      title: 'Comprehension Check',\n      type: 'quiz',",
+        "new_content": "    },\n    {\n      id: 'resource-hub',\n      title: 'Personalized Resources',\n      type: 'resource-hub',\n      content: {}\n    },\n    {\n      id: 'comprehension-check',\n      title: 'Comprehension Check',\n      type: 'quiz',"
+      },
+      {
+        "id": "patch-3",
+        "description": "Add resource-hub case to renderSection switch statement",
+        "action": "add_before",
+        "search_pattern": "      case 'quiz':",
+        "new_content": "      case 'resource-hub':\n        return (\n          <div style={{display: 'flex', flexDirection: 'column', gap: '24px'}}>\n            <div style={{background: '#FFE5DF', borderRadius: '8px', padding: '16px'}}>\n              <p style={{fontSize: '0.875rem', color: '#D63A1A'}}>\n                <strong>Important:</strong> Review these personalized resources before working with {student.name}. \n                This includes their game plan, relevant training videos, and similar student success stories.\n              </p>\n            </div>\n            <SmartResourceHub \n              student={student} \n              coach={{name: 'Coach'}} \n              onProgress={(type, progress) => setResourceHubProgress(progress)} \n            />\n          </div>\n        );\n        \n"
+      }
+    ]
+  }

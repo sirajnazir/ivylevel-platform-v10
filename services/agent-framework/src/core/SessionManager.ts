@@ -32,10 +32,18 @@ export class SessionManager {
   /**
    * Create a new session for a student
    */
-  async createSession(studentId: string, category?: string): Promise<IvyLevelSession> {
+  async createSession(
+    studentId: string,
+    category?: string,
+    coachId: string = 'jenny'
+  ): Promise<IvyLevelSession> {
     const sessionId = `sess_${studentId}_${Date.now()}`;
 
-    log.event('session.create', { session_id: sessionId, student_id: studentId });
+    log.event('session.create', {
+      session_id: sessionId,
+      student_id: studentId,
+      coach_id: coachId,
+    });
 
     // Load student context
     const context = await this.loadStudentContext(studentId);
@@ -44,6 +52,7 @@ export class SessionManager {
       session_id: sessionId,
       student_id: studentId,
       student_name: context.student_name,
+      coach_id: coachId,
       context,
       messages: [],
       created_at: new Date(),
@@ -55,10 +64,10 @@ export class SessionManager {
 
     // Persist session to database
     try {
-      await this.conversationRepo.createSession(sessionId, studentId, context, category);
-      log.event('session.persisted', { session_id: sessionId });
+      await this.conversationRepo.createSession(sessionId, studentId, context, category, coachId);
+      log.event('session.persisted', { session_id: sessionId, coach_id: coachId });
     } catch (error: any) {
-      log.error('session.persist_error', error, { session_id: sessionId });
+      log.error('session.persist_error', error, { session_id: sessionId, coach_id: coachId });
       // Continue even if persistence fails - session is still in memory
     }
 
@@ -67,26 +76,45 @@ export class SessionManager {
 
   /**
    * Get existing session by ID
+   * Checks in-memory cache first, then loads from database if not found
    */
-  getSession(sessionId: string): IvyLevelSession | null {
-    const session = this.sessions.get(sessionId);
-
-    if (session) {
-      log.event('session.retrieved', {
+  async getSession(sessionId: string): Promise<IvyLevelSession | null> {
+    // Check in-memory cache first
+    const cachedSession = this.sessions.get(sessionId);
+    if (cachedSession) {
+      log.event('session.retrieved_cache', {
         session_id: sessionId,
-        turn_count: session.turn_count,
+        turn_count: cachedSession.turn_count,
       });
+      return cachedSession;
     }
 
-    return session || null;
+    // Load from database
+    try {
+      const dbSession = await this.loadSessionFromDatabase(sessionId);
+      if (dbSession) {
+        // Cache it for future use
+        this.sessions.set(sessionId, dbSession);
+        log.event('session.retrieved_db', {
+          session_id: sessionId,
+          turn_count: dbSession.turn_count,
+        });
+        return dbSession;
+      }
+    } catch (error: any) {
+      log.error('session.load_error', error, { session_id: sessionId });
+    }
+
+    return null;
   }
 
   /**
    * Get or create session for student
    * Finds most recent active session or creates new one
+   * Checks both in-memory cache and database
    */
   async getOrCreateSession(studentId: string): Promise<IvyLevelSession> {
-    // Find most recent session for this student
+    // Check in-memory sessions first
     const existingSessions = Array.from(this.sessions.values()).filter(
       (s) => s.student_id === studentId
     );
@@ -97,7 +125,7 @@ export class SessionManager {
         (a, b) => b.last_active.getTime() - a.last_active.getTime()
       )[0];
 
-      log.event('session.reused', {
+      log.event('session.reused_cache', {
         session_id: mostRecent.session_id,
         student_id: studentId,
         turn_count: mostRecent.turn_count,
@@ -106,7 +134,41 @@ export class SessionManager {
       return mostRecent;
     }
 
-    // Create new session
+    // Check database for recent sessions
+    try {
+      const dbResult = await pool.query(
+        `SELECT session_id, last_active_at
+         FROM agent_conversation_sessions
+         WHERE student_id = $1
+           AND resolution_status = 'active'
+         ORDER BY last_active_at DESC
+         LIMIT 1`,
+        [studentId]
+      );
+
+      if (dbResult.rows.length > 0) {
+        const sessionId = dbResult.rows[0].session_id;
+        const session = await this.loadSessionFromDatabase(sessionId);
+
+        if (session) {
+          // Cache it for reuse
+          this.sessions.set(sessionId, session);
+
+          log.event('session.reused_db', {
+            session_id: sessionId,
+            student_id: studentId,
+            turn_count: session.turn_count,
+          });
+
+          return session;
+        }
+      }
+    } catch (error: any) {
+      log.error('session.find_recent_error', error, { student_id: studentId });
+      // Continue to create new session if database lookup fails
+    }
+
+    // Create new session if none found
     return await this.createSession(studentId);
   }
 
@@ -201,6 +263,56 @@ export class SessionManager {
   ): string | undefined {
     const vital = vitals.find((v) => v.metric_type === metricType);
     return vital?.item_value || (defaultValue || undefined);
+  }
+
+  /**
+   * Load session from database by session_id
+   */
+  private async loadSessionFromDatabase(sessionId: string): Promise<IvyLevelSession | null> {
+    try {
+      const result = await pool.query(
+        `SELECT session_id, student_id, student_context AS context, category, resolution_status AS status, created_at, last_active_at
+         FROM agent_conversation_sessions
+         WHERE session_id = $1`,
+        [sessionId]
+      );
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      const row = result.rows[0];
+
+      // Load conversation turns for this session
+      const turnsResult = await pool.query(
+        `SELECT turn_number, user_message, agent_response, agent_id, created_at
+         FROM agent_conversation_turns
+         WHERE session_id = $1
+         ORDER BY turn_number ASC`,
+        [sessionId]
+      );
+
+      // Reconstruct session object
+      const session: IvyLevelSession = {
+        session_id: row.session_id,
+        student_id: row.student_id,
+        student_name: row.context?.student_name || 'Student',
+        context: row.context || {},
+        messages: turnsResult.rows.map((t: any) => ({
+          role: 'user',
+          content: t.user_message,
+          timestamp: t.created_at,
+        })),
+        created_at: new Date(row.created_at),
+        last_active: new Date(row.last_active_at || row.created_at),
+        turn_count: turnsResult.rows.length,
+      };
+
+      return session;
+    } catch (error: any) {
+      log.error('session.db_load_error', error, { session_id: sessionId });
+      return null;
+    }
   }
 
   /**

@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { z } from "zod";
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 import * as resolvers from '../services/resolvers.js';
+import * as nsmResolvers from '../resolvers/nsm.js';
 import type { Pool } from 'pg';
 import { extractUAPX } from '../intent/extractors/uapx.js';
 import type { Domain } from '../intent/schema.js';
@@ -86,10 +87,15 @@ type Intent =
   | "jtbd.milestones"
   | "jtbd.progression"
   | "kb.search"
+  | "nsm.dashboard"
+  | "nsm.recognition"
+  | "nsm.leadership"
+  | "nsm.academic"
+  | "nsm.program"
   | "unknown";
 
 type Phase = "initial" | "final" | null;
-type Object = "ec" | "award" | "program" | "academics" | "narrative" | "sat" | "testing" | "vitals" | "jtbd" | "college" | "readiness" | "gameplan" | "application" | "rubric" | "scholarship" | "kb";
+type Object = "ec" | "award" | "program" | "academics" | "narrative" | "sat" | "testing" | "vitals" | "jtbd" | "college" | "readiness" | "gameplan" | "application" | "rubric" | "scholarship" | "kb" | "nsm";
 type NthOrdinal = "first" | "second" | "third" | "latest" | number;
 
 const IntentSchema = z.object({
@@ -423,6 +429,43 @@ const FEW_SHOT = [
   {input:"vitals summary", output:{intent:"vitals.summary", phase:null, object:"vitals", filters:{}, confidence:0.94}},
   {input:"summarize my EC metrics", output:{intent:"vitals.summary", phase:null, object:"vitals", filters:{}, confidence:0.93}},
 
+  // NSM Dashboard (5 examples - v1.0)
+  {input:"show my NSM dashboard", output:{intent:"nsm.dashboard", phase:null, object:"nsm", filters:{}, confidence:0.96}},
+  {input:"show my north star metrics", output:{intent:"nsm.dashboard", phase:null, object:"nsm", filters:{}, confidence:0.95}},
+  {input:"NSM overview", output:{intent:"nsm.dashboard", phase:null, object:"nsm", filters:{}, confidence:0.94}},
+  {input:"what's my overall profile status?", output:{intent:"nsm.dashboard", phase:null, object:"nsm", filters:{}, confidence:0.92}},
+  {input:"show comprehensive metrics", output:{intent:"nsm.dashboard", phase:null, object:"nsm", filters:{}, confidence:0.91}},
+
+  // NSM Recognition (6 examples - v1.0)
+  {input:"how many awards have I won?", output:{intent:"nsm.recognition", phase:null, object:"nsm", filters:{}, confidence:0.97}},
+  {input:"show my awards status", output:{intent:"nsm.recognition", phase:null, object:"nsm", filters:{}, confidence:0.96}},
+  {input:"what's my award win rate?", output:{intent:"nsm.recognition", phase:null, object:"nsm", filters:{}, confidence:0.95}},
+  {input:"recognition metrics", output:{intent:"nsm.recognition", phase:null, object:"nsm", filters:{}, confidence:0.94}},
+  {input:"how many national awards?", output:{intent:"nsm.recognition", phase:null, object:"nsm", filters:{}, confidence:0.96}},
+  {input:"awards summary", output:{intent:"nsm.recognition", phase:null, object:"nsm", filters:{}, confidence:0.93}},
+
+  // NSM Leadership (6 examples - v1.0)
+  {input:"show my leadership activities", output:{intent:"nsm.leadership", phase:null, object:"nsm", filters:{}, confidence:0.96}},
+  {input:"how many leadership roles do I have?", output:{intent:"nsm.leadership", phase:null, object:"nsm", filters:{}, confidence:0.95}},
+  {input:"what leadership positions have I held?", output:{intent:"nsm.leadership", phase:null, object:"nsm", filters:{}, confidence:0.94}},
+  {input:"president and founder roles", output:{intent:"nsm.leadership", phase:null, object:"nsm", filters:{}, confidence:0.93}},
+  {input:"leadership metrics", output:{intent:"nsm.leadership", phase:null, object:"nsm", filters:{}, confidence:0.95}},
+  {input:"show leadership ECs", output:{intent:"nsm.leadership", phase:null, object:"nsm", filters:{}, confidence:0.94}},
+
+  // NSM Academic (5 examples - v1.0)
+  {input:"what are my test scores?", output:{intent:"nsm.academic", phase:null, object:"nsm", filters:{}, confidence:0.96}},
+  {input:"show my SAT and ACT scores", output:{intent:"nsm.academic", phase:null, object:"nsm", filters:{}, confidence:0.95}},
+  {input:"academic test vitals", output:{intent:"nsm.academic", phase:null, object:"nsm", filters:{}, confidence:0.94}},
+  {input:"how many AP exams passed?", output:{intent:"nsm.academic", phase:null, object:"nsm", filters:{}, confidence:0.95}},
+  {input:"testing metrics", output:{intent:"nsm.academic", phase:null, object:"nsm", filters:{}, confidence:0.93}},
+
+  // NSM Program (5 examples - v1.0)
+  {input:"summer program acceptances", output:{intent:"nsm.program", phase:null, object:"nsm", filters:{}, confidence:0.96}},
+  {input:"how many programs was I accepted to?", output:{intent:"nsm.program", phase:null, object:"nsm", filters:{}, confidence:0.95}},
+  {input:"show program status", output:{intent:"nsm.program", phase:null, object:"nsm", filters:{}, confidence:0.94}},
+  {input:"prestigious programs", output:{intent:"nsm.program", phase:null, object:"nsm", filters:{}, confidence:0.93}},
+  {input:"program application results", output:{intent:"nsm.program", phase:null, object:"nsm", filters:{}, confidence:0.94}},
+
   // JTBD - Week (4 examples - v10.7)
   {input:"what did I accomplish in week 8?", output:{intent:"jtbd.week", phase:null, object:"jtbd", filters:{week:8}, confidence:0.98}},
   {input:"show me week 12 progress", output:{intent:"jtbd.week", phase:null, object:"jtbd", filters:{week:12}, confidence:0.97}},
@@ -521,9 +564,9 @@ const FEW_SHOT = [
 const SYS = `You are an intent classifier for a college admissions coaching agent.
 Output ONLY valid JSON matching this schema:
 {
-  "intent": "ecs.list|awards.list|programs.list|academics.summary|academics.transcript.initial|academics.transcript.final|academics.transcript.progression|academics.gpa.initial|academics.gpa.final|academics.gpa.latest|academics.gpa.progression|narrative.summary|progression.timeline|sat.ordinal|testing.sat.first|testing.sat.latest|testing.sat.progression|gameplan.initial|gameplan.vs_progress|application.final|ivyready.score|ivyready.initial|ivyready.final|ivyready.compare|ivyready.factors|readiness.now|readiness.progress|readiness.drivers|readiness.whatif.sat|readiness.whatif.award|readiness.whatif.ec|readiness.whatif.gpa|readiness.whatif.program|readiness.next_moves|readiness.top_priorities|vitals.latest|vitals.progression|vitals.funding.progression|vitals.scale.progression|vitals.impact.latest|vitals.summary|jtbd.week|jtbd.completed|jtbd.pending|jtbd.milestones|jtbd.progression|college.attending|college.accepted|college.reach|college.match|college.safety|kb.search|unknown",
+  "intent": "ecs.list|awards.list|programs.list|academics.summary|academics.transcript.initial|academics.transcript.final|academics.transcript.progression|academics.gpa.initial|academics.gpa.final|academics.gpa.latest|academics.gpa.progression|narrative.summary|progression.timeline|sat.ordinal|testing.sat.first|testing.sat.latest|testing.sat.progression|gameplan.initial|gameplan.vs_progress|application.final|ivyready.score|ivyready.initial|ivyready.final|ivyready.compare|ivyready.factors|readiness.now|readiness.progress|readiness.drivers|readiness.whatif.sat|readiness.whatif.award|readiness.whatif.ec|readiness.whatif.gpa|readiness.whatif.program|readiness.next_moves|readiness.top_priorities|vitals.latest|vitals.progression|vitals.funding.progression|vitals.scale.progression|vitals.impact.latest|vitals.summary|jtbd.week|jtbd.completed|jtbd.pending|jtbd.milestones|jtbd.progression|college.attending|college.accepted|college.reach|college.match|college.safety|nsm.dashboard|nsm.recognition|nsm.leadership|nsm.academic|nsm.program|kb.search|unknown",
   "phase": "initial|final|null",
-  "object": "ec|award|program|academics|narrative|sat|testing|vitals|jtbd|college|readiness|gameplan|application|rubric|scholarship|kb",
+  "object": "ec|award|program|academics|narrative|sat|testing|vitals|jtbd|college|readiness|gameplan|application|rubric|scholarship|kb|nsm",
   "filters": {
     "as_of"?: string|null,
     "school"?: string|null,
@@ -592,6 +635,11 @@ INTENT ROUTING RULES:
 - "my match schools" -> intent:"college.match", phase:null, object:"college"
 - "my safety schools" -> intent:"college.safety", phase:null, object:"college"
 - "top priorities/what should I focus on" -> intent:"readiness.top_priorities", phase:null, object:"readiness"
+- "NSM dashboard/north star metrics" -> intent:"nsm.dashboard", phase:null, object:"nsm"
+- "how many awards won/award win rate" -> intent:"nsm.recognition", phase:null, object:"nsm"
+- "leadership roles/president positions" -> intent:"nsm.leadership", phase:null, object:"nsm"
+- "test scores/SAT and ACT scores" -> intent:"nsm.academic", phase:null, object:"nsm"
+- "summer program acceptances/programs accepted" -> intent:"nsm.program", phase:null, object:"nsm"
 
 ACADEMICS HANDLING:
 - Extract components from query: "grades", "gpa", "sat", "act", "ap", "transcript"
@@ -1255,6 +1303,25 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
         break;
       case "vitals.summary":
         data = await resolvers.vitalsSummary(pg, studentId);
+        break;
+
+      // ============================================================================
+      // v1.0: NSM (North Star Metrics) Routes
+      // ============================================================================
+      case "nsm.dashboard":
+        data = await nsmResolvers.nsmDashboard(pg, studentId);
+        break;
+      case "nsm.recognition":
+        data = await nsmResolvers.recognitionVitals(pg, studentId);
+        break;
+      case "nsm.leadership":
+        data = await nsmResolvers.leadershipVitals(pg, studentId);
+        break;
+      case "nsm.academic":
+        data = await nsmResolvers.academicVitals(pg, studentId);
+        break;
+      case "nsm.program":
+        data = await nsmResolvers.programVitals(pg, studentId);
         break;
 
       // ============================================================================

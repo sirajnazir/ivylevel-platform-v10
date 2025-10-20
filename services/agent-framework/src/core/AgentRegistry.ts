@@ -14,6 +14,8 @@ import { SummerProgramsAgent } from '../agents/SummerProgramsAgent.js';
 import { CollegeListAgent } from '../agents/CollegeListAgent.js';
 import { EssayAgent } from '../agents/EssayAgent.js';
 import { AdmissionsAgent } from '../agents/AdmissionsAgent.js';
+import { WeeklyExecutionAgent } from '../agents/WeeklyExecutionAgent.js';
+import { ScholarshipAgent } from '../agents/ScholarshipAgent.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 
 const log = createLogger('agent-registry');
@@ -47,8 +49,10 @@ export class AgentRegistry {
       { name: 'AwardsAgent', constructor: AwardsAgent },
       { name: 'SummerProgramsAgent', constructor: SummerProgramsAgent },
       { name: 'CollegeListAgent', constructor: CollegeListAgent },
-      { name: 'EssayAgent', constructor: EssayAgent },           // Week 11: Essay strategy
-      { name: 'AdmissionsAgent', constructor: AdmissionsAgent }, // Week 11: AO perspectives
+      { name: 'EssayAgent', constructor: EssayAgent },                     // Week 11: Essay strategy
+      { name: 'AdmissionsAgent', constructor: AdmissionsAgent },           // Week 11: AO perspectives
+      { name: 'WeeklyExecutionAgent', constructor: WeeklyExecutionAgent }, // Week 17: JTBD tracking
+      { name: 'ScholarshipAgent', constructor: ScholarshipAgent },         // Week 18: Scholarship tracking
     ];
 
     const agents: BaseAgent[] = [];

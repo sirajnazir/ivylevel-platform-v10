@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connection Test</title>
+</head>
+<body>
+    <h1>Testing Vite Server Connection</h1>
+    <div id="status">Checking...</div>
+    
+    <script>
+        async function testConnection() {
+            const status = document.getElementById('status');
+            try {
+                const response = await fetch('http://localhost:5173/');
+                status.innerHTML = `
+                    <p style="color: green;">✓ Server is responding!</p>
+                    <p>Status: ${response.status}</p>
+                    <p>URL: ${response.url}</p>
+                    <p><a href="http://localhost:5173/" target="_blank">Open in new tab</a></p>
+                `;
+                
+                // Try to get the content
+                const text = await response.text();
+                if (text.includes('<!doctype html>')) {
+                    status.innerHTML += '<p style="color: green;">✓ HTML is being served</p>';
+                }
+            } catch (error) {
+                status.innerHTML = `
+                    <p style="color: red;">✗ Error connecting to server</p>
+                    <p>Error: ${error.message}</p>
+                    <p>Make sure the dev server is running with 'npm run dev'</p>
+                `;
+            }
+        }
+        
+        testConnection();
+    </script>
+</body>
+</html>
