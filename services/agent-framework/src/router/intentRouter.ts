@@ -92,6 +92,10 @@ type Intent =
   | "nsm.leadership"
   | "nsm.academic"
   | "nsm.program"
+  | "assessment.start.interactive"
+  | "assessment.start.simulated"
+  | "assessment.respond"
+  | "assessment.status"
   | "unknown";
 
 type Phase = "initial" | "final" | null;
@@ -789,8 +793,35 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
     const q = message.toLowerCase();
     let factIntent: typeof intent | null = null;
 
+    // ========================================
+    // v10.2 Assessment Start Patterns (HIGH PRIORITY)
+    // ========================================
+    // Interactive/Simulated assessment triggers
+    if (/\b(start|begin|run).*(interactive|simulated).*(assessment|evaluation)/i.test(message)) {
+      const isInteractive = /interactive/i.test(message);
+      factIntent = {
+        intent: isInteractive ? "assessment.start.interactive" : "assessment.start.simulated",
+        phase: null,
+        object: "kb" as Object,
+        filters: {},
+        confidence: 0.99,
+        detector: "assessment-trigger"
+      };
+    }
+    // Check for active assessment response (ongoing session)
+    else if (q.startsWith('assessment:') || /^layer\s+\d+\s+response:/i.test(message)) {
+      factIntent = {
+        intent: "assessment.respond",
+        phase: null,
+        object: "kb" as Object,
+        filters: {},
+        confidence: 0.99,
+        detector: "assessment-response"
+      };
+    }
+
     // Awards fact queries
-    if (/\b(what|which|list|show|tell me).*(award|honor|recognition|prize|won|ncwit)/i.test(message)) {
+    else if (/\b(what|which|list|show|tell me).*(award|honor|recognition|prize|won|ncwit)/i.test(message)) {
       const hasPhase = /\b(initial|final|submit|common\s*app)\b/i.test(message);
       const hasWin = /\b(win|won|actual|get|got|receive)/i.test(message);
 
@@ -1104,6 +1135,78 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
 
     let data;
     switch (intent.intent) {
+      // ========================================
+      // v10.2 Assessment Handlers (PHASE 2)
+      // ========================================
+      case "assessment.start.interactive": {
+        console.log('[INTENT-ROUTER] → Starting INTERACTIVE assessment for', studentId);
+        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager.js');
+        const sessionManager = new InteractiveSessionManager();
+        const response = await sessionManager.startAssessment(studentId, 'interactive');
+        data = {
+          answer: response.message,
+          chips: [],
+          hits: [{
+            session_id: response.session_id,
+            mode: 'interactive',
+            progress: response.progress_percentage,
+            current_layer: response.current_layer,
+            total_layers: response.total_layers,
+            next_action: response.next_action,
+          }],
+        };
+        console.log('[INTENT-ROUTER] ✓ Interactive assessment started:', response.session_id);
+        break;
+      }
+      case "assessment.start.simulated": {
+        console.log('[INTENT-ROUTER] → Starting SIMULATED assessment for', studentId);
+        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager.js');
+        const sessionManager = new InteractiveSessionManager();
+        const response = await sessionManager.startAssessment(studentId, 'simulated');
+        data = {
+          answer: response.message,
+          chips: [],
+          hits: [{
+            session_id: response.session_id,
+            mode: 'simulated',
+            progress: response.progress_percentage,
+            current_layer: response.current_layer,
+            total_layers: response.total_layers,
+            completed: response.completed,
+          }],
+        };
+        console.log('[INTENT-ROUTER] ✓ Simulated assessment complete:', response.session_id);
+        break;
+      }
+      case "assessment.respond": {
+        console.log('[INTENT-ROUTER] → Handling assessment response for', studentId);
+        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager.js');
+        const sessionManager = new InteractiveSessionManager();
+
+        // Get active session
+        const activeSession = await sessionManager.getActiveSession(studentId);
+        if (!activeSession) {
+          data = { answer: "No active assessment session found. Please start an assessment first.", chips: [], hits: [] };
+          break;
+        }
+
+        // Handle response
+        const response = await sessionManager.handleInteractiveResponse(activeSession.session_id, message);
+        data = {
+          answer: response.message,
+          chips: [],
+          hits: [{
+            session_id: response.session_id,
+            progress: response.progress_percentage,
+            current_layer: response.current_layer,
+            total_layers: response.total_layers,
+            completed: response.completed,
+            next_action: response.next_action,
+          }],
+        };
+        console.log('[INTENT-ROUTER] ✓ Assessment response handled, layer:', response.current_layer);
+        break;
+      }
       case "ecs.list":
         console.log('[INTENT-ROUTER] → Calling resolvers.ecsList');
         data = await resolvers.ecsList(pg, studentId, intent.phase);

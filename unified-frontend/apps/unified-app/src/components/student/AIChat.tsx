@@ -146,6 +146,36 @@ const InputContainer = styled.div`
   border-top: 1px solid #e5e7eb;
 `;
 
+const ModeButtonsContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+const ModeButton = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid ${props => props.$active ? '#FF4A23' : '#d1d5db'};
+  background: ${props => props.$active ? '#FFF5F2' : 'white'};
+  color: ${props => props.$active ? '#FF4A23' : '#666'};
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #FF4A23;
+    background: #FFF5F2;
+    color: #FF4A23;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 const InputForm = styled.form`
   display: flex;
   gap: 12px;
@@ -210,9 +240,12 @@ const getAgentName = (agentId: string | null): string => {
   return names[agentId] || 'Jenny - AI Coach';
 };
 
+type AssessmentMode = 'normal' | 'interactive' | 'simulated';
+
 export function AIChat() {
   const { user } = useAuth();
   const [input, setInput] = useState('');
+  const [assessmentMode, setAssessmentMode] = useState<AssessmentMode>('normal');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const studentId = user?.id || 'huda-2025';
@@ -235,6 +268,17 @@ export function AIChat() {
 
     await sendMessage(input);
     setInput('');
+  };
+
+  const handleModeClick = async (mode: 'interactive' | 'simulated') => {
+    setAssessmentMode(mode);
+
+    // Send mode-specific request
+    const message = mode === 'interactive'
+      ? 'Start Interactive Assessment'
+      : 'Start Simulated Assessment';
+
+    await sendMessage(message);
   };
 
   return (
@@ -291,6 +335,26 @@ export function AIChat() {
       </MessagesContainer>
 
       <InputContainer>
+        {/* Assessment Mode Buttons - Only show for huda-2025-new */}
+        {studentId === 'huda-2025-new' && (
+          <ModeButtonsContainer>
+            <ModeButton
+              $active={assessmentMode === 'interactive'}
+              onClick={() => handleModeClick('interactive')}
+              disabled={loading}
+            >
+              🎯 Interactive Assessment
+            </ModeButton>
+            <ModeButton
+              $active={assessmentMode === 'simulated'}
+              onClick={() => handleModeClick('simulated')}
+              disabled={loading}
+            >
+              ⚡ Simulated Assessment
+            </ModeButton>
+          </ModeButtonsContainer>
+        )}
+
         <InputForm onSubmit={handleSubmit}>
           <Input
             type="text"
