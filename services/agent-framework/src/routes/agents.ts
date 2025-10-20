@@ -83,6 +83,37 @@ router.post('/chat', withJWT, async (req, res) => {
       session = await sessionManager.getOrCreateSession(student_id, undefined, coachId);
     }
 
+    // ========================================
+    // v10.2: Check for assessment triggers BEFORE agent routing
+    // ========================================
+    if (/\b(start|begin|run).*(interactive|simulated).*(assessment|evaluation)/i.test(message)) {
+      console.log('[AGENTS-ROUTE] Detected assessment trigger, calling intentRouter...');
+      try {
+        const { routePrompt } = await import('../router/intentRouter');
+        const { pool } = await import('../db/pool');
+        console.log('[AGENTS-ROUTE] intentRouter imported successfully');
+        const routerResult = await routePrompt({ studentId: student_id, message, pg: pool });
+        console.log('[AGENTS-ROUTE] routePrompt returned:', routerResult?.answer?.substring(0, 100));
+
+        return res.json({
+          answer: routerResult.answer,
+          chips: routerResult.chips || [],
+          hits: routerResult.hits || [],
+          debug: {
+            agent_id: 'assessment',
+            tools_called: [],
+            took_ms: Date.now() - startTime,
+          },
+          session_id: session.session_id,
+          agent_used: 'InteractiveSessionManager',
+        });
+      } catch (assessmentError: any) {
+        console.error('[AGENTS-ROUTE] Assessment error:', assessmentError.message);
+        console.error('[AGENTS-ROUTE] Stack:', assessmentError.stack);
+        throw assessmentError; // Re-throw to be caught by main error handler
+      }
+    }
+
     // Get agent (specified or auto-route)
     let agent;
     if (agent_id) {

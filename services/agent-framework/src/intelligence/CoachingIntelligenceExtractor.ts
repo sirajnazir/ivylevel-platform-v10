@@ -25,12 +25,12 @@
 import { pool } from '../db/pool';
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+const anthropic = (process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY) ? new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY,
 }) : null;
 
 // Flag to determine if we should use mock extraction (no API key) or real extraction
-const USE_MOCK_EXTRACTION = !process.env.ANTHROPIC_API_KEY;
+const USE_MOCK_EXTRACTION = !(process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY);
 
 /**
  * Data structure mapping for Old Huda:
@@ -289,7 +289,10 @@ Return ONLY a JSON array of 27 layer objects, no additional text.`;
         ],
       });
 
-      extractedLayers = JSON.parse(response.content[0].type === 'text' ? response.content[0].text : '[]');
+      const responseText = response.content[0].type === 'text' ? response.content[0].text : '[]';
+      // Strip markdown code blocks if present
+      const cleanedText = responseText.replace(/^```json\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+      extractedLayers = JSON.parse(cleanedText);
       console.log(`[CoachingIntelligenceExtractor] Extracted ${extractedLayers.length} layers`);
     }
 
@@ -444,7 +447,9 @@ Return ONLY the JSON object, no additional text.`;
       ],
     });
 
-    const extractedFramework = JSON.parse(response.content[0].type === 'text' ? response.content[0].text : '{}');
+    const responseText2 = response.content[0].type === 'text' ? response.content[0].text : '{}';
+    const cleanedText2 = responseText2.replace(/^```json\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+    const extractedFramework = JSON.parse(cleanedText2);
     console.log(`[CoachingIntelligenceExtractor] Extracted Week 1 framework with ${extractedFramework.conversation_flow?.length || 0} phases`);
 
     // 5. Store in coaching_intelligence_extraction table
@@ -527,21 +532,31 @@ Return ONLY the JSON object, no additional text.`;
       ? this.generateAssessmentPromptsPrompt(extraction.extracted_content)
       : this.generateWeek1PromptsPrompt(extraction.extracted_content);
 
-    console.log(`[CoachingIntelligenceExtractor] Calling Claude to generate conversational prompts...`);
+    let generatedPrompts: any;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 12000,
-      messages: [
-        {
-          role: 'user',
-          content: promptGenerationPrompt,
-        },
-      ],
-    });
+    if (anthropic) {
+      console.log(`[CoachingIntelligenceExtractor] Calling Claude to generate conversational prompts...`);
 
-    const generatedPrompts = JSON.parse(response.content[0].type === 'text' ? response.content[0].text : '{}');
-    console.log(`[CoachingIntelligenceExtractor] Generated ${generatedPrompts.prompts?.length || 0} prompts`);
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 12000,
+        messages: [
+          {
+            role: 'user',
+            content: promptGenerationPrompt,
+          },
+        ],
+      });
+
+      const responseText3 = response.content[0].type === 'text' ? response.content[0].text : '{}';
+      const cleanedText3 = responseText3.replace(/^```json\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+      generatedPrompts = JSON.parse(cleanedText3);
+      console.log(`[CoachingIntelligenceExtractor] Generated ${generatedPrompts.prompts?.length || 0} prompts`);
+    } else {
+      console.log(`[CoachingIntelligenceExtractor] ⚠️  ANTHROPIC_API_KEY not set, using extracted content as prompts...`);
+      // In mock mode, the extracted layers already have questions, so we can use them directly
+      generatedPrompts = { prompts: extraction.extracted_content.layers };
+    }
 
     // 3. Store in coaching_frameworks table
     const frameworkId = `framework_${extractionType}_${Date.now()}`;

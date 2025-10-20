@@ -112,9 +112,11 @@ export class InteractiveSessionManager {
     if (!framework) {
       console.log(`[InteractiveSessionManager] No framework found, extracting from ${parentStudentId}...`);
       await extractor.extractAssessmentIntelligence(parentStudentId);
+      console.log(`[InteractiveSessionManager] Extraction complete, generating interactive prompts...`);
+      await extractor.generateInteractivePrompts('assessment');
       const newFramework = await extractor.getFramework('assessment');
       if (!newFramework) {
-        throw new Error('Failed to extract coaching framework');
+        throw new Error('Failed to generate coaching framework');
       }
     }
 

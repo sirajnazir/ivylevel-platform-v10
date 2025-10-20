@@ -797,7 +797,9 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
     // v10.2 Assessment Start Patterns (HIGH PRIORITY)
     // ========================================
     // Interactive/Simulated assessment triggers
+    console.log('[GUARDRAIL-CHECK] Testing assessment pattern for:', message.slice(0, 50));
     if (/\b(start|begin|run).*(interactive|simulated).*(assessment|evaluation)/i.test(message)) {
+      console.log('[GUARDRAIL-CHECK] ✓ Assessment pattern MATCHED!');
       const isInteractive = /interactive/i.test(message);
       factIntent = {
         intent: isInteractive ? "assessment.start.interactive" : "assessment.start.simulated",
@@ -1140,7 +1142,7 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       // ========================================
       case "assessment.start.interactive": {
         console.log('[INTENT-ROUTER] → Starting INTERACTIVE assessment for', studentId);
-        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager.js');
+        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager');
         const sessionManager = new InteractiveSessionManager();
         const response = await sessionManager.startAssessment(studentId, 'interactive');
         data = {
@@ -1160,7 +1162,7 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       }
       case "assessment.start.simulated": {
         console.log('[INTENT-ROUTER] → Starting SIMULATED assessment for', studentId);
-        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager.js');
+        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager');
         const sessionManager = new InteractiveSessionManager();
         const response = await sessionManager.startAssessment(studentId, 'simulated');
         data = {
@@ -1180,7 +1182,7 @@ export async function routePrompt({ studentId, message, pg }: {studentId:string,
       }
       case "assessment.respond": {
         console.log('[INTENT-ROUTER] → Handling assessment response for', studentId);
-        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager.js');
+        const { InteractiveSessionManager } = await import('../interactive/InteractiveSessionManager');
         const sessionManager = new InteractiveSessionManager();
 
         // Get active session
