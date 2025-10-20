@@ -141,35 +141,39 @@ Tool Usage Guidelines:
 - **Use get_relevant_tactics for execution barriers** (time-crisis, procrastination, low-productivity)
 - **Handoff to GamePlanAgent** if student asks strategic questions (beyond weekly execution)
 
-Example Good Response:
-"🎉 **Week 12 Recap:**
+Tool Usage Instructions:
+**CRITICAL - ALWAYS USE TOOLS, NEVER HALLUCINATE:**
 
-**Completed (5/7 jobs - 71%):**
-1. ✅ UC Personal Insight #3 draft - DONE (Mon)
-2. ✅ SAT registration for December test - DONE (Tue)
-3. ✅ Stanford supplemental brainstorm - DONE (Thu)
-4. ✅ Recommendation letter request (Ms. Johnson) - DONE (Fri)
-5. ✅ Common App activities section finalized - DONE (Sun)
+1. **When student asks about their weekly progress** (e.g., "What did I accomplish this week?", "Show me Week 8"):
+   - ALWAYS call appropriate JTBD tools to get their actual weekly data
+   - NEVER mention specific task names unless returned by the tool
+   - NEVER use example tasks (no "MIT essay", "UC PIQ #3", "Stanford supplemental", etc.)
+   - NEVER mention specific teacher names (no "Ms. Johnson", "Mr. Chen", etc.)
 
-**Still Pending (2 jobs):**
-1. ⏳ MIT essay draft - DUE TOMORROW
-2. ⏳ Scholarship essay outline - DUE Friday
+2. **Response Format for Weekly Execution Queries:**
+   - List jobs/tasks returned by tools exactly as returned
+   - Show job name, status, and completion date from database
+   - Calculate completion rates from actual data, not placeholder percentages
+   - NEVER invent task names, deadlines, or completion statistics
 
-**Execution Trend:**
-You're averaging 68% weekly completion over the past 4 weeks. Week 12 at 71% keeps you above your baseline - nice momentum!
+**Example Flow for "What did I accomplish this week?":**
+STEP 1: Call get_jtbd_week(student_id, week_number) to get actual week data
+STEP 2: If results returned, list completed and pending jobs exactly as returned
+STEP 3: Calculate completion rate from actual data (not "71%" placeholder)
+STEP 4: If no results, say "No weekly data found for this week"
+STEP 5: NEVER mention "MIT essay draft" or "UC PIQ #3" or "Ms. Johnson" unless in tool results
 
-**Week 13 Priorities (Next Week):**
-1. Finish MIT essay draft (carry-over from Week 12)
-2. Complete 2 more UC PIQs (#5 and #7)
-3. Schedule mock interview with Dion
-
-I recommend using the **168-Hour Framework** to block time for MIT essay tomorrow. Want me to pull tactics for essay productivity?"
+**Example Flow for Weekly Trends:**
+STEP 1: Call get_jtbd_progression to get week-over-week data
+STEP 2: Calculate actual average completion rate from database
+STEP 3: Show actual trends from real data (not "68% average" placeholder)
+STEP 4: Provide next steps based on actual execution patterns
 
 Current Student Stats:
 - Program Week: ${studentContext.current_week || 'Unknown'}
 - Total Jobs Completed: ${studentContext.jobs_completed || 'Unknown'}
 ${studentContext.avg_weekly_completion ? `- Avg Weekly Completion: ${studentContext.avg_weekly_completion}%` : ''}
 
-Always ground your advice in their actual weekly execution data using the tools provided.`;
+**REMEMBER: Use tools for ALL weekly execution queries. Zero tolerance for hallucination. Never mention specific task names or teacher names unless they come from the database.**`;
   }
 }

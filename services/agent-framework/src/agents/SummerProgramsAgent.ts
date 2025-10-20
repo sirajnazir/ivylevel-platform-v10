@@ -41,6 +41,8 @@ export class SummerProgramsAgent extends BaseAgent {
             'list my programs',
             'summer activities',
             'my programs',
+            'what programs did i attend',
+            'programs i did',
           ],
           priority: 1,
         },
@@ -63,9 +65,13 @@ export class SummerProgramsAgent extends BaseAgent {
             'where did i get accepted',
             'program decisions',
             'which programs accepted me',
+            'which programs did i get into',
+            'what programs did i get into',
+            'programs i got into',
             'program admissions',
+            'program acceptances',
           ],
-          priority: 2,
+          priority: 1,
         },
         {
           intent_id: 'programs.strategy',
@@ -172,62 +178,36 @@ Your Communication Style:
 - Connect programs to college application narrative
 - Emphasize that Tier 1 programs are "nice to have" not "must have"
 
-Example Good Response:
-"Based on your CS interest and strong academics, here's your summer program strategy:
+Tool Usage Instructions:
+**CRITICAL - ALWAYS USE TOOLS, NEVER HALLUCINATE:**
 
-**Your Current Programs:**
-1. **Girls Who Code Summer Program** - Tier 3
-   - Good intro to CS, moderate admissions impact
-   - Shows early interest in tech
+1. **When student asks about their programs** (e.g., "What programs did I get into?", "Which summer programs did I do?"):
+   - ALWAYS call get_programs_list tool with phase="final" to get attended/accepted programs
+   - ALWAYS call get_programs_list tool with phase="initial" to get planned programs
+   - NEVER mention specific program names unless returned by the tool
+   - NEVER use example programs from this prompt
 
-**Recommended Portfolio for Next Summer:**
+2. **When student asks for recommendations** (e.g., "Which programs should I apply to?"):
+   - Call get_summer_programs_catalog tool for program research
+   - Use tier classifications to build recommendations
+   - Explain reach/target/safety strategy
 
-**REACH (Apply to 2):**
-1. **RSI (Research Science Institute)** - Tier 1
-   - Deadline: Early Jan
-   - Free program, 5% acceptance
-   - Best CS program for HYPSM admissions
-   - Prep: Strong research proposal, stellar teacher recs
+3. **Response Format for Program Queries:**
+   - List programs returned by get_programs_list tool
+   - Show program name, provider/role, and date
+   - Add context about tier/prestige if known
+   - NEVER invent or hallucinate program names
 
-2. **MIT Launch** - Tier 2
-   - Deadline: March
-   - $7,500 (financial aid available)
-   - 15% acceptance, entrepreneurship + CS
-   - Complements your CS interests with business
-
-**TARGET (Apply to 2):**
-3. **Carnegie Mellon SAMS** - Tier 2
-   - Deadline: March
-   - Free for accepted students
-   - 20% acceptance, strong CS curriculum
-
-4. **Stanford SIMR (CS Track)** - Tier 2
-   - Deadline: February
-   - $7,000
-   - 15% acceptance, hands-on research
-
-**SAFETY (Have Ready):**
-5. **Local University CS Research** - Tier 3/4
-   - Cold email professors now (October)
-   - Free, flexible, still valuable research experience
-   - Backup if selective programs reject
-
-**Application Timeline:**
-- **October:** Email local professors for backup research
-- **November:** Start RSI research proposal
-- **December:** Finalize RSI application
-- **January 15:** Submit RSI
-- **February 1-March 1:** Submit Target programs
-- **March-April:** Hear back, make decision
-
-**Cost Estimate:** $0-$14,500 depending on acceptances and financial aid
-
-**Key Insight:** Even without Tier 1 acceptance, a strong Tier 2 program + meaningful involvement = excellent college app material. Focus on what you DO during the program, not just the name."
+**Example Flow for "What programs did I get into?":**
+STEP 1: Call get_programs_list(student_id, phase="final")
+STEP 2: If results returned, list them exactly as returned
+STEP 3: If no results, say "No program acceptances found in your profile"
+STEP 4: NEVER mention "Girls Who Code" or any other specific program unless it's in the tool results
 
 Current Student Stats:
 ${studentContext.programs_count ? `- ${studentContext.programs_count} programs on record` : '- No programs count available'}
 - Grade: ${studentContext.grade || 'Unknown'}
 
-Always use the Knowledge Moat summer programs catalog tool to provide accurate prestige tiers and details.`;
+**REMEMBER: Use tools for ALL program queries. Zero tolerance for hallucination.**`;
   }
 }

@@ -68,7 +68,34 @@ export async function programsList(pg: Pool, studentId: string, phase: string) {
 
   const view = phase === "final" ? "v_programs_final" : "v_programs_initial";
   const orderBy = phase === "final" ? "submit_date" : "event_date";
-  const { rows } = await pg.query(`SELECT * FROM ${view} WHERE student_id=$1 ORDER BY ${orderBy} NULLS LAST, program_name`, [studentId]);
+
+  let rows = [];
+
+  if (phase === "initial") {
+    // For initial/planned programs, exclude any that appear in v_programs_final
+    // This ensures "final" takes precedence over "planned"
+    const result = await pg.query(`
+      SELECT i.*
+      FROM v_programs_initial i
+      WHERE i.student_id = $1
+        AND NOT EXISTS (
+          SELECT 1 FROM v_programs_final f
+          WHERE f.student_id = i.student_id
+            AND (
+              -- Match by exact name or fuzzy match (e.g., "AAJA JCamp" vs "JCamp (AAJA)")
+              LOWER(f.program_name) = LOWER(i.program_name)
+              OR LOWER(f.program_name) LIKE '%' || LOWER(SPLIT_PART(i.program_name, ' ', 1)) || '%'
+              OR LOWER(i.program_name) LIKE '%' || LOWER(SPLIT_PART(f.program_name, ' ', 1)) || '%'
+            )
+        )
+      ORDER BY ${orderBy} NULLS LAST, program_name
+    `, [studentId]);
+    rows = result.rows;
+  } else {
+    // For final programs, just query directly
+    const result = await pg.query(`SELECT * FROM ${view} WHERE student_id=$1 ORDER BY ${orderBy} NULLS LAST, program_name`, [studentId]);
+    rows = result.rows;
+  }
 
   log.event('resolver.sql_complete', { resolver: 'programsList', view, row_count: rows.length, took_ms: Date.now() - start });
 

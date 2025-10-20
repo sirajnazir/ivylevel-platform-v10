@@ -126,40 +126,57 @@ export async function academicVitals(pg: Pool, studentId: string) {
   const start = Date.now();
   log.event('resolver.sql_start', { resolver: 'academicVitals', student_id: studentId });
 
-  // Get test scores from kb_items
-  const { rows } = await pg.query(`
-    SELECT
-      student_id,
-      MAX(CASE WHEN subtype = 'SAT' AND key_metric_type = 'score_total' THEN key_metric_value::INTEGER END) AS sat_score_latest,
-      MAX(CASE WHEN subtype = 'ACT' AND key_metric_type = 'score_composite' THEN key_metric_value::INTEGER END) AS act_score_latest,
-      COUNT(*) FILTER (WHERE subtype = 'AP' AND key_metric_value::INTEGER >= 3) AS ap_exams_passed,
-      COUNT(*) FILTER (WHERE subtype = 'AP' AND key_metric_value::INTEGER = 5) AS ap_exams_perfect
-    FROM kb_items
-    WHERE student_id = $1 AND item_type = 'Test' AND tier1_state = 'Outcome'
-    GROUP BY student_id
+  // Get SAT score from v_sat_enum_latest view (v14 foundation)
+  const { rows: satRows } = await pg.query(`
+    SELECT numeric_value AS sat_score_latest
+    FROM v_sat_enum_latest
+    WHERE student_id = $1
+    LIMIT 1
+  `, [studentId]);
+
+  // Get GPA from v_gpa_latest view (v14 foundation)
+  const { rows: gpaRows } = await pg.query(`
+    SELECT gpa_unweighted, gpa_weighted
+    FROM v_gpa_latest
+    WHERE student_id = $1 AND scope = 'cumulative'
+    LIMIT 1
+  `, [studentId]);
+
+  // Get AP courses taken from academic_courses (actual AP courses, not exam scores)
+  const { rows: apRows } = await pg.query(`
+    SELECT COUNT(*) AS ap_courses_taken
+    FROM academic_courses
+    WHERE student_id = $1 AND level = 'AP'
   `, [studentId]);
 
   log.event('resolver.sql_complete', {
     resolver: 'academicVitals',
-    row_count: rows.length,
+    sat_rows: satRows.length,
+    gpa_rows: gpaRows.length,
+    ap_rows: apRows.length,
     took_ms: Date.now() - start
   });
 
-  const vitals = rows[0] || {
-    sat_score_latest: null,
-    act_score_latest: null,
-    ap_exams_passed: 0,
-    ap_exams_perfect: 0
+  const satScore = satRows[0]?.sat_score_latest || null;
+  const gpaUnweighted = gpaRows[0]?.gpa_unweighted || null;
+  const gpaWeighted = gpaRows[0]?.gpa_weighted || null;
+  const apCoursesTaken = apRows[0]?.ap_courses_taken || 0;
+
+  const vitals = {
+    sat_score_latest: satScore,
+    gpa_unweighted: gpaUnweighted,
+    gpa_weighted: gpaWeighted,
+    ap_courses_taken: apCoursesTaken
   };
 
-  const satInfo = vitals.sat_score_latest ? `SAT: ${vitals.sat_score_latest}` : '';
-  const actInfo = vitals.act_score_latest ? `ACT: ${vitals.act_score_latest}` : '';
-  const apInfo = vitals.ap_exams_passed > 0 ? `AP: ${vitals.ap_exams_passed} passed (${vitals.ap_exams_perfect} perfect)` : '';
+  const satInfo = satScore ? `SAT: ${satScore}` : '';
+  const gpaInfo = gpaUnweighted ? `GPA: ${gpaUnweighted} UW / ${gpaWeighted || 'N/A'} W` : '';
+  const apInfo = apCoursesTaken > 0 ? `AP: ${apCoursesTaken} courses taken` : '';
 
   return {
-    answer: [satInfo, actInfo, apInfo].filter(Boolean).join(', '),
-    chips: [{ kind: 'evidence', text: 'kb_items' }],
-    hits: rows,
+    answer: [satInfo, gpaInfo, apInfo].filter(Boolean).join(', '),
+    chips: [{ kind: 'evidence', text: 'v_sat_enum_latest + v_gpa_latest + academic_courses' }],
+    hits: [...satRows, ...gpaRows, ...apRows],
     vitals
   };
 }
@@ -172,57 +189,171 @@ export async function programVitals(pg: Pool, studentId: string) {
   const start = Date.now();
   log.event('resolver.sql_start', { resolver: 'programVitals', student_id: studentId });
 
-  // Use existing v_programs_final for program acceptances
+  // Use existing v_programs_final for program acceptances (actual programs attended)
   const { rows: programRows } = await pg.query(`
-    SELECT * FROM v_programs_final WHERE student_id = $1 ORDER BY submit_date
+    SELECT * FROM v_programs_final WHERE student_id = $1 ORDER BY event_date DESC
   `, [studentId]);
 
-  // Get program stats from kb_items
-  const { rows } = await pg.query(`
-    SELECT
-      student_id,
-      COUNT(*) FILTER (WHERE tier1_state IN ('Submitted', 'Outcome')) AS programs_applied,
-      COUNT(*) FILTER (WHERE tier1_state = 'Outcome' AND status_detail LIKE '%Accept%') AS programs_accepted,
-      COUNT(*) FILTER (WHERE tier1_state = 'Outcome' AND (subtype IN ('RSI', 'TASP', 'SSP') OR title_name LIKE '%RSI%' OR title_name LIKE '%TASP%')) AS prestigious_programs_accepted
-    FROM kb_items
-    WHERE student_id = $1 AND item_type = 'program'
-    GROUP BY student_id
+  // Get planned programs from v_programs_initial, excluding any that appear in v_programs_final
+  // This ensures "final" takes precedence over "planned"
+  const { rows: programPlans } = await pg.query(`
+    SELECT i.*
+    FROM v_programs_initial i
+    WHERE i.student_id = $1
+      AND NOT EXISTS (
+        SELECT 1 FROM v_programs_final f
+        WHERE f.student_id = i.student_id
+          AND (
+            -- Match by exact name or fuzzy match (e.g., "AAJA JCamp" vs "JCamp (AAJA)")
+            LOWER(f.program_name) = LOWER(i.program_name)
+            OR LOWER(f.program_name) LIKE '%' || LOWER(SPLIT_PART(i.program_name, ' ', 1)) || '%'
+            OR LOWER(i.program_name) LIKE '%' || LOWER(SPLIT_PART(f.program_name, ' ', 1)) || '%'
+          )
+      )
+    ORDER BY program_name
   `, [studentId]);
 
   log.event('resolver.sql_complete', {
     resolver: 'programVitals',
-    program_count: programRows.length,
+    programs_final: programRows.length,
+    programs_planned: programPlans.length,
     took_ms: Date.now() - start
   });
 
-  const vitals = rows[0] || {
-    programs_applied: 0,
-    programs_accepted: 0,
-    prestigious_programs_accepted: 0
+  // Count programs from v_programs_final (actual attended programs)
+  const programsAttended = programRows.length;
+
+  // Count planned programs (already filtered to exclude those in final)
+  const programsPlanned = programPlans.length;
+
+  const vitals = {
+    programs_attended: programsAttended,
+    programs_planned: programsPlanned,
+    total_programs: programsAttended + programsPlanned
   };
 
   return {
-    answer: `Programs: ${vitals.programs_accepted} accepted / ${vitals.programs_applied} applied (${vitals.prestigious_programs_accepted} prestigious)`,
-    chips: [{ kind: 'evidence', text: 'v_programs_final + kb_items' }],
-    hits: programRows,
+    answer: `Programs: ${vitals.programs_attended} attended, ${vitals.programs_planned} planned (${vitals.total_programs} total)`,
+    chips: [{ kind: 'evidence', text: 'v_programs_final + v_programs_initial (final takes precedence)' }],
+    hits: [...programRows, ...programPlans],
     vitals
   };
 }
 
 // ============================================================================
-// NSM Dashboard (All vitals combined)
+// College List Vitals (from v14 v_nsm_college_list_vitals)
+// ============================================================================
+
+export async function collegeListVitals(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'collegeListVitals', student_id: studentId });
+
+  const { rows } = await pg.query(`
+    SELECT * FROM v_nsm_college_list_vitals WHERE student_id = $1
+  `, [studentId]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'collegeListVitals',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  const vitals = rows[0] || {
+    total_colleges: 0,
+    reach_schools_count: 0,
+    match_schools_count: 0,
+    safety_schools_count: 0,
+    ed_schools_count: 0,
+    ea_schools_count: 0,
+    rd_schools_count: 0
+  };
+
+  return {
+    answer: `Colleges: ${vitals.total_colleges} total (${vitals.reach_schools_count} reach, ${vitals.match_schools_count} match, ${vitals.safety_schools_count} safety)`,
+    chips: [{ kind: 'evidence', text: 'v_nsm_college_list_vitals' }],
+    hits: rows,
+    vitals
+  };
+}
+
+// ============================================================================
+// Essay Vitals (from v14 v_nsm_essay_vitals)
+// ============================================================================
+
+export async function essayVitals(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'essayVitals', student_id: studentId });
+
+  const { rows } = await pg.query(`
+    SELECT * FROM v_nsm_essay_vitals WHERE student_id = $1
+  `, [studentId]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'essayVitals',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  const vitals = rows[0] || {
+    common_app_essay_quality: 'not_started',
+    identity_fusion_clarity: 'none',
+    differentiation_score: 0,
+    supplemental_essays_completed: 0
+  };
+
+  return {
+    answer: `Essays: Common App ${vitals.common_app_essay_quality}, Identity fusion ${vitals.identity_fusion_clarity}, Differentiation score ${vitals.differentiation_score}`,
+    chips: [{ kind: 'evidence', text: 'v_nsm_essay_vitals' }],
+    hits: rows,
+    vitals
+  };
+}
+
+// ============================================================================
+// IvyReady Score (from v14 v_ivyready_latest)
+// ============================================================================
+
+export async function ivyReadyScore(pg: Pool, studentId: string) {
+  const start = Date.now();
+  log.event('resolver.sql_start', { resolver: 'ivyReadyScore', student_id: studentId });
+
+  const { rows } = await pg.query(`
+    SELECT * FROM v_ivyready_latest WHERE student_id = $1
+  `, [studentId]);
+
+  log.event('resolver.sql_complete', {
+    resolver: 'ivyReadyScore',
+    row_count: rows.length,
+    took_ms: Date.now() - start
+  });
+
+  const score = rows[0] || null;
+
+  return {
+    answer: score ? `IvyReady Score: ${Number(score.overall_score).toFixed(1)}/100 (${score.snapshot_phase})` : 'IvyReady Score: Not assessed',
+    chips: [{ kind: 'evidence', text: 'v_ivyready_latest' }],
+    hits: rows,
+    vitals: score
+  };
+}
+
+// ============================================================================
+// NSM Dashboard (All vitals combined + v14 comprehensive metrics)
 // ============================================================================
 
 export async function nsmDashboard(pg: Pool, studentId: string) {
   const start = Date.now();
   log.event('resolver.sql_start', { resolver: 'nsmDashboard', student_id: studentId });
 
-  // Get all vitals in parallel
-  const [recognition, leadership, academic, program] = await Promise.all([
+  // Get all vitals in parallel (now includes college list, essay, and IvyReady score)
+  const [recognition, leadership, academic, program, collegeList, essay, ivyReady] = await Promise.all([
     recognitionVitals(pg, studentId),
     leadershipVitals(pg, studentId),
     academicVitals(pg, studentId),
-    programVitals(pg, studentId)
+    programVitals(pg, studentId),
+    collegeListVitals(pg, studentId),
+    essayVitals(pg, studentId),
+    ivyReadyScore(pg, studentId)
   ]);
 
   log.event('resolver.sql_complete', {
@@ -232,6 +363,9 @@ export async function nsmDashboard(pg: Pool, studentId: string) {
 
   const answer = [
     'NSM Dashboard:',
+    '',
+    '**IvyReady Score:**',
+    ivyReady.answer,
     '',
     '**Recognition:**',
     recognition.answer,
@@ -243,24 +377,36 @@ export async function nsmDashboard(pg: Pool, studentId: string) {
     academic.answer,
     '',
     '**Programs:**',
-    program.answer
+    program.answer,
+    '',
+    '**College List:**',
+    collegeList.answer,
+    '',
+    '**Essays:**',
+    essay.answer
   ].join('\n');
 
   return {
     answer,
     chips: [
-      { kind: 'evidence', text: 'NSM Dashboard' },
+      { kind: 'evidence', text: 'NSM Dashboard (Comprehensive)' },
+      ...ivyReady.chips,
       ...recognition.chips,
       ...leadership.chips,
       ...academic.chips,
-      ...program.chips
+      ...program.chips,
+      ...collegeList.chips,
+      ...essay.chips
     ],
     hits: [],
     dashboard: {
+      ivyready: ivyReady.vitals,
       recognition: recognition.vitals,
       leadership: leadership.vitals,
       academic: academic.vitals,
-      program: program.vitals
+      program: program.vitals,
+      college_list: collegeList.vitals,
+      essay: essay.vitals
     }
   };
 }
