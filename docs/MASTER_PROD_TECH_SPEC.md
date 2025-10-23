@@ -1,11 +1,11 @@
 # IvyLevel Platform - Master Production Technical Specification
-# v14 → v1.0 → v2.0 → v2.1 Multi-Agent + Unified Frontend + Zero Hallucination
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 Production-Grade Infrastructure
 
-**Document Version:** v2.1
-**Last Updated:** 2025-10-20
-**Status:** ✅ PRODUCTION READY
-**Platform Version:** v2.1 (Multi-Agent + Unified Frontend + Zero Hallucination NSM)
-**Architecture:** Multi-Agent with v14 Zero-Hallucination Foundation + Integrated Frontend + NSM Dashboard
+**Document Version:** v3.2
+**Last Updated:** 2025-10-23
+**Status:** ✅ PRODUCTION READY - Enhanced with Production-Grade Infrastructure
+**Platform Version:** v3.2 (v2.1 + Evidence Chips + HGTI + Governance + RLS)
+**Architecture:** Multi-Agent with Zero-Hallucination + Production Infrastructure (Chips, HGTI, Outbox, RLS)
 
 ---
 
@@ -17,11 +17,12 @@ This is the **single source of truth** for IvyLevel's production technical archi
 2. **v1.0 Multi-Agent Layer** - 7 specialist agents built ON TOP of v14
 3. **v2.0 Integrated Frontend** - Unified authentication + chat integration
 4. **v2.1 Zero Hallucination NSM** - Fixed all 7 agents + NSM dashboard + final precedence logic
-5. **Current Implementation** - What actually exists in production code
-6. **Data Cleanup & Quality** - Fixed awards/colleges/programs dual data, comprehensive testing
-7. **Production Architecture** - Complete end-to-end stack with zero hallucination guarantee
+5. **v3.2 Production Infrastructure** - Evidence chips, HGTI, governance, RLS, outbox pattern
+6. **Current Implementation** - What actually exists in production code
+7. **Data Cleanup & Quality** - Fixed awards/colleges/programs dual data, comprehensive testing
+8. **Production Architecture** - Complete end-to-end stack with zero hallucination guarantee + enterprise-grade infrastructure
 
-**Key Principle:** v2.1 is ADDITIVE - v14 foundation + v1.0 agents + v2.0 unified frontend + v2.1 hallucination fixes, all layers preserved and functioning.
+**Key Principle:** v3.2 is ADDITIVE - All previous layers (v14 → v2.1) preserved and enhanced with production-grade infrastructure (evidence provenance, growth tracking, governance, security).
 
 ---
 
@@ -86,11 +87,35 @@ This is the **single source of truth** for IvyLevel's production technical archi
 - Comprehensive hallucination test suite (7/7 agents passing, zero hallucinations detected)
 - Production verified with real student data (huda-2025: JCamp, Kode With Klossy, UIUC attending)
 
-### Current State
+**v3.2 (Production-Grade Infrastructure):**
+- **Evidence Chips:** Provenance tracking for all agent reasoning (SQL, RAG, LLM, EQ, NARRATIVE)
+- **PII Scrubbing:** Automatic redaction of sensitive data (email, phone, SSN, DOB, address)
+- **HGTI (Human Growth & Transformation Index):** Growth events tracking, 28% of IvyScore
+- **Governance:** Tool Bus with versioned manifests, Policy Gate with real budgets
+- **Outbox Pattern:** Exactly-once event delivery with Redis idempotency
+- **RLS (Row-Level Security):** Database-level student data isolation
+- **MV Refresher:** Cron worker for materialized view refresh (non-blocking)
+- **OTel Tracing:** Mandatory spans with baggage propagation (student_id, agent_name, coach_id)
+- **EQ Safety Rails:** Embedding similarity guard (≥0.85), banned phrases, QA samples
+- **IvyScore Rollout:** Phased HGTI integration (0% → 10% → 20% → 28%)
+- **Production Facts Views:** v_awards_facts, v_tests_facts, v_gpa_facts, v_deadlines_facts (map to real tables)
+- **Temporal UDFs:** Deterministic tie-breakers (award_nth, sat_latest, gpa_as_of, deadline_latest)
+- **2,800+ lines of production TypeScript:** Chips, workers, resolvers, governance, telemetry
 
-**✅ What Works (v2.1):**
-- 7 reactive specialist agents (GamePlan, CollegeList, Essay, Admissions, ECs, Awards, Programs)
-- **ZERO HALLUCINATION GUARANTEE** - All 7 agents fixed with Tool Usage Instructions pattern
+### Current State (v3.2)
+
+**✅ What Works (v3.2):**
+- **All v2.1 features** (7 agents, zero hallucination, NSM dashboard, unified frontend)
+- **Evidence Chips** - Full provenance tracking (chip-creator.ts, chip-repository.ts)
+- **PII Scrubbing** - Automatic redaction before persistence (email, phone, SSN, DOB, address, secrets)
+- **HGTI System** - Growth events tracking + IvyScore integration (growth-tracker.ts, ivyscore.ts)
+- **Governance Layer** - Tool Bus with Ajv validation + outbox pattern (tool-bus.ts, outbox-processor.ts)
+- **RLS Security** - Database-level student isolation (pool-rls.ts + DB policies)
+- **MV Refresher** - Non-blocking cron worker (mv-refresher.ts, 5-min cycle)
+- **OTel Tracing** - Mandatory spans with baggage propagation (tracer.ts)
+- **EQ Safety** - Similarity guard + banned phrases + QA logging (eq-adapter.ts)
+- **Production Facts** - v_awards_facts, v_tests_facts, v_gpa_facts, v_deadlines_facts (map to kb_items, feature_snapshots)
+- **Temporal UDFs** - Deterministic tie-breakers (deadline_latest: priority → created_at → college_name)
 - v14 resolvers 100% preserved and accessible via tools
 - JWT authentication with coach_id isolation + auto-refresh
 - Conversation history persistence
