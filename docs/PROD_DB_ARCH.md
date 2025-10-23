@@ -1,11 +1,11 @@
 # IvyLevel Platform - Production Database Architecture
-# v14 → v1.0 → v2.0 → v2.1 Schema Evolution
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 Production Infrastructure
 
-**Document Version:** v2.1
-**Last Updated:** 2025-10-20
-**Status:** ✅ PRODUCTION READY
+**Document Version:** v3.2
+**Last Updated:** 2025-10-23
+**Status:** ✅ PRODUCTION READY - Enhanced with Production Infrastructure
 **Database:** PostgreSQL 14+
-**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence
+**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure
 
 ---
 
@@ -17,11 +17,12 @@ This is the **single source of truth** for IvyLevel's production database schema
 2. **v1.0 Extensions** - Multi-coach, conversation persistence, Knowledge Moat
 3. **v2.0 Data Quality** - Fixed duplicate data issues (awards, colleges)
 4. **v2.1 Final Precedence** - Fixed programs/awards/colleges dual-state logic
-5. **Current Tables & Views** - What actually exists in production
-6. **Sample Data** - Real Jenny-Huda data only (NO MOCK DATA)
-7. **Verified Data Integrity** - Comprehensive testing validates all queries
+5. **v3.2 Production Infrastructure** - Evidence chips, HGTI, outbox, RLS, facts views
+6. **Current Tables & Views** - What actually exists in production
+7. **Sample Data** - Real Jenny-Huda data only (NO MOCK DATA)
+8. **Verified Data Integrity** - Comprehensive testing validates all queries
 
-**Key Principle:** All data references use REAL student data from Jenny-Huda coaching sessions (student_id: 'huda-2025'). No mock students, no test data in documentation. v2.1 ensures final state takes precedence over planned state for all data types.
+**Key Principle:** All data references use REAL student data from Jenny-Huda coaching sessions (student_id: 'huda-2025'). No mock students, no test data in documentation. v3.2 adds enterprise-grade infrastructure while preserving all existing data and functionality.
 
 ---
 
@@ -51,25 +52,51 @@ IvyLevel Production Database (PostgreSQL)
 │   ├── outcomes (assessment results)
 │   └── 105 temporal views (v_gpa_*, v_awards_*, etc.)
 │
-├── LAYER 2: v1.0 Multi-Coach (NEW)
+├── LAYER 2: v1.0 Multi-Coach - PRESERVED
 │   ├── coaches (coach profiles)
 │   ├── students (extended with coach_id)
 │   ├── agent_conversation_sessions (conversation state)
 │   ├── agent_conversation_turns (turn-level audit trail)
 │   └── agent_handoffs (agent routing history)
 │
-├── LAYER 3: Knowledge Moat (NEW)
+├── LAYER 3: Knowledge Moat - PRESERVED
 │   ├── DS6: moat_essay_examples (real essays from sessions)
 │   ├── DS7: moat_ao_perspectives (AO insights from coaching)
 │   ├── DS-T1: moat_tactic_chips (Jenny's coaching tactics)
 │   ├── DS-T2: moat_success_patterns (student journey patterns)
 │   └── DS1-DS5: MISSING (college benchmarks, rubrics, twins, etc.)
 │
-└── LAYER 4: Autonomous Agents (PARTIAL)
-    ├── assessment_sessions (27-layer onboarding assessment - ✅ COMPLETE)
-    ├── scheduled_nudges (time-based triggers - PARTIAL)
-    ├── event_triggers (deadline reminders, milestone alerts - PARTIAL)
-    └── execution_checklist (weekly execution tracking - PARTIAL)
+├── LAYER 4: Autonomous Agents - PRESERVED
+│   ├── assessment_sessions (27-layer onboarding assessment - ✅ COMPLETE)
+│   ├── scheduled_nudges (time-based triggers - PARTIAL)
+│   ├── event_triggers (deadline reminders, milestone alerts - PARTIAL)
+│   └── execution_checklist (weekly execution tracking - PARTIAL)
+│
+└── LAYER 5: v3.2 Production Infrastructure (NEW) ✅
+    ├── EVIDENCE & PROVENANCE
+    │   ├── chips (evidence provenance: SQL, RAG, LLM, EQ, NARRATIVE)
+    │   └── system_events (monitoring & telemetry)
+    │
+    ├── HGTI (Human Growth & Transformation Index)
+    │   ├── growth_events (barrier types, transformation deltas, breakthroughs)
+    │   ├── mv_hgti_scores (materialized view, refreshed every 5 min)
+    │   └── ivyscore_history (versioned IvyScore with HGTI weighting)
+    │
+    ├── GOVERNANCE & RELIABILITY
+    │   ├── outbox (idempotent event delivery)
+    │   ├── agent_runs (budget tracking: tokens, latency, tool_calls)
+    │   └── eq_qa_samples (EQ adaptation quality assurance)
+    │
+    ├── SECURITY & PRIVACY
+    │   ├── RLS policies (student data isolation on 4 tables)
+    │   ├── eq_profiles (coach digital twin tone)
+    │   └── student_coach_eq_tuning (student-specific EQ overrides)
+    │
+    └── PRODUCTION FACTS VIEWS (authoritative sources)
+        ├── v_awards_facts → kb_items (item_type='Award_Competition')
+        ├── v_tests_facts → kb_items (item_type='Test')
+        ├── v_gpa_facts → feature_snapshot_values
+        └── v_deadlines_facts → kb_items (item_type='Application')
 ```
 
 ### Connection Details
