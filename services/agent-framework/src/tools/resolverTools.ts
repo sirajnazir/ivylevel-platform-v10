@@ -1238,7 +1238,7 @@ export const ALL_RESOLVER_TOOLS: ChatCompletionTool[] = [
 export function getToolsForAgent(agentType: 'gameplan' | 'ecs' | 'awards' | 'programs' | 'college' | 'essay' | 'admissions' | 'weekly-execution' | 'scholarship' | 'all'): ChatCompletionTool[] {
   switch (agentType) {
     case 'gameplan':
-      return [getGamePlanTool, getVitalsTool, getECsListTool, getAwardsListTool, getSummerProgramsListTool, getCollegeListTool, getCollegeAcceptancesTool, getCollegeAttendingTool, getNSMDashboardTool, getNSMRecognitionTool, getNSMLeadershipTool, getNSMAcademicTool, getNSMProgramTool, getRelevantTacticsTool, getSuccessPatternsTool];
+      return [getGamePlanTool, getVitalsTool, getECsListTool, getAwardsListTool, getSummerProgramsListTool, getCollegeListTool, getCollegeAcceptancesTool, getCollegeAttendingTool, getNSMDashboardTool, getNSMRecognitionTool, getNSMLeadershipTool, getNSMAcademicTool, getNSMProgramTool, getSATScoresTool, getGPATool, getTranscriptTool, getRelevantTacticsTool, getSuccessPatternsTool];
 
     case 'ecs':
       return [getECsListTool, getVitalsTool, getRelevantTacticsTool, getSuccessPatternsTool];
