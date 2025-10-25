@@ -1,5 +1,55 @@
 # Changelog
 
+## [2025-10-24 21:01] v3.3.0: Historical Data Migration (v14 → v3.2)
+
+**Focus:** Migrate 2+ years of real student data (huda-2025) from v14 legacy format to v3.2 Evidence Chips format
+
+### Migration Results
+
+- **97 total evidence chips** successfully migrated for student `huda-2025`
+  - 5 SQL chips (GPA, courses, SAT/ACT/AP test scores)
+  - 2 RAG chips (28 colleges, 2 awards)
+  - 89 EQ chips (weekly coaching insights from 185 KB intel files)
+  - 1 NARRATIVE chip (3 canon documents metadata)
+
+### Architecture Confirmed
+
+- v3.2 platform is a **superset of v14** (130 total tables)
+- All v14 legacy tables preserved (`academic_gpa`, `academic_courses`, `fact_observations`, `college_list`, `canon`)
+- Migration is **additive transformation**, not cross-database migration
+- Source data: 258 fact observations, 185 KB intel files, 28 colleges, 7 courses, 2 GPA records, 3 canon documents
+
+### Scripts Created
+
+**Location:** `/scripts/migration_v14_to_v32/`
+- 6 SQL migration scripts (GPA, courses, tests, colleges, awards, canon)
+- 3 Python migration scripts (KB intel → EQ chips, extractions → EQ chips, growth events)
+- 2 shell orchestration scripts (full migration, dry-run test)
+
+### Files Modified
+
+- `scripts/migration_v14_to_v32/*.sql` - Schema-correct SQL migrations
+- `scripts/migration_v14_to_v32/*.py` - Python EQ chip extractors
+- `scripts/migration_v14_to_v32/*.sh` - Migration orchestration
+- `docs/PROD_FEATURE_RELEASE_DETAILS.md` - Updated to v3.3.0
+- `docs/MASTER_PROD_TECH_SPEC.md` - Added migration architecture section
+- `CHANGELOG.md` - This entry
+
+### Database Impact
+
+- `chips` table: +97 rows (student_id='huda-2025')
+- `mv_hgti_scores`: Refreshed (no new growth events for huda-2025)
+- All source v14 tables remain intact
+
+### Next Steps
+
+1. UI validation - verify 97 chips render in v3.2 Evidence Panel
+2. Growth events migration (when Huda-specific coaching extractions available)
+3. HGTI computation from real growth events
+4. Extend migration to additional historical students
+
+---
+
 ## [2025-10-20 03:30] v10.2: Phase 2 - Interactive & Simulated Assessment (PRODUCTION)
 
 ### PHASE 2 COMPLETE - Production-Grade Autonomous Coaching

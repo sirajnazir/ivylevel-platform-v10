@@ -1,13 +1,110 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v3.2
-**Last Updated:** 2025-10-23
-**Current Version:** v3.2.0 - Production-Grade Infrastructure
+**Document Version:** v3.3
+**Last Updated:** 2025-10-24
+**Current Version:** v3.3.0 - Historical Data Migration (v14 → v3.2)
 **Status:** ✅ PRODUCTION READY
 
 ---
 
-## Current Version: v3.2.0 (2025-10-23)
+## v3.3.0 - Historical Data Migration (2025-10-24)
+
+**Focus:** Migrate 2+ years of real student data (huda-2025) from v14 format to v3.2 Evidence Chips
+
+### Summary
+
+v3.3.0 successfully migrates Huda's historical coaching data from the v14 legacy format into v3.2 Evidence Chips format, enabling the v3.2 UI to display real longitudinal data. This migration transforms 258 fact observations, 185 KB intel files, and academic records into 97 structured evidence chips across all 5 chip types.
+
+### Migration Results
+
+**Total Migrated:** 97 evidence chips for student `huda-2025`
+
+1. **SQL Chips (5 total)**
+   - 1 GPA chip (2 records: cumulative + term-level)
+   - 1 Courses chip (7 AP/honors courses)
+   - 3 Test Score chips (SAT, ACT, AP)
+   - Source: `academic_gpa`, `academic_courses`, `fact_observations`
+
+2. **RAG Chips (2 total)**
+   - 1 College List chip (28 colleges across reach/match/safety buckets)
+   - 1 Awards chip (2 awards from fact observations)
+   - Source: `college_list`, `fact_observations` (kind='award_won')
+
+3. **EQ Chips (89 total)**
+   - 89 weekly coaching insights from KB intel files (w001-w093)
+   - Source: `/data/kb_intel_chips/chips/*.json` (185 files processed, 89 valid summaries)
+   - EQ signals: self_awareness, motivation, confidence, resilience, growth_mindset, collaboration
+
+4. **NARRATIVE Chips (1 total)**
+   - 1 Canon metadata chip (3 documents: Final ECs, College Decisions, Master GamePlan)
+   - Source: `canon` table (document pointers with drive_link metadata)
+
+### Migration Scripts
+
+**Location:** `/scripts/migration_v14_to_v32/`
+
+- `01_migrate_gpa_chips.sql` - GPA data from academic_gpa table
+- `02_migrate_course_chips.sql` - Course data from academic_courses table
+- `03_migrate_test_scores_chips.sql` - SAT/ACT/AP scores from fact_observations
+- `04_migrate_college_chips.sql` - College list from college_list table
+- `05_migrate_awards_chips.sql` - Awards from fact_observations
+- `06_migrate_kb_chips_to_eq.py` - KB intel → EQ chips (Python)
+- `07_migrate_coaching_extractions_to_eq.py` - Coaching extractions → EQ chips (Python)
+- `08_migrate_growth_events.py` - Growth events migration (deferred)
+- `09_migrate_canon_to_narrative_chips.sql` - Canon documents → NARRATIVE chips
+- `10_refresh_hgti_after_migration.sql` - HGTI materialized view refresh
+- `run_full_migration.sh` - Master orchestration script
+- `run_dryrun_test.sh` - Dry-run validation script
+
+### Files Modified
+
+**Migration Scripts:**
+- `/scripts/migration_v14_to_v32/*.sql` (6 SQL scripts)
+- `/scripts/migration_v14_to_v32/*.py` (3 Python scripts)
+- `/scripts/migration_v14_to_v32/*.sh` (2 shell scripts)
+
+**Documentation:**
+- `/docs/PROD_FEATURE_RELEASE_DETAILS.md` (v3.2 → v3.3)
+- `/docs/MASTER_PROD_TECH_SPEC.md` (updated with migration architecture)
+- `/CHANGELOG.md` (v3.3.0 entry added)
+
+### Database Impact
+
+**Tables Populated:**
+- `chips`: +97 rows (huda-2025)
+- `growth_events`: No changes (extraction files were for other students)
+- `mv_hgti_scores`: Refreshed (existing huda-2025-new data preserved)
+
+**Source Data Preserved:**
+- All v14 legacy tables remain intact (`academic_gpa`, `academic_courses`, `fact_observations`, `college_list`, `canon`)
+- Migration is additive: v3.2 is a superset containing both v14 and v3.2 data
+
+### Platform Architecture Confirmation
+
+**v3.2 = Superset of v14:**
+- v3.2 database contains **130 total tables**
+- Includes all v14 legacy tables (academic_gpa, fact_observations, etc.)
+- Adds new v3.2 tables (chips, growth_events, mv_hgti_scores)
+- Migration = transformation, not cross-database migration
+
+### Impact
+
+- **User Experience:** v3.2 UI now displays 2+ years of real coaching data for huda-2025
+- **Evidence Provenance:** All 97 chips include migration trace_id for auditability
+- **Performance:** No impact - chips table indexed on (student_id, kind)
+- **Backward Compatibility:** 100% - all v14 tables and data preserved
+- **Testing:** Dry-run validation passed before production migration
+
+### Next Steps
+
+1. **UI Validation:** Verify all 97 chips render correctly in v3.2 Evidence Panel (http://localhost:5175)
+2. **Growth Events:** Complete growth events migration when Huda-specific coaching extractions are available
+3. **HGTI Computation:** Compute real HGTI score once growth events are migrated
+4. **Additional Students:** Apply migration scripts to other historical students as needed
+
+---
+
+## v3.2.0 - Production-Grade Infrastructure (2025-10-23)
 
 **Focus:** Production-Grade Infrastructure (Evidence, HGTI, Governance, Security)
 
