@@ -21,6 +21,7 @@ import { useFeatureFlag } from "../../utils/featureFlags";
 import { TaskManager } from "../v10/TaskManager";
 import { TimelineView } from "../v10/TimelineView";
 import { ProjectsView } from "../v10/ProjectsView";
+import { WeeklyVitals } from "../v10/WeeklyVitals";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -277,7 +278,7 @@ export function StudentDashboard() {
         return <GamePlanView />;
 
       case 'preparation':
-        // Test: Enable TaskManager component only
+        // v10.4: Preparation tab with Weekly Vitals, Tasks, and Projects
         if (!studentId) {
           return (
             <div style={{ padding: '20px', color: '#666', textAlign: 'center' }}>
@@ -286,9 +287,14 @@ export function StudentDashboard() {
           );
         }
         return (
-          <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-            <h2 style={{ fontSize: '28px', marginBottom: '20px', color: '#333' }}>Preparation</h2>
-            <TaskManager studentId={studentId} />
+          <div>
+            {/* Weekly Progress - Weekly action plan and vitals */}
+            <WeeklyVitals studentId={studentId} />
+
+            {/* Tasks - Action items and deadlines */}
+            <div style={{ marginTop: '30px' }}>
+              <TaskManager studentId={studentId} />
+            </div>
           </div>
         );
 

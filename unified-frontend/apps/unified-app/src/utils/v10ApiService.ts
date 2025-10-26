@@ -125,6 +125,39 @@ export interface Essay {
   college_name?: string;
 }
 
+export interface WeeklyVitals {
+  week_number: number;
+  week_start: string;
+  week_end: string;
+  focus_areas: Array<{
+    area: string;
+    source: string;
+    priority: number;
+    target_date?: string;
+  }>;
+  progress_status: 'behind' | 'on_track' | 'ahead';
+  completion_percentage: number;
+  vitals: {
+    academic: {
+      gpa_unweighted?: number;
+      gpa_weighted?: number;
+      sat_score?: number;
+      ap_count?: number;
+    };
+    extracurricular: {
+      projects_active?: number;
+      leadership_roles?: number;
+      awards_won?: number;
+      programs_attended?: number;
+    };
+    growth: {
+      hgti_score?: number;
+      events_total?: number;
+      breakthroughs?: number;
+    };
+  };
+}
+
 // ============================================================================
 // API SERVICE CLASS
 // ============================================================================
@@ -324,6 +357,29 @@ class V10ApiService {
   async getApplicationStats(studentId: string): Promise<ApplicationStats> {
     const response = await fetch(`${this.baseUrl}/students/${studentId}/applications/stats`);
     if (!response.ok) throw new Error(`Failed to fetch application stats: ${response.statusText}`);
+    return response.json();
+  }
+
+  // --------------------------------------------------------------------------
+  // WEEKLY VITALS API
+  // --------------------------------------------------------------------------
+
+  async getWeeklyVitals(
+    studentId: string,
+    params?: {
+      start_week?: number;
+      end_week?: number;
+      limit?: number;
+    }
+  ): Promise<{ weeks: WeeklyVitals[]; total_weeks: number }> {
+    const queryParams = new URLSearchParams();
+    if (params?.start_week) queryParams.append('start_week', params.start_week.toString());
+    if (params?.end_week) queryParams.append('end_week', params.end_week.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+    const url = `${this.baseUrl}/students/${studentId}/vitals/weeks?${queryParams}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch weekly vitals: ${response.statusText}`);
     return response.json();
   }
 
