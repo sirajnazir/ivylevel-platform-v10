@@ -14,6 +14,13 @@ import { useDashboardData } from "../../hooks/useDashboardData";
 import { API_ENDPOINTS } from "../../config/api";
 import { videoPrefetchService } from "../../services/videoPrefetchService";
 import useAuth from "../../hooks/useAuthMock";
+import { EvidencePanel } from "../v3.2/EvidencePanel";
+import { HGTIScoreCard } from "../v3.2/HGTIScoreCard";
+import { MissingEvidenceCard } from "../v3.2/MissingEvidenceCard";
+import { useFeatureFlag } from "../../utils/featureFlags";
+import { TaskManager } from "../v10/TaskManager";
+import { TimelineView } from "../v10/TimelineView";
+import { ProjectsView } from "../v10/ProjectsView";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -100,16 +107,54 @@ const RightCards = styled.div`
   gap: 30px;
 `;
 
+const V32Section = styled.div`
+  margin-top: 40px;
+  padding: 0 30px;
+`;
+
+const V32Grid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 20px;
+`;
+
+const V32Title = styled.h2`
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+`;
+
 export function StudentDashboard() {
   const { user } = useAuth();
   console.log('🎯 StudentDashboard rendered, user:', user);
   console.log('📍 Current URL:', window.location.pathname);
-  
+
   const [activeTab, setActiveTab] = React.useState('assessment');
   const [gamePlanData, setGamePlanData] = React.useState(null);
   const [preparationData, setPreparationData] = React.useState(null);
   const [applicationData, setApplicationData] = React.useState(null);
   const [loadingTab, setLoadingTab] = React.useState(false);
+
+  // v3.2 Feature flags
+  const showEvidence = useFeatureFlag('evidencePanel');
+  const showHGTI = useFeatureFlag('hgtiGraph');
+  const show412 = useFeatureFlag('missingEvidence');
+
+  // Get student ID from user (must be authenticated to view dashboard)
+  const studentId = user?.studentId || user?.id;
+
+  if (!studentId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Authentication Required</h2>
+          <p className="text-gray-600">Please log in to view your dashboard.</p>
+        </div>
+      </div>
+    );
+  }
   
   // Start prefetching video sessions on mount
   React.useEffect(() => {
@@ -177,18 +222,18 @@ export function StudentDashboard() {
           <ContentLayout>
             <LeftColumn>
               <ScoreRingsSection>
-                <CircularProgress 
+                <CircularProgress
                   score={87}
                   profileImage="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400"
                   pillarScores={pillarScores}
                   ivyScoreData={assessmentData ? {
-                    overall_score: Math.round((pillarScores?.aptitude.score || 87 + 
-                                             pillarScores?.passion.score || 87 + 
-                                             pillarScores?.service.score || 87 + 
+                    overall_score: Math.round((pillarScores?.aptitude.score || 87 +
+                                             pillarScores?.passion.score || 87 +
+                                             pillarScores?.service.score || 87 +
                                              pillarScores?.identity.score || 87) / 4),
                     score_change: 0,
                     achievement_level: 'GOLD' as const,
-                    target_gap: assessmentData.admission_probabilities?.tier_1 ? 
+                    target_gap: assessmentData.admission_probabilities?.tier_1 ?
                       Math.round((1 - assessmentData.admission_probabilities.tier_1) * 100) : 5,
                     tier_probability: assessmentData.admission_probabilities?.tier_1 || 0.15
                   } : undefined}
@@ -196,16 +241,16 @@ export function StudentDashboard() {
                 />
               </ScoreRingsSection>
               <IvyScoreCardWrapper>
-                <IvyScoreCard 
-                  score={87} 
+                <IvyScoreCard
+                  score={87}
                   ivyScoreData={assessmentData ? {
-                    overall_score: Math.round((pillarScores?.aptitude.score || 87 + 
-                                             pillarScores?.passion.score || 87 + 
-                                             pillarScores?.service.score || 87 + 
+                    overall_score: Math.round((pillarScores?.aptitude.score || 87 +
+                                             pillarScores?.passion.score || 87 +
+                                             pillarScores?.service.score || 87 +
                                              pillarScores?.identity.score || 87) / 4),
                     score_change: 0,
                     achievement_level: 'GOLD' as const,
-                    target_gap: assessmentData.admission_probabilities?.tier_1 ? 
+                    target_gap: assessmentData.admission_probabilities?.tier_1 ?
                       Math.round((1 - assessmentData.admission_probabilities.tier_1) * 100) : 5,
                     tier_probability: assessmentData.admission_probabilities?.tier_1 || 0.15
                   } : undefined}
@@ -232,6 +277,14 @@ export function StudentDashboard() {
         return <GamePlanView />;
 
       case 'preparation':
+        return (
+          <div>
+            <TaskManager studentId={studentId} />
+            <ProjectsView studentId={studentId} />
+          </div>
+        );
+
+      case 'preparation_old':
         return (
           <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
             <h2 style={{ fontSize: '28px', marginBottom: '20px', color: '#333' }}>Preparation</h2>
@@ -344,6 +397,13 @@ export function StudentDashboard() {
 
       case 'application':
         return (
+          <div>
+            <TimelineView studentId={studentId} />
+          </div>
+        );
+
+      case 'application_old':
+        return (
           <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
             <h2 style={{ fontSize: '28px', marginBottom: '20px', color: '#333' }}>Application</h2>
             {loadingTab ? (
@@ -445,6 +505,23 @@ export function StudentDashboard() {
                 </div>
               </div>
             )}
+          </div>
+        );
+
+      case 'evidence':
+        return (
+          <div style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto' }}>
+            <V32Section>
+              <V32Title>Growth & Evidence Tracking (v3.2)</V32Title>
+              <V32Grid>
+                {showHGTI && (
+                  <HGTIScoreCard studentId={studentId} mode="cached" />
+                )}
+                {showEvidence && (
+                  <EvidencePanel studentId={studentId} />
+                )}
+              </V32Grid>
+            </V32Section>
           </div>
         );
 
