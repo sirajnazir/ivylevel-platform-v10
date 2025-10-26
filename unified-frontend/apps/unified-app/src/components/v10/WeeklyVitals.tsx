@@ -8,10 +8,38 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+`;
+
 const Title = styled.h2`
   font-size: 28px;
   color: #333;
-  margin-bottom: 24px;
+  margin: 0;
+`;
+
+const ViewControls = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: center;
+`;
+
+const ViewButton = styled.button<{ $active?: boolean }>`
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid ${props => props.$active ? '#FF5733' : '#e9ecef'};
+  background: ${props => props.$active ? '#FF5733' : 'white'};
+  color: ${props => props.$active ? 'white' : '#666'};
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #FF5733;
+  }
 `;
 
 const VitalsGrid = styled.div`
@@ -134,15 +162,18 @@ interface WeeklyVitalsProps {
 export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
   const [weeks, setWeeks] = useState<WeeklyVitalsType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
 
   useEffect(() => {
     loadVitals();
-  }, [studentId]);
+  }, [studentId, viewMode]);
 
   const loadVitals = async () => {
     try {
       setLoading(true);
-      const data = await v10Api.getWeeklyVitals(studentId, { limit: 4 });
+      // Recent: last 4 weeks, All: last 12 weeks (3 months)
+      const limit = viewMode === 'recent' ? 4 : 12;
+      const data = await v10Api.getWeeklyVitals(studentId, { limit });
       setWeeks(data.weeks);
     } catch (error) {
       console.error('Failed to load weekly vitals:', error);
@@ -157,7 +188,23 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
 
   return (
     <Container>
-      <Title>Weekly Progress</Title>
+      <Header>
+        <Title>Weekly Progress</Title>
+        <ViewControls>
+          <ViewButton
+            $active={viewMode === 'recent'}
+            onClick={() => setViewMode('recent')}
+          >
+            Recent (4 weeks)
+          </ViewButton>
+          <ViewButton
+            $active={viewMode === 'all'}
+            onClick={() => setViewMode('all')}
+          >
+            Last Quarter (12 weeks)
+          </ViewButton>
+        </ViewControls>
+      </Header>
       <VitalsGrid>
         {weeks.map(week => (
           <VitalCard key={week.week_number}>
