@@ -4,7 +4,8 @@
  * Backend server: http://localhost:8787
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8787';
+// Use Vite environment variable (not Next.js process.env)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8787';
 
 // ============================================================================
 // TYPE DEFINITIONS

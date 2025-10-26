@@ -277,10 +277,18 @@ export function StudentDashboard() {
         return <GamePlanView />;
 
       case 'preparation':
+        // Test: Enable TaskManager component only
+        if (!studentId) {
+          return (
+            <div style={{ padding: '20px', color: '#666', textAlign: 'center' }}>
+              Loading student data...
+            </div>
+          );
+        }
         return (
-          <div>
+          <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: '28px', marginBottom: '20px', color: '#333' }}>Preparation</h2>
             <TaskManager studentId={studentId} />
-            <ProjectsView studentId={studentId} />
           </div>
         );
 
@@ -396,9 +404,21 @@ export function StudentDashboard() {
         return null;
 
       case 'application':
+        // Enable ProjectsView and TimelineView components
+        if (!studentId) {
+          return (
+            <div style={{ padding: '20px', color: '#666', textAlign: 'center' }}>
+              Loading student data...
+            </div>
+          );
+        }
         return (
-          <div>
-            <TimelineView studentId={studentId} />
+          <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+            <h2 style={{ fontSize: '28px', marginBottom: '20px', color: '#333' }}>Application</h2>
+            <ProjectsView studentId={studentId} />
+            <div style={{ marginTop: '30px' }}>
+              <TimelineView studentId={studentId} />
+            </div>
           </div>
         );
 
