@@ -25,6 +25,8 @@ import { pool } from './db/pool.js';
 import { enumsRouter } from './routes/enums.js';
 import { createSnapshotRoutes } from './routes/snapshots.js';
 import { routePrompt } from './router/intentRouter.js';
+import { v32Router } from './routes/v3.2.js';
+import { v10Router } from './routes/v10.0.js';
 import { assertIndexParity } from './retrieval/pinecone.js';
 import { CFG } from './config/env.js';
 
@@ -56,6 +58,12 @@ app.use('/enum', enumsRouter(pool));
 
 // Mount snapshot routes (v3.7.1)
 app.use('/', createSnapshotRoutes(pool));
+
+// Mount v3.2 routes (Evidence chips, HGTI, 412 UX)
+app.use('/', v32Router(pool));
+
+// Mount v10.0 routes (6 UI/UX Gaps: Vitals, Tasks, Timeline, Applications, Session Prep, Projects)
+app.use('/', v10Router(pool));
 
 // Health routes
 app.get('/health', (_req, res) => {
