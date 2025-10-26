@@ -29,7 +29,7 @@ const Timeline = styled.div`
   }
 `;
 
-const EventCard = styled.div`
+const EventCard = styled.div<{ $icon?: string; $color?: string }>`
   position: relative;
   margin-bottom: 24px;
   background: white;
@@ -39,14 +39,14 @@ const EventCard = styled.div`
   margin-left: 20px;
 
   &::before {
-    content: '${props => props.icon || '📌'}';
+    content: '${props => props.$icon || '📌'}';
     position: absolute;
     left: -50px;
     top: 20px;
     width: 32px;
     height: 32px;
     background: white;
-    border: 3px solid ${props => props.color || '#FF5733'};
+    border: 3px solid ${props => props.$color || '#FF5733'};
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -129,7 +129,7 @@ export function TimelineView({ studentId }: TimelineViewProps) {
       <Title>Your Journey Timeline</Title>
       <Timeline>
         {events.map(event => (
-          <EventCard key={event.id} icon={event.icon} color={event.color}>
+          <EventCard key={event.id} $icon={event.icon} $color={event.color}>
             <EventHeader>
               <EventTitle>{event.title}</EventTitle>
               <EventDate>{new Date(event.event_date).toLocaleDateString()}</EventDate>

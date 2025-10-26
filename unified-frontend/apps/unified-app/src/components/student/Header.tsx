@@ -170,6 +170,13 @@ export const Header = ({ activeTab = 'assessment', onTabChange }) => {
             Sessions
           </NavItem>
           <NavItem
+            $active={activeTab === 'evidence'}
+            onClick={() => handleTabClick('evidence')}
+            style={{ cursor: 'pointer' }}
+          >
+            Evidence & Growth
+          </NavItem>
+          <NavItem
             $active={activeTab === 'aichat'}
             onClick={() => handleTabClick('aichat')}
             style={{ cursor: 'pointer' }}

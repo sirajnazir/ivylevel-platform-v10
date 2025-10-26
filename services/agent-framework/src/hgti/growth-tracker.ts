@@ -7,7 +7,7 @@
  * Fix #9: HGTI Infrastructure & IvyScore Integration
  */
 
-import { pool } from '../db/pool-rls.js';
+import { pool } from '../db/pool.js';
 
 // ============================================================================
 // TYPES

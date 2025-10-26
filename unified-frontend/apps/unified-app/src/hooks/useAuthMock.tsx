@@ -6,6 +6,8 @@ interface User {
   email: string;
   name: string;
   role: 'student' | 'coach' | 'admin';
+  studentId?: string; // For student role
+  coachId?: string; // For coach role
 }
 
 interface AuthContextType {
@@ -117,7 +119,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               id: authUser.user_id,
               email: authUser.email,
               name: authUser.name || authUser.email.split('@')[0],
-              role: authUser.role
+              role: authUser.role,
+              studentId: authUser.student_id || authUser.user_id, // For students
+              coachId: authUser.coach_id, // For coaches
             };
 
             setUser(unifiedUser);
