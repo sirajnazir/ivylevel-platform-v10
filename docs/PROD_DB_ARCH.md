@@ -1,11 +1,11 @@
 # IvyLevel Platform - Production Database Architecture
-# v14 → v1.0 → v2.0 → v2.1 → v3.2 Production Infrastructure
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.5 Production Infrastructure
 
-**Document Version:** v3.2
-**Last Updated:** 2025-10-23
-**Status:** ✅ PRODUCTION READY - Enhanced with Production Infrastructure
+**Document Version:** v10.5
+**Last Updated:** 2025-10-27
+**Status:** ✅ PRODUCTION READY - Enhanced with Weekly Vitals Progressive Data
 **Database:** PostgreSQL 14+
-**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure
+**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.5 Weekly Vitals Enrichment
 
 ---
 
@@ -18,9 +18,10 @@ This is the **single source of truth** for IvyLevel's production database schema
 3. **v2.0 Data Quality** - Fixed duplicate data issues (awards, colleges)
 4. **v2.1 Final Precedence** - Fixed programs/awards/colleges dual-state logic
 5. **v3.2 Production Infrastructure** - Evidence chips, HGTI, outbox, RLS, facts views
-6. **Current Tables & Views** - What actually exists in production
-7. **Sample Data** - Real Jenny-Huda data only (NO MOCK DATA)
-8. **Verified Data Integrity** - Comprehensive testing validates all queries
+6. **v10.5 Weekly Vitals Enrichment** - Progressive EC/award/program data in weekly_vitals table
+7. **Current Tables & Views** - What actually exists in production
+8. **Sample Data** - Real Jenny-Huda data only (NO MOCK DATA)
+9. **Verified Data Integrity** - Comprehensive testing validates all queries
 
 **Key Principle:** All data references use REAL student data from Jenny-Huda coaching sessions (student_id: 'huda-2025'). No mock students, no test data in documentation. v3.2 adds enterprise-grade infrastructure while preserving all existing data and functionality.
 

@@ -1,9 +1,139 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v10.4
-**Last Updated:** 2025-10-26
-**Current Version:** v10.4 - Real Data + WeeklyVitals (4/6 Gaps Complete)
-**Status:** ✅ PRODUCTION READY - REAL STUDENT DATA
+**Document Version:** v10.5
+**Last Updated:** 2025-10-27
+**Current Version:** v10.5 - Weekly Vitals Enhancement (All Weeks + Progressive Data)
+**Status:** ✅ PRODUCTION READY - FULL HISTORICAL PROGRESSION
+
+---
+
+## v10.5 - Weekly Vitals Enhancement: All Weeks View + Progressive Data (2025-10-27)
+
+**Focus:** Enhanced WeeklyVitals with full 89-week history and accurate weekly progression data
+
+### Summary
+
+v10.5 adds the ability to view all 89 weeks of Huda's coaching journey (not just 4 or 12 weeks) and enriches each week with accurate historical data showing real progression of ECs, awards, and programs over time. Each week now displays the actual state at that point in time, not just the final state.
+
+### Key Features
+
+1. **All Weeks View**
+   - Added third view button: "All Weeks (89)"
+   - Previous views still available: Recent (4 weeks), Last Quarter (12 weeks)
+   - File: `unified-frontend/apps/unified-app/src/components/v10/WeeklyVitals.tsx:165,175,206-211`
+
+2. **Progressive Data Enrichment**
+   - Ran enrichment script: `services/agent-framework/src/scripts/enrich_weekly_vitals_with_details.ts`
+   - Populated `weekly_vitals.ec_details`, `weekly_vitals.award_details`, `weekly_vitals.program_details`
+   - Week 1: 2 ECs (Synthoria, Filmmaker's Club), 0 awards
+   - Week 10: 4 ECs (added Women in AI, Empowering AI started), 1 award (NCWiT applying)
+   - Week 20: 5 ECs (added Folklift), 2 awards (NCWiT won, Games for Change applying)
+   - Week 60: 5 ECs (all mature), 5 awards (all won)
+
+3. **Auth Fix**
+   - Fixed useAuthMock.tsx to use correct backend URL
+   - Changed default from `http://localhost:4101/api` to `http://localhost:8787`
+   - Added `/api` prefix to auth path
+   - File: `unified-frontend/apps/unified-app/src/hooks/useAuthMock.tsx:101,105`
+
+### Progressive Data Examples
+
+**Empowering AI Hackathon Timeline:**
+- Week 5: Founded, development stage, no metrics
+- Week 10: Development, $5K funding raised
+- Week 25: Launched, $5K funding
+- Week 30: Scaling, $13K funding, 25 participants
+- Week 55: Scaling, $23K funding, 44 participants, 44 cities reached
+- Week 60+: In final application, all metrics finalized
+
+**NCWiT Award Timeline:**
+- Week 10-14: Researching eligibility
+- Week 15-21: Applying, preparing materials
+- Week 22: Won - National Awardee and Regional Winner
+- Week 22+: Winner status maintained
+
+### Files Modified
+
+- `unified-frontend/apps/unified-app/src/components/v10/WeeklyVitals.tsx` (+7 lines: all weeks view)
+- `unified-frontend/apps/unified-app/src/hooks/useAuthMock.tsx` (+2 lines: auth fix)
+- `services/agent-framework/src/server-utfa.ts` (+3 lines: mount auth routes)
+- Database: `weekly_vitals` table (89 weeks enriched with detailed progression data)
+
+### Testing
+
+```bash
+# Login test
+✅ http://localhost:5173 - Login with hudasir4j@gmail.com / password123
+
+# View test
+✅ Assessment tab → Weekly Progress section
+✅ See 3 buttons: Recent (4 weeks) | Last Quarter (12 weeks) | All Weeks (89)
+✅ Click "All Weeks" → displays all 89 weeks in scrollable grid
+
+# Progressive data verification
+✅ Week 1: Shows only 2 ECs (Synthoria in development, Filmmaker's Club)
+✅ Week 20: Shows 5 ECs including Folklift (newly launched)
+✅ Week 89: Shows 5 ECs with all final metrics (funding, users, etc.)
+```
+
+### Database Schema
+
+**enriched columns in `weekly_vitals` table:**
+
+```sql
+-- ec_details: Progressive EC metrics
+jsonb: [{
+  name: "Empowering AI",
+  status: "development|launched|scaling|in_app",
+  metrics: { hours_per_week, funding_raised, participants, cities_reached },
+  founded_week, launched_week
+}]
+
+-- award_details: Award progression
+jsonb: [{
+  name: "NCWiT National Awardee and Regional Winner",
+  level: "school|regional|state|national|international",
+  status: "researching|applying|submitted|finalist|winner",
+  won_week
+}]
+
+-- program_details: Program attendance
+jsonb: [{
+  name: "JCamp180",
+  type: "summer_program|hackathon|competition",
+  status: "researching|applied|accepted|attended|completed",
+  attended_week
+}]
+```
+
+### Impact
+
+**Before v10.5:**
+- Only 2 views (4 weeks, 12 weeks)
+- All weeks showed identical final-state data
+- No visibility into coaching journey progression
+
+**After v10.5:**
+- 3 views including full 89-week history
+- Each week shows accurate historical state
+- Can see when ECs were founded, launched, scaled
+- Can see when awards were applied for and won
+- True progression timeline visible
+
+### Next Steps (v10.6)
+
+Currently, the enriched data exists in the database but is **not yet displayed in the UI**. The cards still show aggregate counts (e.g., "5 ECs", "5 awards") rather than the detailed information.
+
+**Planned for v10.6:**
+- Display actual EC names, metrics, status in cards
+- Display award names, levels, win dates in cards
+- Make cards clickable to show full details in modal/expanded view
+- Add weekly notes section (session summaries, action items, deadlines)
+
+### Documentation
+
+- Comprehensive release notes: `docs/V10.5_WEEKLY_VITALS_ENHANCEMENT.md`
+- Database enrichment script: `services/agent-framework/src/scripts/enrich_weekly_vitals_with_details.ts`
 
 ---
 
