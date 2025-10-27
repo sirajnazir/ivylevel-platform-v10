@@ -98,11 +98,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setIsLoading(true);
     try {
       // First try Agent Framework JWT backend (for AI Chat with 9 agents)
-      const agentApiUrl = import.meta.env.VITE_AGENT_API_URL || 'http://localhost:4101/api';
+      const agentApiUrl = import.meta.env.VITE_AGENT_API_URL || 'http://localhost:8787';
       console.log('📡 Trying Agent Framework login:', agentApiUrl);
 
       try {
-        const agentResponse = await fetch(`${agentApiUrl}/auth/login`, {
+        const agentResponse = await fetch(`${agentApiUrl}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),

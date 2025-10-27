@@ -162,7 +162,7 @@ interface WeeklyVitalsProps {
 export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
   const [weeks, setWeeks] = useState<WeeklyVitalsType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'recent' | 'all'>('recent');
+  const [viewMode, setViewMode] = useState<'recent' | 'quarter' | 'all'>('recent');
 
   useEffect(() => {
     loadVitals();
@@ -171,8 +171,8 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
   const loadVitals = async () => {
     try {
       setLoading(true);
-      // Recent: last 4 weeks, All: last 12 weeks (3 months)
-      const limit = viewMode === 'recent' ? 4 : 12;
+      // Recent: last 4 weeks, Quarter: last 12 weeks (3 months), All: all weeks
+      const limit = viewMode === 'recent' ? 4 : viewMode === 'quarter' ? 12 : 100;
       const data = await v10Api.getWeeklyVitals(studentId, { limit });
       setWeeks(data.weeks);
     } catch (error) {
@@ -198,10 +198,16 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
             Recent (4 weeks)
           </ViewButton>
           <ViewButton
+            $active={viewMode === 'quarter'}
+            onClick={() => setViewMode('quarter')}
+          >
+            Last Quarter (12 weeks)
+          </ViewButton>
+          <ViewButton
             $active={viewMode === 'all'}
             onClick={() => setViewMode('all')}
           >
-            Last Quarter (12 weeks)
+            All Weeks ({weeks.length})
           </ViewButton>
         </ViewControls>
       </Header>

@@ -29,6 +29,7 @@ import { v32Router } from './routes/v3.2.js';
 import { v10Router } from './routes/v10.0.js';
 import { assertIndexParity } from './retrieval/pinecone.js';
 import { CFG } from './config/env.js';
+import authRouter from './routes/auth.js';
 
 const app = express();
 
@@ -64,6 +65,9 @@ app.use('/', v32Router(pool));
 
 // Mount v10.0 routes (6 UI/UX Gaps: Vitals, Tasks, Timeline, Applications, Session Prep, Projects)
 app.use('/', v10Router(pool));
+
+// Mount auth routes
+app.use('/api/auth', authRouter);
 
 // Health routes
 app.get('/health', (_req, res) => {
