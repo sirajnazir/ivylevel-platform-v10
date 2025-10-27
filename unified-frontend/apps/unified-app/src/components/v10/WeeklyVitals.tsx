@@ -338,8 +338,37 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
 
   const formatMetric = (key: string, value: number) => {
     switch (key) {
+      // v2.0 Scale metrics
+      case 'participants_reached':
+        return `${value} participants reached`;
+      case 'locations_reached':
+        return `${value} locations`;
+      case 'audience_size':
+        return `${value >= 1000 ? (value / 1000).toFixed(1) + 'K' : value} audience`;
+      case 'organizational_size':
+        return `${value} team members`;
+
+      // v2.0 Impact metrics
       case 'funding_raised':
         return `$${(value / 1000).toFixed(0)}K raised`;
+      case 'publications':
+        return `${value} publications`;
+      case 'events_organized':
+        return `${value} events`;
+      case 'resources_created':
+        return `${value} resources created`;
+      case 'partnerships':
+        return `${value} partnerships`;
+
+      // v2.0 Recognition metrics
+      case 'press_mentions':
+        return `${value} press mentions`;
+      case 'speaking_engagements':
+        return `${value} speaking engagements`;
+      case 'growth_rate':
+        return `${value}% growth`;
+
+      // v1.0 backwards compatibility
       case 'participants':
         return `${value} participants`;
       case 'cities_reached':
@@ -358,28 +387,64 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
         return `${value} writers`;
       case 'articles':
         return `${value} articles`;
+
       default:
-        return `${key}: ${value}`;
+        return `${key.replace(/_/g, ' ')}: ${value}`;
     }
   };
 
-  const renderEC = (ec: ECDetail) => (
-    <ECItem key={ec.name}>
-      <ECName>
-        {ec.name}
-        <ECStatus $status={ec.status}>
-          {ec.status.replace('_', ' ')}
-        </ECStatus>
-      </ECName>
-      <ECMetrics>
-        {Object.entries(ec.metrics).map(([key, value]) => (
-          <ECMetric key={key}>
-            {formatMetric(key, value as number)}
-          </ECMetric>
-        ))}
-      </ECMetrics>
-    </ECItem>
-  );
+  const renderEC = (ec: ECDetail) => {
+    // Collect all metrics from v2.0 organized structure or v1.0 flat structure
+    const allMetrics: Record<string, number> = {};
+
+    // v2.0: Extract from scale, impact, recognition
+    if (ec.scale) Object.entries(ec.scale).forEach(([k, v]) => { if (v !== undefined) allMetrics[k] = v; });
+    if (ec.impact) Object.entries(ec.impact).forEach(([k, v]) => { if (v !== undefined) allMetrics[k] = v; });
+    if (ec.recognition) {
+      Object.entries(ec.recognition).forEach(([k, v]) => {
+        if (k === 'awards') return; // Skip array
+        if (v !== undefined && typeof v === 'number') allMetrics[k] = v;
+      });
+    }
+
+    // v1.0: Fall back to flat metrics if v2.0 not present
+    if (Object.keys(allMetrics).length === 0 && ec.metrics) {
+      Object.entries(ec.metrics).forEach(([k, v]) => { if (v !== undefined && typeof v === 'number') allMetrics[k] = v; });
+    }
+
+    // Add hours_per_week and weeks_per_year if present
+    if (ec.hours_per_week) allMetrics['hours_per_week'] = ec.hours_per_week;
+    if (ec.weeks_per_year) allMetrics['weeks_per_year'] = ec.weeks_per_year;
+
+    return (
+      <ECItem key={ec.name}>
+        <ECName>
+          {ec.name}
+          {ec.position && <span style={{ fontSize: '12px', color: '#666', marginLeft: '8px' }}>({ec.position})</span>}
+          <ECStatus $status={ec.status}>
+            {ec.status.replace('_', ' ')}
+          </ECStatus>
+        </ECName>
+        {ec.description && (
+          <div style={{ fontSize: '12px', color: '#666', marginTop: '4px', fontStyle: 'italic' }}>
+            {ec.description}
+          </div>
+        )}
+        <ECMetrics>
+          {Object.entries(allMetrics).map(([key, value]) => (
+            <ECMetric key={key}>
+              {formatMetric(key, value as number)}
+            </ECMetric>
+          ))}
+        </ECMetrics>
+        {ec.recognition?.awards && ec.recognition.awards.length > 0 && (
+          <div style={{ marginTop: '8px', fontSize: '11px', color: '#28a745' }}>
+            🏆 {ec.recognition.awards.join(', ')}
+          </div>
+        )}
+      </ECItem>
+    );
+  };
 
   const renderAward = (award: AwardDetail) => (
     <AwardItem key={award.name}>

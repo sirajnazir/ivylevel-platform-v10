@@ -125,10 +125,53 @@ export interface Essay {
   college_name?: string;
 }
 
+// v2.0 Standardized Schema (with v1.0 backwards compatibility)
 export interface ECDetail {
+  // Identity
   name: string;
-  status: 'development' | 'launched' | 'scaling' | 'in_app';
-  metrics: {
+  activity_type?: 'academic' | 'arts_music' | 'athletics' | 'career' | 'community_service' | 'computer_science' | 'cultural' | 'journalism_publication' | 'other_club' | 'research' | 'student_government' | 'work';
+  position?: string;
+  description?: string;
+
+  // Timeline
+  founded_week?: number;
+  launched_week?: number;
+  grade_levels?: ('9' | '10' | '11' | '12' | 'PG')[];
+  timing?: 'school_year' | 'break' | 'all_year';
+
+  // Commitment
+  hours_per_week?: number;
+  weeks_per_year?: number;
+  intend_college?: boolean;
+
+  // Status
+  status: 'planning' | 'development' | 'launched' | 'scaling' | 'in_app';
+
+  // v2.0 Organized Metrics
+  scale?: {
+    participants_reached?: number;
+    locations_reached?: number;
+    audience_size?: number;
+    organizational_size?: number;
+  };
+
+  impact?: {
+    funding_raised?: number;
+    publications?: number;
+    events_organized?: number;
+    resources_created?: number;
+    partnerships?: number;
+  };
+
+  recognition?: {
+    press_mentions?: number;
+    awards?: string[];
+    speaking_engagements?: number;
+    growth_rate?: number;
+  };
+
+  // v1.0 Backwards Compatibility (flat metrics)
+  metrics?: {
     hours_per_week?: number;
     funding_raised?: number;
     participants?: number;
@@ -139,16 +182,31 @@ export interface ECDetail {
     growth_percentage?: number;
     writers?: number;
     articles?: number;
+    [key: string]: any;
   };
-  founded_week?: number;
-  launched_week?: number;
 }
 
+// v2.0 Standardized Award Schema
 export interface AwardDetail {
+  // Identity
   name: string;
   level: 'school' | 'regional' | 'state' | 'national' | 'international';
-  status: 'researching' | 'applying' | 'submitted' | 'winner';
+  category?: 'academic' | 'community_service' | 'leadership' | 'arts' | 'athletics' | 'stem' | 'writing' | 'other';
+
+  // Timeline
+  applied_week?: number;
+  submitted_week?: number;
   won_week?: number;
+  grade_level?: '9' | '10' | '11' | '12' | 'PG';
+
+  // Status
+  status: 'researching' | 'applying' | 'submitted' | 'finalist' | 'winner';
+
+  // Details (v2.0)
+  description?: string;
+  selection_rate?: number;
+  prize_amount?: number;
+  recognition_details?: string;
 }
 
 export interface ProgramDetail {
