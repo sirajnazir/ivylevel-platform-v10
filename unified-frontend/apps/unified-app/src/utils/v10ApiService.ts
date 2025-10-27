@@ -125,6 +125,38 @@ export interface Essay {
   college_name?: string;
 }
 
+export interface ECDetail {
+  name: string;
+  status: 'development' | 'launched' | 'scaling' | 'in_app';
+  metrics: {
+    hours_per_week?: number;
+    funding_raised?: number;
+    participants?: number;
+    cities_reached?: number;
+    users?: number;
+    classes?: number;
+    members?: number;
+    growth_percentage?: number;
+    writers?: number;
+    articles?: number;
+  };
+  founded_week?: number;
+  launched_week?: number;
+}
+
+export interface AwardDetail {
+  name: string;
+  level: 'school' | 'regional' | 'state' | 'national' | 'international';
+  status: 'researching' | 'applying' | 'submitted' | 'winner';
+  won_week?: number;
+}
+
+export interface ProgramDetail {
+  name: string;
+  type: string;
+  attended_week?: number;
+}
+
 export interface WeeklyVitals {
   week_number: number;
   week_start: string;
@@ -156,6 +188,11 @@ export interface WeeklyVitals {
       breakthroughs?: number;
     };
   };
+  ec_details?: ECDetail[];
+  award_details?: AwardDetail[];
+  program_details?: ProgramDetail[];
+  session_summary?: string;
+  session_topics?: string[];
 }
 
 // ============================================================================

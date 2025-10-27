@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { v10Api, WeeklyVitals as WeeklyVitalsType } from '../../utils/v10ApiService';
+import { v10Api, WeeklyVitals as WeeklyVitalsType, ECDetail, AwardDetail } from '../../utils/v10ApiService';
 
 const Container = styled.div`
   padding: 20px;
@@ -155,6 +155,146 @@ const LoadingState = styled.div`
   color: #666;
 `;
 
+const CollapsibleSection = styled.div`
+  margin-top: 16px;
+  border-top: 1px solid #e9ecef;
+  padding-top: 12px;
+`;
+
+const SectionHeader = styled.div<{ $isExpanded?: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 0;
+  user-select: none;
+
+  &:hover {
+    background: #f8f9fa;
+  }
+`;
+
+const SectionTitle = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const ExpandIcon = styled.span<{ $isExpanded?: boolean }>`
+  font-size: 12px;
+  transform: ${props => props.$isExpanded ? 'rotate(90deg)' : 'rotate(0deg)'};
+  transition: transform 0.2s;
+`;
+
+const SectionContent = styled.div<{ $isExpanded?: boolean }>`
+  max-height: ${props => props.$isExpanded ? '1000px' : '0'};
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+`;
+
+const ECItem = styled.div`
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  margin: 8px 0;
+  border-left: 3px solid #FF5733;
+`;
+
+const ECName = styled.div`
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 6px;
+`;
+
+const ECStatus = styled.span<{ $status: string }>`
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 8px;
+  background: ${props => {
+    switch (props.$status) {
+      case 'in_app': return '#28a745';
+      case 'scaling': return '#17a2b8';
+      case 'launched': return '#ffc107';
+      case 'development': return '#6c757d';
+      default: return '#6c757d';
+    }
+  }};
+  color: white;
+`;
+
+const ECMetrics = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+const ECMetric = styled.div`
+  font-size: 12px;
+  color: #666;
+
+  span {
+    font-weight: 600;
+    color: #333;
+  }
+`;
+
+const AwardItem = styled.div`
+  background: #fff8e1;
+  padding: 12px;
+  border-radius: 6px;
+  margin: 8px 0;
+  border-left: 3px solid #ffc107;
+`;
+
+const AwardName = styled.div`
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+  margin-bottom: 6px;
+`;
+
+const AwardBadge = styled.span<{ $level: string }>`
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  margin-left: 8px;
+  background: ${props => {
+    switch (props.$level) {
+      case 'international': return '#6f42c1';
+      case 'national': return '#dc3545';
+      case 'state': return '#fd7e14';
+      case 'regional': return '#20c997';
+      case 'school': return '#6c757d';
+      default: return '#6c757d';
+    }
+  }};
+  color: white;
+`;
+
+const AwardStatus = styled.div`
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+`;
+
+const EmptyState = styled.div`
+  padding: 12px;
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  font-style: italic;
+`;
+
 interface WeeklyVitalsProps {
   studentId: string;
 }
@@ -163,6 +303,7 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
   const [weeks, setWeeks] = useState<WeeklyVitalsType[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'recent' | 'quarter' | 'all'>('recent');
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     loadVitals();
@@ -181,6 +322,79 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
       setLoading(false);
     }
   };
+
+  const toggleSection = (weekNumber: number, section: string) => {
+    const key = `${weekNumber}-${section}`;
+    setExpandedSections(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const isSectionExpanded = (weekNumber: number, section: string) => {
+    const key = `${weekNumber}-${section}`;
+    return expandedSections[key] || false;
+  };
+
+  const formatMetric = (key: string, value: number) => {
+    switch (key) {
+      case 'funding_raised':
+        return `$${(value / 1000).toFixed(0)}K raised`;
+      case 'participants':
+        return `${value} participants`;
+      case 'cities_reached':
+        return `${value} cities`;
+      case 'users':
+        return `${(value / 1000).toFixed(1)}K users`;
+      case 'classes':
+        return `${value} classes`;
+      case 'members':
+        return `${value} members`;
+      case 'growth_percentage':
+        return `${value}% growth`;
+      case 'hours_per_week':
+        return `${value} hrs/week`;
+      case 'writers':
+        return `${value} writers`;
+      case 'articles':
+        return `${value} articles`;
+      default:
+        return `${key}: ${value}`;
+    }
+  };
+
+  const renderEC = (ec: ECDetail) => (
+    <ECItem key={ec.name}>
+      <ECName>
+        {ec.name}
+        <ECStatus $status={ec.status}>
+          {ec.status.replace('_', ' ')}
+        </ECStatus>
+      </ECName>
+      <ECMetrics>
+        {Object.entries(ec.metrics).map(([key, value]) => (
+          <ECMetric key={key}>
+            {formatMetric(key, value as number)}
+          </ECMetric>
+        ))}
+      </ECMetrics>
+    </ECItem>
+  );
+
+  const renderAward = (award: AwardDetail) => (
+    <AwardItem key={award.name}>
+      <AwardName>
+        {award.name}
+        <AwardBadge $level={award.level}>
+          {award.level}
+        </AwardBadge>
+      </AwardName>
+      <AwardStatus>
+        Status: {award.status.replace('_', ' ')}
+        {award.won_week && ` • Won in Week ${award.won_week}`}
+      </AwardStatus>
+    </AwardItem>
+  );
 
   if (loading) {
     return <LoadingState>Loading weekly vitals...</LoadingState>;
@@ -303,6 +517,36 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
                   <FocusArea key={index}>{area.area}</FocusArea>
                 ))}
               </div>
+            )}
+
+            {/* Extracurriculars Section */}
+            {week.ec_details && week.ec_details.length > 0 && (
+              <CollapsibleSection>
+                <SectionHeader onClick={() => toggleSection(week.week_number, 'ecs')} $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>
+                  <SectionTitle>
+                    <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>▶</ExpandIcon>
+                    Extracurriculars ({week.ec_details.length})
+                  </SectionTitle>
+                </SectionHeader>
+                <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>
+                  {week.ec_details.map(renderEC)}
+                </SectionContent>
+              </CollapsibleSection>
+            )}
+
+            {/* Awards Section */}
+            {week.award_details && week.award_details.length > 0 && (
+              <CollapsibleSection>
+                <SectionHeader onClick={() => toggleSection(week.week_number, 'awards')} $isExpanded={isSectionExpanded(week.week_number, 'awards')}>
+                  <SectionTitle>
+                    <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'awards')}>▶</ExpandIcon>
+                    Awards ({week.award_details.length})
+                  </SectionTitle>
+                </SectionHeader>
+                <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'awards')}>
+                  {week.award_details.map(renderAward)}
+                </SectionContent>
+              </CollapsibleSection>
             )}
           </VitalCard>
         ))}

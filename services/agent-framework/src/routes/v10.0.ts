@@ -86,6 +86,11 @@ export function v10Router(pool: Pool): Router {
           academic_vitals,
           ec_vitals,
           growth_vitals,
+          ec_details,
+          award_details,
+          program_details,
+          session_summary,
+          session_topics,
           created_at,
           updated_at
         FROM weekly_vitals
@@ -124,7 +129,12 @@ export function v10Router(pool: Pool): Router {
             academic: row.academic_vitals || {},
             extracurricular: row.ec_vitals || {},
             growth: row.growth_vitals || {}
-          }
+          },
+          ec_details: row.ec_details || [],
+          award_details: row.award_details || [],
+          program_details: row.program_details || [],
+          session_summary: row.session_summary,
+          session_topics: row.session_topics || []
         })),
         total_weeks: result.rows.length
       });

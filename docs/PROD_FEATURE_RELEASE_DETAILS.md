@@ -1,9 +1,88 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v10.5
+**Document Version:** v10.6
 **Last Updated:** 2025-10-27
-**Current Version:** v10.5 - Weekly Vitals Enhancement (All Weeks + Progressive Data)
-**Status:** ✅ PRODUCTION READY - FULL HISTORICAL PROGRESSION
+**Current Version:** v10.6 - WeeklyVitals EC/Award Details Display
+**Status:** ✅ PRODUCTION READY - RICH DATA VISUALIZATION
+
+---
+
+## v10.6 - WeeklyVitals EC/Award Details Display - Collapsible Rich Data (2025-10-27)
+
+**Focus:** Enhanced WeeklyVitals cards with collapsible EC/Award sections showing actual names and detailed metrics
+
+### Summary
+
+v10.6 transforms the WeeklyVitals cards from showing only aggregate counts to displaying actual EC and Award names with detailed metrics in beautiful collapsible sections. Users can now see "Empowering AI" with "$23K funding, 44 cities" instead of just "Active Projects: 4".
+
+### Key Features
+
+1. **Collapsible EC Section**
+   - Shows actual EC names: Empowering AI, Synthoria, Folklift, Filmmaker's Club, Women in AI
+   - Rich metrics: $23K funding, 6.4K users, 44 cities, 200 classes, 132 members
+   - Progressive status badges: Development → Launched → Scaling → In App
+   - Color-coded by status (Green=in_app, Cyan=scaling, Yellow=launched, Gray=development)
+   - File: `unified-frontend/apps/unified-app/src/components/v10/WeeklyVitals.tsx:522-535`
+
+2. **Collapsible Award Section**
+   - Shows actual award names: NCWiT National Awardee, Games for Change, CS CTE Award, etc.
+   - Level badges: International, National, State, Regional, School
+   - Status progression: Researching → Applying → Submitted → Winner
+   - Won week tracking: "Won in Week 22"
+   - Color-coded by level (Purple=international, Red=national, Orange=state)
+   - File: `unified-frontend/apps/unified-app/src/components/v10/WeeklyVitals.tsx:537-550`
+
+3. **Backend API Enhancement**
+   - Updated `/students/:id/vitals/weeks` to return enriched fields
+   - Added `ec_details`, `award_details`, `program_details` to response
+   - File: `services/agent-framework/src/routes/v10.0.ts:79-96,120-140`
+
+4. **TypeScript Interfaces**
+   - Added `ECDetail` interface with name, status, metrics, founded_week
+   - Added `AwardDetail` interface with name, level, status, won_week
+   - Added `ProgramDetail` interface for summer programs
+   - File: `unified-frontend/apps/unified-app/src/utils/v10ApiService.ts:128-196`
+
+### Progressive Data Display
+
+**Week 1 (Early Stage):**
+- Extracurriculars (2): Synthoria (development, 0 users), Filmmaker's Club (30 members)
+- Awards (0): None yet
+
+**Week 20 (Growing):**
+- Extracurriculars (5): All 5 ECs now active
+  - Empowering AI: $5K funding (development)
+  - Synthoria: 150 users, 20 classes (launched)
+  - Folklift: 2 writers, 1 article (launched)
+- Awards (2): NCWiT (applying), Games for Change (researching)
+
+**Week 60 (Mature):**
+- Extracurriculars (5): All ECs in final app state
+  - Empowering AI: $23K funding, 44 participants, 44 cities (in_app)
+  - Synthoria: 6.4K users, 200 classes (in_app)
+  - Filmmaker's Club: 132 members, 413% growth (in_app)
+- Awards (5): All 5 awards won with week numbers
+
+### Files Modified
+
+- `services/agent-framework/src/routes/v10.0.ts` (lines 79-96, 120-140)
+- `unified-frontend/apps/unified-app/src/utils/v10ApiService.ts` (lines 128-196)
+- `unified-frontend/apps/unified-app/src/components/v10/WeeklyVitals.tsx` (lines 3, 158-296, 306-397, 522-550)
+
+### Impact
+
+**Before v10.6:**
+- ❌ Only showed aggregate counts (Active Projects: 4, Awards Won: 5)
+- ❌ No way to see actual EC names or award names
+- ❌ No detailed metrics visible
+
+**After v10.6:**
+- ✅ Shows actual EC names: Empowering AI, Synthoria, etc.
+- ✅ Shows actual award names: NCWiT National Awardee, Games for Change, etc.
+- ✅ Rich metrics: $23K funding, 6.4K users, 44 cities
+- ✅ Progressive status: Development → Launched → Scaling → In App
+- ✅ Collapsible sections for better UX
+- ✅ Color-coded badges for visual hierarchy
 
 ---
 
