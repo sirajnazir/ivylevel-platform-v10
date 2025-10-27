@@ -209,10 +209,142 @@ export interface AwardDetail {
   recognition_details?: string;
 }
 
+// v2.0 Standardized Program Schema
 export interface ProgramDetail {
+  // Identity
   name: string;
-  type: string;
+  program_type: 'summer' | 'year_round' | 'weekend' | 'online' | 'competition';
+  category: 'academic' | 'research' | 'leadership' | 'arts' | 'stem' | 'pre_college' | 'internship';
+
+  // Selection
+  selection_rate?: number; // 0.01 = 1% acceptance
+  total_applicants?: number;
+  total_accepted?: number;
+
+  // Timeline
   attended_week?: number;
+  start_date?: string;
+  end_date?: string;
+  grade_level: '9' | '10' | '11' | '12' | 'PG';
+
+  // Details
+  institution?: string;
+  location?: string;
+  is_paid?: boolean;
+  cost?: number;
+  scholarship_amount?: number;
+  hours_total?: number;
+
+  // Outcomes
+  outcomes?: {
+    projects_completed?: number;
+    papers_published?: number;
+    presentations?: number;
+    skills_learned?: string[];
+    recommendation_received?: boolean;
+  };
+
+  // Link to activity (if this program is also an EC activity)
+  related_activity_name?: string;
+
+  // v1.0 Backwards Compatibility
+  type?: string; // Maps to program_type
+}
+
+// v3.0 Complete Academic Vitals Schema (Common App Aligned)
+export interface AcademicVitals {
+  // === GPA (supports any scale) ===
+  gpa_weighted?: number;
+  gpa_unweighted?: number;
+  gpa_scale?: number; // Default 4.0, but supports 5.0, 100, etc.
+  gpa_trend?: 'improving' | 'stable' | 'declining';
+
+  // === Class Rank ===
+  class_rank?: number | 'na'; // null = unknown, 'na' = unranked
+  class_size?: number;
+  percentile?: number; // Calculated: (class_size - rank) / class_size * 100
+
+  // === SAT ===
+  sat?: {
+    total?: number; // Superscored
+    ebrw?: number; // Evidence-Based Reading and Writing (200-800)
+    math?: number; // Math (200-800)
+    essay_reading?: number; // Optional essay (2-8)
+    essay_analysis?: number;
+    essay_writing?: number;
+    attempts?: {
+      date: string; // 'MM/DD/YYYY'
+      total: number;
+      ebrw: number;
+      math: number;
+    }[];
+  };
+
+  // === ACT ===
+  act?: {
+    composite?: number; // Superscored (1-36)
+    english?: number;
+    math?: number;
+    reading?: number;
+    science?: number;
+    writing?: number;
+    attempts?: {
+      date: string;
+      composite: number;
+      english: number;
+      math: number;
+      reading: number;
+      science: number;
+    }[];
+  };
+
+  // === AP Exams ===
+  ap_exams?: {
+    subject: string; // 'Human Geography', 'Calculus AB', etc.
+    score: number; // 1-5
+    test_date: string; // 'MM/YYYY'
+    grade_level: '9' | '10' | '11' | '12';
+  }[];
+
+  // === IB Exams (for IB students) ===
+  ib_exams?: {
+    subject: string;
+    level: 'SL' | 'HL'; // Standard or Higher Level
+    predicted_score?: number; // 1-7
+    final_score?: number; // 1-7
+    test_date?: string;
+    grade_level: '11' | '12';
+  }[];
+
+  // === Subject Tests ===
+  subject_tests?: {
+    subject: string;
+    score: number;
+    test_date: string;
+  }[];
+
+  // === Current Course Load ===
+  current_courses?: {
+    year: '9' | '10' | '11' | '12' | 'PG';
+    semester: 'fall' | 'spring' | 'full_year';
+    courses: {
+      subject: string; // 'ENG', 'MATH', 'SCI', 'HIST', 'LANG', 'COMPSCI', 'OTH/ELE', 'ARTS'
+      title: string;
+      level: 'REG' | 'HONORS' | 'AP' | 'IB' | 'DE'; // Dual Enrollment
+      credits?: number; // For college courses
+    }[];
+  }[];
+
+  // === Cumulative Stats (auto-calculated) ===
+  total_ap_courses?: number;
+  total_ib_courses?: number;
+  total_honors_courses?: number;
+  total_de_courses?: number;
+  academic_rigor_score?: number;
+
+  // === v1.0 Backwards Compatibility ===
+  sat_score?: number; // Maps to sat.total
+  ap_count?: number; // Maps to ap_exams.length
 }
 
 export interface WeeklyVitals {
@@ -227,25 +359,31 @@ export interface WeeklyVitals {
   }>;
   progress_status: 'behind' | 'on_track' | 'ahead';
   completion_percentage: number;
-  vitals: {
-    academic: {
+
+  // v3.0: Direct academic_vitals (replaces vitals.academic nested object)
+  academic_vitals?: AcademicVitals;
+
+  // v1.0 Backwards compatibility: nested vitals object
+  vitals?: {
+    academic?: {
       gpa_unweighted?: number;
       gpa_weighted?: number;
       sat_score?: number;
       ap_count?: number;
     };
-    extracurricular: {
+    extracurricular?: {
       projects_active?: number;
       leadership_roles?: number;
       awards_won?: number;
       programs_attended?: number;
     };
-    growth: {
+    growth?: {
       hgti_score?: number;
       events_total?: number;
       breakthroughs?: number;
     };
   };
+
   ec_details?: ECDetail[];
   award_details?: AwardDetail[];
   program_details?: ProgramDetail[];
