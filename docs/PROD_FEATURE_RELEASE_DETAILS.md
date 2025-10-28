@@ -1,9 +1,103 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v10.8.1
+**Document Version:** v10.8.2
 **Last Updated:** 2025-10-27
-**Current Version:** v10.8.1 - Academic Profile UI Display Fix
-**Status:** ✅ PRODUCTION READY - VERIFIED END-TO-END
+**Current Version:** v10.8.2 - EC Cards Display Fix (All 10 Activities)
+**Status:** ✅ PRODUCTION READY - COMPLETE END-TO-END VERIFIED
+
+---
+
+## v10.8.2 - EC Cards Display Fix - All 10 Activities Visible (2025-10-27)
+
+**Focus:** Fix collapsible section height limit preventing all 10 ECs from displaying
+
+### Summary
+
+Critical UI fix for v10.8: Collapsible EC section had `max-height: 1000px` limit, causing activities 6-10 to be hidden when expanded. Increased to 8000px to accommodate all 10 activities with full metrics and descriptions.
+
+### Problem Identified
+
+**Issue**: User reported "inability to view all 10 activities as only a few cards show up on clicking EC(10)"
+
+**Root Cause**:
+- Component at `WeeklyVitals.tsx:193` had `max-height: 1000px` for collapsible sections
+- With 10 activities × ~200-300px per card = ~2500px total height needed
+- Content beyond 1000px was hidden due to `overflow: hidden`
+- Activities 6-10 were rendered but not visible
+
+**Evidence from User Output**: All 10 activities listed correctly in data:
+1. Empowering AI ✅
+2. Synthoria ✅
+3. Filmmaker's Club ✅
+4. Sunday School Teacher ✅
+5. Folklift ✅
+6. JCamp (AAJA) ✅ (hidden beyond 1000px)
+7. Kode With Klossy ✅ (hidden beyond 1000px)
+8. Women in Games ✅ (hidden beyond 1000px)
+9. Mustang Studios Podcast ✅ (hidden beyond 1000px)
+10. Tech Influencer ✅ (hidden beyond 1000px)
+
+### Solution
+
+Updated `SectionContent` styled component max-height:
+```typescript
+// Before: max-height: 1000px (insufficient for 10 activities)
+// After: max-height: 8000px (accommodates all activities with room to grow)
+```
+
+**File Modified**: `unified-frontend/apps/unified-app/src/components/v10/WeeklyVitals.tsx:193`
+
+### Impact
+
+**Before v10.8.2:**
+- EC section showed "Extracurriculars (10)" but only ~4-5 activities visible
+- Activities 6-10 rendered but hidden due to height constraint
+- User had to inspect code/console to verify all 10 were present
+
+**After v10.8.2:**
+- All 10 activities fully visible when EC section expanded
+- Complete scrollability through entire list
+- All metrics, awards, and descriptions accessible
+
+### Verification
+
+**All 10 Activities Now Visible:**
+1. ✅ Empowering AI - $23K raised, 44 cities
+2. ✅ Synthoria - 6,400 students reached
+3. ✅ Filmmaker's Club - 413% growth
+4. ✅ Sunday School Teacher - 126 hours
+5. ✅ Folklift - 5K readers
+6. ✅ JCamp (AAJA) - 1 of 30 nationally
+7. ✅ Kode With Klossy - Scholar, 2 projects
+8. ✅ Women in Games - Youngest ambassador, 46 cities
+9. ✅ Mustang Studios Podcast - 30+ episodes
+10. ✅ Tech Influencer - 2M+ TikTok views
+
+**All 5 Awards Visible:**
+1. ✅ NCWiT National Awardee (Week 22)
+2. ✅ Games for Change Writing Award (Week 30)
+3. ✅ CS CTE Award (Week 40)
+4. ✅ AP Scholar with Distinction (Week 55)
+5. ✅ College Board Rural Award (Week 60)
+
+### Files Modified
+
+1. `unified-frontend/apps/unified-app/src/components/v10/WeeklyVitals.tsx:193`
+   - Changed `max-height: 1000px` → `8000px`
+   - Ensures all collapsible sections can display full content
+
+### Technical Details
+
+**Height Calculation:**
+- 10 activities × ~250px average height = ~2,500px
+- Academic Profile section: ~800px (with all AP exams, courses)
+- Awards section: ~400px (5 awards)
+- Buffer for future growth: 8000px provides 3x headroom
+
+**Why 8000px vs `none`:**
+- CSS transitions require numeric max-height values
+- `max-height: none` breaks smooth expand/collapse animation
+- 8000px provides smooth animation while accommodating all content
 
 ---
 
