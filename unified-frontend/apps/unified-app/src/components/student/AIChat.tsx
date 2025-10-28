@@ -6,7 +6,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAgentChat } from '../../hooks/useAgentChat';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 
 const ChatContainer = styled.div`
   display: flex;
@@ -57,28 +57,28 @@ const V152Toggle = styled.button<{ $active: boolean }>`
   }
 `;
 
-const AssessmentButton = styled.button`
-  padding: 8px 16px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-left: 8px;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
+// const AssessmentButton = styled.button` // Temporarily disabled - v15.3 routes not ready
+//   padding: 8px 16px;
+//   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+//   color: white;
+//   border: none;
+//   border-radius: 6px;
+//   font-size: 13px;
+//   font-weight: 600;
+//   cursor: pointer;
+//   transition: all 0.2s;
+//   margin-left: 8px;
+//
+//   &:hover:not(:disabled) {
+//     transform: translateY(-1px);
+//     box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+//   }
+//
+//   &:disabled {
+//     opacity: 0.5;
+//     cursor: not-allowed;
+//   }
+// `;
 
 const QualityBadge = styled.div<{ $score: number }>`
   display: inline-flex;
@@ -303,7 +303,7 @@ export function AIChat() {
   const [input, setInput] = useState('');
   const [assessmentMode, setAssessmentMode] = useState<AssessmentMode>('normal');
   const [useV152, setUseV152] = useState(true); // v15.2 enabled by default
-  const [assessmentRunning, setAssessmentRunning] = useState(false);
+  // const [assessmentRunning, setAssessmentRunning] = useState(false); // Temporarily disabled - v15.3 routes not ready
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Use actual logged-in user's student ID from backend auth
@@ -348,39 +348,39 @@ export function AIChat() {
     await sendMessage(message);
   };
 
-  const handleV153Assessment = async () => {
-    if (assessmentRunning) return;
-
-    setAssessmentRunning(true);
-
-    try {
-      console.log(`[v15.3] Starting assessment for student: ${studentId}`);
-
-      const response = await fetch('http://localhost:3004/api/v15.3/assessment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          student_id: studentId,
-          assessment_trigger: 'manual',
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        console.log(`[v15.3] ✅ Assessment complete!`, result.data);
-        alert(`Assessment Complete!\n\nPhases: ${result.data.phase_results.length}/4\nLayers: ${result.data.total_layers_analyzed}\nDoc ID: ${result.data.assessment_doc_id}\n\nCheck console for full results.`);
-      } else {
-        console.error(`[v15.3] ❌ Assessment failed:`, result.error);
-        alert(`Assessment Failed: ${result.error}`);
-      }
-    } catch (error) {
-      console.error(`[v15.3] Request error:`, error);
-      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    } finally {
-      setAssessmentRunning(false);
-    }
-  };
+  // const handleV153Assessment = async () => { // Temporarily disabled - v15.3 routes not ready
+  //   if (assessmentRunning) return;
+  //
+  //   setAssessmentRunning(true);
+  //
+  //   try {
+  //     console.log(`[v15.3] Starting assessment for student: ${studentId}`);
+  //
+  //     const response = await fetch('http://localhost:3004/api/v15.3/assessment', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         student_id: studentId,
+  //         assessment_trigger: 'manual',
+  //       }),
+  //     });
+  //
+  //     const result = await response.json();
+  //
+  //     if (result.success) {
+  //       console.log(`[v15.3] ✅ Assessment complete!`, result.data);
+  //       alert(`Assessment Complete!\n\nPhases: ${result.data.phase_results.length}/4\nLayers: ${result.data.total_layers_analyzed}\nDoc ID: ${result.data.assessment_doc_id}\n\nCheck console for full results.`);
+  //     } else {
+  //       console.error(`[v15.3] ❌ Assessment failed:`, result.error);
+  //       alert(`Assessment Failed: ${result.error}`);
+  //     }
+  //   } catch (error) {
+  //     console.error(`[v15.3] Request error:`, error);
+  //     alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  //   } finally {
+  //     setAssessmentRunning(false);
+  //   }
+  // };
 
   return (
     <ChatContainer>
@@ -391,9 +391,9 @@ export function AIChat() {
             <V152Toggle $active={useV152} onClick={() => setUseV152(!useV152)}>
               {useV152 ? '⚡ v15.2 Active' : 'v14.0 Legacy'}
             </V152Toggle>
-            <AssessmentButton onClick={handleV153Assessment} disabled={assessmentRunning || loading}>
+            {/* <AssessmentButton onClick={handleV153Assessment} disabled={assessmentRunning || loading}>
               {assessmentRunning ? '🔄 Running...' : '✨ v15.3 Assessment'}
-            </AssessmentButton>
+            </AssessmentButton> */}
           </div>
         </HeaderTitle>
         <HeaderSubtitle>

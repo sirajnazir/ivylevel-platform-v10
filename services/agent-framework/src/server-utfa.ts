@@ -29,7 +29,7 @@ import { v32Router } from './routes/v3.2.js';
 import { v10Router } from './routes/v10.0.js';
 import { v12Router } from './routes/v12.0.js';
 import { v152Router } from './routes/v15.2.js';
-import { v153Router } from './routes/v15.3.js';
+// import { v153Router } from './routes/v15.3.js'; // Temporarily disabled - AssessmentAgent not created yet
 import { assertIndexParity } from './retrieval/pinecone.js';
 import { CFG } from './config/env.js';
 import authRouter from './routes/auth.js';
@@ -76,7 +76,7 @@ app.use('/', v12Router(pool));
 app.use('/api/v15.2', v152Router);
 
 // Mount v15.3 routes (Universal Assessment Agent + Rich EQ Integration)
-app.use('/api/v15.3', v153Router);
+// app.use('/api/v15.3', v153Router); // Temporarily disabled - AssessmentAgent not created yet
 
 // Mount auth routes
 app.use('/api/auth', authRouter);
