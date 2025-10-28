@@ -282,7 +282,9 @@ export function AIChat() {
   const [useV152, setUseV152] = useState(true); // v15.2 enabled by default
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const studentId = user?.id || 'huda-2025';
+  // Use actual logged-in user's student ID from backend auth
+  // Backend auth (/api/auth/login) returns student_id which is mapped to user.studentId
+  const studentId = user?.studentId || user?.id || 'huda-2025';
 
   const { messages, loading, currentAgent, sendMessage, v152Metadata } = useAgentChat({
     studentId,
@@ -398,25 +400,23 @@ export function AIChat() {
       </MessagesContainer>
 
       <InputContainer>
-        {/* Assessment Mode Buttons - Only show for huda-2025-new */}
-        {studentId === 'huda-2025-new' && (
-          <ModeButtonsContainer>
-            <ModeButton
-              $active={assessmentMode === 'interactive'}
-              onClick={() => handleModeClick('interactive')}
-              disabled={loading}
-            >
-              🎯 Interactive Assessment
-            </ModeButton>
-            <ModeButton
-              $active={assessmentMode === 'simulated'}
-              onClick={() => handleModeClick('simulated')}
-              disabled={loading}
-            >
-              ⚡ Simulated Assessment
-            </ModeButton>
-          </ModeButtonsContainer>
-        )}
+        {/* Assessment Mode Buttons - Available for all students */}
+        <ModeButtonsContainer>
+          <ModeButton
+            $active={assessmentMode === 'interactive'}
+            onClick={() => handleModeClick('interactive')}
+            disabled={loading}
+          >
+            🎯 Interactive Assessment
+          </ModeButton>
+          <ModeButton
+            $active={assessmentMode === 'simulated'}
+            onClick={() => handleModeClick('simulated')}
+            disabled={loading}
+          >
+            ⚡ Simulated Assessment
+          </ModeButton>
+        </ModeButtonsContainer>
 
         <InputForm onSubmit={handleSubmit}>
           <Input
