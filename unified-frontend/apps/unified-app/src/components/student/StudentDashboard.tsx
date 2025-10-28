@@ -573,12 +573,12 @@ export function StudentDashboard() {
 
             <CardsGrid>
               <LeftCards>
-                <AptitudeCard />
-                <IdentityCard />
+                <AptitudeCard pillarData={v12AssessmentData?.pillars.aptitude} />
+                <IdentityCard pillarData={v12AssessmentData?.pillars.identity} />
               </LeftCards>
               <RightCards>
-                <ServiceCard />
-                <PassionCard />
+                <ServiceCard pillarData={v12AssessmentData?.pillars.service} />
+                <PassionCard pillarData={v12AssessmentData?.pillars.passion} />
               </RightCards>
             </CardsGrid>
 

@@ -168,7 +168,18 @@ const ScoreStatus = styled.div`
   margin-top: 2px;
 `;
 
-export const ServiceCard = () => {
+interface ServiceCardProps {
+  pillarData?: {
+    score: number;
+    percentage: number;
+    evidence: string;
+    weight: number;
+    contribution: number;
+  };
+}
+
+export const ServiceCard = ({ pillarData }: ServiceCardProps = {}) => {
+  const percentage = pillarData?.percentage || 81;
   return (
     <Container>
       <HeaderContainer>
@@ -179,7 +190,7 @@ export const ServiceCard = () => {
             <ScoreLabel>score last month</ScoreLabel>
           </ScoreContainer>
         </HeaderContent>
-        <PercentageBadge>81%</PercentageBadge>
+        <PercentageBadge>{percentage}%</PercentageBadge>
       </HeaderContainer>
 
       <ChartContainer>

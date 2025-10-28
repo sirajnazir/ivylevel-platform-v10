@@ -168,7 +168,18 @@ const ScoreStatus = styled.div`
   margin-top: 2px;
 `;
 
-export const PassionCard = () => {
+interface PassionCardProps {
+  pillarData?: {
+    score: number;
+    percentage: number;
+    evidence: string;
+    weight: number;
+    contribution: number;
+  };
+}
+
+export const PassionCard = ({ pillarData }: PassionCardProps = {}) => {
+  const percentage = pillarData?.percentage || 83;
   return (
     <Container>
       <HeaderContainer>
@@ -179,7 +190,7 @@ export const PassionCard = () => {
             <ScoreLabel>score last month</ScoreLabel>
           </ScoreContainer>
         </HeaderContent>
-        <PercentageBadge>83%</PercentageBadge>
+        <PercentageBadge>{percentage}%</PercentageBadge>
       </HeaderContainer>
 
       <ChartContainer>
