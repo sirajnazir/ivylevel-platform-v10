@@ -1,11 +1,11 @@
 # IvyLevel Platform - Production Database Architecture
-# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.5 Production Infrastructure
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 Complete Common App Schema
 
-**Document Version:** v10.5
+**Document Version:** v10.8.2
 **Last Updated:** 2025-10-27
-**Status:** ✅ PRODUCTION READY - Enhanced with Weekly Vitals Progressive Data
+**Status:** ✅ PRODUCTION READY - Complete Common App Data with Universal Schema
 **Database:** PostgreSQL 14+
-**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.5 Weekly Vitals Enrichment
+**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.8 Universal Academic Schema
 
 ---
 
@@ -18,12 +18,14 @@ This is the **single source of truth** for IvyLevel's production database schema
 3. **v2.0 Data Quality** - Fixed duplicate data issues (awards, colleges)
 4. **v2.1 Final Precedence** - Fixed programs/awards/colleges dual-state logic
 5. **v3.2 Production Infrastructure** - Evidence chips, HGTI, outbox, RLS, facts views
-6. **v10.5 Weekly Vitals Enrichment** - Progressive EC/award/program data in weekly_vitals table
-7. **Current Tables & Views** - What actually exists in production
-8. **Sample Data** - Real Jenny-Huda data only (NO MOCK DATA)
-9. **Verified Data Integrity** - Comprehensive testing validates all queries
+6. **v10.0-10.7** - Weekly Vitals UI/UX with 6 core gaps implementation
+7. **v10.8** - Complete Common App alignment with universal academic schema
+8. **v10.8.1-10.8.2** - API and UI fixes for complete data display
+9. **Current Tables & Views** - What actually exists in production
+10. **Sample Data** - Real Jenny-Huda data with complete Common App submission
+11. **Verified Data Integrity** - Comprehensive testing validates all queries
 
-**Key Principle:** All data references use REAL student data from Jenny-Huda coaching sessions (student_id: 'huda-2025'). No mock students, no test data in documentation. v3.2 adds enterprise-grade infrastructure while preserving all existing data and functionality.
+**Key Principle:** All data references use REAL student data from Huda's actual UNC Chapel Hill Early Action submission (student_id: 'huda-2025'). Universal schema design enables support for any student type (STEM, Arts, Athletics, IB) while maintaining complete accuracy with final college applications.
 
 ---
 
@@ -2428,3 +2430,484 @@ planned   | 4
 **Next Steps:** Review with stakeholders → Approve enhancements → Begin implementation
 **Owner:** Development Team
 **Last Updated:** 2025-10-20
+
+---
+
+## v10.8 - Universal Academic Schema (2025-10-27)
+
+### Overview
+
+v10.8 introduces a **universal academic schema** stored in JSONB columns of the `weekly_vitals` table, supporting complete Common Application data for any student type without requiring database migrations.
+
+### Schema Design Principles
+
+1. **JSONB Flexibility**: All new data stored in JSONB columns (no ALTER TABLE needed)
+2. **Universal Support**: Works for STEM, Arts, Athletics, IB, AP, and any student type
+3. **Common App Alignment**: Every field matches actual Common Application format
+4. **Progressive Enrichment**: Historical week-by-week accuracy (Week 1 → Week 89)
+5. **Type Safety**: TypeScript interfaces ensure data consistency
+
+### weekly_vitals Table - Enhanced Columns
+
+**Table:** `weekly_vitals`
+
+**New/Enhanced JSONB Columns:**
+
+```sql
+CREATE TABLE weekly_vitals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id text NOT NULL REFERENCES students(student_id),
+  week_number integer NOT NULL,
+  week_start_date timestamp with time zone NOT NULL,
+  week_end_date timestamp with time zone NOT NULL,
+  
+  -- v10.8: Universal Academic Schema
+  academic_vitals jsonb, -- Complete academic profile (GPA, SAT, AP, courses)
+  
+  -- v10.8: Enhanced Activity Data (all 10 Common App activities)
+  ec_details jsonb, -- Array of extracurricular activities
+  award_details jsonb, -- Array of awards and honors
+  program_details jsonb, -- Array of programs with selectivity
+  
+  -- v10.5: Other vitals
+  ec_vitals jsonb,
+  growth_vitals jsonb,
+  focus_areas jsonb,
+  progress_status text,
+  completion_percentage numeric,
+  session_summary text,
+  session_topics jsonb,
+  
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  
+  UNIQUE(student_id, week_number)
+);
+```
+
+### academic_vitals JSONB Schema
+
+**Structure:** Universal schema supporting any student type
+
+```json
+{
+  "gpa_weighted": 3.93,
+  "gpa_unweighted": null,
+  "gpa_scale": 4.0,
+  "gpa_trend": "stable",
+  "class_rank": "na",
+  "class_size": 582,
+  "percentile": null,
+  
+  "sat": {
+    "total": 1530,
+    "ebrw": 750,
+    "math": 780,
+    "attempts": [
+      {
+        "date": "12/01/2023",
+        "total": 1510,
+        "ebrw": 730,
+        "math": 780
+      },
+      {
+        "date": "03/04/2024",
+        "total": 1530,
+        "ebrw": 750,
+        "math": 780
+      }
+    ]
+  },
+  
+  "act": {
+    "composite": null,
+    "english": null,
+    "math": null,
+    "reading": null,
+    "science": null,
+    "attempts": []
+  },
+  
+  "ap_exams": [
+    {
+      "subject": "Human Geography",
+      "score": 5,
+      "test_date": "05/2023",
+      "grade_level": "10"
+    },
+    {
+      "subject": "United States History",
+      "score": 4,
+      "test_date": "05/2024",
+      "grade_level": "11"
+    },
+    {
+      "subject": "Calculus AB",
+      "score": 4,
+      "test_date": "05/2024",
+      "grade_level": "11"
+    },
+    {
+      "subject": "English Language & Composition",
+      "score": 4,
+      "test_date": "05/2024",
+      "grade_level": "11"
+    }
+  ],
+  
+  "ib_exams": [],
+  
+  "current_courses": [
+    {
+      "year": "12",
+      "semester": "fall",
+      "courses": [
+        {
+          "subject": "OTH/ELE",
+          "title": "Adulting",
+          "level": "REG",
+          "credits": 0.5
+        },
+        {
+          "subject": "COMPSCI",
+          "title": "Applied Computer Science Practices",
+          "level": "REG",
+          "credits": 1.0
+        },
+        {
+          "subject": "ENG",
+          "title": "AP Literature and Composition",
+          "level": "AP",
+          "credits": 1.0
+        },
+        {
+          "subject": "MATH",
+          "title": "AP Statistics",
+          "level": "AP",
+          "credits": 1.0
+        },
+        {
+          "subject": "LANG",
+          "title": "AP Spanish Language and Culture",
+          "level": "AP",
+          "credits": 1.0
+        },
+        {
+          "subject": "HIST",
+          "title": "AP US Government and Politics",
+          "level": "AP",
+          "credits": 0.5
+        },
+        {
+          "subject": "HIST",
+          "title": "AP Psychology",
+          "level": "AP",
+          "credits": 0.5
+        }
+      ]
+    },
+    {
+      "year": "12",
+      "semester": "spring",
+      "courses": [
+        {
+          "subject": "OTH/ELE",
+          "title": "Adulting",
+          "level": "REG",
+          "credits": 0.5
+        },
+        {
+          "subject": "COMPSCI",
+          "title": "Applied Computer Science Practices",
+          "level": "REG",
+          "credits": 1.0
+        },
+        {
+          "subject": "ENG",
+          "title": "AP Literature and Composition",
+          "level": "AP",
+          "credits": 1.0
+        },
+        {
+          "subject": "MATH",
+          "title": "AP Statistics",
+          "level": "AP",
+          "credits": 1.0
+        },
+        {
+          "subject": "LANG",
+          "title": "AP Spanish Language and Culture",
+          "level": "AP",
+          "credits": 1.0
+        },
+        {
+          "subject": "HIST",
+          "title": "AP Psychology",
+          "level": "AP",
+          "credits": 0.5
+        }
+      ]
+    }
+  ],
+  
+  "total_ap_courses": 11,
+  "total_ib_courses": 0,
+  "total_honors_courses": 0,
+  "academic_rigor_score": 11
+}
+```
+
+### ec_details JSONB Schema
+
+**Structure:** Array of 10 Common App activities (max per Common App)
+
+```json
+[
+  {
+    "name": "Empowering AI",
+    "role": "Founder & National Officer Board Leader",
+    "description": "Founded nonprofit teaching AI ethics to underserved communities. Raised $23K, reached 44 cities via EmpowHER Hacks hackathon series.",
+    "category": "community_service",
+    "locations_reached": 44,
+    "team_size": 15,
+    "participants_reached": 44,
+    "partnerships": 3,
+    "funds_raised": 23000,
+    "events_held": 44,
+    "press_mentions": 2,
+    "speaking_engagements": 3,
+    "hours_per_week": 8,
+    "weeks_per_year": 50,
+    "grade_levels": ["10", "11", "12"],
+    "awards": ["Featured by Tech for Social Good"]
+  },
+  {
+    "name": "Synthoria",
+    "role": "Founder & Solo Developer",
+    "description": "Created educational game teaching data science & AI ethics. Distributed lesson kit to 200 classes reaching 6,400 students.",
+    "category": "computer_science",
+    "audience_size": 6400,
+    "team_size": 1,
+    "events_held": 15,
+    "resources_created": 200,
+    "growth_percentage": 4266,
+    "press_mentions": 1,
+    "hours_per_week": 6,
+    "weeks_per_year": 48,
+    "grade_levels": ["10", "11", "12"],
+    "awards": []
+  }
+  // ... 8 more activities
+]
+```
+
+### program_details JSONB Schema
+
+**Structure:** Array of programs with selectivity tracking
+
+```json
+[
+  {
+    "name": "JCamp (AAJA)",
+    "program_type": "summer",
+    "category": "journalism",
+    "role": "Student Leader",
+    "selection_rate": 0.01,
+    "total_applicants": 3000,
+    "total_accepted": 30,
+    "attended_week": 70,
+    "start_date": "2024-06-15",
+    "end_date": "2024-06-22",
+    "grade_level": "11",
+    "institution": "Asian American Journalists Association",
+    "location": "Austin, TX",
+    "is_paid": false,
+    "cost": 0,
+    "scholarship_amount": 3000,
+    "hours_total": 100,
+    "outcomes": {
+      "projects_completed": 2,
+      "papers_published": 2,
+      "presentations": 0,
+      "skills_learned": ["investigative journalism", "data journalism", "multimedia storytelling"],
+      "recommendation_received": true
+    },
+    "related_activity_name": "JCamp (AAJA)"
+  },
+  {
+    "name": "Kode With Klossy",
+    "program_type": "summer",
+    "category": "stem",
+    "role": "Scholar",
+    "selection_rate": 0.15,
+    "total_applicants": null,
+    "total_accepted": null,
+    "attended_week": 60,
+    "grade_level": "11",
+    "outcomes": {
+      "projects_completed": 2,
+      "skills_learned": ["machine learning", "data visualization", "Python"],
+      "recommendation_received": false
+    },
+    "related_activity_name": "Kode With Klossy Scholar"
+  }
+]
+```
+
+### Data Queries
+
+**Query 1: Get complete academic profile for Week 89**
+```sql
+SELECT 
+  week_number,
+  academic_vitals->>'gpa_weighted' as gpa,
+  academic_vitals->'sat'->>'total' as sat_total,
+  jsonb_array_length(academic_vitals->'ap_exams') as ap_count,
+  academic_vitals->>'total_ap_courses' as total_ap_courses
+FROM weekly_vitals
+WHERE student_id = 'huda-2025' AND week_number = 89;
+```
+
+**Query 2: Get all 10 activities for Week 89**
+```sql
+SELECT 
+  week_number,
+  jsonb_array_length(ec_details) as activity_count,
+  ec_detail->>'name' as activity_name,
+  ec_detail->>'role' as role,
+  ec_detail->>'category' as category,
+  ec_detail->>'hours_per_week' as hours_per_week
+FROM weekly_vitals,
+  jsonb_array_elements(ec_details) as ec_detail
+WHERE student_id = 'huda-2025' AND week_number = 89;
+```
+
+**Query 3: Track SAT progression across weeks**
+```sql
+SELECT 
+  week_number,
+  academic_vitals->'sat'->>'total' as sat_total,
+  academic_vitals->'sat'->>'ebrw' as sat_ebrw,
+  academic_vitals->'sat'->>'math' as sat_math
+FROM weekly_vitals
+WHERE student_id = 'huda-2025' 
+  AND academic_vitals->'sat'->>'total' IS NOT NULL
+ORDER BY week_number;
+```
+
+**Query 4: Get AP exam scores by subject**
+```sql
+SELECT 
+  week_number,
+  ap_exam->>'subject' as subject,
+  ap_exam->>'score' as score,
+  ap_exam->>'grade_level' as grade_level,
+  ap_exam->>'test_date' as test_date
+FROM weekly_vitals,
+  jsonb_array_elements(academic_vitals->'ap_exams') as ap_exam
+WHERE student_id = 'huda-2025' AND week_number = 89;
+```
+
+### Extensibility Examples
+
+**STEM Student:**
+```json
+{
+  "gpa_weighted": 4.8,
+  "gpa_scale": 5.0,
+  "sat": {"total": 1580, "ebrw": 780, "math": 800},
+  "ap_exams": [
+    {"subject": "Calculus BC", "score": 5, "grade_level": "11"},
+    {"subject": "Physics C: Mechanics", "score": 5, "grade_level": "11"},
+    {"subject": "Chemistry", "score": 5, "grade_level": "12"}
+  ],
+  "total_ap_courses": 8
+}
+```
+
+**IB Student:**
+```json
+{
+  "gpa_unweighted": 3.95,
+  "gpa_scale": 4.0,
+  "ib_exams": [
+    {"subject": "Mathematics HL", "level": "HL", "predicted_score": 7, "grade_level": "12"},
+    {"subject": "Physics HL", "level": "HL", "predicted_score": 7, "grade_level": "12"},
+    {"subject": "English HL", "level": "HL", "predicted_score": 6, "grade_level": "12"}
+  ],
+  "total_ib_courses": 6
+}
+```
+
+**Arts Student:**
+```json
+{
+  "gpa_weighted": 3.85,
+  "class_rank": 15,
+  "class_size": 350,
+  "sat": {"total": 1450, "ebrw": 780, "math": 670},
+  "ap_exams": [
+    {"subject": "English Literature", "score": 5, "grade_level": "11"},
+    {"subject": "Art History", "score": 5, "grade_level": "12"},
+    {"subject": "Studio Art", "score": 5, "grade_level": "12"}
+  ],
+  "total_ap_courses": 3,
+  "total_honors_courses": 7
+}
+```
+
+### Migration Notes
+
+**No ALTER TABLE Required:**
+- All new data stored in existing JSONB columns
+- `academic_vitals` column already exists in `weekly_vitals` table
+- Data enrichment via INSERT/UPDATE only
+- Zero downtime migration
+
+**Progressive Enrichment:**
+```sql
+-- Update Week 89 with complete academic data
+UPDATE weekly_vitals
+SET academic_vitals = '{
+  "gpa_weighted": 3.93,
+  "sat": {"total": 1530, "ebrw": 750, "math": 780},
+  "ap_exams": [...],
+  "current_courses": [...],
+  "total_ap_courses": 11
+}'::jsonb
+WHERE student_id = 'huda-2025' AND week_number = 89;
+```
+
+### Index Recommendations
+
+```sql
+-- Index for JSONB queries on academic_vitals
+CREATE INDEX idx_weekly_vitals_academic_gpa ON weekly_vitals 
+  USING GIN ((academic_vitals->'gpa_weighted'));
+
+CREATE INDEX idx_weekly_vitals_academic_sat ON weekly_vitals 
+  USING GIN ((academic_vitals->'sat'));
+
+CREATE INDEX idx_weekly_vitals_ec_details ON weekly_vitals 
+  USING GIN (ec_details);
+```
+
+### Production Data Summary
+
+**Student:** huda-2025
+
+**Week 89 Data:**
+- Academic: GPA 3.93, SAT 1530, 4 AP exams, 2 semesters courses, 11 total AP
+- Activities: 10 complete Common App activities
+- Awards: 5 awards (NCWiT, Games for Change, CS CTE, AP Scholar, College Board Rural)
+- Programs: 2 highly selective programs (JCamp 1%, Kode With Klossy 15%)
+
+**Historical Coverage:**
+- 89 weeks enriched with progressive data
+- Week 1: 2 activities, no test scores
+- Week 30: 4 activities, first SAT (1510)
+- Week 60: 9 activities, 2 programs, improved SAT (1530)
+- Week 89: 10 activities, 4 AP exams, complete academic profile
+
+---
+
