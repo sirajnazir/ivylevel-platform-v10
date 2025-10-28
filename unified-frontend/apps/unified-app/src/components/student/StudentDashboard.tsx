@@ -128,6 +128,272 @@ const V32Title = styled.h2`
   margin-bottom: 16px;
 `;
 
+// v12.1: Assessment section styled components
+const ErrorMessage = styled.div`
+  background: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 20px 30px;
+  font-size: 14px;
+`;
+
+const AssessmentSection = styled.div`
+  margin: 40px 30px;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
+const DimensionalGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+`;
+
+const DimensionCard = styled.div`
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+`;
+
+const DimensionName = styled.div`
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 8px;
+`;
+
+const DimensionScore = styled.div<{ tier: string }>`
+  font-size: 24px;
+  font-weight: 700;
+  color: ${props => {
+    const tierColors: Record<string, string> = {
+      'Diamond': '#3b82f6',
+      'Platinum': '#8b5cf6',
+      'Gold': '#f59e0b',
+      'Silver': '#6b7280',
+      'Bronze': '#92400e'
+    };
+    return tierColors[props.tier] || '#333';
+  }};
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const DimensionTier = styled.span`
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 4px;
+`;
+
+const StrengthsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+`;
+
+const StrengthCard = styled.div`
+  padding: 16px;
+  background: #f0fdf4;
+  border-radius: 8px;
+  border: 1px solid #86efac;
+`;
+
+const StrengthHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 12px;
+`;
+
+const StrengthTitle = styled.div`
+  font-size: 16px;
+  font-weight: 600;
+  color: #166534;
+  flex: 1;
+`;
+
+const StrengthBadge = styled.span`
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 4px;
+  white-space: nowrap;
+`;
+
+const StrengthDescription = styled.div`
+  font-size: 14px;
+  color: #065f46;
+  margin-bottom: 12px;
+  line-height: 1.5;
+`;
+
+const StrengthFooter = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const ROIScore = styled.div`
+  font-size: 13px;
+  font-weight: 600;
+  color: #059669;
+`;
+
+const ImpactLabel = styled.div`
+  font-size: 12px;
+  color: #047857;
+`;
+
+const WeakSpotsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+`;
+
+const WeakSpotCard = styled.div<{ priority: string }>`
+  padding: 16px;
+  background: ${props => {
+    const priorityColors: Record<string, string> = {
+      'P0': '#fef3c7',
+      'P1': '#fed7aa',
+      'P2': '#e0e7ff'
+    };
+    return priorityColors[props.priority] || '#f3f4f6';
+  }};
+  border-radius: 8px;
+  border: 1px solid ${props => {
+    const borderColors: Record<string, string> = {
+      'P0': '#fbbf24',
+      'P1': '#fb923c',
+      'P2': '#a5b4fc'
+    };
+    return borderColors[props.priority] || '#d1d5db';
+  }};
+`;
+
+const WeakSpotHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 12px;
+`;
+
+const WeakSpotTitle = styled.div`
+  font-size: 16px;
+  font-weight: 600;
+  color: #92400e;
+  flex: 1;
+`;
+
+const WeakSpotStatus = styled.span<{ status: string }>`
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  background: ${props => props.status === 'RESOLVED' ? '#d1fae5' : '#fecaca'};
+  color: ${props => props.status === 'RESOLVED' ? '#065f46' : '#991b1b'};
+  border-radius: 4px;
+  white-space: nowrap;
+`;
+
+const PriorityRow = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+`;
+
+const PriorityBadge = styled.span<{ priority: string }>`
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  background: ${props => {
+    const bgColors: Record<string, string> = {
+      'P0': '#fbbf24',
+      'P1': '#fb923c',
+      'P2': '#a5b4fc'
+    };
+    return bgColors[props.priority] || '#d1d5db';
+  }};
+  color: ${props => {
+    const textColors: Record<string, string> = {
+      'P0': '#78350f',
+      'P1': '#7c2d12',
+      'P2': '#3730a3'
+    };
+    return textColors[props.priority] || '#374151';
+  }};
+  border-radius: 4px;
+`;
+
+const TacticalPlan = styled.div`
+  font-size: 14px;
+  color: #78350f;
+  margin-bottom: 8px;
+  line-height: 1.5;
+`;
+
+const TargetWeeks = styled.div`
+  font-size: 12px;
+  font-weight: 500;
+  color: #92400e;
+`;
+
+const AdmissionsRubricCard = styled.div`
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+`;
+
+const RubricRow = styled.div<{ highlight?: boolean }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: ${props => props.highlight ? '2px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)'};
+  font-weight: ${props => props.highlight ? '700' : '500'};
+  font-size: ${props => props.highlight ? '18px' : '15px'};
+`;
+
+const RubricLabel = styled.span`
+  opacity: 0.95;
+`;
+
+const RubricScore = styled.span`
+  font-weight: 700;
+  font-size: 18px;
+`;
+
+const RubricDivider = styled.div`
+  height: 2px;
+  background: rgba(255,255,255,0.3);
+  margin: 12px 0;
+`;
+
+const TargetSchools = styled.div`
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  font-size: 14px;
+`;
+
 export function StudentDashboard() {
   const { user } = useAuth();
   console.log('🎯 StudentDashboard rendered, user:', user);
@@ -255,39 +521,52 @@ export function StudentDashboard() {
             <LeftColumn>
               <ScoreRingsSection>
                 <CircularProgress
-                  score={87}
+                  score={v12AssessmentData?.ivyReadyScore.overall || 87}
                   profileImage="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400"
-                  pillarScores={pillarScores}
-                  ivyScoreData={assessmentData ? {
-                    overall_score: Math.round((pillarScores?.aptitude.score || 87 +
-                                             pillarScores?.passion.score || 87 +
-                                             pillarScores?.service.score || 87 +
-                                             pillarScores?.identity.score || 87) / 4),
-                    score_change: 0,
-                    achievement_level: 'GOLD' as const,
-                    target_gap: assessmentData.admission_probabilities?.tier_1 ?
-                      Math.round((1 - assessmentData.admission_probabilities.tier_1) * 100) : 5,
-                    tier_probability: assessmentData.admission_probabilities?.tier_1 || 0.15
+                  pillarScores={v12AssessmentData ? {
+                    aptitude: {
+                      score: v12AssessmentData.pillars.aptitude.score * 10,
+                      label: 'Aptitude',
+                      description: v12AssessmentData.pillars.aptitude.evidence
+                    },
+                    passion: {
+                      score: v12AssessmentData.pillars.passion.score * 10,
+                      label: 'Passion',
+                      description: v12AssessmentData.pillars.passion.evidence
+                    },
+                    service: {
+                      score: v12AssessmentData.pillars.service.score * 10,
+                      label: 'Service',
+                      description: v12AssessmentData.pillars.service.evidence
+                    },
+                    identity: {
+                      score: v12AssessmentData.pillars.identity.score * 10,
+                      label: 'Identity',
+                      description: v12AssessmentData.pillars.identity.evidence
+                    }
+                  } : pillarScores}
+                  ivyScoreData={v12AssessmentData ? {
+                    overall_score: v12AssessmentData.ivyReadyScore.overall,
+                    score_change: v12AssessmentData.ivyReadyScore.changeVs180Days,
+                    achievement_level: v12AssessmentData.ivyReadyScore.tier.toUpperCase() as 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND',
+                    target_gap: 100 - v12AssessmentData.ivyReadyScore.overall,
+                    tier_probability: v12AssessmentData.admissionsRubric.overallAdmitProbability
                   } : undefined}
-                  isLoading={isLoading}
+                  isLoading={assessmentLoading}
                 />
               </ScoreRingsSection>
               <IvyScoreCardWrapper>
                 <IvyScoreCard
-                  score={87}
-                  ivyScoreData={assessmentData ? {
-                    overall_score: Math.round((pillarScores?.aptitude.score || 87 +
-                                             pillarScores?.passion.score || 87 +
-                                             pillarScores?.service.score || 87 +
-                                             pillarScores?.identity.score || 87) / 4),
-                    score_change: 0,
-                    achievement_level: 'GOLD' as const,
-                    target_gap: assessmentData.admission_probabilities?.tier_1 ?
-                      Math.round((1 - assessmentData.admission_probabilities.tier_1) * 100) : 5,
-                    tier_probability: assessmentData.admission_probabilities?.tier_1 || 0.15
+                  score={v12AssessmentData?.ivyReadyScore.overall || 87}
+                  ivyScoreData={v12AssessmentData ? {
+                    overall_score: v12AssessmentData.ivyReadyScore.overall,
+                    score_change: v12AssessmentData.ivyReadyScore.changeVs180Days,
+                    achievement_level: v12AssessmentData.ivyReadyScore.tier.toUpperCase() as 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND',
+                    target_gap: 100 - v12AssessmentData.ivyReadyScore.overall,
+                    tier_probability: v12AssessmentData.admissionsRubric.overallAdmitProbability
                   } : undefined}
                   assessmentData={assessmentData}
-                  isLoading={isLoading}
+                  isLoading={assessmentLoading}
                 />
               </IvyScoreCardWrapper>
             </LeftColumn>
@@ -302,6 +581,109 @@ export function StudentDashboard() {
                 <PassionCard />
               </RightCards>
             </CardsGrid>
+
+            {/* v12.1: Display error if assessment data failed to load */}
+            {assessmentError && (
+              <ErrorMessage>{assessmentError}</ErrorMessage>
+            )}
+
+            {/* v12.1: Dimensional Scores Section */}
+            {v12AssessmentData && (
+              <AssessmentSection>
+                <SectionTitle>📊 Dimensional Breakdown</SectionTitle>
+                <DimensionalGrid>
+                  {v12AssessmentData.dimensionalScores.map((dim, idx) => (
+                    <DimensionCard key={idx}>
+                      <DimensionName>{dim.dimension}</DimensionName>
+                      <DimensionScore tier={dim.tier}>
+                        {dim.score}%
+                        <DimensionTier>{dim.tier}</DimensionTier>
+                      </DimensionScore>
+                    </DimensionCard>
+                  ))}
+                </DimensionalGrid>
+              </AssessmentSection>
+            )}
+
+            {/* v12.1: Strengths Section */}
+            {v12AssessmentData && v12AssessmentData.strengths.length > 0 && (
+              <AssessmentSection>
+                <SectionTitle>⭐ Standout Strengths</SectionTitle>
+                <StrengthsGrid>
+                  {v12AssessmentData.strengths.map((strength, idx) => (
+                    <StrengthCard key={strength.id}>
+                      <StrengthHeader>
+                        <StrengthTitle>{strength.title}</StrengthTitle>
+                        <StrengthBadge>{strength.dimension}</StrengthBadge>
+                      </StrengthHeader>
+                      <StrengthDescription>{strength.description}</StrengthDescription>
+                      <StrengthFooter>
+                        <ROIScore>ROI: {strength.roiScore}/10</ROIScore>
+                        <ImpactLabel>{strength.impact}</ImpactLabel>
+                      </StrengthFooter>
+                    </StrengthCard>
+                  ))}
+                </StrengthsGrid>
+              </AssessmentSection>
+            )}
+
+            {/* v12.1: Weak Spots Section */}
+            {v12AssessmentData && v12AssessmentData.weakSpots.length > 0 && (
+              <AssessmentSection>
+                <SectionTitle>🎯 Focus Areas</SectionTitle>
+                <WeakSpotsGrid>
+                  {v12AssessmentData.weakSpots.map((weakSpot, idx) => (
+                    <WeakSpotCard key={weakSpot.id} priority={weakSpot.priority}>
+                      <WeakSpotHeader>
+                        <WeakSpotTitle>{weakSpot.title}</WeakSpotTitle>
+                        <WeakSpotStatus status={weakSpot.status}>{weakSpot.status}</WeakSpotStatus>
+                      </WeakSpotHeader>
+                      <PriorityRow>
+                        <PriorityBadge priority={weakSpot.priority}>{weakSpot.priority}</PriorityBadge>
+                        <ROIScore>ROI: {weakSpot.roiScore}/10</ROIScore>
+                      </PriorityRow>
+                      <TacticalPlan>{weakSpot.tacticalPlan}</TacticalPlan>
+                      {weakSpot.targetWeeks && (
+                        <TargetWeeks>Target: {weakSpot.targetWeeks}</TargetWeeks>
+                      )}
+                    </WeakSpotCard>
+                  ))}
+                </WeakSpotsGrid>
+              </AssessmentSection>
+            )}
+
+            {/* v12.1: Admissions Rubric Correlation Section */}
+            {v12AssessmentData && (
+              <AssessmentSection>
+                <SectionTitle>🎓 Admissions Rubric Correlation</SectionTitle>
+                <AdmissionsRubricCard>
+                  <RubricRow>
+                    <RubricLabel>Academic Index</RubricLabel>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.academicIndex}</RubricScore>
+                  </RubricRow>
+                  <RubricRow>
+                    <RubricLabel>Extracurricular Rating</RubricLabel>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.extracurricularRating}</RubricScore>
+                  </RubricRow>
+                  <RubricRow>
+                    <RubricLabel>Personal Qualities</RubricLabel>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.personalQualities}</RubricScore>
+                  </RubricRow>
+                  <RubricRow>
+                    <RubricLabel>Recommendation Strength</RubricLabel>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.recommendationStrength}</RubricScore>
+                  </RubricRow>
+                  <RubricDivider />
+                  <RubricRow highlight>
+                    <RubricLabel>Overall Admit Probability</RubricLabel>
+                    <RubricScore>{Math.round(v12AssessmentData.admissionsRubric.overallAdmitProbability * 100)}%</RubricScore>
+                  </RubricRow>
+                  <TargetSchools>
+                    <strong>Target Schools:</strong> {v12AssessmentData.admissionsRubric.targetSchoolTier}
+                  </TargetSchools>
+                </AdmissionsRubricCard>
+              </AssessmentSection>
+            )}
           </ContentLayout>
         );
 
