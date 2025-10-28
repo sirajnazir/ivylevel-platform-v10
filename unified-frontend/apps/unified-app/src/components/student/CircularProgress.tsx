@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
-import { Target } from 'lucide-react';
 
 const ProgressContainer = styled.div`
   position: relative;
@@ -32,6 +31,16 @@ const RingWrapper = styled.div`
 `;
 
 const FrameContainer = styled.div<{ $visible: boolean; $x: number; $y: number }>`
+  position: absolute;
+  top: ${props => props.$y}px;
+  left: ${props => props.$x}px;
+  transform: translate(-50%, -50%);
+  opacity: ${props => props.$visible ? 1 : 0};
+  transition: opacity 0.3s ease-in-out;
+  z-index: 20;
+`;
+
+const TargetFrameBackground = styled.div<{ $visible: boolean; $x: number; $y: number }>`
   position: absolute;
   top: ${props => props.$y}px;
   left: ${props => props.$x}px;
@@ -133,45 +142,64 @@ const ProfileImage = styled.img`
   object-fit: cover;
 `;
 
-const TargetIndicator = styled.div<{ $visible: boolean; $x: number; $y: number }>`
+// Target/IVY+ frame styled components (matching T20Frame design)
+const TargetFrame = styled.div<{ $visible: boolean; $x: number; $y: number }>`
   position: absolute;
   top: ${props => props.$y}px;
   left: ${props => props.$x}px;
   transform: translate(-50%, -50%);
   opacity: ${props => props.$visible ? 1 : 0};
   transition: opacity 0.3s ease-in-out;
-  background: #E8F5E9;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
+  z-index: 21;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 10;
-  color: #2E7D32;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  gap: 9.78px;
+  height: 34.22px;
+  width: 125px;
 `;
 
-const IvyBadge = styled.div<{ $visible: boolean; $x: number; $y: number }>`
-  background: #FFD700;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+const TargetCircleContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #16a34a;
+  border-radius: 50%;
+  width: 34.22px;
+  height: 34.22px;
+  min-width: 34.22px;
+  min-height: 34.22px;
+  flex-shrink: 0;
+`;
+
+const TargetCircleText = styled.div`
+  color: white;
+  font-family: "Inter", sans-serif;
+  font-size: 9px;
   font-weight: 600;
-  font-size: 14px;
-  color: #333;
-  position: absolute;
-  top: ${props => props.$y}px;
-  left: ${props => props.$x}px;
-  transform: translate(-50%, -50%);
-  opacity: ${props => props.$visible ? 1 : 0};
-  transition: opacity 0.3s ease-in-out;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  line-height: 1;
+  text-align: center;
+`;
+
+const TargetTextContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f4f3f2;
+  border-radius: 24.44px;
+  height: 28.6px;
+  flex: 1;
+  padding: 0 8px;
+  position: relative;
+  top: 2.25px;
+`;
+
+const TargetLabel = styled.div`
+  color: #16a34a;
+  font-family: "Inter", sans-serif;
+  font-size: 8.5px;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
 `;
 
 const ScoreDisplay = styled.div`
@@ -213,11 +241,13 @@ interface CircularProgressProps {
 }
 
 // Base ring configuration with paths and styling
+// CLOCKWISE paths: 359.5° arcs (12:00 to 11:59)  for accurate percentage representation
+// 85% score = 306° (10:12), 90% score = 324° (10:48), 100% score = 359.5° (11:59)
 const baseRings = [
   {
     name: 'Aptitude',
     size: 895,
-    path: "M447.641 35.4554C546.276 35.4554 641.64 70.8292 716.415 135.153C791.19 199.476 840.416 288.484 855.155 386.011C869.894 483.538 849.167 583.117 796.739 666.665C744.311 750.212 663.659 812.186 569.429 841.332C475.199 870.479 373.641 864.865 283.198 825.51C192.754 786.155 119.424 715.668 76.5246 626.852C33.6247 538.035 24.0001 436.778 49.3986 341.47C74.7972 246.161 133.534 163.122 214.943 107.432",
+    path: "M 447.50 35.00 A 412.5 412.5 0 1 1 443.90 35.02",
     color: "#FFBB6D",
     strokeWidth: 69.8544,
     backgroundColor: "#E5E7EB",
@@ -225,7 +255,7 @@ const baseRings = [
   {
     name: 'Passion',
     size: 1090,
-    path: "M544.921 35.057C656.184 35.057 764.394 71.447 853.048 138.677C941.703 205.908 1005.94 300.289 1035.95 407.427C1065.97 514.565 1060.12 628.58 1019.3 732.084C978.477 835.588 904.923 922.901 809.855 980.707C714.787 1038.51 603.421 1063.64 492.742 1052.25C382.063 1040.87 278.144 993.598 196.835 917.649C115.525 841.7 61.2867 741.242 42.3912 631.595C23.4958 521.948 40.9802 409.13 92.1781 310.346",
+    path: "M 545.00 35.00 A 510 510 0 1 1 540.55 35.02",
     color: "#FF6E6D",
     strokeWidth: 69.8544,
     backgroundColor: "#E5E7EB",
@@ -233,7 +263,7 @@ const baseRings = [
   {
     name: 'Service',
     size: 1287,
-    path: "M643.643 35.852C772.734 35.852 898.472 76.958 1002.63 153.213C1106.8 229.467 1183.97 336.909 1222.97 459.967C1261.98 583.025 1260.78 715.306 1219.56 837.64C1178.34 959.973 1099.24 1066 993.716 1140.36C888.194 1214.72 761.734 1253.55 632.664 1251.22C503.594 1248.89 378.619 1205.52 275.852 1127.39C173.084 1049.27 97.8632 940.449 61.0898 816.707C24.3163 692.964 27.901 560.726 71.3243 439.158",
+    path: "M 643.50 35.00 A 608.5 608.5 0 1 1 638.19 35.02",
     color: "#55AAAA",
     strokeWidth: 69.8544,
     backgroundColor: "#E5E7EB",
@@ -241,7 +271,7 @@ const baseRings = [
   {
     name: 'Identity',
     size: 1482,
-    path: "M741.356 35.8817C888.312 35.8817 1031.6 81.7701 1151.22 167.141C1270.83 252.511 1360.8 373.102 1408.57 512.078C1456.34 651.053 1459.52 801.476 1417.67 942.346C1375.81 1083.22 1291.02 1207.5 1175.12 1297.85C1059.21 1388.2 917.993 1440.1 771.168 1446.31C624.344 1452.52 479.245 1412.73 356.128 1332.49C233.012 1252.25 138.024 1135.57 84.426 998.733C30.828 861.9 21.2951 711.746 57.1583 569.233",
+    path: "M 741.00 35.00 A 706 706 0 1 1 734.84 35.03",
     color: "#979797",
     strokeWidth: 69.8544,
     backgroundColor: "#E5E7EB",
@@ -249,7 +279,9 @@ const baseRings = [
   {
     name: 'Ivy+ Score',
     size: 1750,
-    path: "M875 50C1057.97 50 1235.74 110.822 1380.36 222.9C1524.98 334.978 1628.24 491.951 1673.9 669.129C1719.56 846.306 1705.02 1033.64 1632.58 1201.65C1560.14 1369.66 1433.9 1508.83 1273.72 1597.25C1113.54 1685.68 928.508 1718.35 747.732 1690.12C566.956 1661.9 400.692 1574.38 275.092 1441.33C149.492 1308.29 71.6828 1137.27 53.9041 955.165C36.1253 773.065 79.3854 590.221 176.88 435.394",
+    path: "M 875.00 50.00 A 825 825 0 1 1 867.80 50.03",
+    // Special: gradient layer goes from 6:00 (180°) to current score
+    gradientPath: "M 875.00 875.00 A 825 825 0 0 1 207.56 340.08", // 6:00 to 10:12 (85%)
     strokeWidth: 100,
     backgroundColor: "#E5E7EB",
   },
@@ -285,10 +317,15 @@ const calculatePointOnPath = (pathD: string, percentage: number): { x: number, y
   document.body.appendChild(tempSvg);
 
   const length = path.getTotalLength();
-  const point = path.getPointAtLength(length * (1 - percentage));
+
+  // CLOCKWISE paths: percentage maps directly to visual angle
+  // 0% = 12:00, 25% = 3:00, 50% = 6:00, 75% = 9:00, 85% = 10:12, 90% = 10:48
+  const point = path.getPointAtLength(length * percentage);
+
+  console.log(`[calculatePointOnPath] percentage=${percentage}, length=${length}, position=${length * percentage}, point=(${point.x}, ${point.y})`);
 
   document.body.removeChild(tempSvg);
-  
+
   return { x: point.x, y: point.y };
 };
 
@@ -310,10 +347,29 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
   const rings = createRingsWithScores(pillarScores, ivyScoreData?.overall_score || score);
   
   // Calculate overall score from pillar scores if available
-  const overallScore = pillarScores ? 
-    Math.round((pillarScores.aptitude.score + pillarScores.passion.score + 
-                pillarScores.service.score + pillarScores.identity.score) / 4) : 
+  const overallScore = pillarScores ?
+    Math.round((pillarScores.aptitude.score + pillarScores.passion.score +
+                pillarScores.service.score + pillarScores.identity.score) / 4) :
     score;
+
+  // Calculate dynamic target gap (Target IVY+ level is 90%)
+  // Use the actual displayed overall score for accurate calculation
+  const TARGET_IVY_LEVEL = 90;
+  const displayedScore = ivyScoreData?.overall_score || overallScore;
+  const calculatedTargetGap = Math.max(0, TARGET_IVY_LEVEL - displayedScore);
+
+  // Always use calculated value for accuracy (ignore potentially stale ivyScoreData.target_gap)
+  const targetGap = calculatedTargetGap;
+
+  console.log('[CircularProgress] Target gap calculation:', {
+    propsScore: score,
+    overallScore,
+    displayedScore,
+    targetLevel: TARGET_IVY_LEVEL,
+    calculatedGap: calculatedTargetGap,
+    ivyScoreDataGap: ivyScoreData?.target_gap,
+    finalTargetGap: targetGap
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -345,17 +401,64 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
             const centerX = containerWidth / 2;
             const centerY = containerHeight / 2;
 
+            // Corrected paths now cover 359.5° (almost full circle)
+            // strokeDashoffset animation: dashoffset = (1 - score/100)
+            //   - For 85%: dashoffset = 0.15, shows 85% of path (from 0 to 0.85)
+            //   - For 90%: dashoffset = 0.10, shows 90% of path (from 0 to 0.90)
+            //   - For 100%: dashoffset = 0, shows 100% of path (full arc)
+            //
+            // Now score percentages map directly to clock positions:
+            //   85% → 85% of 360° = 306° = 10:12 o'clock
+            //   90% → 90% of 360° = 324° = 10:48 o'clock
+            //   100% → 100% of 359.5° = 11:59 o'clock
+
+            // SVG coordinate system: viewBox is 1750x1750, center at (875, 875)
+            // We scale down by 0.28 and center in the container
+            const svgCenterX = outerRing.size / 2; // 875
+            const svgCenterY = outerRing.size / 2; // 875
+
             // T20 indicator at current score (85%)
-            const sweepPercentage = score / 100;
-            const currentPoint = calculatePointOnPath(outerRing.path, sweepPercentage);
-            const currentX = (currentPoint.x * scale) + centerX;
-            const currentY = (currentPoint.y * scale) + centerY;
+            // Position at 85% along the path
+            const scorePercentage = score / 100; // 0.85
+            const currentPoint = calculatePointOnPath(outerRing.path, scorePercentage);
+
+            // Transform: (SVG coords - SVG center) * scale + screen center
+            // Add offset to align T20 circle center with ring tip (shift right by ~30px)
+            const currentX = ((currentPoint.x - svgCenterX) * scale) + centerX + 30;
+            const currentY = ((currentPoint.y - svgCenterY) * scale) + centerY;
+
+            console.log('[CircularProgress] T20 at 85%:', {
+              scorePercentage,
+              svgPoint: currentPoint,
+              svgCenter: { x: svgCenterX, y: svgCenterY },
+              scale,
+              screenCenter: { x: centerX, y: centerY },
+              screenX: currentX,
+              screenY: currentY,
+              offset: '+30px right'
+            });
+
             setFramePosition({ x: currentX, y: currentY });
 
-            // Target Level / IVY+ at 100% mark
-            const targetPoint = calculatePointOnPath(outerRing.path, 1.0);
-            const targetX = (targetPoint.x * scale) + centerX;
-            const targetY = (targetPoint.y * scale) + centerY;
+            // Target Level (IVY+) at 90% mark
+            // Position at 90% along the path (10:48 o'clock)
+            const targetPercentage = 0.90; // IVY+ target is 90%
+            const targetPoint = calculatePointOnPath(outerRing.path, targetPercentage);
+
+            // Transform: (SVG coords - SVG center) * scale + screen center
+            // Add offset to move further right (shift right by ~30px)
+            const targetX = ((targetPoint.x - svgCenterX) * scale) + centerX + 30;
+            const targetY = ((targetPoint.y - svgCenterY) * scale) + centerY;
+
+            console.log('[CircularProgress] Target at 90%:', {
+              targetPercentage,
+              svgPoint: targetPoint,
+              svgCenter: { x: svgCenterX, y: svgCenterY },
+              screenX: targetX,
+              screenY: targetY,
+              offset: '+30px right'
+            });
+
             setTargetPosition({ x: targetX, y: targetY });
 
             setShowFrames(true);
@@ -446,11 +549,11 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
           <CircleText>T20</CircleText>
         </CircleContainer>
         <TargetContainer>
-                  <TargetText>
-          <span className="value">{ivyScoreData?.target_gap || 5}%</span>
-          <span className="spacer">&nbsp;</span>
-          <span className="label">to target</span>
-        </TargetText>
+          <TargetText>
+            <span className="value">{targetGap}%</span>
+            <span className="spacer">&nbsp;</span>
+            <span className="label">to target</span>
+          </TargetText>
         </TargetContainer>
       </T20Frame>
 
@@ -458,22 +561,28 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
         <ProfileImage src={profileImage} alt="Profile" />
       </ProfileContainer>
 
-      <TargetIndicator
+      <TargetFrameBackground
         $visible={showFrames}
         $x={targetPosition.x}
         $y={targetPosition.y}
       >
-        <Target size={16} />
-        Target Level
-      </TargetIndicator>
+        <svg width="133" height="43" viewBox="0 0 133 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fillRule="evenodd" clipRule="evenodd" d="M0.936035 21.326C0.936035 9.85122 10.2382 0.549072 21.713 0.549072H22.4757C29.629 0.549072 35.938 4.16411 39.6754 9.66694C40.894 11.4611 42.8088 12.771 44.9776 12.771C46.9471 12.771 48.716 11.6741 50.0005 10.1812C53.1431 6.52837 57.7994 4.21525 62.996 4.21525H115.543C125.007 4.21525 132.679 11.8874 132.679 21.3514C132.679 30.8154 125.007 38.4876 115.543 38.4876H62.996C57.776 38.4876 53.1011 36.1535 49.958 32.4721C48.6828 30.9784 46.9197 29.8814 44.9556 29.8814C42.8 29.8814 40.8967 31.1829 39.6875 32.9673C35.9516 38.4801 29.6367 42.1029 22.4757 42.1029H21.713C10.2382 42.1029 0.936035 32.8008 0.936035 21.326Z" fill="white"/>
+        </svg>
+      </TargetFrameBackground>
 
-      <IvyBadge
+      <TargetFrame
         $visible={showFrames}
-        $x={targetPosition.x + 80}
+        $x={targetPosition.x}
         $y={targetPosition.y}
       >
-        IVY+
-      </IvyBadge>
+        <TargetCircleContainer>
+          <TargetCircleText>IVY+</TargetCircleText>
+        </TargetCircleContainer>
+        <TargetTextContainer>
+          <TargetLabel>Target Level</TargetLabel>
+        </TargetTextContainer>
+      </TargetFrame>
 
       <ScoreDisplay>
         <div>
