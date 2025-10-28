@@ -1,9 +1,107 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v10.8
+**Document Version:** v10.8.1
 **Last Updated:** 2025-10-27
-**Current Version:** v10.8 - Complete Common App Alignment (All 10 Activities + Academic Profile)
-**Status:** ✅ PRODUCTION READY - COMPLETE COMMON APP DATA
+**Current Version:** v10.8.1 - Academic Profile UI Display Fix
+**Status:** ✅ PRODUCTION READY - VERIFIED END-TO-END
+
+---
+
+## v10.8.1 - Academic Profile Display Fix (2025-10-27)
+
+**Focus:** Fix API response structure to display Academic Profile in UI
+
+### Summary
+
+Critical fix for v10.8: Backend API was not returning `academic_vitals` at root level, causing UI component to not display the expandable Academic Profile section. Now fully functional with complete SAT breakdown, AP exams, and course details.
+
+### Problem Identified
+
+**Issue**: User reported Academic Profile section not displaying despite:
+- ✅ Database containing complete academic data (4 AP exams, SAT breakdown, courses)
+- ✅ UI component code written to display expandable section
+- ❌ API returning data nested in `vitals.academic` instead of root-level `academic_vitals`
+- ❌ UI component looking for `week.academic_vitals` (not found)
+
+**Root Cause**: Backend route `/students/:id/vitals/weeks` was mapping `row.academic_vitals` into nested `vitals.academic` structure for v1.0 compatibility, but not exposing it at root level for v3.0 schema.
+
+### Solution
+
+Updated backend API response to include both:
+1. **v3.0 Schema**: `academic_vitals` at root level (new)
+2. **v1.0 Compatibility**: `vitals.academic` nested (preserved)
+
+**File Modified**: `services/agent-framework/src/routes/v10.0.ts:128-135`
+
+```typescript
+// v3.0: academic_vitals at root level (new schema)
+academic_vitals: row.academic_vitals || null,
+// v1.0 backwards compatibility: nested vitals
+vitals: {
+  academic: row.academic_vitals || {},
+  extracurricular: row.ec_vitals || {},
+  growth: row.growth_vitals || {}
+}
+```
+
+### Verification
+
+**API Response (Week 89):**
+```json
+{
+  "weeks": [{
+    "week_number": 89,
+    "academic_vitals": {
+      "gpa_weighted": 3.93,
+      "sat": { "total": 1530, "ebrw": 750, "math": 780 },
+      "ap_exams": [
+        { "subject": "Human Geography", "score": 5 },
+        { "subject": "United States History", "score": 4 },
+        { "subject": "Calculus AB", "score": 4 },
+        { "subject": "English Language & Composition", "score": 4 }
+      ],
+      "current_courses": [/* 2 semesters, 7 courses */],
+      "total_ap_courses": 11
+    }
+  }]
+}
+```
+
+**UI Display (Expected):**
+- ✅ Academic Profile ▶ (collapsible header)
+- ✅ GPA: 3.93 / 4.0 (Unranked class of 582)
+- ✅ SAT: 1530 (EBRW: 750 | Math: 780, 2 attempts)
+- ✅ AP Exams (4): Human Geo (5, green), US History (4, orange), Calc AB (4), English Lang (4)
+- ✅ Current Courses: Fall (7 courses, 5 AP highlighted), Spring (6 courses, 4 AP)
+- ✅ Course Rigor: 11 AP/IB courses
+
+### Impact
+
+**Before v10.8.1:**
+- Academic section showed only "GPA (Weighted) 3.93"
+- No expandable section for AP exams, SAT breakdown, courses
+- Data existed in database but not accessible via API
+
+**After v10.8.1:**
+- Complete Academic Profile collapsible section displays
+- SAT breakdown with EBRW/Math split and attempt history
+- AP exams with color-coded scores (5=green, 4=orange)
+- Current courses by semester with rigor highlighting
+- Academic rigor summary (11 AP courses)
+
+### Files Modified
+
+1. `services/agent-framework/src/routes/v10.0.ts:128-135`
+   - Added `academic_vitals` at root level in API response
+   - Maintained backwards compatibility with nested `vitals.academic`
+
+### Backwards Compatibility
+
+✅ **Fully backwards compatible:**
+- v1.0 code using `week.vitals.academic` still works
+- v3.0 code using `week.academic_vitals` now works
+- No database schema changes required
+- No breaking changes to existing functionality
 
 ---
 

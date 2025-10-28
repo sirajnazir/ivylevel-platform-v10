@@ -125,6 +125,9 @@ export function v10Router(pool: Pool): Router {
           focus_areas: row.focus_areas || [],
           progress_status: row.progress_status,
           completion_percentage: parseFloat(row.completion_percentage),
+          // v3.0: academic_vitals at root level (new schema)
+          academic_vitals: row.academic_vitals || null,
+          // v1.0 backwards compatibility: nested vitals
           vitals: {
             academic: row.academic_vitals || {},
             extracurricular: row.ec_vitals || {},
