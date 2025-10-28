@@ -1,0 +1,499 @@
+{
+  "metadata": {
+    "extraction_date": "2025-10-28",
+    "source": "Huda's coaching session transcripts and intelligence documents",
+    "student": "Huda A.",
+    "coach": "Jenny (Stanford)"
+  },
+  "student_identity": {
+    "full_name": "Huda A.",
+    "ethnic_cultural_identity": "Muslim American Indian (immigrant background)",
+    "personality_traits": [
+      "Quiet",
+      "Collaborative",
+      "Strategic",
+      "Non-competitive \u2192 Ambitious (growth)"
+    ],
+    "family_background": "Immigrant family, parents supportive of Stanford REA",
+    "school_context": {
+      "type": "Non-competitive public high school",
+      "transcript_issues": "Sophomore year AP HUG grade correction (B\u2192A pending)"
+    },
+    "unique_narrative": "Digital storyteller who uses code as a medium for bringing stories to life, exists in the 'hyphens' between identities (Muslim-Indian, Indian-American, Film-CS)"
+  },
+  "academic_profile": {
+    "gpa_weighted": 4.3,
+    "gpa_weighted_projected": 4.46,
+    "gpa_unweighted": 4.0,
+    "ap_courses_total": 11,
+    "honors_courses": 5,
+    "ap_scores": [
+      {
+        "subject": "AP Human Geography",
+        "score": 5,
+        "year": "Sophomore"
+      }
+    ],
+    "sat_act": "Not mentioned in excerpts",
+    "class_rank": "Not explicitly stated",
+    "course_rigor": "Maximum rigor with 11 APs"
+  },
+  "extracurricular_activities": [
+    {
+      "activity_name": "Empowering AI",
+      "role": "Founder/President",
+      "years": "11, 12",
+      "hours_per_week": "Significant (primary activity)",
+      "weeks_per_year": 52,
+      "description": "Founded nonprofit focused on AI ethics education for young women coders. Raised $24K+, hosted hackathons, marketed to 44 international cities.",
+      "impact": "24K+ raised, 44 international cities reached",
+      "leadership": "Founder and primary leader",
+      "display_order": 1,
+      "category": "Technology/Service"
+    },
+    {
+      "activity_name": "Synthoria (AI Ethics Game)",
+      "role": "Solo Developer/Creator",
+      "years": "10, 11",
+      "hours_per_week": "High (multi-month project)",
+      "weeks_per_year": 40,
+      "description": "Developed educational game teaching AI ethics concepts to young female coders. Submitted for NCWIT Aspirations in Computing Award.",
+      "impact": "Educational tool for AI ethics",
+      "leadership": "Independent creator",
+      "display_order": 2,
+      "category": "Technology/Computer Science"
+    },
+    {
+      "activity_name": "Technology Influencer and Freelancer",
+      "role": "Content Creator/Freelance Developer",
+      "years": "10, 11, 12",
+      "hours_per_week": 8,
+      "weeks_per_year": 48,
+      "description": "Created tech content and educational materials. Achieved 1.8 million social media views. Freelance web development for clients.",
+      "impact": "1.8 million social media views",
+      "leadership": "Independent entrepreneur",
+      "display_order": 3,
+      "category": "Technology/Media"
+    },
+    {
+      "activity_name": "Folklift (Small Business Stories)",
+      "role": "Founder/Filmmaker",
+      "years": "11, 12",
+      "hours_per_week": 6,
+      "weeks_per_year": 48,
+      "description": "Documentary project filming and sharing stories of immigrant-owned small businesses. Created website with map interface, social media presence.",
+      "impact": "Community storytelling, cultural preservation",
+      "leadership": "Founder and content creator",
+      "display_order": 4,
+      "category": "Journalism/Service"
+    },
+    {
+      "activity_name": "ELD Tutor (English Language Development)",
+      "role": "Volunteer Tutor",
+      "years": "12",
+      "hours_per_week": 4,
+      "weeks_per_year": 36,
+      "description": "Tutored immigrants learning English, helping with language acquisition and cultural navigation. Full-circle as immigrant helping other immigrants.",
+      "impact": "Direct community service to immigrant students",
+      "leadership": "Volunteer educator",
+      "display_order": 5,
+      "category": "Service/Education"
+    },
+    {
+      "activity_name": "Sunday School Teacher",
+      "role": "Teacher",
+      "years": "10, 11, 12",
+      "hours_per_week": 2,
+      "weeks_per_year": 48,
+      "description": "Consistent 2-year commitment teaching at Sunday school, demonstrating religious community engagement.",
+      "impact": "Religious education and mentorship",
+      "leadership": "Teaching role",
+      "display_order": 6,
+      "category": "Service/Religious"
+    },
+    {
+      "activity_name": "Filmmaking/Documentary Production",
+      "role": "Filmmaker/Director",
+      "years": "9, 10, 11, 12",
+      "hours_per_week": 5,
+      "weeks_per_year": 48,
+      "description": "Created documentary films and videos, including VFX work. Combines technical skills with storytelling passion.",
+      "impact": "Multiple completed film projects",
+      "leadership": "Independent creator",
+      "display_order": 7,
+      "category": "Arts/Media"
+    }
+  ],
+  "awards_and_honors": [
+    {
+      "award_name": "NCWIT Aspirations in Computing Award",
+      "level": "National/State",
+      "year": "Applied/Target (11th or 12th grade)",
+      "description": "Target award for AI ethics game and CS achievements. Coach Jenny won this twice (National Honorable Mention and State Winner)."
+    },
+    {
+      "award_name": "Bank of America Essay Competition",
+      "level": "National",
+      "year": "11th grade",
+      "description": "Mentioned in session transcripts as target award"
+    },
+    {
+      "award_name": "AP Scholar (5 on AP HUG)",
+      "level": "School/Regional",
+      "year": "10th grade",
+      "description": "Scored 5 on AP Human Geography exam"
+    }
+  ],
+  "summer_programs": [
+    {
+      "program_name": "Self-Directed Project Work",
+      "year": "Summer after 10th grade",
+      "duration": "Full summer",
+      "description": "Declined Launch X entrepreneurship program. Instead used time to build personal projects (Empowering AI, Synthoria, Folklift)",
+      "outcome": "Saved 4 weeks, built stronger independent projects"
+    },
+    {
+      "program_name": "J-Camp",
+      "year": "11th grade summer",
+      "duration": "Multi-week program",
+      "description": "Journalism camp for student journalists",
+      "outcome": "Enhanced journalism and storytelling skills"
+    },
+    {
+      "program_name": "Disney Dreamers Academy",
+      "year": "11th or 12th grade",
+      "duration": "Weekend/short program",
+      "description": "Leadership and career development program for high-achieving students",
+      "outcome": "Leadership development, supplemental essay material (600 characters)"
+    }
+  ],
+  "target_profile_three_pillars": {
+    "profile_archetype": "The Digital Storyteller / Tech for Social Good",
+    "aptitude": {
+      "score": "High (8-9/10)",
+      "evidence": [
+        "11 AP courses",
+        "4.3 weighted GPA",
+        "Solo game developer",
+        "Self-taught web development",
+        "Technical content creation"
+      ]
+    },
+    "passion": {
+      "score": "Exceptional (9-10/10)",
+      "evidence": [
+        "Film + CS intersection",
+        "AI ethics focus",
+        "Documentary filmmaking",
+        "1.8M social media views",
+        "Multiple self-initiated projects",
+        "Folklift cultural preservation"
+      ]
+    },
+    "service": {
+      "score": "Growing (initially weak \u2192 strong by senior year)",
+      "evidence": [
+        "Empowering AI nonprofit ($24K raised)",
+        "ELD tutoring",
+        "Sunday school teaching",
+        "Small business storytelling",
+        "Community service gap identified and filled"
+      ]
+    },
+    "strategic_narrative": "Muslim-Indian-American digital storyteller who exists in the 'hyphens' between identities. Uses code and film to bring stories to life, with focus on AI ethics education and cultural preservation. Transformed from non-competitive to ambitious through coaching."
+  },
+  "game_plan_phases": [
+    {
+      "phase_number": 1,
+      "phase_name": "FOUNDATION",
+      "weeks": "001-025",
+      "goals": [
+        "Complete diagnostic assessment",
+        "Identify passion intersection (Film + CS)",
+        "Launch initial projects (Small Business Stories, AI Ethics Game)",
+        "Fill community service gap",
+        "Develop 168-hour time framework"
+      ],
+      "key_milestones": [
+        "Week 1: Game plan creation",
+        "Week 2-3: 168-hour framework implementation",
+        "Week 4-5: Naviance school data analysis",
+        "Week 8: Summer program strategy (NCWIT application)",
+        "Week 9-11: Project management foundations"
+      ]
+    },
+    {
+      "phase_number": 2,
+      "phase_name": "BUILDING",
+      "weeks": "026-046",
+      "goals": [
+        "Scale existing projects",
+        "Win target awards (NCWIT, Bank of America)",
+        "Develop leadership positions",
+        "Strategic college and major selection",
+        "CMU essays and Notre Dame Leadership Seminar application"
+      ],
+      "key_milestones": [
+        "Week 26: Post-NCWIT celebration and senior year strategy",
+        "Week 27: Notre Dame Leadership Seminar application",
+        "Week 34: CMU essays finalization",
+        "Week 36: Teacher recommendation crisis management",
+        "Week 39: Post-KWK celebration and Common App planning"
+      ]
+    },
+    {
+      "phase_number": 3,
+      "phase_name": "JUNIOR",
+      "weeks": "047-064",
+      "goals": [
+        "Formal college app kickoff",
+        "Summer architecture planning",
+        "Essay development (Common App draft)",
+        "Recommendation letter strategy",
+        "10-spot strategy development"
+      ],
+      "key_milestones": [
+        "Week 47: College app formal kickoff and major selection",
+        "Week 48: Scaling impact through marketing and team management",
+        "Week 51: Recommendation letter strategy",
+        "Week 52: App timeline architecture and freelance development",
+        "Week 59: Common App essay revolution ('Gaming Guilt' draft)",
+        "Week 63: Teacher recommender forms and advanced essay drafts"
+      ]
+    },
+    {
+      "phase_number": 4,
+      "phase_name": "SUMMER (Pre-Senior)",
+      "weeks": "065-072",
+      "goals": [
+        "Complete Common App personal statement",
+        "Finalize activities list",
+        "UC essays",
+        "UNC essays",
+        "USC essays",
+        "Early Decision strategy pivot"
+      ],
+      "key_milestones": [
+        "Week 65: ED strategic pivot and Disney Dreams integration",
+        "Week 66: 'Peach Fuzz' essay breakthrough + Activities list (1.8M views discovered)",
+        "Week 73: Common App personal statement finalization",
+        "Week 74: Common App + UNC essays refinement"
+      ]
+    },
+    {
+      "phase_number": 5,
+      "phase_name": "SENIOR (Application Season)",
+      "weeks": "073-093+",
+      "goals": [
+        "Submit Stanford REA",
+        "USC EA for merit scholarship",
+        "Complete all supplements",
+        "CSS Profile and financial aid",
+        "Final polishes on Duke, MIT, UPenn, Northwestern"
+      ],
+      "key_milestones": [
+        "Week 77-78: USC supplemental essays mastery",
+        "Week 82: CSS Profile completion",
+        "Week 84: UC essays (glitter pens metaphor)",
+        "Week 89: MIT final polish and UPenn DMD strategy",
+        "Week 92: J-Camp thank you transformation and DMD graphic",
+        "Week 93: App sprint - Northwestern, Duke final edits"
+      ]
+    }
+  ],
+  "target_schools": {
+    "reaches": [
+      {
+        "name": "Stanford University",
+        "application_type": "REA (Restrictive Early Action)",
+        "reasoning": "Top choice, CS+Film programs, Dad's strong preference, AI ethics research",
+        "coach_confidence": "20%"
+      },
+      {
+        "name": "MIT",
+        "application_type": "Regular Decision",
+        "reasoning": "Top CS program, technical excellence",
+        "coach_confidence": "15-20%"
+      },
+      {
+        "name": "UC Berkeley",
+        "application_type": "UC Application",
+        "reasoning": "Top public, CS strength, California",
+        "coach_confidence": "25%"
+      },
+      {
+        "name": "Northwestern University",
+        "application_type": "Regular Decision (considered ED but declined)",
+        "reasoning": "Film + CS programs, but different state was concern",
+        "coach_confidence": "Not stated"
+      }
+    ],
+    "targets": [
+      {
+        "name": "USC (University of Southern California)",
+        "application_type": "EA (Early Action)",
+        "reasoning": "Merit scholarship advantage, strong film+CS programs",
+        "coach_confidence": "50-60%"
+      },
+      {
+        "name": "UC Irvine",
+        "application_type": "UC Application",
+        "reasoning": "Strong CS program, target match",
+        "coach_confidence": "40%"
+      }
+    ],
+    "safeties": [
+      {
+        "name": "To be determined",
+        "application_type": "Various",
+        "reasoning": "Additional UCs and other schools",
+        "coach_confidence": "High"
+      }
+    ],
+    "early_decision_strategy": "Stanford REA confirmed (not binding). Declined Northwestern ED due to binding nature and out-of-state concerns. USC EA for merit scholarship."
+  },
+  "standout_strengths": [
+    "Technical Skills: Self-taught developer, game creator, web developer, VFX artist",
+    "Impact at Scale: 1.8 million social media views, $24K raised, 44 international cities",
+    "Unique Narrative: Muslim-Indian-American 'hyphen' identity, film+CS intersection",
+    "Entrepreneurial: Founded nonprofit, freelance business, multiple self-initiated projects",
+    "Storytelling: Documentary filmmaker, cultural preservation, digital narratives",
+    "AI Ethics Focus: Timely and unique angle on CS, educational game development",
+    "Growth Trajectory: Transformed from non-competitive to ambitious, GPA 4.25\u21924.46",
+    "Authenticity: Immigrant helping immigrants (ELD), cultural preservation (Folklift)"
+  ],
+  "weak_spots_and_focus_areas": [
+    {
+      "gap": "Community Service",
+      "initial_status": "Missing component",
+      "solution": "Added Empowering AI nonprofit, ELD tutoring, Sunday school teaching",
+      "current_status": "Addressed by senior year",
+      "priority": "Critical - was major gap identified in Week 1"
+    },
+    {
+      "gap": "Time Management",
+      "initial_status": "4 hours homework daily, only 2 hours for meaningful activities",
+      "solution": "168-hour framework, reduce homework time, maximize impact activities",
+      "current_status": "Improved through coaching",
+      "priority": "High - efficiency critical"
+    },
+    {
+      "gap": "Competitive Mindset",
+      "initial_status": "Non-competitive personality in competitive admissions",
+      "solution": "Coaching transformed mindset, developed ambition",
+      "current_status": "Student self-reports becoming 'more competitive'",
+      "priority": "Medium - cultural/personality shift"
+    },
+    {
+      "gap": "Transcript Error",
+      "initial_status": "Sophomore year AP HUG grade showing B instead of A",
+      "solution": "Working with school to correct",
+      "current_status": "Pending correction (GPA 4.25\u21924.46 after fix)",
+      "priority": "High - impacts GPA significantly"
+    },
+    {
+      "gap": "Quantifiable Metrics",
+      "initial_status": "Folklift lacked solid numbers",
+      "solution": "Discovered 1.8M social media views, emphasized quantifiable impact",
+      "current_status": "Resolved - strong numbers identified",
+      "priority": "Medium - needed for activities list"
+    }
+  ],
+  "potential_spikes": [
+    {
+      "spike_area": "AI Ethics Education",
+      "evidence": [
+        "Empowering AI nonprofit",
+        "Synthoria game",
+        "Target major: CS with AI ethics focus"
+      ],
+      "differentiation": "Young women in CS + AI ethics education angle",
+      "strength": "Very Strong - timely, unique, demonstrated impact"
+    },
+    {
+      "spike_area": "Digital Storytelling (Film + CS)",
+      "evidence": [
+        "Folklift documentary project",
+        "VFX work",
+        "Game development",
+        "Film major consideration"
+      ],
+      "differentiation": "Code as medium for storytelling, cultural preservation",
+      "strength": "Strong - authentic passion, multiple projects"
+    },
+    {
+      "spike_area": "Tech Entrepreneurship",
+      "evidence": [
+        "Founded nonprofit",
+        "Freelance web development",
+        "1.8M social media reach",
+        "Independent projects"
+      ],
+      "differentiation": "Young woman tech entrepreneur with social impact focus",
+      "strength": "Strong - demonstrated business and technical skills"
+    },
+    {
+      "spike_area": "Cultural Bridge-Building",
+      "evidence": [
+        "Immigrant identity",
+        "ELD tutoring",
+        "Folklift small business stories",
+        "Muslim-Indian-American perspective"
+      ],
+      "differentiation": "'Hyphen' identity framework, immigrant helping immigrants",
+      "strength": "Medium-Strong - authentic but needs more development"
+    }
+  ],
+  "essay_themes": {
+    "common_app": {
+      "final_topic": "Peach Fuzz - embracing unchangeable identity",
+      "metaphor": "Peach fuzz as symbol for Muslim-Indian-American identity that can't be erased",
+      "framework": "Hyphen identity - existing in connections between labels",
+      "word_count": 723,
+      "breakthrough_moment": "Week 66 - shifted from code format to peach fuzz metaphor"
+    },
+    "supplements": {
+      "stanford": "Wordle-related essay (to avoid Common App repetition)",
+      "uc_essays": "Academic achievements focus",
+      "disney_dreamers": "600 characters about transformation experience"
+    }
+  },
+  "coaching_intelligence": {
+    "coach_name": "Jenny (Stanford student, Symbolic Systems major)",
+    "coaching_start": "June 21, 2023 (Week 1, end of sophomore year)",
+    "total_weeks_tracked": "93+ weeks",
+    "key_methodologies": [
+      "168-hour time framework",
+      "Strategic project development",
+      "Award intelligence (NCWIT, Bank of America, etc.)",
+      "School-specific intel (Stanford REA strategy)",
+      "Narrative synthesis (Film+CS \u2192 Digital Storyteller)",
+      "Gap identification and filling",
+      "Real-time pivots (Launch X redirect)"
+    ],
+    "impact_metrics": {
+      "gpa_improvement": "4.25 \u2192 4.46",
+      "projects_launched": "5+ (Empowering AI, Synthoria, Folklift, freelance, content)",
+      "funding_raised": "$24K+",
+      "social_reach": "1.8M views",
+      "mindset_shift": "Non-competitive \u2192 Ambitious",
+      "awards_targeted": "NCWIT, Bank of America, Disney Dreamers"
+    }
+  },
+  "data_quality_notes": {
+    "completeness": "High - extracted from 93+ weeks of coaching sessions",
+    "accuracy": "Based on direct transcript intelligence extractions",
+    "gaps": [
+      "Exact SAT/ACT scores not mentioned in excerpts",
+      "Full list of AP courses not detailed",
+      "Some award results not confirmed (applications vs. wins)",
+      "Safety schools list incomplete"
+    ],
+    "validation_needed": [
+      "Verify NCWIT award result",
+      "Confirm Disney Dreamers participation details",
+      "Validate final GPA after transcript correction",
+      "Confirm Stanford REA decision outcome"
+    ]
+  }
+}
