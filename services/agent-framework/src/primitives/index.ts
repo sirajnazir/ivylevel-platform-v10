@@ -18,3 +18,9 @@ export * from './implementations';
 
 // Memory Store (Pinecone)
 export * from './PineconeMemoryStore';
+
+// Assessment Planner
+export * from './AssessmentPlanner';
+
+// ToneAdapter Tool
+export * from './ToneAdapterTool';
