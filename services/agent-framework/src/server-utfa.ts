@@ -27,6 +27,8 @@ import { createSnapshotRoutes } from './routes/snapshots.js';
 import { routePrompt } from './router/intentRouter.js';
 import { v32Router } from './routes/v3.2.js';
 import { v10Router } from './routes/v10.0.js';
+import { v12Router } from './routes/v12.0.js';
+import { v152Router } from './routes/v15.2.js';
 import { assertIndexParity } from './retrieval/pinecone.js';
 import { CFG } from './config/env.js';
 import authRouter from './routes/auth.js';
@@ -65,6 +67,12 @@ app.use('/', v32Router(pool));
 
 // Mount v10.0 routes (6 UI/UX Gaps: Vitals, Tasks, Timeline, Applications, Session Prep, Projects)
 app.use('/', v10Router(pool));
+
+// Mount v12.0 routes (Game Plan / Precision Roadmap)
+app.use('/', v12Router(pool));
+
+// Mount v15.2 routes (LangChain LCEL Orchestration + Framework Integration)
+app.use('/api/v15.2', v152Router);
 
 // Mount auth routes
 app.use('/api/auth', authRouter);
