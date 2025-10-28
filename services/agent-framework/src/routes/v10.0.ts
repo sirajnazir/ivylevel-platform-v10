@@ -1724,6 +1724,128 @@ export function v10Router(pool: Pool): Router {
     }
   });
 
+  // ============================================================================
+  // GAP 7: GROWTH TRANSFORMATIONS TIMELINE API (v13.1)
+  // ============================================================================
+
+  /**
+   * GET /students/:id/timeline
+   * Get unified timeline of growth transformations
+   * Includes: applications, growth events, phase transitions, academic milestones
+   *
+   * Query params:
+   * - start_date: Filter events from this date (YYYY-MM-DD)
+   * - end_date: Filter events to this date (YYYY-MM-DD)
+   * - event_types: Comma-separated list (e.g., "application,growth_event")
+   * - limit: Max events to return (default: 100)
+   */
+  router.get('/students/:id/timeline', async (req: Request, res: Response) => {
+    try {
+      const studentId = req.params.id;
+      const { start_date, end_date, event_types, limit = '100' } = req.query;
+
+      // Build dynamic query
+      let query = `
+        SELECT
+          id,
+          student_id,
+          event_type,
+          subtype,
+          title,
+          event_date,
+          description,
+          impact,
+          metadata,
+          source_table,
+          source_id,
+          created_at
+        FROM timeline_events
+        WHERE student_id = $1
+      `;
+
+      const params: any[] = [studentId];
+      let paramIndex = 2;
+
+      // Add date filters
+      if (start_date) {
+        query += ` AND event_date >= $${paramIndex}`;
+        params.push(start_date);
+        paramIndex++;
+      }
+
+      if (end_date) {
+        query += ` AND event_date <= $${paramIndex}`;
+        params.push(end_date);
+        paramIndex++;
+      }
+
+      // Add event type filter
+      if (event_types && typeof event_types === 'string') {
+        const typesArray = event_types.split(',').map(t => t.trim());
+        query += ` AND event_type = ANY($${paramIndex})`;
+        params.push(typesArray);
+        paramIndex++;
+      }
+
+      query += ` ORDER BY event_date DESC, created_at DESC LIMIT $${paramIndex}`;
+      params.push(parseInt(limit as string, 10));
+
+      const result = await pool.query(query, params);
+
+      // Get stats
+      const statsQuery = `
+        SELECT
+          event_type,
+          COUNT(*) as count,
+          MIN(event_date) as earliest,
+          MAX(event_date) as latest
+        FROM timeline_events
+        WHERE student_id = $1
+        GROUP BY event_type
+      `;
+      const statsResult = await pool.query(statsQuery, [studentId]);
+
+      // Calculate total and by-type stats
+      const statsByType: Record<string, number> = {};
+      let totalEvents = 0;
+      let earliestDate: string | null = null;
+      let latestDate: string | null = null;
+
+      statsResult.rows.forEach(row => {
+        statsByType[row.event_type] = parseInt(row.count, 10);
+        totalEvents += parseInt(row.count, 10);
+
+        if (!earliestDate || row.earliest < earliestDate) {
+          earliestDate = row.earliest;
+        }
+        if (!latestDate || row.latest > latestDate) {
+          latestDate = row.latest;
+        }
+      });
+
+      res.json({
+        success: true,
+        data: {
+          timeline: result.rows,
+          stats: {
+            total_events: totalEvents,
+            by_type: statsByType,
+            date_range: {
+              earliest: earliestDate,
+              latest: latestDate
+            }
+          }
+        }
+      });
+    } catch (error: any) {
+      console.error('[v13.1] Error fetching timeline:', error);
+      res.status(500).json({
+        error: 'Failed to fetch timeline',
+        message: error.message
+      });
+    }
+  });
+
   return router;
 }
 

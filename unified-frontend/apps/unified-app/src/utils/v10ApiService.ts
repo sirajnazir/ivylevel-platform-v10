@@ -1036,6 +1036,34 @@ class V10ApiService {
     }
     return response.json();
   }
+
+  /**
+   * Get Growth Transformations timeline
+   * Unified timeline combining applications, growth events, phase transitions, etc.
+   * v13.1 endpoint
+   */
+  async getGrowthTransformations(
+    studentId: string,
+    params?: {
+      start_date?: string;
+      end_date?: string;
+      event_types?: string;
+      limit?: number;
+    }
+  ): Promise<GrowthTransformationsResponse> {
+    const queryParams = new URLSearchParams();
+    if (params?.start_date) queryParams.append('start_date', params.start_date);
+    if (params?.end_date) queryParams.append('end_date', params.end_date);
+    if (params?.event_types) queryParams.append('event_types', params.event_types);
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+    const url = `${this.baseUrl}/students/${studentId}/timeline${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch growth transformations: ${response.statusText}`);
+    }
+    return response.json();
+  }
 }
 
 // ============================================================================
@@ -1144,6 +1172,39 @@ export interface AssessmentData {
   familyContext: any;
   uniqueStory: string;
   potentialSpikes: string[];
+}
+
+// v13.1 Growth Transformations Timeline Types
+export interface GrowthTransformationEvent {
+  id: string;
+  student_id: string;
+  event_type: 'growth_event' | 'phase_transition' | 'academic' | 'application' | 'project' | 'award' | 'program';
+  subtype?: string;
+  title: string;
+  event_date: string;
+  description: string;
+  impact?: 'minor' | 'moderate' | 'major';
+  metadata: Record<string, any>;
+  source_table?: string;
+  source_id?: string;
+  created_at: string;
+}
+
+export interface TimelineStats {
+  total_events: number;
+  by_type: Record<string, number>;
+  date_range: {
+    earliest: string | null;
+    latest: string | null;
+  };
+}
+
+export interface GrowthTransformationsResponse {
+  success: boolean;
+  data: {
+    timeline: GrowthTransformationEvent[];
+    stats: TimelineStats;
+  };
 }
 
 // Export singleton instance
