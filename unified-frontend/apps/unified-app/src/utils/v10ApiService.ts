@@ -347,6 +347,131 @@ export interface AcademicVitals {
   ap_count?: number; // Maps to ap_exams.length
 }
 
+// v10.9: Weekly Action Plan & Tasks Types
+export interface Outcome {
+  outcome_id: string;
+  outcome_domain: string;
+  outcome_type: string;
+  outcome_scope: string;
+  title: string;
+  description: string;
+  purpose?: string;
+  target_metric?: any;
+  current_metric?: any;
+  priority_level: 'P0' | 'P1' | 'P2' | 'P3';
+  urgency_score: number;
+  impact_score: number;
+  completion_state: 'not_started' | 'in_progress' | 'completed' | 'blocked' | 'deferred' | 'cancelled';
+  completion_percentage: number;
+  child_execution_items: string[];
+  created_at: string;
+  completed_date?: string;
+}
+
+export interface ExecutionItem {
+  execution_item_id: string;
+  parent_outcome_id: string;
+  title: string;
+  description: string;
+  call_to_action: string;
+  why: string;
+  what: string;
+  how: string;
+  when: string;
+  who: string;
+  execution_domain: string;
+  execution_type: string;
+  priority_level: 'P0' | 'P1' | 'P2' | 'P3';
+  urgency_score: number;
+  impact_score: number;
+  estimated_duration_minutes: number;
+  is_recurring: boolean;
+  completion_state: 'not_started' | 'in_progress' | 'completed' | 'blocked' | 'deferred' | 'cancelled';
+  progress_percentage: number;
+  child_tasks: string[];
+  created_at: string;
+}
+
+export interface TaskItem {
+  task_id: string;
+  parent_execution_item_id: string;
+  task_title: string;
+  task_description: string;
+  call_to_action: string;
+  completion_state: 'not_started' | 'in_progress' | 'completed' | 'blocked' | 'deferred' | 'cancelled';
+  priority_level: 'P0' | 'P1' | 'P2' | 'P3';
+  estimated_duration_minutes: number;
+  actual_duration_minutes?: number;
+  deadline?: string;
+  completed_date?: string;
+  completion_proof?: any;
+  verification_evidence?: any[];
+  created_at: string;
+}
+
+export interface TimeAllocation {
+  total_hours_in_period: number;
+  fixed_commitments: Array<{
+    block_type: string;
+    hours_per_week: number;
+  }>;
+  total_fixed_hours: number;
+  available_hours: number;
+  outcome_allocations: Array<{
+    outcome_id: string;
+    allocated_hours: number;
+    buffer_hours: number;
+  }>;
+}
+
+export interface ProgressTracking {
+  week_number: number;
+  tracking_period_start: string;
+  tracking_period_end: string;
+  completion_metrics: {
+    total_outcomes: number;
+    completed_outcomes: number;
+    outcome_completion_rate: number;
+    total_execution_items: number;
+    completed_execution_items: number;
+    execution_item_completion_rate: number;
+    total_tasks: number;
+    completed_tasks: number;
+    task_completion_rate: number;
+    overall_completion_percentage: number;
+  };
+}
+
+export interface WeeklyActionPlan {
+  plan_id: string;
+  student_id: string;
+  week_number: number;
+  academic_year: string;
+  plan_version: number;
+  week_start_date: string;
+  week_end_date: string;
+  created_at: string;
+  last_updated_at: string;
+
+  outcomes: Outcome[];
+  execution_items: ExecutionItem[];
+  tasks: TaskItem[];
+
+  resource_allocation: {
+    week_number: number;
+    time_allocation: TimeAllocation;
+    tools_required: any[];
+    people_dependencies: any[];
+    other_resources: any[];
+  };
+
+  critical_dates: any[];
+  progress_tracking: ProgressTracking;
+  context: any;
+  custom_fields?: any;
+  framework_applications?: any[];
+}
+
 export interface WeeklyVitals {
   week_number: number;
   week_start: string;
@@ -389,6 +514,9 @@ export interface WeeklyVitals {
   program_details?: ProgramDetail[];
   session_summary?: string;
   session_topics?: string[];
+
+  // v10.9: Action plan link
+  action_plan?: WeeklyActionPlan;
 }
 
 // ============================================================================
@@ -630,6 +758,129 @@ class V10ApiService {
     const url = `${this.baseUrl}/students/${studentId}/essays?${queryParams}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Failed to fetch essays: ${response.statusText}`);
+    return response.json();
+  }
+
+  // --------------------------------------------------------------------------
+  // WEEKLY ACTION PLAN API (v10.9)
+  // --------------------------------------------------------------------------
+
+  async getActionPlan(
+    studentId: string,
+    weekNumber: number
+  ): Promise<{ action_plan: WeeklyActionPlan | null; linked_vitals: any }> {
+    const url = `${this.baseUrl}/students/${studentId}/weeks/${weekNumber}/action-plan`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch action plan: ${response.statusText}`);
+    const data = await response.json();
+    return data.data;
+  }
+
+  async updateActionPlan(
+    studentId: string,
+    weekNumber: number,
+    actionPlan: WeeklyActionPlan
+  ): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/students/${studentId}/weeks/${weekNumber}/action-plan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(actionPlan),
+    });
+    if (!response.ok) throw new Error(`Failed to update action plan: ${response.statusText}`);
+    return response.json();
+  }
+
+  async addOutcome(
+    studentId: string,
+    weekNumber: number,
+    outcome: Partial<Outcome>
+  ): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/students/${studentId}/weeks/${weekNumber}/outcomes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(outcome),
+    });
+    if (!response.ok) throw new Error(`Failed to add outcome: ${response.statusText}`);
+    return response.json();
+  }
+
+  async updateOutcome(
+    studentId: string,
+    weekNumber: number,
+    outcomeId: string,
+    updates: Partial<Outcome>
+  ): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/students/${studentId}/weeks/${weekNumber}/outcomes/${outcomeId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) throw new Error(`Failed to update outcome: ${response.statusText}`);
+    return response.json();
+  }
+
+  async addExecutionItem(
+    studentId: string,
+    weekNumber: number,
+    executionItem: Partial<ExecutionItem>
+  ): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/students/${studentId}/weeks/${weekNumber}/execution-items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(executionItem),
+    });
+    if (!response.ok) throw new Error(`Failed to add execution item: ${response.statusText}`);
+    return response.json();
+  }
+
+  async addTask(
+    studentId: string,
+    weekNumber: number,
+    task: Partial<TaskItem>
+  ): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/students/${studentId}/weeks/${weekNumber}/tasks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(task),
+    });
+    if (!response.ok) throw new Error(`Failed to add task: ${response.statusText}`);
+    return response.json();
+  }
+
+  async completeTask(
+    studentId: string,
+    weekNumber: number,
+    taskId: string,
+    completionData: {
+      completion_proof?: any;
+      proof_artifacts?: any[];
+      completion_notes?: string;
+      actual_duration_minutes?: number;
+    }
+  ): Promise<{ message: string }> {
+    const response = await fetch(`${this.baseUrl}/students/${studentId}/weeks/${weekNumber}/tasks/${taskId}/complete`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(completionData),
+    });
+    if (!response.ok) throw new Error(`Failed to complete task: ${response.statusText}`);
+    return response.json();
+  }
+
+  async getActionPlansSummary(
+    studentId: string,
+    params?: {
+      start_week?: number;
+      end_week?: number;
+    }
+  ): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.start_week) queryParams.append('start_week', params.start_week.toString());
+    if (params?.end_week) queryParams.append('end_week', params.end_week.toString());
+
+    const url = `${this.baseUrl}/students/${studentId}/action-plans/summary?${queryParams}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch action plans summary: ${response.statusText}`);
     return response.json();
   }
 }

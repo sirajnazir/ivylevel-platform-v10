@@ -1,11 +1,11 @@
 # IvyLevel Platform - Production Database Architecture
-# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 Complete Common App Schema
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 Enhanced Preparation Tab
 
-**Document Version:** v10.8.2
-**Last Updated:** 2025-10-27
-**Status:** ✅ PRODUCTION READY - Complete Common App Data with Universal Schema
+**Document Version:** v11.0
+**Last Updated:** 2025-10-28
+**Status:** ✅ PRODUCTION READY - Complete Common App Data + Weekly Action Plans
 **Database:** PostgreSQL 14+
-**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.8 Universal Academic Schema
+**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.8 Universal Academic Schema + v11.0 Action Plans
 
 ---
 
@@ -21,11 +21,12 @@ This is the **single source of truth** for IvyLevel's production database schema
 6. **v10.0-10.7** - Weekly Vitals UI/UX with 6 core gaps implementation
 7. **v10.8** - Complete Common App alignment with universal academic schema
 8. **v10.8.1-10.8.2** - API and UI fixes for complete data display
-9. **Current Tables & Views** - What actually exists in production
-10. **Sample Data** - Real Jenny-Huda data with complete Common App submission
-11. **Verified Data Integrity** - Comprehensive testing validates all queries
+9. **v11.0** - Weekly Action Plans & Tasks with first principles DB design
+10. **Current Tables & Views** - What actually exists in production
+11. **Sample Data** - Real Jenny-Huda data with complete Common App submission
+12. **Verified Data Integrity** - Comprehensive testing validates all queries
 
-**Key Principle:** All data references use REAL student data from Huda's actual UNC Chapel Hill Early Action submission (student_id: 'huda-2025'). Universal schema design enables support for any student type (STEM, Arts, Athletics, IB) while maintaining complete accuracy with final college applications.
+**Key Principle:** All data references use REAL student data from Huda's actual UNC Chapel Hill Early Action submission (student_id: 'huda-2025'). Universal schema design enables support for any student type (STEM, Arts, Athletics, IB) while maintaining complete accuracy with final college applications. v11.0 adds comprehensive weekly action plans based on 2 years of Jenny-Huda coaching intelligence (88 weeks, 1,151 execution items).
 
 ---
 
@@ -2468,7 +2469,10 @@ CREATE TABLE weekly_vitals (
   ec_details jsonb, -- Array of extracurricular activities
   award_details jsonb, -- Array of awards and honors
   program_details jsonb, -- Array of programs with selectivity
-  
+
+  -- v11.0: Weekly Action Plans & Tasks
+  action_plan jsonb, -- Complete action plan with outcomes, execution items, tasks
+
   -- v10.5: Other vitals
   ec_vitals jsonb,
   growth_vitals jsonb,
@@ -2477,12 +2481,22 @@ CREATE TABLE weekly_vitals (
   completion_percentage numeric,
   session_summary text,
   session_topics jsonb,
-  
+
+  -- Legacy columns (use action_plan instead)
+  action_items jsonb, -- [LEGACY - Use action_plan instead]
+  deadlines jsonb,    -- [LEGACY - Use action_plan instead]
+
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
-  
+
   UNIQUE(student_id, week_number)
 );
+
+-- v11.0 Indexes for action_plan JSONB queries
+CREATE INDEX idx_weekly_vitals_action_plan ON weekly_vitals USING GIN (action_plan);
+CREATE INDEX idx_action_plan_outcomes ON weekly_vitals USING GIN ((action_plan->'outcomes'));
+CREATE INDEX idx_action_plan_execution_items ON weekly_vitals USING GIN ((action_plan->'execution_items'));
+CREATE INDEX idx_action_plan_tasks ON weekly_vitals USING GIN ((action_plan->'tasks'));
 ```
 
 ### academic_vitals JSONB Schema
@@ -2753,6 +2767,202 @@ CREATE TABLE weekly_vitals (
   }
 ]
 ```
+
+### action_plan JSONB Schema (v11.0)
+
+**Structure:** Complete weekly action plan with three-layer hierarchy
+
+**Design Principles:**
+1. **Hierarchical Structure:** Outcomes (strategic) → Execution Items (tactical) → Tasks (operational)
+2. **Five W's Framework:** Every execution item answers Why/What/How/When/Who
+3. **168-Hour Time Allocation:** Jenny's foundational time management framework
+4. **Priority System:** P0 (critical) → P1 (high) → P2 (medium) → P3 (low)
+5. **Completion Tracking:** not_started, in_progress, completed, blocked, deferred, cancelled
+
+**Real Data Example (Week 1):**
+```json
+{
+  "plan_id": "plan_1730136420123_abc123",
+  "student_id": "huda-2025",
+  "week_number": 1,
+  "academic_year": "2023-2024",
+  "plan_version": 2,
+  "week_start_date": "2023-06-21",
+  "week_end_date": "2023-06-27",
+  "created_at": "2025-10-28T12:00:00Z",
+  "last_updated_at": "2025-10-28T12:00:00Z",
+
+  "outcomes": [],
+
+  "execution_items": [
+    {
+      "execution_item_id": "exec_1730136420124_def456",
+      "parent_outcome_id": null,
+      "title": "Send Jenny complete course schedule",
+      "description": "Share full junior year course schedule with Jenny for planning",
+      "call_to_action": "Email course schedule to Jenny",
+      "why": "Jenny needs to understand academic commitments for time allocation",
+      "what": "List of all junior year classes with times",
+      "how": "Email or share via Google Doc",
+      "when": "This week",
+      "who": "student",
+      "execution_domain": "academic",
+      "execution_type": "communication",
+      "priority_level": "P0",
+      "urgency_score": 9,
+      "impact_score": 8,
+      "estimated_duration_minutes": 15,
+      "is_recurring": false,
+      "completion_state": "not_started",
+      "progress_percentage": 0,
+      "child_tasks": [],
+      "created_at": "2023-08-02T00:00:00Z"
+    },
+    {
+      "execution_item_id": "exec_1730136420125_ghi789",
+      "parent_outcome_id": null,
+      "title": "Explore Machine Learning Club / Women in AI Club",
+      "description": "Research and connect with ML/AI clubs to join",
+      "call_to_action": "Research clubs and reach out to organizers",
+      "why": "Build technical community and leadership opportunities",
+      "what": "Find club contacts, meeting times, and join",
+      "how": "Online research + email outreach",
+      "when": "This week",
+      "who": "student",
+      "execution_domain": "extracurricular",
+      "execution_type": "research_and_outreach",
+      "priority_level": "P1",
+      "urgency_score": 7,
+      "impact_score": 8,
+      "estimated_duration_minutes": 60,
+      "is_recurring": false,
+      "completion_state": "not_started",
+      "progress_percentage": 0,
+      "child_tasks": [],
+      "created_at": "2023-08-02T00:00:00Z"
+    }
+    // ... 8 more execution items for Week 1 (10 total)
+  ],
+
+  "tasks": [],
+
+  "resource_allocation": {
+    "week_number": 1,
+    "time_allocation": {
+      "total_hours_in_period": 168,
+      "total_fixed_hours": 119,
+      "available_hours": 49,
+      "fixed_commitments": [
+        {"block_type": "sleep", "hours_per_week": 56},
+        {"block_type": "school", "hours_per_week": 37.5},
+        {"block_type": "transportation", "hours_per_week": 4.5},
+        {"block_type": "meals_personal", "hours_per_week": 21}
+      ],
+      "flexible_blocks": [
+        {"category": "VFX Club", "hours_allocated": 2, "priority": "P2"},
+        {"category": "Women in AI Club", "hours_allocated": 3, "priority": "P1"},
+        {"category": "Game Development", "hours_allocated": 7, "priority": "P0"},
+        {"category": "Video Project", "hours_allocated": 7, "priority": "P1"},
+        {"category": "YouTube", "hours_allocated": 4, "priority": "P1"},
+        {"category": "Applications", "hours_allocated": 2, "priority": "P2"},
+        {"category": "SAT Prep", "hours_allocated": 5, "priority": "P0"}
+      ],
+      "buffers_flexibility": [
+        {"buffer_type": "unallocated", "hours": 19, "notes": "Flexibility for unexpected tasks"}
+      ]
+    },
+    "tools_required": [
+      {"tool_name": "Email", "purpose": "Communication with counselor, Jenny"},
+      {"tool_name": "Google Docs", "purpose": "Activity list documentation"},
+      {"tool_name": "Python/TensorFlow", "purpose": "Classification model"}
+    ],
+    "people_dependencies": [
+      {"person_role": "counselor", "dependency_type": "meeting_required"},
+      {"person_role": "Jenny", "dependency_type": "check_in"}
+    ],
+    "other_resources": []
+  },
+
+  "critical_dates": [
+    {
+      "date": "2023-08-14",
+      "event_type": "meeting",
+      "description": "Counselor meeting scheduled",
+      "importance": "high"
+    }
+  ],
+
+  "progress_tracking": {
+    "last_reviewed_date": "2025-10-28T12:00:00Z",
+    "completion_metrics": {
+      "total_outcomes": 0,
+      "completed_outcomes": 0,
+      "total_execution_items": 10,
+      "completed_execution_items": 0,
+      "total_tasks": 0,
+      "completed_tasks": 0,
+      "overall_completion_percentage": 0
+    },
+    "momentum_indicators": {
+      "consecutive_weeks_with_plans": 1,
+      "completion_velocity": 0,
+      "blocked_items_count": 0
+    }
+  },
+
+  "context": {
+    "coach_observations": "Week 1: Foundation setting. Focus on building relationships (counselor, clubs, Jenny), establishing time management framework (168 hours), and creating baseline documentation (course schedule, activity list).",
+    "student_reflections": "",
+    "previous_week_carryover": [],
+    "next_week_priorities": ["Follow up on counselor meeting", "Join ML/AI club", "Continue YouTube content"]
+  },
+
+  "custom_fields": {
+    "frameworks_applied": [
+      "168 Hour Architecture",
+      "LOR Conversation Script",
+      "Cold Email Template System"
+    ],
+    "session_dates": ["2023-08-02 (Planning)", "2023-08-05 (Check-in)"]
+  },
+
+  "framework_applications": [
+    {
+      "framework_name": "168 Hour Architecture",
+      "application_date": "2023-08-02",
+      "insights_gained": "Discovered 49 hours of unallocated time for passion projects"
+    },
+    {
+      "framework_name": "LOR Conversation Script",
+      "application_date": "2023-08-05",
+      "insights_gained": "Exact script for building teacher relationships"
+    },
+    {
+      "framework_name": "Cold Email Template",
+      "application_date": "2023-08-05",
+      "insights_gained": "4-part structure for counselor outreach"
+    },
+    {
+      "framework_name": "Strategic Overwhelm Calibration",
+      "application_date": "2023-08-05",
+      "insights_gained": "10 tasks assigned, expecting ~70% completion"
+    },
+    {
+      "framework_name": "Weekly Action Item Framework",
+      "application_date": "2023-08-02",
+      "insights_gained": "Checkbox system with measurable tasks"
+    }
+  ]
+}
+```
+
+**Coverage Statistics (as of 2025-10-28):**
+- Total weeks with action plans: 88 out of 89 (98.9%)
+- Weeks with execution items: 80 out of 88
+- Total execution items across all weeks: 1,151
+- Week 1: 10 items (manually curated from planning + check-in sessions)
+- Weeks 2-89: 0-25 items per week (automated extraction from session transcripts)
+- Source data: 2 years of Jenny-Huda coaching session transcripts
 
 ### Data Queries
 

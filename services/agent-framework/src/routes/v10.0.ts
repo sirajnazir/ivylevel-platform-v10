@@ -1218,6 +1218,512 @@ export function v10Router(pool: Pool): Router {
     }
   });
 
+  // ============================================================================
+  // GAP 7: WEEKLY ACTION PLAN & TASKS API (v10.9)
+  // ============================================================================
+
+  /**
+   * GET /students/:id/weeks/:weekNumber/action-plan
+   * Get complete action plan for specific week
+   * Returns: outcomes, execution items, tasks, resource allocation, progress tracking
+   */
+  router.get('/students/:id/weeks/:weekNumber/action-plan', async (req: Request, res: Response) => {
+    try {
+      const { id: studentId, weekNumber } = req.params;
+
+      const result = await pool.query(`
+        SELECT
+          week_number,
+          week_start_date,
+          week_end_date,
+          action_plan,
+          academic_vitals,
+          ec_details,
+          award_details,
+          program_details
+        FROM weekly_vitals
+        WHERE student_id = $1 AND week_number = $2
+      `, [studentId, parseInt(weekNumber)]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Week not found',
+          message: `No data found for week ${weekNumber}`
+        });
+      }
+
+      const row = result.rows[0];
+
+      res.json({
+        success: true,
+        data: {
+          week_number: row.week_number,
+          week_start_date: row.week_start_date,
+          week_end_date: row.week_end_date,
+          action_plan: row.action_plan || null,
+          linked_vitals: {
+            academic_vitals: row.academic_vitals,
+            ec_details: row.ec_details,
+            award_details: row.award_details,
+            program_details: row.program_details
+          }
+        }
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error fetching action plan:', error);
+      res.status(500).json({
+        error: 'Failed to fetch action plan',
+        message: error.message
+      });
+    }
+  });
+
+  /**
+   * POST /students/:id/weeks/:weekNumber/action-plan
+   * Create or update action plan for week
+   */
+  router.post('/students/:id/weeks/:weekNumber/action-plan', async (req: Request, res: Response) => {
+    try {
+      const { id: studentId, weekNumber } = req.params;
+      const actionPlan = req.body;
+
+      // Upsert action plan
+      const result = await pool.query(`
+        UPDATE weekly_vitals
+        SET
+          action_plan = $1::jsonb,
+          updated_at = NOW()
+        WHERE student_id = $2 AND week_number = $3
+        RETURNING week_number, action_plan->>'plan_id' as plan_id
+      `, [JSON.stringify(actionPlan), studentId, parseInt(weekNumber)]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Week not found',
+          message: `Cannot create action plan - week ${weekNumber} does not exist`
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          plan_id: result.rows[0].plan_id,
+          week_number: result.rows[0].week_number,
+          created_at: new Date().toISOString()
+        }
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error creating action plan:', error);
+      res.status(500).json({
+        error: 'Failed to create action plan',
+        message: error.message
+      });
+    }
+  });
+
+  /**
+   * PATCH /students/:id/weeks/:weekNumber/action-plan
+   * Partial update to action plan
+   */
+  router.patch('/students/:id/weeks/:weekNumber/action-plan', async (req: Request, res: Response) => {
+    try {
+      const { id: studentId, weekNumber } = req.params;
+      const updates = req.body;
+
+      // Get existing action plan
+      const existing = await pool.query(`
+        SELECT action_plan
+        FROM weekly_vitals
+        WHERE student_id = $1 AND week_number = $2
+      `, [studentId, parseInt(weekNumber)]);
+
+      if (existing.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Week not found',
+          message: `No data found for week ${weekNumber}`
+        });
+      }
+
+      const existingPlan = existing.rows[0].action_plan || {};
+      const mergedPlan = { ...existingPlan, ...updates, last_updated_at: new Date().toISOString() };
+
+      // Update
+      await pool.query(`
+        UPDATE weekly_vitals
+        SET
+          action_plan = $1::jsonb,
+          updated_at = NOW()
+        WHERE student_id = $2 AND week_number = $3
+      `, [JSON.stringify(mergedPlan), studentId, parseInt(weekNumber)]);
+
+      res.json({
+        success: true,
+        message: 'Action plan updated successfully'
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error updating action plan:', error);
+      res.status(500).json({
+        error: 'Failed to update action plan',
+        message: error.message
+      });
+    }
+  });
+
+  /**
+   * POST /students/:id/weeks/:weekNumber/outcomes
+   * Add new outcome to week's action plan
+   */
+  router.post('/students/:id/weeks/:weekNumber/outcomes', async (req: Request, res: Response) => {
+    try {
+      const { id: studentId, weekNumber } = req.params;
+      const newOutcome = req.body;
+
+      // Get existing action plan
+      const existing = await pool.query(`
+        SELECT action_plan
+        FROM weekly_vitals
+        WHERE student_id = $1 AND week_number = $2
+      `, [studentId, parseInt(weekNumber)]);
+
+      if (existing.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Week not found'
+        });
+      }
+
+      const actionPlan = existing.rows[0].action_plan || { outcomes: [] };
+      actionPlan.outcomes = actionPlan.outcomes || [];
+      actionPlan.outcomes.push(newOutcome);
+      actionPlan.last_updated_at = new Date().toISOString();
+
+      // Update
+      await pool.query(`
+        UPDATE weekly_vitals
+        SET
+          action_plan = $1::jsonb,
+          updated_at = NOW()
+        WHERE student_id = $2 AND week_number = $3
+      `, [JSON.stringify(actionPlan), studentId, parseInt(weekNumber)]);
+
+      res.json({
+        success: true,
+        data: {
+          outcome_id: newOutcome.outcome_id,
+          week_number: parseInt(weekNumber)
+        }
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error adding outcome:', error);
+      res.status(500).json({
+        error: 'Failed to add outcome',
+        message: error.message
+      });
+    }
+  });
+
+  /**
+   * PATCH /students/:id/weeks/:weekNumber/outcomes/:outcomeId
+   * Update specific outcome
+   */
+  router.patch('/students/:id/weeks/:weekNumber/outcomes/:outcomeId', async (req: Request, res: Response) => {
+    try {
+      const { id: studentId, weekNumber, outcomeId } = req.params;
+      const updates = req.body;
+
+      // Use PostgreSQL jsonb_set to update specific outcome
+      const result = await pool.query(`
+        UPDATE weekly_vitals
+        SET
+          action_plan = jsonb_set(
+            action_plan,
+            '{outcomes}',
+            (
+              SELECT jsonb_agg(
+                CASE
+                  WHEN outcome->>'outcome_id' = $4
+                  THEN outcome || $3::jsonb
+                  ELSE outcome
+                END
+              )
+              FROM jsonb_array_elements(action_plan->'outcomes') outcome
+            )
+          ),
+          updated_at = NOW()
+        WHERE student_id = $1 AND week_number = $2
+        RETURNING week_number
+      `, [studentId, parseInt(weekNumber), JSON.stringify(updates), outcomeId]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Week or outcome not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Outcome updated successfully'
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error updating outcome:', error);
+      res.status(500).json({
+        error: 'Failed to update outcome',
+        message: error.message
+      });
+    }
+  });
+
+  /**
+   * POST /students/:id/weeks/:weekNumber/execution-items
+   * Add execution item to action plan
+   */
+  router.post('/students/:id/weeks/:weekNumber/execution-items', async (req: Request, res: Response) => {
+    try {
+      const { id: studentId, weekNumber } = req.params;
+      const newItem = req.body;
+
+      const existing = await pool.query(`
+        SELECT action_plan
+        FROM weekly_vitals
+        WHERE student_id = $1 AND week_number = $2
+      `, [studentId, parseInt(weekNumber)]);
+
+      if (existing.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Week not found'
+        });
+      }
+
+      const actionPlan = existing.rows[0].action_plan || { execution_items: [] };
+      actionPlan.execution_items = actionPlan.execution_items || [];
+      actionPlan.execution_items.push(newItem);
+      actionPlan.last_updated_at = new Date().toISOString();
+
+      await pool.query(`
+        UPDATE weekly_vitals
+        SET
+          action_plan = $1::jsonb,
+          updated_at = NOW()
+        WHERE student_id = $2 AND week_number = $3
+      `, [JSON.stringify(actionPlan), studentId, parseInt(weekNumber)]);
+
+      res.json({
+        success: true,
+        data: {
+          execution_item_id: newItem.execution_item_id,
+          week_number: parseInt(weekNumber)
+        }
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error adding execution item:', error);
+      res.status(500).json({
+        error: 'Failed to add execution item',
+        message: error.message
+      });
+    }
+  });
+
+  /**
+   * POST /students/:id/weeks/:weekNumber/tasks
+   * Add task to action plan
+   */
+  router.post('/students/:id/weeks/:weekNumber/tasks', async (req: Request, res: Response) => {
+    try {
+      const { id: studentId, weekNumber } = req.params;
+      const newTask = req.body;
+
+      const existing = await pool.query(`
+        SELECT action_plan
+        FROM weekly_vitals
+        WHERE student_id = $1 AND week_number = $2
+      `, [studentId, parseInt(weekNumber)]);
+
+      if (existing.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Week not found'
+        });
+      }
+
+      const actionPlan = existing.rows[0].action_plan || { tasks: [] };
+      actionPlan.tasks = actionPlan.tasks || [];
+      actionPlan.tasks.push(newTask);
+      actionPlan.last_updated_at = new Date().toISOString();
+
+      await pool.query(`
+        UPDATE weekly_vitals
+        SET
+          action_plan = $1::jsonb,
+          updated_at = NOW()
+        WHERE student_id = $2 AND week_number = $3
+      `, [JSON.stringify(actionPlan), studentId, parseInt(weekNumber)]);
+
+      res.json({
+        success: true,
+        data: {
+          task_id: newTask.task_id,
+          week_number: parseInt(weekNumber)
+        }
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error adding task:', error);
+      res.status(500).json({
+        error: 'Failed to add task',
+        message: error.message
+      });
+    }
+  });
+
+  /**
+   * PATCH /students/:id/weeks/:weekNumber/tasks/:taskId/complete
+   * Mark task as complete with optional proof
+   */
+  router.patch('/students/:id/weeks/:weekNumber/tasks/:taskId/complete', async (req: Request, res: Response) => {
+    try {
+      const { id: studentId, weekNumber, taskId } = req.params;
+      const { completion_proof, proof_artifacts, completion_notes, actual_duration_minutes } = req.body;
+
+      const updates = {
+        completion_state: 'completed',
+        completed_date: new Date().toISOString(),
+        completion_verified: !!proof_artifacts,
+        ...(completion_proof && { completion_proof }),
+        ...(proof_artifacts && { verification_evidence: proof_artifacts }),
+        ...(completion_notes && { execution_notes: completion_notes }),
+        ...(actual_duration_minutes && { actual_duration_minutes })
+      };
+
+      const result = await pool.query(`
+        UPDATE weekly_vitals
+        SET
+          action_plan = jsonb_set(
+            action_plan,
+            '{tasks}',
+            (
+              SELECT jsonb_agg(
+                CASE
+                  WHEN task->>'task_id' = $4
+                  THEN task || $3::jsonb
+                  ELSE task
+                END
+              )
+              FROM jsonb_array_elements(action_plan->'tasks') task
+            )
+          ),
+          updated_at = NOW()
+        WHERE student_id = $1 AND week_number = $2
+        RETURNING week_number
+      `, [studentId, parseInt(weekNumber), JSON.stringify(updates), taskId]);
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Week or task not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          task_id: taskId,
+          completion_state: 'completed',
+          completed_date: updates.completed_date
+        }
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error completing task:', error);
+      res.status(500).json({
+        error: 'Failed to complete task',
+        message: error.message
+      });
+    }
+  });
+
+  /**
+   * GET /students/:id/action-plans/summary
+   * Get multi-week action plan summary
+   * Query params: start_week, end_week, weeks_back
+   */
+  router.get('/students/:id/action-plans/summary', async (req: Request, res: Response) => {
+    try {
+      const studentId = req.params.id;
+      const { start_week, end_week, weeks_back = '4' } = req.query;
+
+      let query = `
+        SELECT
+          week_number,
+          action_plan
+        FROM weekly_vitals
+        WHERE student_id = $1 AND action_plan IS NOT NULL
+      `;
+
+      const params: any[] = [studentId];
+
+      if (start_week && end_week) {
+        query += ` AND week_number BETWEEN $2 AND $3`;
+        params.push(parseInt(start_week as string), parseInt(end_week as string));
+      } else if (weeks_back) {
+        query += ` AND week_number >= (SELECT MAX(week_number) - $2 FROM weekly_vitals WHERE student_id = $1)`;
+        params.push(parseInt(weeks_back as string));
+      }
+
+      query += ` ORDER BY week_number DESC`;
+
+      const result = await pool.query(query, params);
+
+      // Calculate aggregate metrics
+      let totalOutcomes = 0;
+      let completedOutcomes = 0;
+      let totalHoursEstimated = 0;
+      let totalHoursActual = 0;
+      const frameworkUsage: Record<string, number> = {};
+
+      result.rows.forEach(row => {
+        const plan = row.action_plan;
+        if (plan.outcomes) {
+          totalOutcomes += plan.outcomes.length;
+          completedOutcomes += plan.outcomes.filter((o: any) => o.completion_state === 'completed').length;
+        }
+        if (plan.execution_items) {
+          plan.execution_items.forEach((item: any) => {
+            if (item.estimated_duration_minutes) totalHoursEstimated += item.estimated_duration_minutes / 60;
+            if (item.actual_duration_minutes) totalHoursActual += item.actual_duration_minutes / 60;
+          });
+        }
+        if (plan.framework_applications) {
+          plan.framework_applications.forEach((fw: any) => {
+            frameworkUsage[fw.framework_name] = (frameworkUsage[fw.framework_name] || 0) + 1;
+          });
+        }
+      });
+
+      const topFrameworks = Object.entries(frameworkUsage)
+        .map(([name, count]) => ({ framework_name: name, times_applied: count }))
+        .sort((a, b) => b.times_applied - a.times_applied)
+        .slice(0, 5);
+
+      res.json({
+        success: true,
+        data: {
+          student_id: studentId,
+          weeks_analyzed: result.rows.map(r => r.week_number),
+          aggregate_metrics: {
+            total_outcomes: totalOutcomes,
+            completed_outcomes: completedOutcomes,
+            overall_completion_rate: totalOutcomes > 0 ? Math.round((completedOutcomes / totalOutcomes) * 100) : 0,
+            total_hours_estimated: Math.round(totalHoursEstimated * 10) / 10,
+            total_hours_actual: Math.round(totalHoursActual * 10) / 10,
+            time_efficiency_ratio: totalHoursEstimated > 0 ? Math.round((totalHoursActual / totalHoursEstimated) * 100) / 100 : 0
+          },
+          top_frameworks_used: topFrameworks
+        }
+      });
+    } catch (error: any) {
+      console.error('[v10.9] Error fetching action plan summary:', error);
+      res.status(500).json({
+        error: 'Failed to fetch action plan summary',
+        message: error.message
+      });
+    }
+  });
+
   return router;
 }
 

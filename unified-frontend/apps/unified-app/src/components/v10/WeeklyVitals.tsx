@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { v10Api, WeeklyVitals as WeeklyVitalsType, ECDetail, AwardDetail } from '../../utils/v10ApiService';
+import { v10Api, WeeklyVitals as WeeklyVitalsType, ECDetail, AwardDetail, WeeklyActionPlan } from '../../utils/v10ApiService';
+import { WeeklyActionPlanCard } from './WeeklyActionPlanCard';
 
 const Container = styled.div`
   padding: 20px;
@@ -304,6 +305,8 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'recent' | 'quarter' | 'all'>('recent');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [actionPlans, setActionPlans] = useState<Record<number, WeeklyActionPlan | null>>({});
+  const [loadingActionPlans, setLoadingActionPlans] = useState(false);
 
   useEffect(() => {
     loadVitals();
@@ -316,10 +319,39 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
       const limit = viewMode === 'recent' ? 4 : viewMode === 'quarter' ? 12 : 100;
       const data = await v10Api.getWeeklyVitals(studentId, { limit });
       setWeeks(data.weeks);
+
+      // Load action plans for all weeks
+      await loadActionPlans(data.weeks);
     } catch (error) {
       console.error('Failed to load weekly vitals:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadActionPlans = async (weeksData: WeeklyVitalsType[]) => {
+    try {
+      setLoadingActionPlans(true);
+      const plans: Record<number, WeeklyActionPlan | null> = {};
+
+      // Load action plans in parallel for all weeks
+      await Promise.all(
+        weeksData.map(async (week) => {
+          try {
+            const result = await v10Api.getActionPlan(studentId, week.week_number);
+            plans[week.week_number] = result.action_plan;
+          } catch (error) {
+            console.error(`Failed to load action plan for week ${week.week_number}:`, error);
+            plans[week.week_number] = null;
+          }
+        })
+      );
+
+      setActionPlans(plans);
+    } catch (error) {
+      console.error('Failed to load action plans:', error);
+    } finally {
+      setLoadingActionPlans(false);
     }
   };
 
@@ -492,7 +524,8 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
       </Header>
       <VitalsGrid>
         {weeks.map(week => (
-          <VitalCard key={week.week_number}>
+          <div key={week.week_number}>
+          <VitalCard>
             <VitalHeader>
               <VitalTitle>Week {week.week_number}</VitalTitle>
               <WeekInfo>
@@ -768,6 +801,17 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
               </CollapsibleSection>
             )}
           </VitalCard>
+
+          {/* Weekly Action Plan Card - v10.9 */}
+          <WeeklyActionPlanCard
+            studentId={studentId}
+            weekNumber={week.week_number}
+            weekStart={week.week_start}
+            weekEnd={week.week_end}
+            actionPlan={actionPlans[week.week_number] || null}
+            onRefresh={() => loadActionPlans([week])}
+          />
+        </div>
         ))}
       </VitalsGrid>
     </Container>
