@@ -325,8 +325,30 @@ export function AIChat() {
   return (
     <ChatContainer>
       <ChatHeader>
-        <HeaderTitle>{getAgentName(currentAgent)}</HeaderTitle>
-        <HeaderSubtitle>Powered by Agent Framework v1.0 • 9 Specialized AI Agents</HeaderSubtitle>
+        <HeaderTitle>
+          <span>{getAgentName(currentAgent)}</span>
+          <V152Toggle $active={useV152} onClick={() => setUseV152(!useV152)}>
+            {useV152 ? '⚡ v15.2 Active' : 'v14.0 Legacy'}
+          </V152Toggle>
+        </HeaderTitle>
+        <HeaderSubtitle>
+          {useV152 ? 'Multi-Agent with LangChain LCEL + Quality Gates' : 'Powered by Agent Framework v1.0 • 9 Specialized AI Agents'}
+          {useV152 && v152Metadata.reflection_quality && (
+            <QualityBadge $score={v152Metadata.reflection_quality}>
+              ⭐ Quality: {v152Metadata.reflection_quality.toFixed(1)}/10
+            </QualityBadge>
+          )}
+          {useV152 && v152Metadata.confidence && (
+            <span style={{ marginLeft: '8px', opacity: 0.8 }}>
+              • Confidence: {(v152Metadata.confidence * 100).toFixed(0)}%
+            </span>
+          )}
+          {useV152 && v152Metadata.processing_time_ms && (
+            <span style={{ marginLeft: '8px', opacity: 0.8 }}>
+              • {(v152Metadata.processing_time_ms / 1000).toFixed(1)}s
+            </span>
+          )}
+        </HeaderSubtitle>
       </ChatHeader>
 
       <MessagesContainer>
