@@ -133,11 +133,13 @@ const ProfileImage = styled.img`
   object-fit: cover;
 `;
 
-const TargetIndicator = styled.div`
+const TargetIndicator = styled.div<{ $visible: boolean; $x: number; $y: number }>`
   position: absolute;
-  top: calc(20% - 12px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: ${props => props.$y}px;
+  left: ${props => props.$x}px;
+  transform: translate(-50%, -50%);
+  opacity: ${props => props.$visible ? 1 : 0};
+  transition: opacity 0.3s ease-in-out;
   background: #E8F5E9;
   padding: 8px 16px;
   border-radius: 20px;
@@ -151,7 +153,7 @@ const TargetIndicator = styled.div`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 `;
 
-const IvyBadge = styled.div`
+const IvyBadge = styled.div<{ $visible: boolean; $x: number; $y: number }>`
   background: #FFD700;
   width: 32px;
   height: 32px;
@@ -163,8 +165,11 @@ const IvyBadge = styled.div`
   font-size: 14px;
   color: #333;
   position: absolute;
-  top: 30%;
-  right: 30%;
+  top: ${props => props.$y}px;
+  left: ${props => props.$x}px;
+  transform: translate(-50%, -50%);
+  opacity: ${props => props.$visible ? 1 : 0};
+  transition: opacity 0.3s ease-in-out;
   z-index: 10;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
@@ -298,6 +303,7 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
   const [currentScore, setCurrentScore] = useState(0);
   const [showFrames, setShowFrames] = useState(false);
   const [framePosition, setFramePosition] = useState({ x: 0, y: 0 });
+  const [targetPosition, setTargetPosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Create rings with dynamic scores
@@ -332,20 +338,26 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
           clearInterval(timer);
           setTimeout(() => {
             const outerRing = rings[rings.length - 1];
-            const sweepPercentage = score / 100;
-            const point = calculatePointOnPath(outerRing.path, sweepPercentage);
-            
+
             const scale = 0.28;
             const containerWidth = containerRef.current?.offsetWidth || 500;
             const containerHeight = containerRef.current?.offsetHeight || 500;
-            
             const centerX = containerWidth / 2;
             const centerY = containerHeight / 2;
-            
-            const x = (point.x * scale) + centerX;
-            const y = (point.y * scale) + centerY;
-            
-            setFramePosition({ x, y });
+
+            // T20 indicator at current score (85%)
+            const sweepPercentage = score / 100;
+            const currentPoint = calculatePointOnPath(outerRing.path, sweepPercentage);
+            const currentX = (currentPoint.x * scale) + centerX;
+            const currentY = (currentPoint.y * scale) + centerY;
+            setFramePosition({ x: currentX, y: currentY });
+
+            // Target Level / IVY+ at 100% mark
+            const targetPoint = calculatePointOnPath(outerRing.path, 1.0);
+            const targetX = (targetPoint.x * scale) + centerX;
+            const targetY = (targetPoint.y * scale) + centerY;
+            setTargetPosition({ x: targetX, y: targetY });
+
             setShowFrames(true);
           }, 200);
         }
@@ -446,12 +458,20 @@ export const CircularProgress: React.FC<CircularProgressProps> = ({
         <ProfileImage src={profileImage} alt="Profile" />
       </ProfileContainer>
 
-      <TargetIndicator>
+      <TargetIndicator
+        $visible={showFrames}
+        $x={targetPosition.x}
+        $y={targetPosition.y}
+      >
         <Target size={16} />
         Target Level
       </TargetIndicator>
 
-      <IvyBadge>
+      <IvyBadge
+        $visible={showFrames}
+        $x={targetPosition.x + 80}
+        $y={targetPosition.y}
+      >
         IVY+
       </IvyBadge>
 
