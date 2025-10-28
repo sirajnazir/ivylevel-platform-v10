@@ -513,29 +513,183 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
               </ProgressBar>
             </div>
 
-            <VitalsSection>
-              <strong style={{ fontSize: '14px', display: 'block', marginBottom: '8px' }}>Academic</strong>
-              {week.vitals.academic.gpa_unweighted && (
-                <VitalRow>
-                  <VitalLabel>GPA (UW/W)</VitalLabel>
-                  <VitalValue>
-                    {week.vitals.academic.gpa_unweighted?.toFixed(2)} / {week.vitals.academic.gpa_weighted?.toFixed(2)}
-                  </VitalValue>
-                </VitalRow>
-              )}
-              {week.vitals.academic.sat_score && (
-                <VitalRow>
-                  <VitalLabel>SAT Score</VitalLabel>
-                  <VitalValue>{week.vitals.academic.sat_score}</VitalValue>
-                </VitalRow>
-              )}
-              {week.vitals.academic.ap_count !== undefined && (
-                <VitalRow>
-                  <VitalLabel>AP Courses</VitalLabel>
-                  <VitalValue>{week.vitals.academic.ap_count}</VitalValue>
-                </VitalRow>
-              )}
-            </VitalsSection>
+            {/* Academic Profile - v3.0 with complete data */}
+            {week.academic_vitals && (
+              <CollapsibleSection>
+                <SectionHeader onClick={() => toggleSection(week.week_number, 'academic')} $isExpanded={isSectionExpanded(week.week_number, 'academic')}>
+                  <SectionTitle>
+                    <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'academic')}>▶</ExpandIcon>
+                    Academic Profile
+                  </SectionTitle>
+                </SectionHeader>
+                <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'academic')}>
+                  {/* GPA */}
+                  {week.academic_vitals.gpa_weighted && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>GPA</div>
+                      <div style={{ fontSize: '16px', fontWeight: 600 }}>
+                        {week.academic_vitals.gpa_weighted.toFixed(2)} / {week.academic_vitals.gpa_scale || 4.0}
+                        {week.academic_vitals.gpa_unweighted && ` (UW: ${week.academic_vitals.gpa_unweighted.toFixed(2)})`}
+                      </div>
+                      {week.academic_vitals.class_rank && (
+                        <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                          Class Rank: {week.academic_vitals.class_rank === 'na' ? 'Unranked' : `${week.academic_vitals.class_rank} / ${week.academic_vitals.class_size}`}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SAT */}
+                  {week.academic_vitals.sat && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>SAT</div>
+                      <div style={{ fontSize: '16px', fontWeight: 600 }}>{week.academic_vitals.sat.total}</div>
+                      <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                        EBRW: {week.academic_vitals.sat.ebrw} | Math: {week.academic_vitals.sat.math}
+                        {week.academic_vitals.sat.attempts && week.academic_vitals.sat.attempts.length > 1 &&
+                          ` (${week.academic_vitals.sat.attempts.length} attempts)`
+                        }
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ACT */}
+                  {week.academic_vitals.act && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>ACT</div>
+                      <div style={{ fontSize: '16px', fontWeight: 600 }}>{week.academic_vitals.act.composite}</div>
+                      <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
+                        E: {week.academic_vitals.act.english} | M: {week.academic_vitals.act.math} |
+                        R: {week.academic_vitals.act.reading} | S: {week.academic_vitals.act.science}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AP Exams */}
+                  {week.academic_vitals.ap_exams && week.academic_vitals.ap_exams.length > 0 && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px' }}>
+                        AP Exams ({week.academic_vitals.ap_exams.length})
+                      </div>
+                      {week.academic_vitals.ap_exams.map((exam, idx) => (
+                        <div key={idx} style={{
+                          fontSize: '12px',
+                          padding: '4px 8px',
+                          background: '#f8f9fa',
+                          borderRadius: '4px',
+                          marginBottom: '4px',
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}>
+                          <span>{exam.subject}</span>
+                          <span style={{
+                            fontWeight: 600,
+                            color: exam.score === 5 ? '#28a745' : exam.score >= 4 ? '#FF5733' : '#6c757d'
+                          }}>
+                            {exam.score}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* IB Exams */}
+                  {week.academic_vitals.ib_exams && week.academic_vitals.ib_exams.length > 0 && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px' }}>
+                        IB Exams ({week.academic_vitals.ib_exams.length})
+                      </div>
+                      {week.academic_vitals.ib_exams.map((exam, idx) => (
+                        <div key={idx} style={{
+                          fontSize: '12px',
+                          padding: '4px 8px',
+                          background: '#f8f9fa',
+                          borderRadius: '4px',
+                          marginBottom: '4px'
+                        }}>
+                          {exam.subject} ({exam.level}): {exam.final_score || exam.predicted_score}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Current Courses */}
+                  {week.academic_vitals.current_courses && week.academic_vitals.current_courses.length > 0 && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px' }}>
+                        Current Courses (Grade {week.academic_vitals.current_courses[0].year})
+                      </div>
+                      {week.academic_vitals.current_courses.map((term, termIdx) => (
+                        <div key={termIdx} style={{ marginBottom: '8px' }}>
+                          <div style={{ fontSize: '11px', color: '#999', textTransform: 'uppercase', marginBottom: '4px' }}>
+                            {term.semester === 'fall' ? 'Fall Semester' : 'Spring Semester'}
+                          </div>
+                          {term.courses.map((course, courseIdx) => (
+                            <div key={courseIdx} style={{
+                              fontSize: '11px',
+                              padding: '3px 6px',
+                              background: course.level === 'AP' || course.level === 'IB' ? '#fff3cd' : '#f8f9fa',
+                              borderRadius: '3px',
+                              marginBottom: '2px',
+                              display: 'flex',
+                              justifyContent: 'space-between'
+                            }}>
+                              <span>{course.title}</span>
+                              <span style={{
+                                fontWeight: 600,
+                                color: course.level === 'AP' || course.level === 'IB' ? '#FF5733' : '#6c757d',
+                                fontSize: '10px'
+                              }}>
+                                {course.level}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Academic Rigor Summary */}
+                  {week.academic_vitals.total_ap_courses !== undefined && (
+                    <div style={{
+                      marginTop: '12px',
+                      padding: '8px',
+                      background: '#e7f3ff',
+                      borderRadius: '4px',
+                      fontSize: '12px'
+                    }}>
+                      <strong>Course Rigor:</strong> {week.academic_vitals.total_ap_courses} AP/IB courses
+                      {week.academic_vitals.total_honors_courses && ` + ${week.academic_vitals.total_honors_courses} Honors`}
+                    </div>
+                  )}
+                </SectionContent>
+              </CollapsibleSection>
+            )}
+
+            {/* Fallback to old vitals format for backwards compatibility */}
+            {!week.academic_vitals && week.vitals?.academic && (
+              <VitalsSection>
+                <strong style={{ fontSize: '14px', display: 'block', marginBottom: '8px' }}>Academic</strong>
+                {week.vitals.academic.gpa_weighted && (
+                  <VitalRow>
+                    <VitalLabel>GPA (Weighted)</VitalLabel>
+                    <VitalValue>{week.vitals.academic.gpa_weighted.toFixed(2)}</VitalValue>
+                  </VitalRow>
+                )}
+                {week.vitals.academic.sat_score && (
+                  <VitalRow>
+                    <VitalLabel>SAT Score</VitalLabel>
+                    <VitalValue>{week.vitals.academic.sat_score}</VitalValue>
+                  </VitalRow>
+                )}
+                {week.vitals.academic.ap_count !== undefined && (
+                  <VitalRow>
+                    <VitalLabel>AP Courses</VitalLabel>
+                    <VitalValue>{week.vitals.academic.ap_count}</VitalValue>
+                  </VitalRow>
+                )}
+              </VitalsSection>
+            )}
 
             <VitalsSection>
               <strong style={{ fontSize: '14px', display: 'block', marginBottom: '8px' }}>Extracurricular</strong>
