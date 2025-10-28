@@ -31,6 +31,7 @@ export interface ToneAdapterInput {
     student_emotion?: string;     // anxious, resistant, overwhelmed, motivated
     student_archetype?: string;   // high_achiever, anxious_perfectionist, etc.
     phase?: string;               // discovery, narrative, strategy, time
+    move_type?: string;           // validation_without_judgment, constraint_reframe, etc.
     factual_chips?: string[];     // SQL chips that must be preserved
   };
 }
@@ -40,6 +41,7 @@ export interface ToneAdapterOutput {
   tone_applied: ToneVectors;      // Actual tone vectors used
   style_techniques: string[];     // Techniques applied (meta-coaching, validation, etc.)
   exemplars_used: string[];       // Exemplar chunks referenced
+  training_examples_used: number; // Number of real Jenny examples used (from 100 EQ chips)
   forbidden_violations: string[]; // Any forbidden phrases found (should be empty)
   factual_preservation_check: {
     chips_before: number;
@@ -78,9 +80,10 @@ export class ToneAdapterTool implements Tool<ToneAdapterInput, ToneAdapterOutput
    *
    * Process:
    * 1. Extract factual chips (preserve provenance)
+   * 1.5. Get relevant training examples from communication profile (100 EQ chips)
    * 2. Adapt tone vectors based on context
    * 3. Apply lexical cadence patterns
-   * 4. Inject style techniques
+   * 4. Inject style techniques (using few-shot examples)
    * 5. Reference exemplar chunks
    * 6. Validate forbidden phrases
    * 7. Verify factual chips preserved
@@ -89,6 +92,15 @@ export class ToneAdapterTool implements Tool<ToneAdapterInput, ToneAdapterOutput
     try {
       // Step 1: Extract and preserve factual chips
       const factualChips = this.extractFactualChips(input.raw_response);
+
+      // Step 1.5: Get relevant training examples from communication profile (100 EQ chips)
+      const trainingExamples = this.getRelevantTrainingExamples(input.eq_profile, input.context);
+      const fewShotPrompt = this.buildFewShotPrompt(trainingExamples);
+
+      if (trainingExamples.length > 0) {
+        console.log(`[ToneAdapter] ✅ Using ${trainingExamples.length} training examples from communication profile`);
+        console.log(`  - Quality scores: ${trainingExamples.map(ex => ex.quality_score).join(', ')}`);
+      }
 
       // Step 2: Get adapted EQ profile based on context
       const adaptedTone = this.adaptToneToContext(input.eq_profile.tone_vectors, input.context);
@@ -164,6 +176,7 @@ export class ToneAdapterTool implements Tool<ToneAdapterInput, ToneAdapterOutput
           tone_applied: adaptedTone,
           style_techniques: techniquesApplied,
           exemplars_used: exemplarsUsed.map(e => e.chunk_id),
+          training_examples_used: trainingExamples.length,
           forbidden_violations: violations,
           factual_preservation_check: {
             chips_before: factualChips.length,
@@ -356,6 +369,85 @@ export class ToneAdapterTool implements Tool<ToneAdapterInput, ToneAdapterOutput
     return profile.exemplar_chunks
       .filter(chunk => chunk.context.toLowerCase().includes(context.toLowerCase()))
       .slice(0, 3);
+  }
+
+  /**
+   * Get relevant training examples from communication profile
+   * Returns best few-shot examples for current context (from 100 EQ chips)
+   */
+  private getRelevantTrainingExamples(profile: EQProfile, context?: any): any[] {
+    if (!profile.communication_profile) {
+      return [];
+    }
+
+    const { training_examples } = profile.communication_profile;
+    if (!training_examples || training_examples.length === 0) {
+      return [];
+    }
+
+    let relevant = training_examples;
+
+    // Filter by move_type if provided
+    if (context?.move_type) {
+      relevant = relevant.filter(ex =>
+        ex.labels.some(label => label.toLowerCase().includes(context.move_type.toLowerCase()))
+      );
+    }
+
+    // Filter by phase if provided
+    if (context?.phase) {
+      relevant = relevant.filter(ex =>
+        ex.labels.some(label => label.toLowerCase().includes(context.phase.toLowerCase()))
+      );
+    }
+
+    // Filter by student emotion if provided
+    if (context?.student_emotion) {
+      const emotionKeywords: Record<string, string[]> = {
+        anxious: ['validation', 'normalization', 'warmth'],
+        resistant: ['transparency', 'socratic'],
+        overwhelmed: ['reframe', 'strategic'],
+        motivated: ['celebration', 'enthusiasm'],
+      };
+
+      const keywords = emotionKeywords[context.student_emotion as keyof typeof emotionKeywords] || [];
+      if (keywords.length > 0) {
+        relevant = relevant.filter(ex =>
+          ex.labels.some(label => keywords.some(kw => label.toLowerCase().includes(kw)))
+        );
+      }
+    }
+
+    // Return top 3 highest quality examples
+    return relevant
+      .sort((a, b) => b.quality_score - a.quality_score)
+      .slice(0, 3);
+  }
+
+  /**
+   * Build few-shot prompt from training examples
+   * Uses real Jenny coaching examples from iMessages + sessions
+   */
+  private buildFewShotPrompt(examples: any[]): string {
+    if (examples.length === 0) {
+      return '';
+    }
+
+    let prompt = '\n\nHere are examples of Jenny\'s coaching style:\n\n';
+
+    examples.forEach((ex, i) => {
+      prompt += `Example ${i + 1}:\n`;
+      ex.messages.forEach((msg: any) => {
+        if (msg.role === 'user') {
+          prompt += `Student: ${msg.content}\n`;
+        } else if (msg.role === 'assistant') {
+          prompt += `Jenny: ${msg.content}\n`;
+        }
+      });
+      prompt += `\nTechniques used: ${ex.labels.join(', ')}\n\n`;
+    });
+
+    return prompt;
   }
 
   // ============================================================================

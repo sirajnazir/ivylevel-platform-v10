@@ -12,3 +12,6 @@ export * from './CoachingIntelligenceLoader';
 
 // EQ Profile Loader
 export * from './EQProfileLoader';
+
+// Communication Intelligence Loader (iMessages + Sessions)
+export * from './CommunicationIntelligenceLoader';

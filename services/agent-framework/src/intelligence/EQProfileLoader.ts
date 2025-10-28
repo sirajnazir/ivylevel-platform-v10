@@ -19,6 +19,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { IntelligenceLoader } from '../primitives/types';
+import { CommunicationIntelligenceLoader, CoachCommunicationProfile } from './CommunicationIntelligenceLoader';
 
 // ============================================================================
 // TYPES: EQ Profile Structure
@@ -89,6 +90,9 @@ export interface EQProfile {
   exemplar_chunks: ExemplarChunk[];
   forbidden_phrases: string[];
 
+  // Rich communication intelligence (NEW - from iMessages + sessions)
+  communication_profile?: CoachCommunicationProfile;
+
   // Metadata
   source_sessions: number;       // Number of sessions analyzed
   confidence_score: number;      // 0-1, how well-defined this profile is
@@ -119,6 +123,7 @@ export class EQProfileLoader implements IntelligenceLoader<EQProfile> {
   private cache: Map<string, EQProfile> = new Map();
   private db: any;
   private dataDirectory: string;
+  private communicationLoader: CommunicationIntelligenceLoader;
 
   constructor(db: any, dataDirectory?: string) {
     this.db = db;
@@ -127,6 +132,8 @@ export class EQProfileLoader implements IntelligenceLoader<EQProfile> {
       'data',
       'eq_profiles'
     );
+    // Initialize communication intelligence loader
+    this.communicationLoader = new CommunicationIntelligenceLoader();
   }
 
   /**
@@ -142,20 +149,40 @@ export class EQProfileLoader implements IntelligenceLoader<EQProfile> {
     }
 
     // Try loading from database first
+    let profile: EQProfile;
     if (this.db) {
       try {
-        const profile = await this.loadFromDatabase(identifier);
-        if (profile) {
-          this.cache.set(identifier, profile);
-          return profile;
+        const dbProfile = await this.loadFromDatabase(identifier);
+        if (dbProfile) {
+          profile = dbProfile;
+        } else {
+          profile = await this.loadFromFileSystem(identifier);
         }
       } catch (error) {
         console.warn(`Failed to load EQ profile from DB for ${identifier}, trying file system:`, error);
+        profile = await this.loadFromFileSystem(identifier);
       }
+    } else {
+      // Fallback to file system
+      profile = await this.loadFromFileSystem(identifier);
     }
 
-    // Fallback to file system
-    const profile = await this.loadFromFileSystem(identifier);
+    // Load rich communication profile (iMessages + sessions)
+    console.log(`[EQProfileLoader] Loading communication profile for ${identifier}...`);
+    try {
+      const communicationProfile = await this.communicationLoader.loadIntelligence(identifier);
+      profile.communication_profile = communicationProfile;
+
+      console.log(`[EQProfileLoader] ✅ Loaded communication profile:`);
+      console.log(`  - ${communicationProfile.total_conversations} conversations analyzed`);
+      console.log(`  - ${communicationProfile.total_utterances_analyzed} utterances`);
+      console.log(`  - ${communicationProfile.linguistic_markers.length} linguistic markers`);
+      console.log(`  - ${communicationProfile.move_types.length} move types`);
+      console.log(`  - ${communicationProfile.training_examples.length} training examples`);
+    } catch (error) {
+      console.warn(`[EQProfileLoader] Failed to load communication profile:`, error);
+    }
+
     this.cache.set(identifier, profile);
     return profile;
   }

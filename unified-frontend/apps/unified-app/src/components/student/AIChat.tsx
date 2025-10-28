@@ -293,7 +293,7 @@ export function AIChat() {
       archetype: 'STEM_innovator',
       grade: 12,
       burnout_level: 5,
-      recent_topics: messages.slice(-5).map(m => m.content).filter((_, i) => i % 2 === 0), // Last 5 user queries
+      recent_topics: [], // Will be populated dynamically after messages load
     },
     onError: (error) => {
       console.error('Chat error:', error);
