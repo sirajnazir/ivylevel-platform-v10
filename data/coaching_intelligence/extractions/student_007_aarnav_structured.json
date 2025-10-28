@@ -1,0 +1,590 @@
+{
+  "student_id": "aarnav_007",
+  "extraction_date": "2025-10-20",
+  "coach_id": "jenny_duan",
+  "additional_coaches": ["andrew", "summer", "founder"],
+
+  "session_metadata": {
+    "student_archetype": "Cookie-Cutter Bay Area CS-Debater with Zero Authentic Passion",
+    "sub_archetype": "High-Achieving Autopilot Student Needing Prescriptive Direction",
+    "grade_level": 10,
+    "session_duration_minutes": 60,
+    "session_date": "2024-02-01",
+    "session_type": "360_assessment_with_team",
+    "school_type": "competitive_public",
+    "school_name": "Not specified (Bay Area)",
+    "location": "Bay Area, California",
+    "student_readiness_score": 5.0,
+    "narrative_clarity_start": 1,
+    "narrative_clarity_end": 6,
+    "parent_involvement": "very_high",
+    "parent_present": "father_shishir_google_background",
+    "intended_major": "Computer Science (typical/forced)",
+    "authentic_passion_level": 0,
+    "discovery_vs_prescriptive_ratio": "20_discovery_80_prescriptive"
+  },
+
+  "student_profile": {
+    "academic_standing": {
+      "gpa": "high_implied_not_stated",
+      "sat_act": "not_yet_taken_planned_spring_2024",
+      "psat": "not_mentioned",
+      "aps_taken": 2,
+      "aps_planned": "7 junior year",
+      "ap_scores": "5 on AP CSA, 5 on AP World History",
+      "course_rigor": "very_high_7_aps_junior_year"
+    },
+    "involvement_level": "high_quantity_zero_depth",
+    "starting_readiness": "strong_academics_weak_profile",
+    "achievement_orientation": "high_achiever_external_validation",
+    "execution_style": "autopilot_resume_building",
+    "passion_clarity": "zero_authentic_passion",
+    "resource_access": "very_high_google_parent",
+    "demographic": "bay_area_asian_male_cs_debater_most_saturated"
+  },
+
+  "key_challenges": [
+    {
+      "challenge": "Cookie-cutter profile in most saturated demographic",
+      "quote": "Your profile seems very cookie cutter",
+      "context": "Bay Area, Asian male, CS interest, debate = thousands with same profile",
+      "severity": "critical"
+    },
+    {
+      "challenge": "Zero authentic passion discovered",
+      "description": "15+ minutes of discovery questions yielded 'not really' to everything",
+      "quote_pattern": "Not really... nothing really... just because...",
+      "severity": "critical"
+    },
+    {
+      "challenge": "No meaningful teacher relationships",
+      "quote": "I don't have any extremely positive relationships with teachers... I don't really participate much in class",
+      "severity": "high"
+    },
+    {
+      "challenge": "Scattered activities with no narrative thread",
+      "description": "Debate, CS club, SteelCityCodes teaching, USACO - all disconnected",
+      "severity": "high"
+    },
+    {
+      "challenge": "Parent expectations too high for realistic time allocation",
+      "quote": "You have to make some hard choices",
+      "context": "Father wants ToC + USACO Gold + AIME + research + service simultaneously",
+      "severity": "medium"
+    }
+  ],
+
+  "breakthrough_moments": [
+    {
+      "timestamp": "minute_19",
+      "trigger": "Jenny's direct confrontation",
+      "language": "Your profile seems very cookie cutter",
+      "student_response": "implicit_acceptance",
+      "significance": "Created urgency and clarity for rest of session",
+      "effectiveness": "very_high",
+      "student_confirmation": "The biggest thing I took away from this is like the whole cookie cutter thing (1:09:44)"
+    },
+    {
+      "timestamp": "minute_30",
+      "trigger": "Mode switch from discovery to prescriptive",
+      "language": "One thing that I'm thinking about... taking the idea of predictive policing and extrapolating to algorithms that make decisions in social contexts",
+      "coach_action": "Jenny explicitly proposed direction after discovery failed",
+      "significance": "Recognized pattern: Student has no organic passion, needs guidance not just discovery",
+      "effectiveness": "high"
+    },
+    {
+      "timestamp": "minute_41",
+      "trigger": "Aviation interest probe",
+      "question": "You mentioned you like planes - what's your favorite?",
+      "student_response": "A380... just a curiosity",
+      "significance": "Potential quirky differentiator identified but not developed in GamePlan",
+      "effectiveness": "medium_unexplored"
+    }
+  ],
+
+  "critical_interventions": [
+    {
+      "issue": "cookie_cutter_profile_in_saturated_demographic",
+      "coach_response": "direct_confrontation_early_in_session",
+      "language": "I'm not saying this in a bad way, I'm saying this to point it out early... You're young, you have time to change that",
+      "rationale": "Student can't fix what they don't see - must name problem explicitly",
+      "alternative_avoided": "generic_encouragement_without_hard_truth"
+    },
+    {
+      "issue": "zero_authentic_passion_after_15min_discovery",
+      "coach_response": "switch_to_prescriptive_mode",
+      "proposal": "Algorithmic justice (CS + debate + social impact) OR Climate tech",
+      "rationale": "Student needs direction proposed, then 3-6 month exploration to develop authentic connection",
+      "monitoring_plan": "Weekly check-ins to assess if genuine interest developing vs. going through motions"
+    },
+    {
+      "issue": "unrealistic_parent_expectations",
+      "coach_response": "time_allocation_forcing_function",
+      "language": "You have to make some hard choices... can't do debate camp + USACO Silver + service project + research in one summer",
+      "rationale": "Scarcity creates strategy - force prioritization through reality check"
+    }
+  ],
+
+  "narrative_development": {
+    "initial_clarity_score": 1,
+    "final_clarity_score": 6,
+    "narrative_framework_proposed": {
+      "tool": "Computer Science (technical skill)",
+      "voice": "Debate (communication/argumentation)",
+      "cause": "Algorithmic Justice OR Climate Change (social impact)",
+      "formula": "CS as tool + Debate as voice + [Cause] as reason"
+    },
+    "two_path_options": {
+      "option_1": {
+        "name": "Algorithmic Justice",
+        "description": "Algorithms in social context - predictive policing, housing allocation, resource distribution",
+        "specific_orgs": ["Encode Justice Youth Advisory Board", "Recidiviz internship"],
+        "research_angle": "Stanford/Berkeley professors studying algorithmic ethics",
+        "student_response": "sounds interesting (lukewarm)"
+      },
+      "option_2": {
+        "name": "Climate Change Technology",
+        "description": "CS applications to climate - modeling, optimization, renewable energy",
+        "strategic_advantage": "Sustainability = institutional priority = lower admissions standards",
+        "student_response": "sounds interesting (lukewarm)"
+      }
+    },
+    "unexplored_option": {
+      "name": "Aviation Technology",
+      "student_signal": "I like planes, A380 is my favorite, play aviation video games",
+      "potential": "Quirky differentiator - aviation safety algorithms, air traffic control optimization",
+      "status": "mentioned_but_not_developed_in_gameplan"
+    },
+    "authenticity_concern": "Student showed NO genuine excitement for any option - all responses were 'sounds interesting' (polite but not passionate)",
+    "development_plan_needed": "90-day structured exploration with weekly authenticity checkpoints, willingness to pivot if forced"
+  },
+
+  "frameworks_introduced": [
+    {
+      "framework_name": "Cookie-Cutter Profile Direct Confrontation",
+      "introduced_when": "Minute 19, after initial discovery phase",
+      "introduction_language": "Your profile seems very cookie cutter... I'm not saying this in a bad way, I'm saying this to point it out early",
+      "sandwich_technique": "Praise (charismatic, impressive record) → Hard truth (cookie cutter) → Softening (not bad way) → Hope (you're young, can change)",
+      "application_immediate": true,
+      "student_response": "Implicit acceptance, confirmed as key takeaway at end",
+      "effectiveness": "very_high",
+      "demographic_specificity": "Bay Area, Asian male, CS interest = most saturated demo"
+    },
+    {
+      "framework_name": "Discovery → Prescriptive Mode-Switching",
+      "introduced_when": "After 15+ minutes of 'not really' responses",
+      "pattern_recognition": "5+ discovery questions yielding nothing → Switch modes",
+      "prescriptive_approach": "Coach proposes direction based on weak signals (predictive policing case mentioned)",
+      "monitoring_plan": "3-6 month exploration period with weekly check-ins to assess authenticity development",
+      "pivot_criteria": "If after 90 days no genuine engagement, try different direction",
+      "effectiveness": "high"
+    },
+    {
+      "framework_name": "CS as Tool + Debate as Voice + [Cause] as Reason",
+      "introduced_when": "After proposing algorithmic justice direction",
+      "structure": "3-part formula for narrative synthesis",
+      "purpose": "Simple, memorable framework student can internalize",
+      "application": "CS (skill) + Debate (communication) + Algorithmic Justice (why it matters)",
+      "effectiveness": "high_memorable_actionable"
+    },
+    {
+      "framework_name": "Institutional Priority Strategic Advantage",
+      "introduced_when": "When discussing climate vs. algorithmic justice options",
+      "insider_knowledge": "Sustainability majors = institutional priority = schools want more students = lower admissions standards",
+      "quote_from_gameplan": "Enrolling sustainability-related majors is what admissions officers term an institutional priority. This means the school wants a greater percentage of students who are interested in sustainability and as a result will have lower standards for these students.",
+      "strategic_calculation": "CS alone = ultra-competitive. CS + Climate/Sustainability = less competitive",
+      "ethical_balance": "Still must develop authentic interest, but strategic positioning matters",
+      "effectiveness": "very_high_insider_intelligence"
+    },
+    {
+      "framework_name": "Working Backwards from Outcome (Not Forward from Interests)",
+      "introduced_when": "Founder's intervention when discussing priorities",
+      "founder_quote": "Working backwards is our kind of mantra... At the end of the day, the outcome you want is... top school and top programs... We have to start there.",
+      "application": "Define target (Stanford/MIT) → Reverse-engineer what's needed → Execute tactics",
+      "example": "Debate camp vs. service project? Which moves toward differentiated profile needed for Stanford? Answer: Service (fills gap) > Debate (reinforces existing)",
+      "effectiveness": "very_high"
+    },
+    {
+      "framework_name": "Narrative-First Activity Selection",
+      "introduced_when": "Founder's statement about prioritization",
+      "founder_quote": "The narrative is very important... if it doesn't fit into that narrative, you are deprioritizing it.",
+      "permission_to_say_no": "Turn down prestigious opportunities that don't fit narrative",
+      "example": "Could win debate camp scholarship (prestigious!) BUT if narrative is 'CS + Climate,' debate doesn't reinforce → BETTER to do climate research",
+      "counterintuitive": "Reject good opportunities that don't fit strategic narrative",
+      "effectiveness": "very_high"
+    },
+    {
+      "framework_name": "Quirky Interest Legitimization",
+      "introduced_when": "When discussing differentiation strategies",
+      "jenny_quote": "Don't be afraid to like go out of the mold, even if it's not something that your friends are doing... even if it's something different, like juggling, or I don't know horseback riding, or like competitive cup stacking",
+      "strategic_rationale": "Memorability matters more than impressiveness - AOs remember 'the aviation kid' not 'another CS student #4,739'",
+      "aarnav_application": "Aviation interest (A380 favorite) could be developed but wasn't prioritized",
+      "effectiveness": "high_if_authentic"
+    },
+    {
+      "framework_name": "Time Allocation Forcing Function",
+      "introduced_when": "Father asked about debate camp vs. USACO vs. service",
+      "language": "You can't do debate camp + USACO Silver prep + service project + research in one summer... You have to make some hard choices",
+      "strategic_purpose": "Scarcity creates strategy - forces prioritization based on ROI",
+      "application": "Force choice between multiple good options → Depth in areas that matter > Breadth across everything",
+      "effectiveness": "very_high"
+    },
+    {
+      "framework_name": "Authentic Passion Development (Not Just Discovery)",
+      "introduced_when": "Throughout session and in founder's closing",
+      "recognition": "Passion can be DEVELOPED, not just discovered - some students on autopilot need guidance",
+      "process": "Coach proposes → Student explores 3-6 months → Monitor authenticity → Pivot if forced",
+      "founder_quote": "It's not about enforcing a narrative, because the authenticity comes out. You can smell it, you can sense it, and I'm sure that AOs can actually easily sense it.",
+      "middle_ground": "Between 'follow your passion' (assumes exists) and 'fake it' (inauthentic) → Structured authentic exploration",
+      "effectiveness": "very_high"
+    }
+  ],
+
+  "strategic_recommendations": {
+    "extracurriculars": {
+      "continue": [
+        "Debate (maintain current level, aim for regional/national recognition)",
+        "CS Club leadership (but connect to narrative)",
+        "USACO participation (Silver → Gold path, but don't sacrifice narrative development)"
+      ],
+      "add_priority_1_critical": [
+        "Service project in algorithmic justice OR climate (choose ONE within 30 days)",
+        "Encode Justice Youth Advisory Board (if algorithmic justice path)",
+        "Climate-focused CS research with professor (if climate path)",
+        "Specific impactful project with measurable outcomes"
+      ],
+      "add_priority_2_important": [
+        "Research mentorship (Stanford/Berkeley professor in chosen area)",
+        "Summer program aligned with narrative (not generic CS camp)",
+        "Competition entries in chosen focus area"
+      ],
+      "deprioritize": [
+        "SteelCityCodes teaching (doesn't fit narrative, time-consuming)",
+        "Generic CS activities that don't connect to social impact",
+        "Debate camp IF conflicts with narrative development (controversial but strategic)"
+      ],
+      "unexplored": [
+        "Aviation interest development (flight lessons, connect to CS - aviation safety algorithms, air traffic control optimization)"
+      ],
+      "strategy": "narrative_first_depth_over_breadth"
+    },
+    "awards": {
+      "tier_1_must_apply": [
+        "National Merit Scholar (via PSAT)",
+        "Congressional App Challenge",
+        "NCWIT Aspirations in Computing"
+      ],
+      "tier_2_highly_recommended": [
+        "Google Science Fair",
+        "Regeneron STS",
+        "Davidson Fellows",
+        "Scholastic Art & Writing Awards",
+        "National Speech & Debate Tournament"
+      ],
+      "tier_3_time_permitting": [
+        "MIT THINK Scholars",
+        "Coca-Cola Scholars",
+        "National Cyber Scholarship Competition",
+        "Local/regional CS competitions",
+        "Climate-related competitions if that path chosen"
+      ],
+      "total_listed_in_gameplan": 15,
+      "target": "Win at least 2-3 national/international awards by senior year"
+    },
+    "summer_programs": {
+      "sophomore_summer_2024": [
+        "Research with Stanford/Berkeley professor (algorithmic ethics OR climate tech)",
+        "Intensive service project launch (100+ hours)",
+        "Selective summer program (RSI, TASP-level OR field-specific)"
+      ],
+      "junior_summer_2025": [
+        "Continuation of research",
+        "Internship in chosen field (Recidiviz if algorithmic justice)",
+        "Competition preparation",
+        "Essay drafting using developed narrative"
+      ],
+      "programs_listed": [
+        "Research Science Institute (RSI)",
+        "TASP",
+        "Field-specific programs aligned with chosen narrative",
+        "NOT generic CS camps"
+      ],
+      "strategy": "narrative_aligned_prestigious_impactful"
+    },
+    "course_rigor": {
+      "sophomore_year_current": "2 APs completed (CSA, World History)",
+      "junior_year_planned": "7 APs (extremely rigorous)",
+      "senior_year_strategy": "Load up on APs but don't necessarily take all exams (after admissions decisions)",
+      "concern": "7 APs junior year + debate + USACO + service = time management critical",
+      "recommendation": "May need to reduce one commitment if struggling"
+    },
+    "testing": {
+      "sat_act_plan": "Take first attempt April/May 2024 OR August 2024",
+      "target_score": "1550+ SAT (implied but not stated explicitly)",
+      "psat_junior_year": "1500+ for National Merit eligibility",
+      "subject_tests": "Not mentioned (likely not required anymore)",
+      "gap_identified": "NO specific prep plan detailed in session or GamePlan"
+    },
+    "teacher_relationships": {
+      "current_state": "Admits no strong relationships, doesn't participate in class",
+      "critical_problem": "Needs 2-3 strong teacher recommendations for top schools",
+      "action_plan_missing": "No specific strategy provided despite identifying gap",
+      "recommendation": "Target 2-3 specific teachers, increase participation, attend office hours weekly, share projects beyond classwork",
+      "timeline": "Start NOW (spring sophomore), build over 18 months"
+    },
+    "differentiation": {
+      "primary_strategy": "Narrative synthesis - CS + Debate + [Social Impact Cause]",
+      "demographic_challenge": "Bay Area Asian male CS-debater = most saturated",
+      "solution": "Add unique third dimension (algorithmic justice OR climate OR aviation)",
+      "memorability_goal": "Be remembered as 'the algorithmic justice kid' or 'the climate tech advocate' not 'another CS debater'",
+      "authenticity_monitoring": "Weekly check-ins for 90 days to ensure genuine engagement developing"
+    }
+  },
+
+  "coaching_tactics_observed": {
+    "rapport_building": [
+      "Multi-coach team approach (3 Stanford students + founder = credibility)",
+      "Validation of strengths first ('impressive record, charismatic, kind')",
+      "Andrew's relatability ('I quit Lincoln Douglas for same reason')",
+      "Founder's Google background connecting with father's tech experience"
+    ],
+    "probing_techniques": [
+      "15+ minutes of discovery questions before mode-switching",
+      "Repeated 'tell me more' attempts even when getting 'not really' responses",
+      "Aviation interest probe ('what's your favorite plane?')",
+      "Testing for authentic excitement vs. polite interest"
+    ],
+    "confrontation_tactics": [
+      "EARLY direct confrontation (minute 19, not end of session)",
+      "Sandwich technique: Praise → Hard truth → Softening → Hope",
+      "Specific demographic framing ('Bay Area, Asian male, CS = saturated')",
+      "Creating urgency without hopelessness ('you're young, time to change')"
+    ],
+    "mode_switching": [
+      "Recognition when discovery failing (5+ 'not really' responses)",
+      "Explicit pivot to prescriptive approach",
+      "Proposing direction based on weak signals (predictive policing case)",
+      "Setting up 90-day exploration with authenticity monitoring"
+    ],
+    "resource_bombardment": [
+      "15 awards listed",
+      "10 service organizations",
+      "6 summer programs",
+      "Specific URLs shared in Zoom chat during session",
+      "Then narrowing: 'We'll hone in on highest ROI'"
+    ],
+    "parent_management": [
+      "Father present for entire session",
+      "Using parent's language (Google terminology, ROI, working backwards)",
+      "Founder's direct engagement with parent concerns",
+      "Validating high expectations while managing reality (time constraints)",
+      "Providing frameworks for decisions, not just opinions"
+    ],
+    "team_validation": [
+      "Andrew reinforcing from CS + debate background",
+      "Summer reinforcing from CS + bio perspective",
+      "Jenny providing overall strategy",
+      "Founder validating approach ('working backwards,' 'narrative-first')",
+      "Multiple experts agreeing = not just one opinion"
+    ]
+  },
+
+  "timeline_and_priorities": {
+    "immediate_next_30_days": {
+      "tier_1_critical": [
+        "CHOOSE ONE: Algorithmic justice OR Climate path (decision deadline)",
+        "Join Encode Justice OR climate org (if chosen)",
+        "Target 2 specific teachers for relationship building",
+        "Schedule SAT/ACT for April or May"
+      ],
+      "tier_2_important": [
+        "PSAT prep begins for junior year National Merit",
+        "Begin award applications (check deadlines)",
+        "Increase class participation (teacher relationships)"
+      ]
+    },
+    "next_90_days_spring_2024": {
+      "tier_1_critical": [
+        "Take SAT/ACT first attempt",
+        "Complete first service project milestone (if started)",
+        "Attend 3+ meetings of chosen org, assess authentic interest",
+        "Strong teacher relationship with at least 1 teacher"
+      ],
+      "tier_2_important": [
+        "Reach out to professors for summer research (if targeting)",
+        "Apply to 3-5 summer programs",
+        "Award applications for spring deadlines"
+      ],
+      "authenticity_checkpoint": "After 90 days, assess: Is genuine interest developing in chosen path? Or still going through motions? If latter, PIVOT."
+    },
+    "summer_2024_sophomore": {
+      "tier_1_critical": [
+        "Research with professor OR intensive service project (100+ hours)",
+        "Continue org involvement, build leadership",
+        "USACO Silver → Gold attempt (if time permits)"
+      ],
+      "tier_2_important": [
+        "Attend 1-2 debate tournaments (maintain skill)",
+        "Competition entries in chosen field",
+        "Begin collecting 'essay-worthy moments'"
+      ],
+      "hard_choice": "If conflict: Debate camp OR service/research? Choose service/research (fills gap in profile)"
+    },
+    "junior_year_2024_2025": {
+      "tier_1_critical": [
+        "Maintain 4.0 GPA with 7 APs (extremely challenging)",
+        "Leadership position in chosen org",
+        "Research continuation with measurable outcomes",
+        "Strong relationships with 2-3 teachers for recommendations",
+        "SAT/ACT retake if needed (target 1550+)",
+        "PSAT for National Merit"
+      ],
+      "tier_2_important": [
+        "Award applications (10+ competitions)",
+        "Debate performance (regional/national level)",
+        "CS competitions aligned with narrative",
+        "Begin college list development"
+      ],
+      "time_management_critical": "7 APs + debate + service + research = must make trade-offs if struggling"
+    }
+  },
+
+  "meta_coaching_moments": {
+    "explaining_team_approach": "Founder: 'I wanted to show your dad... this is where the magic happens... We bring that level of talent and caliber'",
+    "working_backwards_philosophy": "Founder: 'Working backwards is our kind of mantra... At the end of the day, the outcome you want is top school... We have to start there'",
+    "authenticity_emphasis": "Founder: 'It's not about enforcing a narrative, because the authenticity comes out. You can smell it... AOs can sense it'",
+    "selective_client_base": "Founder: 'I don't give this option to many parents... I'll be very honest, we see so many students'",
+    "pattern_recognition": "Founder: 'This is fundamentally the problem... cookie cutter... We see it across many students'",
+    "time_investment_disclosure": "Founder: 'It takes time. So that's why I'm not scaling for the entire world... Jenny's been with me 2 years'"
+  },
+
+  "knowledge_moat_insights": {
+    "proprietary_frameworks": [
+      "Discovery → Prescriptive mode-switching (pattern recognition: 5+ 'not really' → switch)",
+      "CS as Tool + Debate as Voice + [Cause] as Reason (3-part narrative formula)",
+      "Institutional Priority Strategic Advantage (sustainability = lower standards)",
+      "Working Backwards from Outcome (define target → reverse-engineer)",
+      "Narrative-First Activity Selection (permission to reject prestigious if doesn't fit)",
+      "Quirky Interest Legitimization (memorability > impressiveness)",
+      "Time Allocation Forcing Function (scarcity creates strategy)",
+      "Authentic Passion Development (not just discovery)",
+      "Cookie-Cutter Direct Confrontation with Sandwich Technique",
+      "Resource Bombardment → Narrow to ROI"
+    ],
+    "insider_knowledge_examples": [
+      "Sustainability majors = institutional priority = easier admission path",
+      "Encode Justice Youth Advisory Board (specific org most coaches don't know)",
+      "Recidiviz internship (algorithmic justice + criminal justice)",
+      "Memorability matters: 'Aviation kid' remembered > 'CS student #4,739'",
+      "Admissions officers can 'smell' fake passion",
+      "Free programs often more prestigious (merit-based) than paid"
+    ],
+    "competitive_moats": [
+      "Multi-coach Stanford student team with diverse specializations",
+      "500+ student interviews → pattern recognition (what works for Stanford/MIT admits)",
+      "Comprehensive program/award database with strategic intelligence",
+      "Real-time adaptive coaching with mode-switching capability",
+      "Brutal honesty culture ('cookie cutter' confrontation)",
+      "2-year coach training investment (Jenny)",
+      "Founder's Google background + admissions expertise"
+    ]
+  },
+
+  "critical_gaps_identified": {
+    "in_session": [
+      "No standardized testing strategy detailed (SAT/ACT prep plan missing)",
+      "No teacher relationship action plan despite identifying gap",
+      "No specific time allocation breakdown (hours per week per activity)",
+      "Aviation interest mentioned but not developed",
+      "No backup narrative options if primary doesn't resonate"
+    ],
+    "in_gameplan": [
+      "No 90-day exploration plan with weekly milestones for passion development",
+      "No authenticity checkpoint criteria (how to know if pivoting needed?)",
+      "No specific award application timeline with deadlines",
+      "No professor outreach plan (which professors? how to approach? when?)",
+      "No essay strategy (what to write about given narrative?)",
+      "No parent expectation alignment document (priority ranking agreed?)",
+      "No backup narrative if algorithmic justice AND climate both fail to resonate"
+    ],
+    "follow_up_needed": [
+      "Weekly check-ins (not biweekly) for first 90 days to monitor authenticity",
+      "Explicit decision on aviation interest: pursue or ignore?",
+      "168-hour weekly time breakdown to force realistic prioritization",
+      "Teacher relationship targeting (which 2-3 teachers specifically?)",
+      "SAT/ACT diagnostic test → prep plan → target score",
+      "Parent session to align on priority order when conflicts arise"
+    ]
+  },
+
+  "success_metrics_defined": {
+    "immediate_30_days": {
+      "decision": "Choose algorithmic justice OR climate path",
+      "action": "Join 1 org in chosen field",
+      "relationships": "Increase participation in at least 1 class"
+    },
+    "90_day_authenticity_checkpoint": {
+      "metric": "Student talks about cause with genuine enthusiasm (not just 'sounds interesting')",
+      "pivot_criteria": "If still going through motions after 90 days, try different direction"
+    },
+    "end_sophomore_year": {
+      "testing": "SAT 1500+ (first attempt) or clear path to 1550+",
+      "relationships": "1-2 strong teacher relationships established",
+      "narrative": "Authentic connection developing in chosen field (observable enthusiasm)"
+    },
+    "end_junior_year": {
+      "academic": "4.0 GPA maintained with 7 APs",
+      "testing": "1550+ SAT, 1500+ PSAT (National Merit)",
+      "extracurricular": "Leadership in chosen org + measurable impact project",
+      "awards": "2-3 regional/national awards in chosen field",
+      "recommendations": "2-3 teachers who would write 'exceptional student' letters"
+    },
+    "college_applications": {
+      "target": "Stanford, MIT, Ivies",
+      "differentiation": "Remembered as 'the [specific cause] kid' not 'another CS debater'",
+      "narrative_coherence": "All activities reinforce CS + Debate + [Cause] framework",
+      "authenticity": "Essay shows genuine passion (from 18-month development process)"
+    }
+  },
+
+  "archetype_specific_patterns": {
+    "for_cookie_cutter_bay_area_cs_debaters": {
+      "lead_with": "Direct confrontation about saturated demographic",
+      "emphasize": "Narrative differentiation through third dimension (social impact cause)",
+      "avoid": "Generic CS activities, more of what everyone else has",
+      "key_deliverables": [
+        "Prescriptive direction proposal (not just discovery)",
+        "Extensive resource lists (15 awards, 10 orgs, 6 programs)",
+        "90-day exploration plan with authenticity monitoring",
+        "Hard trade-off decisions (can't do everything)",
+        "Parent expectation management (reality check)"
+      ],
+      "unique_challenges": [
+        "Zero authentic passion despite high achievement",
+        "Parent pressure to excel in ALL areas simultaneously",
+        "Need to DEVELOP passion, not just discover it",
+        "Extremely saturated demographic requires unique positioning"
+      ]
+    }
+  },
+
+  "effectiveness_indicators": {
+    "narrative_clarity_improvement": 5,
+    "student_engagement": "moderate (polite interest but no genuine excitement)",
+    "parent_satisfaction": "very_high (father stayed engaged, asked detailed questions)",
+    "frameworks_resonated": true,
+    "immediate_value_demonstrated": true,
+    "conversion_likelihood": "very_high",
+    "authenticity_concern": "high (student showed no genuine passion for any proposed direction - requires monitoring)",
+    "student_takeaway_confirmation": "Cookie cutter diagnosis = #1 takeaway (mission accomplished)"
+  },
+
+  "data_sources": {
+    "transcript_available": true,
+    "gameplan_available": true,
+    "session_length": "60 minutes",
+    "gameplan_length": "10+ pages (very comprehensive)",
+    "coaches_present": 4,
+    "quote_accuracy": "high (transcript available)"
+  }
+}

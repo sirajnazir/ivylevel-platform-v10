@@ -1,0 +1,667 @@
+{
+  "student_id": "srinidhi_005",
+  "extraction_date": "2025-10-20",
+  "coach_id": "jenny_duan",
+  "gameplan_author_id": "erin_ye",
+  "program_director_id": "siraj",
+
+  "session_metadata": {
+    "student_archetype": "High-Achiever Late-Starter with Major Pivot",
+    "sub_archetype": "Accomplished Scattered Achiever Seeking Focus / Strong Academic Foundation, Narrative Misalignment",
+    "grade_level": 11,
+    "session_date": "2024-02-24",
+    "session_duration_minutes": 90,
+    "session_type": "360_assessment",
+    "school_type": "dual_enrollment_public_research_academy",
+    "school_name": "Academy of Loudoun (research academy) + Home School",
+    "location": "Loudoun County, Virginia",
+    "student_readiness_score": 6.5,
+    "academic_strength_score": 9.0,
+    "extracurricular_depth_score": 5.0,
+    "narrative_clarity_start": 2.0,
+    "narrative_clarity_end": 7.5,
+    "parent_involvement": "high_support",
+    "intended_major_initial": "Neuroscience/Biology Research (9th-10th grade)",
+    "intended_major_pivot": "Computer Science (discovered junior year)",
+    "intended_major_secondary": "International Relations",
+    "career_goal": "NSA Intelligence Analysis",
+    "time_to_applications": "~15 months (late junior year)"
+  },
+
+  "student_profile": {
+    "academic_standing": {
+      "gpa_unweighted": 3.95,
+      "gpa_weighted": 4.35,
+      "sat": 1550,
+      "sat_date": "December junior year",
+      "psat": 1430,
+      "psat_index": 217,
+      "national_merit_status": "Semifinalist qualifier",
+      "ap_scores": [
+        {"subject": "AP Statistics", "score": 4},
+        {"subject": "AP World History", "score": 5}
+      ],
+      "current_courses": [
+        "AP Biology",
+        "AP Chemistry",
+        "AP US History",
+        "AP Lang",
+        "AOS Calculus AB (self-studying BC)",
+        "Data Science elective"
+      ],
+      "course_rigor": "HIGH - dual enrollment at competitive research academy + home school"
+    },
+    "involvement_level": "moderate_breadth_limited_depth",
+    "extracurricular_activities": [
+      {
+        "activity": "Editor-in-Chief of school newspaper",
+        "leadership": true,
+        "promoted": "junior year",
+        "alignment_with_major": "storytelling/writing, not CS-specific"
+      },
+      {
+        "activity": "Yearbook management",
+        "leadership": true,
+        "alignment_with_major": "storytelling, not CS-specific"
+      },
+      {
+        "activity": "Honor Societies (4 total: NHS, English, Math, Science)",
+        "leadership": false,
+        "time_investment": "low",
+        "strategic_value": "diminishing returns with 4 chapters"
+      },
+      {
+        "activity": "Peer tutor - Academic Support Center",
+        "schedule": "Tuesdays/Thursdays",
+        "alignment_with_major": "service, teaching"
+      },
+      {
+        "activity": "Junior Science Research project",
+        "topic": "Autism, learning & memory (fruit fly study, supplements)",
+        "personal_connection": "Brother is autistic",
+        "status": "ongoing",
+        "alignment_with_major": "research skills (transferable to CS research)"
+      },
+      {
+        "activity": "Charity bake sale organizer",
+        "funds_raised": "$2,000",
+        "beneficiary": "Down Syndrome Federation of India",
+        "status": "planning second fundraiser (security cameras for school in India)",
+        "formalization_needed": true
+      },
+      {
+        "activity": "Volunteer work",
+        "hours": "100+",
+        "recognition": "Presidential Award recipient"
+      },
+      {
+        "activity": "Dance (Indian classical)",
+        "duration": "10+ years",
+        "status": "quit December junior year",
+        "potential": "Arangetram (cultural graduation ceremony) if willing to resume"
+      },
+      {
+        "activity": "Music (Piano, Guitar, Cello)",
+        "certifications": true,
+        "status": "pre-high school, not continued"
+      }
+    ],
+    "leadership_roles": 2,
+    "awards": [
+      "National Merit Semifinalist (likely finalist)",
+      "Presidential Award for Volunteer Service (100+ hours)"
+    ],
+    "starting_readiness": "partially_built_but_misaligned",
+    "achievement_orientation": "high_achiever_strong_execution",
+    "execution_style": "self_directed_needs_strategic_guidance",
+    "passion_clarity": "recently_clarified_major_pivot",
+    "resource_access": "high",
+    "personal_qualities": [
+      "interdisciplinary thinker",
+      "initiative taker",
+      "authentic passion for causes (disability advocacy)",
+      "strong academic foundation",
+      "scattered but high-quality activities"
+    ]
+  },
+
+  "key_challenges": [
+    {
+      "challenge": "Disjointed Profile / Lack of Cohesive Narrative",
+      "quote": "My main concern with my college application would be I have done a decent amount of things, but they don't really fit together very well. For example, I only recently found out that I wanted to do computer science as my major. So I haven't really done many extracurriculars with a focus of computer science... I'm the editor in chief of the school newspaper, I'm on the management of the Yearbook, but both of those don't really have much to do with the majors that I'm planning on taking.",
+      "severity": "critical",
+      "priority": "P0"
+    },
+    {
+      "challenge": "Limited Time Due to Late Discovery of CS Interest",
+      "quote": "I figured since I just realized about the computer science Major, that I should probably compensate for the time that I lost.",
+      "severity": "high",
+      "priority": "P0",
+      "student_misconception": "Student planned to take college Python/Java courses at NOVA to 'compensate' - coach strongly intervened"
+    },
+    {
+      "challenge": "Weak Awards Profile",
+      "description": "While she will be a National Merit Semifinalist and has earned the presidential award for community service from her school, Srinidhi does not have any standout awards that showcase her exceptional academic or extracurricular achievements.",
+      "severity": "high",
+      "priority": "P0"
+    },
+    {
+      "challenge": "Inefficient Time Allocation Strategy",
+      "student_initial_plan": "Taking college courses in Python and Java at NOVA (community college) over summer",
+      "coach_intervention": "Jenny strongly advised AGAINST this, calling it 'waste of time' - redirected to competitive summer programs instead",
+      "severity": "high",
+      "priority": "P0"
+    },
+    {
+      "challenge": "Lack of CS/Tech Depth in Extracurriculars",
+      "description": "There is a lack of depth and tangible impact in these activities related to her interests in international relations and computer science.",
+      "severity": "medium",
+      "priority": "P1"
+    }
+  ],
+
+  "narrative_development": {
+    "initial_clarity_score": 2,
+    "final_clarity_score": 7.5,
+    "breakthrough_moments": [
+      {
+        "timestamp": "minute_19",
+        "trigger_question": "What inspired you to start this [autism research] project?",
+        "student_revelation": "My brother is autistic - witnessed learning/memory challenges",
+        "coach_validation": "That's really awesome, especially that you have a personal connection to the topic",
+        "significance": "Unlocked authentic 'why' and disability advocacy theme",
+        "impact": "Foundation for entire narrative synthesis"
+      },
+      {
+        "timestamp": "minute_37",
+        "trigger_question": "How did you know that you're interested in history? What sparked your interest?",
+        "student_revelation": "I've always been interested in history ever since I was like really young. In fact, like on road trips, me and my dad would spend the entire like 4 or 5 hours like in the car just talking about the Industrial Revolution, the Gilded Age. I was always passionate about Greek mythology, Roman mythology, Egyptian mythology",
+        "significance": "Validated authentic long-term passion vs. resume-building",
+        "impact": "Confirmed history interest is genuine, not surface-level"
+      },
+      {
+        "timestamp": "minute_50",
+        "trigger": "Jenny screen-shared Yale History of Science, Medicine, and Public Health major",
+        "student_response": "No, this sounds really good actually.",
+        "significance": "Student saw path forward for interdisciplinary interests",
+        "impact": "Opened student's eyes to hyper-specific programs designed for multi-passionate students"
+      }
+    ],
+    "three_hub_model": {
+      "hub_1": {
+        "name": "Research",
+        "activities": [
+          "Autism/learning & memory research project (junior year)",
+          "Future: Regeneron Science Talent Search / ISEF entry",
+          "Future: CS summer program (NYU CS Research for Girls)",
+          "Future: Machine learning research project (senior year)"
+        ],
+        "level": "moderate_with_growth_potential"
+      },
+      "hub_2": {
+        "name": "Service",
+        "activities": [
+          "Charity bake sale organizer ($2K raised)",
+          "Peer tutor (Academic Support Center)",
+          "Honor Societies (NHS, English, Math, Science)",
+          "Future: Formalized charity organization with leadership title",
+          "Future: Disability advocacy organization involvement"
+        ],
+        "level": "moderate_needs_formalization"
+      },
+      "hub_3": {
+        "name": "Storytelling",
+        "activities": [
+          "Editor-in-Chief of school newspaper",
+          "Yearbook management",
+          "Dance (10+ years, cultural connection)",
+          "Future: Personal storytelling project (publish/submit for awards/fundraise)",
+          "Future: [School leadership or personal project TBD]"
+        ],
+        "level": "strong_with_leadership"
+      }
+    },
+    "final_narrative": "Student with interdisciplinary interests at the intersection of history, research/science, technology (CS/data science), and social impact - particularly focused on neurodiversity/disability advocacy with a career goal in national security/intelligence analysis. Personal connection (brother's autism) drives research on learning/memory and broader commitment to disability advocacy. Uses storytelling (newspaper, yearbook) to connect with community and amplify causes.",
+    "differentiation_angle": "Multi-passionate student pursuing hyper-specific interdisciplinary programs (History of Science at Yale, STS at Brown) rather than generic CS or IR. Authentic personal connection to disability advocacy positions her as leader for institutional priorities (schools establishing disability studies programs)."
+  },
+
+  "frameworks_introduced": [
+    {
+      "framework_name": "Expertise Not Required for College Major",
+      "framework_category": "academic_mindset",
+      "introduced_when": "Strategy phase - after student expressed plan to take college courses to 'compensate for lost time'",
+      "introduction_language": "One thing we can think about is you don't need to be a professional in a subject to major in it in college... your expertise in a certain area is not required to study it in college, especially especially given that you wanna focus on something more interdisciplinary that maybe doesn't have CS at the forefront... There's no reason for you to spend that much time now. The trade off here isn't necessarily that you're not capable of, or that you can't do CS. It's more that that time is very, very precious.",
+      "supporting_rationale": "In college, there's a reason why there's introduction to computer science. That class is required for like every CS major at Stanford... Stanford and other schools wouldn't require this class for every CS major if they expected every CS major to come in learning CS.",
+      "application_immediate": true,
+      "student_response": "Agreed to drop college course plan, pursue summer programs instead",
+      "effectiveness": "very_high",
+      "student_archetype_relevance": ["late_starters", "major_pivoters", "worried_about_gaps"],
+      "contraindications": ["Early starters who genuinely want to go deeper", "Students with unlimited time"]
+    },
+    {
+      "framework_name": "Activity Web/Hub Architecture",
+      "framework_category": "extracurricular_organization",
+      "introduced_when": "Strategy phase - after student expressed concern about 'disjointed' activities",
+      "introduction_language": "When evaluating an applicant's activities, they should be organized like a web, with each extracurricular connected with one another. Each extracurricular or passion should be able to be categorized into one of her main 'hubs,' with smaller connections to the others.",
+      "framework_structure": {
+        "hub_count": 3,
+        "hub_1": "Research (intellectual aptitude)",
+        "hub_2": "Service (community commitment, personal connection to causes)",
+        "hub_3": "Storytelling (creative expression, connecting with others)"
+      },
+      "application_immediate": true,
+      "student_response": "Activities organized into clear hubs in GamePlan",
+      "effectiveness": "high",
+      "student_archetype_relevance": ["scattered_profile", "multi_passionate", "breadth_over_depth"],
+      "key_quote": "This is a balanced list that includes activities that demonstrate Srinidhi's intellectual aptitude, passion, and service."
+    },
+    {
+      "framework_name": "Low Effort, High Impact Time Optimization",
+      "framework_category": "time_management",
+      "introduced_when": "Throughout session, especially when discussing summer plans",
+      "introduction_language": "One of the goals that we can work on is finding some sort of lower lift but higher impact program",
+      "supporting_rationale": "Time is most precious asset for late-starters, must maximize ROI on every activity",
+      "application_immediate": true,
+      "effectiveness": "very_high",
+      "student_archetype_relevance": ["late_starters", "time_constrained", "junior_year"],
+      "application_examples": {
+        "high_impact_low_effort": [
+          "Awards (medium effort, high payoff)",
+          "Competitive summer program admission (functions as experience AND award)"
+        ],
+        "low_impact_high_effort_TO_AVOID": [
+          "College courses",
+          "Additional honor societies",
+          "More APs when already strong"
+        ]
+      },
+      "key_quote_coach_siraj": "Low effort, high impact. We need to figure out the top weak spots. Time is your biggest asset now.",
+      "contraindications": ["Early starters with more time to explore", "Students who need to build basic foundation first"]
+    },
+    {
+      "framework_name": "Interdisciplinary Program Matching",
+      "framework_category": "college_positioning",
+      "introduced_when": "Narrative phase - after discovering student's multiple strong interests (history + CS + research)",
+      "introduction_language": "Something that I didn't realize when I was going into college is that there are programs that are very specific to whatever you want to work on... I always knew I was very interested in artificial intelligence, but understanding that not only from the computer science perspective, but also from the psychology of philosophy and more human sociology side too. And so that's one of the reasons why I chose to go to Stanford is because there was a major that was very hyper specific to my interest, that I couldn't find anywhere else.",
+      "concrete_example_shown": "Yale History of Science, Medicine, and Public Health major (screen-shared)",
+      "student_response": "This sounds really good actually",
+      "application_immediate": true,
+      "effectiveness": "very_high",
+      "student_archetype_relevance": ["multi_passionate", "interdisciplinary", "scattered_profile"],
+      "programs_recommended": [
+        "Yale: History of Science, Medicine, Public Health",
+        "Brown: Science Technology and Society",
+        "Duke: Program II (Interdisciplinary), International Comparative Studies",
+        "Georgetown: International History",
+        "CMU: Global Studies, Human-Computer Interaction",
+        "Hopkins: CS and International Studies",
+        "Dartmouth: International Studies, Human Centered Design"
+      ],
+      "key_quote": "You might think that your activities are too broad... But if we do research, we can find very specific programs that might be a perfect fit for your background, your story, and what you wanna do."
+    },
+    {
+      "framework_name": "Authentic Personal Connection as Spike Foundation",
+      "framework_category": "narrative_development",
+      "introduced_when": "Discovery phase - after student revealed brother has autism",
+      "introduction_language": "That's really awesome, especially that you have a personal connection to the topic. And that's really great, that it's something that affects your story. And hopefully, your research can make a contribution to that space.",
+      "supporting_rationale": "Authentic personal connections = differentiated narratives that stand out; schools are looking for students to lead disability studies initiatives",
+      "application_immediate": true,
+      "effectiveness": "very_high",
+      "student_archetype_relevance": ["all_especially_students_with_personal_causes"],
+      "how_to_uncover": "Ask 'What inspired you to [do activity]?' or 'Why does [topic] matter to you?'",
+      "progression_for_srinidhi": {
+        "discovery": "Brother has autism",
+        "connection_1": "Research project on autism learning/memory",
+        "connection_2": "Charity work for Down Syndrome Federation (disability advocacy)",
+        "synthesis": "Broader theme of neurodiversity/disability advocacy",
+        "expansion": "Schools are looking for students to lead disability studies initiatives"
+      },
+      "key_quote": "Schools are specifically looking for people that they know will help lead these [disability advocacy] initiatives or provide support to existing community offices."
+    },
+    {
+      "framework_name": "Career Background Validation (FBI Multi-Disciplinary Agent Story)",
+      "framework_category": "motivation_validation",
+      "introduced_when": "Narrative phase - after student mentioned wanting to work for NSA in intelligence",
+      "introduction_language": "I think you actually have a really great background for this. Like 2 weeks ago I went to the FBI in San Francisco for a tour, and met a lot of their agents there, and they actually come from all different backgrounds. So you know, there's people with science PhDs in the FBI who are doing like security work... There's people from social science backgrounds, from history, from molecular bio, psychology, computer science, all different backgrounds.",
+      "anecdote_purpose": "Reframe student's perceived weakness (scattered interests) as strength for target career",
+      "application_immediate": true,
+      "effectiveness": "high",
+      "student_archetype_relevance": ["career_focused", "interdisciplinary", "worried_about_fit"],
+      "key_quote": "Being able to have a very specialized area of expertise would be good for you. Whether that's computer science, bioinformatics, biology, or something different.",
+      "coach_note": "Sharing recent, specific personal anecdote (FBI tour 2 weeks ago) adds credibility and relatability"
+    },
+    {
+      "framework_name": "Institutional Priorities Alignment",
+      "framework_category": "strategic_positioning",
+      "introduced_when": "Strategy phase - after identifying disability advocacy as potential theme",
+      "introduction_language": "Schools have what we call institutional priorities... they're trying to expand programs in disability studies... A lot of students here who are advocates for people with disabilities who are neurodivergent folks are trying to establish a minor in disability studies.",
+      "supporting_rationale": "Position student as solution to school's stated needs/goals",
+      "application_immediate": true,
+      "effectiveness": "high",
+      "student_archetype_relevance": ["students_with_causes_aligned_to_institutional_priorities"],
+      "current_institutional_priorities": {
+        "disability_studies": "Stanford and other schools establishing minors, putting funding",
+        "neurodiversity_advocacy": "Community offices seeking student leaders",
+        "interdisciplinary_programs": "New programs being created (like History of Science at Yale)"
+      },
+      "key_quote": "Schools are putting more funding in these areas. And I think they're trying to seek students who have these types of backgrounds or interests."
+    }
+  ],
+
+  "strategic_recommendations": {
+    "extracurriculars": {
+      "add": [
+        {
+          "activity": "Competitive CS Summer Program",
+          "specific_options": ["Kode with Klossy", "Girls Who Code", "NYU CS Research Program for Girls"],
+          "priority": "URGENT - apply within 1-2 weeks",
+          "strategic_rationale": "Addresses CS gap, competitive admission = functions as award, network building, leverages existing research skills into CS domain"
+        },
+        {
+          "activity": "Research Competition Entry",
+          "specific_options": ["Regeneron Science Talent Search", "ISEF"],
+          "timeline": "Junior year project → Submit senior year fall",
+          "strategic_rationale": "Leverages existing autism research project for national recognition"
+        },
+        {
+          "activity": "Disability Advocacy Organization/Initiative",
+          "status": "Not yet specific, flagged as critical gap",
+          "strategic_rationale": "Connects all three hubs (research on autism, service/charity work, personal story); aligns with institutional priorities"
+        },
+        {
+          "activity": "Personal Storytelling Project",
+          "format": "Publication, submitted for awards, or used to fund donations",
+          "timeline": "Summer before senior year",
+          "strategic_rationale": "Leverages newspaper/yearbook leadership + history interest + service mission; demonstrates creativity"
+        },
+        {
+          "activity": "Formalize Charity Work",
+          "specific_recommendation": "Turn bake sales into fully formed organization with leadership title",
+          "strategic_rationale": "Already raised $2,000 and planning second fundraiser - just needs structure/title to formalize on Common App"
+        }
+      ],
+      "continue": [
+        "Editor-in-Chief of school newspaper",
+        "Yearbook management",
+        "Peer tutoring",
+        "Honor societies (but don't add more)"
+      ],
+      "drop_or_avoid": [
+        "College courses in Python and Java at NOVA (strong intervention: 'waste of time')",
+        "Additional honor societies (already in 4, diminishing returns)",
+        "Additional APs beyond current load",
+        "Breadth activities without leadership progression"
+      ],
+      "strategy": "Hub-based depth (3 hubs: Research, Service, Storytelling) + low effort/high impact activities only"
+    },
+    "awards": {
+      "must_apply": [
+        {
+          "award": "NCWIT Aspirations in Technology Award",
+          "strategic_rationale": "National recognition in CS for women, aligns with CS pivot, achievable with current profile"
+        },
+        {
+          "award": "AFSA National High School Essay Contest",
+          "strategic_rationale": "Targets international relations interest, leverages writing skills (Editor-in-Chief), aligns with NSA career goal"
+        },
+        {
+          "award": "NYTimes Student Essay Contest",
+          "strategic_rationale": "Leverages storytelling strength, prestigious recognition, can write about neurodiversity/autism/history topics"
+        }
+      ],
+      "also_consider": [
+        {
+          "award": "National History Day",
+          "status": "Jenny checking if deadline passed",
+          "strategic_rationale": "Leverages authentic history passion + research skills, national competition"
+        }
+      ],
+      "awards_already_secured": [
+        "National Merit Semifinalist (likely finalist)",
+        "Presidential Award for Volunteer Service (100+ hours)"
+      ],
+      "prioritization_logic": "Medium effort, high payoff - focus on awards that leverage EXISTING strengths (writing, history knowledge) not areas being built (CS technical)"
+    },
+    "summer_programs": {
+      "top_priorities": [
+        {
+          "program": "Kode with Klossy",
+          "why_aligned": "Competitive, free program for girls in CS, 2-week commitment, covers web dev/mobile app dev/AI/data science, admission = award",
+          "urgency": "Apply within 1-2 weeks"
+        },
+        {
+          "program": "Girls Who Code",
+          "why_aligned": "Same as Kode with Klossy",
+          "status": "Student already planning to sign up",
+          "urgency": "Apply within 1-2 weeks"
+        },
+        {
+          "program": "NYU CS Research Program for Girls",
+          "why_aligned": "Combines existing research skills with new CS domain, research project outcome (can publish paper), prestigious university affiliation",
+          "strategic_rationale": "Allows you to apply your existing research background into a new skillset or new domain that you're interested in, which in this case is computer science",
+          "urgency": "Application still open at time of session"
+        }
+      ],
+      "also_do": [
+        {
+          "activity": "Personal Storytelling Project",
+          "timeline": "Summer before senior year",
+          "purpose": "Demonstrate creativity, tie to service mission"
+        },
+        {
+          "activity": "Prepare College Applications",
+          "timeline": "Summer before senior year",
+          "purpose": "Get ahead on school list, essay plans, strategy for each program"
+        },
+        {
+          "activity": "Organize Second Charity Fundraiser",
+          "purpose": "Security cameras for school in India"
+        }
+      ],
+      "strongly_discouraged": [
+        {
+          "program": "Community College Courses (Python, Java at NOVA)",
+          "student_reasoning": "Compensate for the time that I lost",
+          "coach_rejection": "Waste of precious time, colleges don't expect pre-expertise, better alternatives exist (free online + summer programs)",
+          "time_investment_vs_payoff": "High time, low admissions impact"
+        }
+      ],
+      "criteria_for_evaluation": [
+        "Competitiveness/Selectivity (admission = award)",
+        "Cost structure (FREE = merit-based preferred)",
+        "Alignment with existing strengths",
+        "Network/resource access",
+        "Project outcomes (publications, etc.)",
+        "Time investment vs. admissions impact"
+      ],
+      "objective": "Secure Admission in at least 1 Prestigious Summer Program"
+    },
+    "course_rigor": {
+      "senior_year_plan": [
+        "AP Computer Science A (take actual course after self-studying prerequisites)",
+        "AP Comparative Government",
+        "AP US Government",
+        "AOS Multivariable Calculus (if BC exam goes well)"
+      ],
+      "current_junior_year_validation": "Course load is strong, self-studying AP Calc BC while taking AB is fine",
+      "balancing_philosophy": "Don't push for more APs - focus on extracurriculars and summer programs instead",
+      "key_philosophy_coach_siraj": "You don't need more academics anymore, you've already demonstrated that.",
+      "what_not_recommended": [
+        "Additional AP sciences",
+        "Additional college courses during school year",
+        "Stretching beyond current capacity for more academic rigor"
+      ]
+    },
+    "differentiation": {
+      "positioning": "Interdisciplinary student pursuing hyper-specific programs (not generic CS or IR)",
+      "programs_that_validate_narrative": [
+        "Yale: History of Science, Medicine, Public Health",
+        "Brown: Science Technology and Society",
+        "CMU: Human-Computer Interaction",
+        "Duke: Program II (design your own interdisciplinary major)"
+      ],
+      "personal_connection_emphasis": "Brother's autism → research → broader disability advocacy theme",
+      "institutional_priorities_angle": "Schools establishing disability studies programs, need student leaders",
+      "career_goal_alignment": "NSA intelligence analysis requires interdisciplinary thinking + specialized expertise"
+    }
+  },
+
+  "coaching_tactics_observed": {
+    "rapport_building": [
+      "Immediate validation of concerns: 'I think you don't need to be worried...'",
+      "'I've been there too' relatability: 'When I was in high school I did a bunch of things that really weren't related'",
+      "Casual, natural language: 'Cool', 'Awesome', 'That's super cool'",
+      "Active listening signals: 'I hear you saying...', 'That makes sense because...'",
+      "Personal anecdote sharing: FBI tour story, Stanford Symbolic Systems experience",
+      "Inclusive language: 'We can work on this together', 'Let's figure this out'"
+    ],
+    "probing_techniques": [
+      "Simple follow-up: 'Tell me more about that' (repeated)",
+      "Origin story questions: 'How did you know you're interested in history? What sparked your interest?'",
+      "Personal connection probes: 'What inspired you to start this [autism research] project?'",
+      "Clarifying questions: 'Haven't you already taken data science and another intro to computer science class?'",
+      "Hypothetical/exploratory: 'Would you be interested in doing or preparing for Arangetram?'",
+      "Priority-forcing: 'What is your priority between a school with really good Liberal Arts vs. really good STEM?'"
+    ],
+    "reframing_tactics": [
+      "'Disjointed' → 'Interdisciplinary': 'If we do research, we can find very specific programs that might be a perfect fit'",
+      "'Late start in CS' → 'Curiosity is enough': 'You don't need to be a professional in a subject to major in it in college'",
+      "'Not enough activities' → 'Quality over quantity': Research is 'definitely like a big project for you'",
+      "'Different backgrounds' → 'Strength for FBI/Intelligence': 'Agents come from all different backgrounds'",
+      "'I quit dance' → 'Cultural asset to leverage': 'Having connection to your culture is great for colleges too'"
+    ],
+    "motivation_techniques": [
+      "Create urgency without panic: 'Very fast turnaround... next 1-2 weeks' balanced with 'I don't think it's too late'",
+      "Show what's possible (aspiration): Screen-shared Yale History of Science major",
+      "Celebrate existing achievements: '1550 SAT - awesome', 'You raised $2,000 - that's awesome'",
+      "Reference institutional priorities: 'Schools are specifically looking for people like you'",
+      "Specific, achievable next steps: 'Let's start with summer programs' (concrete first step)",
+      "Paint vision of success: 'With the right strategies... [you] can build a strong profile'"
+    ],
+    "parent_management": [
+      "Include parent in introduction: Coach Siraj invited mom, set expectations",
+      "Set expectations with parent: 'Goal is to bring out things that will help your daughter stand out'",
+      "Direct most questions to student: Jenny consistently addressed student first",
+      "Validate parent input, redirect to student: Mom mentioned music → Jenny asked student if interested",
+      "Educate parent on process: Siraj explained 'why weekly coaching' vs. just giving activity list",
+      "Create partnership: 'We want to really deliver an outcome and impact'"
+    ],
+    "adaptive_behavior": [
+      "When student confused: Didn't push, asked about history interest origin story instead",
+      "When student showed resistance: Immediate reassurance + reframe",
+      "When student highly engaged: Doubled down (after Yale reveal, explained her own Symbolic Systems experience)",
+      "When time running out: Shifted from Q&A to deeper extracurricular exploration",
+      "When parent interjected: Asked follow-up, then looped back to student for decision"
+    ]
+  },
+
+  "critical_interventions": [
+    {
+      "issue": "Student planned to take college Python and Java courses at NOVA to 'compensate for lost time'",
+      "coach_response": "Strong recommendation AGAINST: 'My advice for you right off the bat is, I would say, don't do those 2 courses. I think it would be a waste of your time'",
+      "rationale": "Limited time means must focus on high-ROI activities; colleges don't expect CS expertise; time is most precious asset for late-starters",
+      "alternative_provided": "Free online resources (Codingbat.com), competitive summer programs (Kode with Klossy, Girls Who Code, NYU CS Research)",
+      "outcome": "Student agreed to pivot strategy",
+      "significance": "Critical for late-starters - prevents wasted effort on low-ROI activities"
+    }
+  ],
+
+  "timeline_and_priorities": {
+    "immediate_1_2_weeks": {
+      "tier_1_critical": [
+        "Apply to 3-5 competitive summer programs (Girls Who Code, Kode with Klossy, NYU CS Research) - URGENT deadlines",
+        "Begin outline for 2-3 essay-based awards (NCWIT, AFSA, NYTimes)"
+      ]
+    },
+    "short_term_3_months_spring_junior": {
+      "tier_1_critical": [
+        "Submit award applications (NCWIT, AFSA Essay, NYTimes Essay)",
+        "Complete junior year research project (autism/learning & memory)",
+        "Formalize charity organization (create title/role, structure)"
+      ],
+      "tier_2_important": [
+        "Identify 1-2 disability advocacy organizations to join/launch",
+        "Prepare for AP exams (especially BC Calc self-study)"
+      ]
+    },
+    "summer_before_senior_year": {
+      "tier_1_critical": [
+        "Attend competitive summer program (if admitted)",
+        "Personal storytelling project (publish/submit/fundraise)",
+        "Begin college application preparation (school list, essay outlines, strategy)",
+        "Organize second charity fundraiser (security cameras for school in India)"
+      ]
+    },
+    "senior_year_fall": {
+      "tier_1_critical": [
+        "Submit Regeneron Science Talent Search / ISEF application (using junior year research)",
+        "Submit machine learning research project",
+        "Continue leadership roles (Editor-in-Chief, Yearbook)",
+        "Early Decision/Early Action applications (November)",
+        "Regular Decision applications (January)"
+      ]
+    },
+    "prioritization_hierarchy": {
+      "tier_1_urgent_1_2_weeks": "Summer program applications",
+      "tier_2_high_priority_3_months": "Extracurricular depth building (CS summer program, research competitions), Awards strategy execution, Narrative clarification through activities",
+      "tier_3_ongoing_senior_year": "Maintaining leadership roles, Continuing research projects, Honor society participation"
+    }
+  },
+
+  "meta_coaching_moments": {
+    "explaining_why_colleges_dont_expect_expertise": "Colleges recognize that you could have curiosity in a subject, and that's enough for you to wanna major in it, and you don't necessarily need to be a pro in something to major in college.",
+    "connecting_recommendations_to_broader_strategy": "This is something that I wanna share with you is that you might think that your activities are too broad, or that they don't fit into a certain category or major. But if we do research, we can find very specific programs like this one at a school that you're very interested in that might be a perfect fit actually for your background, your story, and like what you wanna do.",
+    "referenced_past_student_success": "A lot of schools have what we call like institutional priorities, or they have they make it a priority that they're trying to expand a program in disability studies... schools are specifically looking for people that they know will help lead these initiatives.",
+    "explaining_summer_program_strategic_value": "Summer programs are quite important, because, first of all, they give you practice writing essays, which is good for the college application. But also, they connect you with other resources. So other students, different institutions, and other programs, and other opportunities that you can take advantage of, for example, like through this program, publishing a paper doing research with NYU faculty.",
+    "from_coach_siraj_process_transparency": "Your narrative needs to be, you know, clarified quite soon. Then your target colleges and programs need to be like, you know, kind of a baseline somewhere. What that will do is that will bring more clarity, and that will reduce unnecessary stress and noise from your scheduling."
+  },
+
+  "archetype_specific_patterns": {
+    "for_high_achiever_late_starters": {
+      "lead_with": "Time optimization framework (low effort, high impact)",
+      "emphasize": "Strong interventions against low-ROI activities, Interdisciplinary program matching, Leveraging existing skills into new domain",
+      "avoid": "Adding more academics, Starting from scratch in new area, Overwhelming with long timelines",
+      "key_deliverables": [
+        "Activity hub organization (3 hubs: Research, Service, Storytelling)",
+        "Specific summer program targets (competitive, free, CS-focused)",
+        "Awards in existing strength areas (writing, history) not new areas",
+        "Interdisciplinary college programs (Yale History of Science, Brown STS)",
+        "Strong anti-recommendations (what NOT to do)"
+      ]
+    }
+  },
+
+  "success_metrics_defined": {
+    "summer_programs": {
+      "target": "Secure admission in at least 1 prestigious summer program (10-20% admit rate)",
+      "applications": "Apply to 3-5 programs"
+    },
+    "awards": {
+      "target": "Submit applications to at least 3 national-level awards",
+      "win_target": "At least 1-2 wins (but application demonstrates effort)"
+    },
+    "extracurriculars": {
+      "hub_depth": "Each of 3 hubs should have at least ONE leadership/recognition element",
+      "formalization": "Charity work formalized with title/role"
+    },
+    "narrative_clarity": {
+      "target": "Student can articulate cohesive story connecting disparate interests through disability advocacy theme"
+    },
+    "college_positioning": {
+      "target": "Apply to 15 schools (7 reach, 5 target, 3 safety) with specific interdisciplinary programs identified"
+    },
+    "research": {
+      "target": "Complete junior year project + submit to Regeneron/ISEF senior year fall"
+    }
+  },
+
+  "effectiveness_indicators": {
+    "narrative_clarity_improvement": 5.5,
+    "student_engagement": "very_high (student excited about Yale History of Science reveal, agreed to pivot from college courses)",
+    "parent_satisfaction": "high (mother present, no objections, engaged with coach Siraj's explanations)",
+    "frameworks_resonated": true,
+    "immediate_value_demonstrated": true,
+    "conversion_likelihood": "high",
+    "critical_intervention_success": "Student agreed to drop college courses (major time/money savings)"
+  }
+}

@@ -1,0 +1,667 @@
+{
+  "student_id": "aaryan_003",
+  "extraction_date": "2025-10-20",
+  "coach_id": "jenny_duan",
+  "additional_coaches": ["saraj_ivylevel", "rishi_p", "yanav_lall"],
+
+  "session_metadata": {
+    "student_archetype": "High-Achiever Early Explorer (Bay Area STEM)",
+    "sub_archetype": "Bay Area STEM Achiever with Emerging Differentiation",
+    "grade_level": 9,
+    "session_count": 2,
+    "session_1_date": "2024-04-14",
+    "session_1_duration_minutes": 62,
+    "session_2_date": "2024-04-24",
+    "session_2_duration_minutes": 58,
+    "total_session_time_minutes": 120,
+    "session_type": "360_assessment_plus_gameplan",
+    "school_type": "private_religious",
+    "school_name": "Valley Christian High School",
+    "location": "San Jose, California",
+    "student_readiness_score": 6.5,
+    "narrative_clarity_start": 3,
+    "narrative_clarity_end": 8,
+    "parent_involvement": "very_high",
+    "intended_major": "Computer Science (initially vague business+tech)",
+    "technical_issues": "Session 2: Jenny late due to Uber, VPN connection issues",
+    "multi_coach_format": true
+  },
+
+  "student_profile": {
+    "academic_standing": {
+      "gpa": 4.5,
+      "gpa_type": "weighted",
+      "current_semester_gpa": 4.3,
+      "lowest_grade": "87 (B) in Precalc Honors",
+      "sat_psat": "Not yet taken",
+      "aps_taken": 1,
+      "aps_planned": "12+ by graduation (target: 16 to match Valley Christian Stanford admit)",
+      "course_rigor": "very_high",
+      "courses_current": ["Precalc Honors", "AP CSP", "Honors Biology", "Honors English 9", "Spanish 2 H", "PE", "Theology (required)"],
+      "courses_next_year": ["Calc BC", "AP CS A", "Honors Chem", "Spanish 3 H", "AP World History", "AP Physics 1 (pending approval)", "AP Stats (recommended by Jenny)"]
+    },
+    "involvement_level": "moderate_quantity_shallow_depth",
+    "starting_readiness": "academically_strong_unclear_passion",
+    "achievement_orientation": "high_achiever",
+    "execution_style": "needs_structure_gets_bored_easily",
+    "passion_clarity": "initially_vague_parent_influenced_breakthrough_in_session_2",
+    "resource_access": "very_high",
+    "personality_traits": ["introverted", "shy", "thoughtful", "gets_bored_easily", "needs_concrete_examples"],
+    "demographics": {
+      "ethnicity": "Indian/South Asian",
+      "gender": "Male",
+      "socioeconomic": "High (private school, coaching program)"
+    }
+  },
+
+  "key_challenges": [
+    {
+      "challenge": "Cookie-cutter Bay Area STEM profile",
+      "quote": "Let's be honest like you are an Indian male who's wants to study Cs from the Bay Area. There's many, many students with the same profile as you",
+      "severity": "critical"
+    },
+    {
+      "challenge": "Lack of clarity on intended major (scattered interests)",
+      "description": "Interests span CS, business, cybersecurity, space, astrophysics - initially unfocused",
+      "quote": "Aaryan's interests span across computer science, business, cybersecurity, and now space and astrophysics, further complicating his academic focus",
+      "severity": "high"
+    },
+    {
+      "challenge": "Parent-driven interests (business from father)",
+      "quote": "I think it's probably my dad...He's in business and tech. So I kinda wanna do what he does",
+      "severity": "medium"
+    },
+    {
+      "challenge": "B in Math (Precalc Honors - 87)",
+      "quote": "Right now, the lowest is at 87 in precalc",
+      "severity": "medium",
+      "mitigation": "Not a B yet, can still improve to A before semester ends"
+    },
+    {
+      "challenge": "Shallow community service (mandatory soup kitchen)",
+      "quote": "With the soup kitchen, I'm not really interested in that. I just do it cause I have to",
+      "severity": "medium"
+    },
+    {
+      "challenge": "Tennis time investment with no competitive achievements",
+      "description": "10 hours/week on tennis, no wins or leadership, most common sport for demographic",
+      "severity": "low_to_medium"
+    },
+    {
+      "challenge": "Shyness limiting leadership opportunities",
+      "quote": "Probably more shy...I just don't want to [be more outgoing]",
+      "severity": "low",
+      "mitigation": "Jenny normalized as developmental phase"
+    }
+  ],
+
+  "narrative_development": {
+    "initial_clarity_score": 3,
+    "final_clarity_score": 8,
+    "breakthrough_moment": {
+      "session": 2,
+      "timestamp": "00:30:00",
+      "trigger_question": "Is there anything you just want to build just for the sake of building it?",
+      "student_response": "Something to do with space. Maybe.",
+      "coach_follow_up": "Oh, wait. Tell me more about this interest in space. I feel like I haven't heard you speak about this before",
+      "significance": "Unlocked authentic passion (space/astrophysics from Interstellar movie) vs. stated interest (business from dad)"
+    },
+    "initial_stated_interests": {
+      "primary": "Business and technology (father's influence)",
+      "secondary": "Computer science, cybersecurity",
+      "tertiary": "Tennis (athletic activity)",
+      "origin": "External - father's startup, parent expectations"
+    },
+    "discovered_authentic_interests": {
+      "primary": "Space and astrophysics (black holes, cosmic phenomena)",
+      "origin_story": "Watching Interstellar movie sparked obsession with black holes",
+      "validation": "Mother confirmed: 'He was obsessed with black holes for a while'",
+      "depth_indicators": ["Watches space videos regularly", "Interested in how things work in space", "Drawn to sci-fi"]
+    },
+    "final_narrative": "CS + Space + Entrepreneurship student who wants to use technology to make complex astrophysics concepts accessible, with pathway toward NASA internship and space tech innovation",
+    "differentiation_angle": "Space+CS (uncommon for Bay Area) + authentic origin story (Interstellar) + family entrepreneurship exposure = unique profile vs. generic CS students",
+    "three_pillars": {
+      "aptitude": "Computer Science, Cybersecurity, Astrophysics",
+      "passion": "Space phenomena, making STEM accessible",
+      "service": "Tennis mentorship, cybersecurity education for underserved"
+    }
+  },
+
+  "frameworks_introduced": [
+    {
+      "framework_name": "Cookie Cutter Profile Awareness",
+      "introduced_when": "Session 1, after extracurricular discussion (00:36:00)",
+      "introduction_language": "Let's be honest like you are an Indian male who's wants to study Cs from the Bay Area. There's many, many students with the same profile as you, who maybe spend hours volunteering at the soup kitchen, who do business, who are interested in all these areas. And that's not a bad thing. But what we wanna do is really make your profile and make you stand out by highlighting what's unique about you",
+      "application_immediate": true,
+      "student_response": "implicit_agreement_parent_acknowledgment",
+      "effectiveness": "very_high",
+      "reinforcement": "Saraj showed Rishi example (Stanford admit with community impact focus)"
+    },
+    {
+      "framework_name": "Activity Categorization (Common App 10 Activities)",
+      "introduced_when": "Session 1, before strategic planning (00:21:00)",
+      "introduction_language": "On the common application there's space to list up to 10 different activities...typically, people have a balance of academic related activities...pre professional things like Deca or Investment Club...people also like to spend their time volunteering",
+      "application_immediate": true,
+      "effectiveness": "high",
+      "purpose": "Establish framework for balanced EC portfolio"
+    },
+    {
+      "framework_name": "Purpose-Driven Work (Not Just for College)",
+      "introduced_when": "Session 1, after TIME Magazine question (00:17:00)",
+      "introduction_language": "I want you to approach school and tennis and everything else with that sense of purpose...College preparation is not ultimately just about getting into a good school. It's about developing as a person. So when I say these things, I don't want it to seem like you're doing everything just to get into college. It's really to help you grow as a person and getting into college is a byproduct of that",
+      "positioned_as": "meta_coaching_motivation",
+      "effectiveness": "high",
+      "purpose": "Reduce cynicism, maintain authenticity"
+    },
+    {
+      "framework_name": "Leadership Through Club Growth Metrics",
+      "introduced_when": "Session 1, during Investment Club discussion (00:34:00)",
+      "introduction_language": "Most college applications...wanna see metrics. If you're starting with a small club that is actually gonna be a benefit because you can show more growth. For a bigger club already with 100 members, it's hard to show 20-30-40-50% growth. But if you're a small club and you only have like 5 members, it can be really easy to double even triple quadruple your membership",
+      "application_immediate": true,
+      "effectiveness": "very_high",
+      "key_insight": "Small club = advantage (easier to show percentage growth) vs. liability"
+    },
+    {
+      "framework_name": "Service vs. Impact Distinction",
+      "introduced_when": "Session 1, during community service discussion (00:35:00)",
+      "introduction_language": "It's not just service. It's not just about being a body there and giving a number of hours. It's about trying to make an impact in some area or some cause in the world",
+      "reinforcement": "Saraj's Rishi example: 'It's his community and service impact right? Not a single line of code. It's all like what they've done is they've actually procured all the waste kind of devices'",
+      "effectiveness": "very_high",
+      "key_components": ["Hours ≠ impact", "Need authentic cause", "Measurable outcomes", "Connect to personal why"]
+    },
+    {
+      "framework_name": "Summer Strategy: Upskilling vs. Impact Projects",
+      "introduced_when": "Session 2, when discussing summer plans (00:52:00)",
+      "introduction_language": "There is an upskilling path. There are thousands and tons of programs that actually help you learn things...What we want to do, however, is leverage your summer for passion projects, passion areas, community impact areas",
+      "key_distinction": "Upskilling (courses/bootcamps) vs. Building (projects with measurable impact)",
+      "anti_pattern_example": "Inspire AI - 'everyone goes after that...Typical kind of bay area tech profile'",
+      "effectiveness": "very_high",
+      "led_by": "saraj",
+      "student_archetype_relevance": "high_resource_students_bay_area"
+    },
+    {
+      "framework_name": "Tenure + Depth Formula",
+      "introduced_when": "Session 2, when explaining why to start early (00:54:00)",
+      "introduction_language": "There are 2 metrics around it. One is the commitment of tenure is very important. Because, are you really someone who's actually spent a lot of time and effort on it for a long period of time? Or was this something that you just did for checklists? Plus the depth of it is also important",
+      "example_given": "Rishi started e-waste project freshman year → 4 years tenure",
+      "effectiveness": "high",
+      "purpose": "Justify starting projects now (9th grade) for 4-year runway"
+    }
+  ],
+
+  "strategic_recommendations": {
+    "extracurriculars": {
+      "add": [
+        "CyberPatriot club (founding president) - cybersecurity competition focus",
+        "CS for Social Good club - create apps/websites for nonprofits and small businesses",
+        "Space-related activities: NASA Ames volunteering, Aerospace Museum, space simulation projects",
+        "Professor research outreach (SJSU, Stanford, SCU, UC Davis) - space/CS research"
+      ],
+      "continue": [
+        "Investment Club (with co-leadership opportunity)",
+        "DECA (but not primary focus)",
+        "Tennis (IF can achieve team captain by 11th grade, otherwise pivot to coaching/mentorship)"
+      ],
+      "drop_or_deprioritize": [
+        "Soup kitchen volunteering (not authentic, mandatory)",
+        "Tennis as primary activity (if no competitive achievements)",
+        "Football, volleyball (diminishing returns, tennis already covers athletic involvement)"
+      ],
+      "strategy": "differentiation_through_space_niche_plus_cybersecurity_depth"
+    },
+    "awards": {
+      "must_apply": [
+        "CyberPatriot Competition (target: State Platinum or higher)",
+        "PSAT/National Merit (target: 1500+ in California)"
+      ],
+      "should_apply": [
+        "Diamond Challenge (international business competition - 'not challenging to win at some level')",
+        "Conrad Challenge (innovation competition for 13-18)",
+        "SAGE Global (international entrepreneurship)",
+        "Teens in Business Award"
+      ],
+      "avoid": [
+        "USACO (too competitive for his current level)",
+        "AMC Math Competition (has B in math, not strength area)",
+        "Science Olympiad (no biology/chemistry passion demonstrated)"
+      ],
+      "target": "at_least_one_state_or_national_level_award_by_11th_grade"
+    },
+    "summer_programs": {
+      "freshman_summer_priorities": [
+        "Community college courses at De Anza (cybersecurity fundamentals, Linux) - FREE for CA residents",
+        "Python skill building (py4e.org)",
+        "Visit NASA Ames Research Center + Aerospace Museum of California",
+        "Professor outreach for potential research opportunities",
+        "Begin space simulation passion project"
+      ],
+      "sophomore_summer": [
+        "Computer Science/Astro/Cybersecurity programs (TBD based on progress)",
+        "Continued service leadership",
+        "Develop impactful service project"
+      ],
+      "junior_summer": [
+        "Notre Dame Leadership Seminars",
+        "Bank of America Student Leaders",
+        "Yale Young Global Scholars",
+        "AI Scholars"
+      ],
+      "avoid": [
+        "Inspire AI (oversaturated for Bay Area STEM students)",
+        "Generic coding bootcamps (Coding Dojo, App Academy)",
+        "Expensive leadership programs with no selectivity"
+      ],
+      "strategy": "freshman_summer_upskilling_sophomore_onward_impact_projects"
+    },
+    "course_rigor": {
+      "sophomore_year": ["Calc BC", "AP CS A", "Honors Chem", "Spanish 3 H", "AP World History", "AP Physics 1", "AP Stats (ADDED per Jenny recommendation)"],
+      "target_ap_count": "16 APs by graduation (benchmark from Valley Christian Stanford admit)",
+      "community_college": "Take cybersecurity fundamentals + Linux courses summer before 10th grade at De Anza",
+      "business_classes": "Take Business Fundamentals, Entrepreneurship, Social Innovation (when offered at Valley Christian)",
+      "priority": "Fix math grade (87 → A in Precalc) before semester ends"
+    },
+    "differentiation": {
+      "primary_angle": "Space + CS (uncommon for Bay Area CS students)",
+      "origin_story": "Interstellar movie sparked fascination with black holes and cosmic phenomena (authentic, emotional hook for essays)",
+      "supporting_activities": [
+        "Space simulation/visualization projects",
+        "CS research on astronomical phenomena detection",
+        "NASA Ames involvement",
+        "Cybersecurity club (father's field, authentic connection)"
+      ],
+      "narrative_integration": "Using technology to make complex space concepts accessible to broader audiences",
+      "long_term_goal": "NASA internship pathway, space tech entrepreneurship"
+    },
+    "community_service": {
+      "authentic_areas": [
+        "Tennis mentorship for low-income students (leverages existing skill)",
+        "Cybersecurity education for imprisoned youth or immigrant/refugee centers (combines tech + unique population)",
+        "Space education workshops for underserved communities (aligns with passion)"
+      ],
+      "avoid": "Soup kitchen (acknowledged as inauthentic mandatory service)",
+      "required_metrics": ["# people impacted", "$ raised (if applicable)", "Media features", "Partnership with established organization"],
+      "timeline": "Explore 9th grade, launch 10th grade, scale 11th grade"
+    },
+    "sports_strategy": {
+      "decision_framework": "Continue IF achieves team captain by 11th grade OR pivot to coaching/mentorship",
+      "rationale": "Tennis is most common sport for Indian males in Bay Area + no competitive wins → diminishing returns",
+      "alternative_path": "Reduce to recreational, free up 10hrs/week for differentiating activities (space projects, CyberPatriot)",
+      "coaching_opportunity": "Lead free tennis camp for low-income students OR coach at SJSU Racquet Club",
+      "timeline": "Decide by end of 10th grade season"
+    }
+  },
+
+  "coaching_tactics_observed": {
+    "rapport_building": [
+      "Personal connection finding ('My best friend went to Valley Christian')",
+      "Shared experience validation ('I went to Jesuit High School, I know about required mass')",
+      "Normalizing video games ('My Stanford professor loves video games, going to League of Legends championships')",
+      "Empathetic framing ('Freshman year is scary, gets easier after that')",
+      "Age-appropriate casualness ('So okay...What else?')",
+      "'I hear you saying' mirroring (validates before deepening)"
+    ],
+    "probing_techniques": [
+      "The 'Why' Ladder (ask why 3-5 times in different ways until authentic answer emerges)",
+      "Binary choice follow-ups ('Physics vs. space travel? Natural vs. man-made objects?')",
+      "Scaffolded examples (provide 3-4 concrete examples when student struggles with abstract question)",
+      "The 'Tell me more' probe (with urgency: 'Oh wait, tell me more about this')",
+      "Multi-part follow-ups (attack interest from multiple angles)",
+      "The 'What's stopping you?' probe (assumes student wants to do it, identifies obstacles)",
+      "Hypothetical future projection ('What kind of business will you start? What do you want out of it?')"
+    ],
+    "reframing_tactics": [
+      "'Cookie cutter' → Opportunity for differentiation",
+      "'Late starter' → Growth opportunity (small club = easier to show metrics)",
+      "'Shy' → Developmental phase (normalized with Jenny's own 8th/9th grade story)",
+      "'B in math' → Opportunity to show improvement (past straight A's prove capability)",
+      "'Soup kitchen mandatory' → Find authentic service instead (validated lack of interest, pivoted immediately)",
+      "'Tennis time sink' → Mentorship opportunity (if not competitive athlete, become coach)"
+    ],
+    "motivation_techniques": [
+      "'I know you can do it' evidence-based affirmations (references past straight A's)",
+      "'Props to you' immediate recognition",
+      "Future success projection (TIME Magazine cover in 20 years)",
+      "Gentle deadline awareness ('It's already May...starting now')",
+      "Opportunity cost framing ('This is a really good opportunity to demonstrate growth')",
+      "Social proof without pressure (Rishi example: 'started same age, look at impact')"
+    ],
+    "parent_management": [
+      "Acknowledge then redirect (brief validation → immediate student question)",
+      "Thank parent for context, keep student centered",
+      "Use parent input as data, not direction",
+      "Explicit meta-communication about process ('This is discovery, not prescriptive')",
+      "Validate parent concerns then reframe (father's startup excitement → student's own vision)",
+      "Direct questions to student even when parent answers"
+    ],
+    "breakthrough_tactics": [
+      "The 'Just for fun' pivot question (removed performance pressure → unlocked space interest)",
+      "The 'Wait, tell me more' interrupt (creates curiosity, signals importance)",
+      "Rapid resource generation (5 opportunities in 5 minutes after space mention)",
+      "Multi-angle validation (tested space interest from physics, building, research, CS angles)",
+      "Origin story capture ('How'd you get interested? When?' → Interstellar movie = essay gold)"
+    ],
+    "adaptive_behaviors": [
+      "When student gives short answers → provide scaffolding examples",
+      "When student shows resistance → validate and pivot (soup kitchen → alternative service)",
+      "When student shows engagement → lean in heavily (space interest got 15+ minutes)",
+      "When parent interjects → acknowledge briefly, redirect to student",
+      "When brainstorming stalls → break big question into micro-questions"
+    ]
+  },
+
+  "gameplan_structure": {
+    "total_pages": 17,
+    "sections": [
+      "Introduction",
+      "Profile Evaluation: Standout Strengths (6 strengths)",
+      "Top Weak Spots Identified (4 major weak spots)",
+      "Tailored 4-Year Strategies (5 strategies)",
+      "Aaryan's Ideal Ivy Level Profile",
+      "Additional Notes (Tennis/Sports)",
+      "School AP/Course Selection Strategy",
+      "Personalized 1:1 Program Proposal (year-by-year breakdown)",
+      "Why IvyLevel",
+      "Signatures"
+    ],
+    "visual_elements": {
+      "highlighting": "Yellow for Session 1 insights, Pink for Session 2 insights",
+      "formatting": "Headers, bullet points, numbered lists",
+      "emphasis": "Bold for key terms, underline for critical warnings"
+    },
+    "narrative_articulation": {
+      "primary_statement": "Cohesively weaving his Astro + Cybersecurity + Business passions to deliver Community Impact is a very unique and standout Ivy level profile especially for a student from Aaryan's background, location, school system",
+      "word_count": 33
+    },
+    "key_differentiators_from_generic": [
+      "Student name used throughout (not 'the student')",
+      "Direct quotes from sessions",
+      "School-specific data (Valley Christian Stanford admit took 16 APs)",
+      "Local resources named (De Anza College, NASA Ames, SJSU Racquet Club)",
+      "Session discovery moments highlighted ('Based on Session 2, Aaryan...')",
+      "Personal origin stories (Interstellar movie)",
+      "Anti-patterns specific to archetype (avoid Inspire AI)",
+      "Family context integrated (father's funded AI startup)"
+    ]
+  },
+
+  "timeline_and_priorities": {
+    "immediate_next_3_months": {
+      "tier_1_critical": [
+        "Submit club application (CyberPatriot or CS for Good) by May 10th deadline",
+        "Fix math grade (87 → A in Precalc before semester ends)",
+        "Sign up for De Anza College summer cybersecurity course"
+      ],
+      "tier_2_important": [
+        "Begin Python learning (py4e.org)",
+        "Visit NASA Ames Research Center",
+        "Start space project brainstorming"
+      ]
+    },
+    "next_6_months_fall_2024": {
+      "tier_1_critical": [
+        "Launch CyberPatriot club, recruit members",
+        "Take PSAT 10 (prep over summer)",
+        "Begin CyberPatriot competition training"
+      ],
+      "tier_2_important": [
+        "Start space simulation passion project",
+        "Secure 1-2 leadership roles (club founder + Investment Club officer)",
+        "Professor outreach for research opportunities"
+      ]
+    },
+    "next_12_months_through_april_2025": {
+      "tier_1_critical": [
+        "Compete in first CyberPatriot competition",
+        "Submit to Conrad Challenge or Diamond Challenge",
+        "Have concrete space project to showcase"
+      ],
+      "tier_2_important": [
+        "Apply to sophomore summer programs (Bank of America Student Leaders, etc.)",
+        "Grow Investment Club membership (show metrics)",
+        "Begin authentic community service project (tennis mentorship or cyber education)"
+      ]
+    },
+    "sophomore_year_goals": [
+      "Clarify intended major (Space+CS vs. Cybersecurity+Business)",
+      "Develop and implement at least one major community impact initiative",
+      "Secure at least one major leadership role",
+      "Apply for top prestigious awards"
+    ],
+    "junior_year_goals": [
+      "Target national award (based on sophomore service project)",
+      "Community impact/social justice writing award",
+      "Draft CommonApp statement",
+      "Apply for competitive scholarships (Cameron Impact, Davidson Fellows)"
+    ]
+  },
+
+  "meta_coaching_moments": {
+    "explaining_assessment_structure": "We'll start talking first about the academics, and then move on to the extracurriculars and the motivations so kind of doing a holistic assessment, how an admissions officer might view a student",
+    "college_prep_as_personal_development": "College preparation is not ultimately just about getting into a good school. It's about like developing as a person...getting into college is a byproduct of that",
+    "connecting_current_to_broader_strategy": "The reason why we're doing this, and the reason why all of the hard work that you're gonna put in now and over the next 4 years is to set you on that track to one day be on that cover of Times magazine",
+    "why_this_session_exists": "What we do in this 2 weeks...One of the primary questions you had was to really find the right fit in terms of the coach that actually would be partnering with Ayan...after that we'll spend the entire week as a team trying to figure out what's the right strategy",
+    "acknowledging_overwhelm": "I hope it's not very overwhelming, Arian, but I'm thoroughly enjoying this conversation. There's so many things that come out. It's just the depth of exploring your personality and your identity and your background",
+    "process_transparency": "This is a very heavy kind of...definitely. That's the intent. It's still not in the good shape. Right? More is not the point. Why is this a long term program?"
+  },
+
+  "knowledge_moat_insights": {
+    "proprietary_frameworks": [
+      "The 'Just for Fun' pivot question (removes performance pressure to unlock authentic passions)",
+      "School-specific admission data (Valley Christian Stanford admit took 16 APs)",
+      "Anti-pattern library (explicitly name oversaturated programs by demographic: Inspire AI for Bay Area)",
+      "Competition difficulty tier list (CyberPatriot easier than USACO/AMC for winning)",
+      "Small club = growth metrics advantage (reframe disadvantage as advantage)",
+      "Community college dual enrollment for niche skills (free CA resource underutilized)",
+      "Parent-driven interest detection (distinguish external vs. internal motivation)",
+      "Origin story validation (Interstellar movie = authentic vs. 'always been interested')",
+      "Multi-coach collaborative model (Jenny + Saraj tag-team with different strengths)",
+      "Real-time session adaptation (space interest pivot with immediate resource generation)"
+    ],
+    "proprietary_tactics": [
+      "Multi-angle interest validation (test from 5+ angles before building strategy)",
+      "The 'Wait, tell me more' interrupt (creates urgency/importance)",
+      "Rapid resource generation (5 local opportunities in 5 minutes)",
+      "Evidence-based affirmations ('You got straight A's last semester, so I know you can do it again')",
+      "Parent acknowledgment + immediate student redirect",
+      "2-coach model (Jenny = young/relatable, Saraj = experienced/data-driven/parent-facing)"
+    ],
+    "hard_to_replicate_strategies": [
+      "School-specific admit database (requires years of data collection from 1000s of schools)",
+      "Archetype-specific anti-pattern library (requires tracking which programs are oversaturated yearly)",
+      "2-coach collaborative model (requires culture of collaboration, doubles cost)",
+      "Real-time session adaptation (can't be scripted, requires coach expertise)",
+      "17-page personalized GamePlan with session quotes (10-15 hours per student)"
+    ],
+    "candid_program_assessments": [
+      "Inspire AI: 'everyone goes after that...Typical kind of bay area tech profile' - AVOID",
+      "CyberPatriot: 'not as competitive as USACO, AMC' - RECOMMENDED",
+      "Diamond Challenge: 'not challenging to win an award at some level' - RECOMMENDED",
+      "De Anza College: FREE for CA residents, college credit, differentiation - HIGHLY RECOMMENDED"
+    ],
+    "insider_access_examples": [
+      "Valley Christian Stanford admit data (16 APs taken)",
+      "Local professor contacts (SJSU, Stanford, SCU, UC Davis)",
+      "NASA Ames Research Center (San Jose location)",
+      "Aerospace Museum of California",
+      "Rishi case study (Stanford admit with 3.8 GPA, community impact focus)"
+    ]
+  },
+
+  "questions_by_phase": {
+    "discovery_questions": [
+      "Tell me your name, what grade you're in and what school and city you're from",
+      "What classes are you enrolled in right now?",
+      "Do you have good friends and everything at school?",
+      "Out of all your classes, what's your favorite class so far? (CRITICAL - Aaryan said PE not CS)",
+      "How are you perceived at school by your peers? Do you think you come off as more shy or more talkative?",
+      "What do you feel like is stopping you from being more outgoing right now?",
+      "What else are you interested in? What else do you spend time doing?"
+    ],
+    "narrative_questions": [
+      "When you're on the top cover of Times magazine in 20 years, what's the cover gonna say? (Required scaffolding with 3-4 examples)",
+      "Why is computer science interesting to you? (Asked 3+ times in different ways)",
+      "What got you interested in business? (Revealed parent influence)",
+      "Tell me about a cause that keeps you up at night (NOT USED - alternative: 'what areas stand out for community contribution')",
+      "Is there anything you just want to build just for the sake of building it? (BREAKTHROUGH QUESTION - unlocked space interest)",
+      "How'd you get interested in [space]? When did you first discover this? (Origin story: Interstellar movie)"
+    ],
+    "strategy_questions": [
+      "What's stopping you from [starting a club/taking leadership]?",
+      "Do you feel like you would have the opportunity to take leadership positions moving forward?",
+      "Would this be something that you would find interesting? (Test receptivity to recommendations)",
+      "Have you heard of [CyberPatriot/specific program]?",
+      "How would you solve this problem? (Aaryan suggested pre-order app for lunch lines)"
+    ],
+    "execution_questions": [
+      "What are your plans for the summer?",
+      "How much programming knowledge do you have right now?",
+      "How long does tennis take you every week? (10 hours - significant time sink)",
+      "Are you thinking about taking standardized testing anytime?",
+      "By the end of high school, how many APs do you forecast taking?"
+    ]
+  },
+
+  "archetype_specific_patterns": {
+    "for_high_achiever_early_explorer": {
+      "lead_with": "Academic validation (build confidence) → then probe passions",
+      "question_sequencing": "Academics first (safe territory) → ECs → Narrative (vulnerable) → Strategy",
+      "emphasize": "Tenure advantage (4 years to build), differentiation urgency, early leadership opportunities",
+      "avoid": "Overwhelming with tactics too early, accepting first-stated interests at face value, rigid timelines",
+      "key_deliverables": [
+        "Cookie cutter profile diagnosis + differentiation strategy",
+        "Authentic passion discovery (not parent-driven)",
+        "Club founding opportunity (vs. competing in established clubs)",
+        "Long-term 4-year roadmap with flexibility"
+      ],
+      "scaffolding_intensity": "HIGH (provide 3-4 examples before expecting answers)",
+      "parent_management": "Expect very high involvement, prepare gentle redirects to keep student centered",
+      "breakthrough_tactics": "Remove performance pressure ('just for fun' framing), probe until authentic interest emerges"
+    }
+  },
+
+  "success_metrics_defined": {
+    "academics": {
+      "gpa_target": "Maintain 4.0+ unweighted (fix current 87 in Precalc to A)",
+      "sat_target": "1550+",
+      "psat_target": "1500+ for National Merit (California cutoff)",
+      "ap_target": "16 APs by graduation (benchmark from Valley Christian Stanford admit)"
+    },
+    "extracurriculars": {
+      "leadership_count": "At least 2-3 leadership roles by 12th grade",
+      "tenure_target": "Start major projects 9th/10th grade for 3-4 year commitment",
+      "national_level_activities": "At least 1 activity at national level (CyberPatriot competition)",
+      "differentiation": "Space+CS niche clearly established through projects and research"
+    },
+    "awards": {
+      "by_10th_grade": "CyberPatriot State Platinum or higher, Diamond Challenge finalist",
+      "by_11th_grade": "At least one national-level award, PSAT National Merit",
+      "total": "Fill all 5 Common App award slots with meaningful recognition"
+    },
+    "summer": {
+      "freshman_summer": "Upskilling (De Anza courses, Python learning, NASA visit)",
+      "sophomore_summer": "Impact projects (service project launch, continued research)",
+      "junior_summer": "Selective programs (Bank of America Student Leaders, Yale Young Global Scholars, AI Scholars)"
+    },
+    "community_service": {
+      "quality": "Measurable impact (not just hours)",
+      "metrics": "# people impacted, $ raised, media features, organizational partnerships",
+      "authenticity": "Connected to tennis OR cybersecurity OR space (not generic soup kitchen)"
+    },
+    "narrative": {
+      "clarity": "Space+CS+entrepreneurship integration clearly articulated",
+      "origin_story": "Interstellar movie spark captured for essay potential",
+      "differentiation": "Distinct from typical Bay Area CS students"
+    }
+  },
+
+  "effectiveness_indicators": {
+    "narrative_clarity_improvement": 5,
+    "student_engagement": "moderate_then_high (quiet Session 1, opened up Session 2 with space discovery)",
+    "parent_satisfaction": "high (both parents engaged, appreciative of detailed report)",
+    "frameworks_resonated": true,
+    "immediate_value_demonstrated": true,
+    "breakthrough_achieved": true,
+    "conversion_likelihood": "very_high",
+    "unique_insights_uncovered": [
+      "Space interest from Interstellar (authentic passion)",
+      "Father's funded AI startup (family entrepreneurship context)",
+      "Tennis time investment with no ROI (10hrs/week, no wins)",
+      "Mother's concern about getting bored easily (important execution risk)"
+    ]
+  },
+
+  "cross_student_comparisons": {
+    "vs_anoushka": {
+      "similarities": [
+        "High GPA with one concerning grade (both had B risk)",
+        "Cookie cutter profile concern (both need differentiation)",
+        "Bay Area competitive context",
+        "Scattered initial interests",
+        "Need for national recognition"
+      ],
+      "differences": [
+        "Anoushka 11th grade (late starter) vs. Aaryan 9th grade (early explorer)",
+        "Anoushka outgoing/self-directed vs. Aaryan introverted/needs structure",
+        "Anoushka female CS + music vs. Aaryan male CS + space",
+        "Anoushka's interests more developed vs. Aaryan's still discovering"
+      ],
+      "framework_overlap": [
+        "Cookie cutter profile diagnosis",
+        "Academic foundation first",
+        "Free = prestigious summer programs"
+      ],
+      "framework_differences": [
+        "Anoushka: Woman in STEM positioning (gender strategy)",
+        "Aaryan: Space differentiation (niche interest strategy)",
+        "Anoushka: Web metaphor for scattered activities",
+        "Aaryan: Club growth metrics (small club advantage)"
+      ]
+    },
+    "vs_ananyaa": {
+      "similarities": [
+        "Both introverted personalities",
+        "Both need structure and scaffolding",
+        "Both have unique niche interests (Ananyaa: roses, Aaryan: space)",
+        "Both have authentic origin stories (Ananyaa: immigrant background, Aaryan: Interstellar movie)"
+      ],
+      "differences": [
+        "Ananyaa 10th grade female vs. Aaryan 9th grade male",
+        "Ananyaa's interest (gardening/roses) more established vs. Aaryan's space just discovered",
+        "Ananyaa immigrant/adversity narrative vs. Aaryan privileged demographic (harder differentiation)",
+        "Ananyaa Washington state vs. Aaryan Bay Area (different competitive landscapes)"
+      ],
+      "framework_overlap": [
+        "Cookie cutter profile diagnosis",
+        "Interest bridging strategy (roses → food science vs. space → CS applications)",
+        "Geographic resource arbitrage (Seattle Rose Society vs. NASA Ames)"
+      ],
+      "framework_differences": [
+        "Ananyaa: Overcoming adversity narrative (immigrant challenges)",
+        "Aaryan: Bay Area differentiation (must stand out from STEM crowd)",
+        "Ananyaa: Mother as research assistant (explicit parent task delegation)",
+        "Aaryan: Parent management more about centering student voice"
+      ]
+    }
+  },
+
+  "session_quality_notes": {
+    "strengths": [
+      "Two-session format allowed for discovery → reflection → deeper exploration",
+      "Multi-coach collaboration (Jenny + Saraj + Rishi + Yanav) provided diverse perspectives",
+      "GamePlan document (17 pages) extremely comprehensive with session quotes",
+      "Breakthrough moment in Session 2 (space interest) showed value of persistence",
+      "Parent management was excellent (acknowledged input while centering student)",
+      "Local resource identification (NASA Ames, De Anza, SJSU) highly specific"
+    ],
+    "areas_for_improvement": [
+      "TIME Magazine question didn't work well for 9th grader (too abstract, required heavy scaffolding)",
+      "Could have probed space interest earlier in Session 1 (discovered only in Session 2)",
+      "Tennis decision left somewhat unresolved (continue vs. pivot not fully decided)",
+      "Some redundancy between Session 1 and Session 2 discussions"
+    ],
+    "technical_issues": [
+      "Session 2: Jenny late due to Uber (apologized, offered to extend)",
+      "VPN connection issues causing audio dropouts"
+    ]
+  }
+}

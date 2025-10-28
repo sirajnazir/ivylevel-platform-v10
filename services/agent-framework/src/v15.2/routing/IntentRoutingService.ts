@@ -44,8 +44,11 @@ export class IntentRoutingService {
   private parser: StructuredOutputParser<z.infer<typeof IntentSchema>>;
 
   constructor() {
+    // Use best model by default (configurable via env)
+    const modelName = process.env.V15_2_INTENT_MODEL || 'gpt-4o';
+
     this.llm = new ChatOpenAI({
-      modelName: 'gpt-3.5-turbo',
+      modelName,
       temperature: 0,
       openAIApiKey: process.env.OPENAI_API_KEY!,
     });
@@ -112,7 +115,7 @@ Respond with your classification, confidence (0.0-1.0), and brief reasoning.`,
         query: studentQuery,
         classified_intent: result.intent as IntentType,
         confidence_score: result.confidence,
-        model_used: 'gpt-3.5-turbo',
+        model_used: process.env.V15_2_INTENT_MODEL || 'gpt-4o',
         reasoning: result.reasoning,
         context_snapshot: studentContext,
         processing_time_ms: processingTime,
@@ -122,7 +125,7 @@ Respond with your classification, confidence (0.0-1.0), and brief reasoning.`,
         intent: result.intent as IntentType,
         confidence: result.confidence,
         reasoning: result.reasoning,
-        model_used: 'gpt-3.5-turbo',
+        model_used: process.env.V15_2_INTENT_MODEL || 'gpt-4o',
       };
     } catch (error) {
       console.error('Intent classification failed:', error);
@@ -132,7 +135,7 @@ Respond with your classification, confidence (0.0-1.0), and brief reasoning.`,
         intent: 'clarification_needed',
         confidence: 0.3,
         reasoning: 'LLM classification failed, defaulting to clarification',
-        model_used: 'gpt-3.5-turbo',
+        model_used: process.env.V15_2_INTENT_MODEL || 'gpt-4o',
       };
     }
   }

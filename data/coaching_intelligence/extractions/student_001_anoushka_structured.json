@@ -1,0 +1,372 @@
+{
+  "student_id": "anoushka_001",
+  "extraction_date": "2025-10-20",
+  "coach_id": "jenny_duan",
+
+  "session_metadata": {
+    "student_archetype": "Well-Rounded Late-Starter with Scattered Excellence",
+    "grade_level": 11,
+    "session_duration_minutes": 60,
+    "session_date": "2023-08-01",
+    "session_type": "360_assessment",
+    "school_type": "large_competitive_public",
+    "school_name": "Lynbrook High School",
+    "location": "Bay Area, California",
+    "student_readiness_score": 6.5,
+    "narrative_clarity_start": 2,
+    "narrative_clarity_end": 7,
+    "parent_involvement": "high",
+    "intended_major": "Computer Science"
+  },
+
+  "student_profile": {
+    "academic_standing": {
+      "gpa": 4.0,
+      "gpa_type": "unweighted",
+      "sat_practice": 1560,
+      "psat": 1380,
+      "aps_taken": 2,
+      "aps_planned": "7-8 by graduation",
+      "course_rigor": "moderate_need_increase"
+    },
+    "involvement_level": "high_quantity_moderate_depth",
+    "starting_readiness": "partially_built_unfocused",
+    "achievement_orientation": "high_achiever",
+    "execution_style": "self_directed_aware_gaps",
+    "passion_clarity": "multiple_seeking_integration",
+    "resource_access": "high"
+  },
+
+  "key_challenges": [
+    {
+      "challenge": "Lack of CS depth despite CS major intent",
+      "quote": "none of them are really CS oriented except robotics...I'm not really doing anything that really showcases my CS",
+      "severity": "critical"
+    },
+    {
+      "challenge": "No national/international level recognition",
+      "quote": "I'd like to expand the impact of your curriculum because you're doing a lot of things on the State level",
+      "severity": "critical"
+    },
+    {
+      "challenge": "Disconnected activity profile",
+      "description": "Activities span music, CS, environmental policy, service - but no unifying narrative",
+      "severity": "high"
+    },
+    {
+      "challenge": "Competitive school context makes standing out difficult",
+      "description": "Lynbrook High School - large public with 60+ clubs, hard to differentiate",
+      "severity": "medium"
+    }
+  ],
+
+  "narrative_development": {
+    "initial_clarity_score": 2,
+    "final_clarity_score": 7,
+    "three_hubs_identified": {
+      "hub_1": {
+        "name": "Music/Arts (Passion Hub)",
+        "activities": ["Viking Vocalists President", "State Choir"],
+        "level": "state"
+      },
+      "hub_2": {
+        "name": "Computer Science (Aptitude Hub)",
+        "activities": ["AP CS A (score 5)", "tutoring Python/Scratch", "dropped robotics"],
+        "level": "regional_weak"
+      },
+      "hub_3": {
+        "name": "Environmental Advocacy (Service Hub)",
+        "activities": ["Sunnyvale YUPI Environmental Chair", "Octagon Service Club Secretary"],
+        "level": "regional"
+      }
+    },
+    "final_narrative": "Woman in STEM (CS focus) who balances technical aptitude with artistic expression (State-level choir) and civic engagement (environmental policy advocacy)",
+    "differentiation_angle": "Jack-of-all-trades well-rounded skill set rare for grade level + Woman in STEM positioning"
+  },
+
+  "frameworks_introduced": [
+    {
+      "framework_name": "Web Metaphor for Extracurriculars",
+      "introduced_when": "After EC discovery, when student expressed disconnection",
+      "introduction_language": "I think about extracurriculars, and how they support a person's profile is I think about it like a web",
+      "application_immediate": true,
+      "student_response": "positive_implicit_agreement",
+      "effectiveness": "high"
+    },
+    {
+      "framework_name": "Free = Prestigious (Summer Programs)",
+      "introduced_when": "When discussing summer program options",
+      "introduction_language": "Usually, if it's a free program, free means it's more prestigious",
+      "key_insight": "Free → merit-based → competitive → prestigious",
+      "positioned_as": "insider_knowledge_students_dont_know",
+      "effectiveness": "high"
+    },
+    {
+      "framework_name": "Senior Year AP Load-Up Strategy",
+      "introduced_when": "When discussing course rigor",
+      "introduction_language": "You should load up on as many APs as possible, because you don't actually have to follow through and take the exam",
+      "positioned_as": "insider_tactic_not_commonly_discussed",
+      "effectiveness": "high"
+    },
+    {
+      "framework_name": "Academic Foundation First",
+      "introduced_when": "Early in session",
+      "introduction_language": "They really start at the beginning from your standardized test and your grades, and that's your foundation",
+      "purpose": "Justify assessment sequence and set priorities",
+      "effectiveness": "high"
+    },
+    {
+      "framework_name": "Leadership for Teacher Relationships",
+      "introduced_when": "When discussing school involvement",
+      "introduction_language": "Aim for positions that give you a big leadership position, but are low time commitment...to make a good impression on your teachers",
+      "context_specific": "large_public_school",
+      "effectiveness": "high"
+    },
+    {
+      "framework_name": "Woman in STEM as Strategic Positioning",
+      "introduced_when": "When discussing CS opportunities",
+      "introduction_language": "Leverage your profile as a woman in stem...presenting yourself as a woman in stem is a very powerful positioning",
+      "opens_opportunities": ["Kode With Klossy", "NCWiT", "Girls Who Code"],
+      "effectiveness": "high"
+    }
+  ],
+
+  "strategic_recommendations": {
+    "extracurriculars": {
+      "add": [
+        "CS research (CS + music OR CS + environmental advocacy integration)",
+        "Hackathon participation and organization (via Hack Club)",
+        "School-based CS club with leadership (Girls Who Code or general)",
+        "National environmental justice board membership",
+        "Environmental justice conference organization"
+      ],
+      "continue": [
+        "Viking Vocalists (President)",
+        "State Choir",
+        "Octagon Service Club (Secretary)",
+        "Sunnyvale YUPI (VP Activities, Environmental Chair)"
+      ],
+      "drop_or_avoid": [
+        "Robotics (already dropped - validated decision)",
+        "School CS club (low quality)",
+        "Adding more breadth activities"
+      ],
+      "strategy": "depth_over_breadth_expand_to_national"
+    },
+    "awards": {
+      "must_apply": [
+        "National Merit Scholar (via PSAT 1500+ target)",
+        "NCWiT Aspirations in Technology"
+      ],
+      "should_apply": [
+        "NYTimes Student Essay Contest",
+        "YoungArts (music)"
+      ],
+      "target": "at_least_one_national_level_award"
+    },
+    "summer_programs": {
+      "top_priorities": [
+        "AI Scholars @ CMU (free, residential, merit-based)",
+        "Kode With Klossy (free, women in tech, Apple connections)"
+      ],
+      "also_apply": [
+        "TASP",
+        "Bank of America Student Leaders",
+        "Sunrise Summer Camp (environmental justice)",
+        "Research at biosciences lab (genomics)"
+      ],
+      "strategy": "apply_to_5plus_programs",
+      "target": "secure_admission_to_at_least_one_prestigious"
+    },
+    "course_rigor": {
+      "junior_year": ["AP Lang", "AP Calc BC", "Normal US History", "consider more STEM APs"],
+      "senior_year_strategy": "Load up on APs (target 12 total) but don't take all exams",
+      "do_not": "Don't retake AP Psych (scores optional to report)",
+      "target": "12_plus_APs_by_graduation"
+    },
+    "differentiation": {
+      "music_supplement": "Prepare 10-min recording, music resume, music letter of rec",
+      "woman_in_stem_framing": "Emphasize throughout application",
+      "jack_of_all_trades_positioning": "Frame as rare well-rounded skill set"
+    }
+  },
+
+  "coaching_tactics_observed": {
+    "rapport_building": [
+      "Enthusiastic validation ('Amazing', 'Awesome', 'Congratulations')",
+      "Active listening confirmations ('Totally', 'Got it')",
+      "Personal story sharing (Jenny's Stanford experience, sister in Hack Club)",
+      "Transparency framing ('No BS, no filter advice')",
+      "Partnership language ('If we start working together')"
+    ],
+    "probing_techniques": [
+      "'Can you tell me more about that?' (repeated 5+ times)",
+      "'What do you want to work on before I present my opinion?' (gets self-assessment first)",
+      "Hypothetical exploration ('Have you ever thought about...')",
+      "Specific detail questions showing research ('That's team 846, right?')"
+    ],
+    "reframing_tactics": [
+      "Scattered activities → Unique 'web' of interconnected interests",
+      "Late-start CS → Perfect timing in 'most critical year'",
+      "Dropping robotics → Smart decision validated, pivot to leadership",
+      "Generic student → 'Jack of all trades' rare skill set",
+      "Large public school → Opportunity for strategic teacher visibility"
+    ],
+    "motivation_techniques": [
+      "Creating urgency without overwhelming ('Most critical year' + 'This is totally doable')",
+      "Inspiring confidence through validation ('That's very impressive')",
+      "Insider knowledge positioning ('This is hard to know by yourself, no one tells you')",
+      "Future pacing ('Over the next 2 years')",
+      "Explicit reassurance ('All of this will be provided to you later')"
+    ],
+    "parent_management": [
+      "Direct address when parent asks questions",
+      "Maintains focus on student as primary conversation partner",
+      "Validates parent concerns but redirects to student",
+      "Provides transparency through detailed report"
+    ]
+  },
+
+  "timeline_and_priorities": {
+    "immediate_next_3_months": {
+      "tier_1_critical": [
+        "Take SAT (target 1550+)",
+        "Take PSAT (target 1500+ for National Merit)",
+        "Maintain 4.0 GPA"
+      ],
+      "tier_2_important": [
+        "Apply for Legislative Council",
+        "Begin award applications",
+        "Network with teachers for letters"
+      ]
+    },
+    "next_6_months_winter_spring_junior": {
+      "tier_1_critical": [
+        "Summer program applications (5+ programs)",
+        "Begin CS research project",
+        "Ask teachers for letters of recommendation"
+      ],
+      "tier_2_important": [
+        "Launch new CS club (if approved)",
+        "Continue award applications (NCWiT, NYTimes)",
+        "Finalize college list"
+      ]
+    },
+    "summer_after_junior_year": {
+      "tier_1_critical": [
+        "Attend prestigious summer program",
+        "Continue research",
+        "Prepare music supplement"
+      ],
+      "tier_2_important": [
+        "Hackathon participation/organization",
+        "Draft Common App essay",
+        "Continue scholarship applications"
+      ]
+    }
+  },
+
+  "meta_coaching_moments": {
+    "explaining_assessment_structure": "The reason why I'm asking you all these questions is because since this is a 360 assess session, I'm really trying to understand you holistically",
+    "candid_industry_critique": "I'm gonna give you all of this that I've been saying to you is very no BS, because I think it's important to talk candidly",
+    "explaining_framework_value": "Obviously, this is information that it's really hard to know by yourself, because like no one tells you",
+    "setting_expectations": "And obviously I'm gonna write all this down and send it to you in the report. So no worries about taking notes",
+    "connecting_to_broader_strategy": "And that kind of brings me into the next question, which is, how is your relationship with your teachers right now?"
+  },
+
+  "knowledge_moat_insights": {
+    "proprietary_frameworks": [
+      "Free = Prestigious (summer programs)",
+      "Senior Year AP Load-Up without taking exams",
+      "Leadership for Teacher Relationships (large school strategy)",
+      "Web Framework for scattered activities",
+      "Music Supplement as CS differentiator",
+      "Summer Programs as Award Precursors",
+      "Integration Projects (CS + music, CS + environment)",
+      "Woman in STEM as explicit strategic positioning"
+    ],
+    "candid_program_assessments": [
+      "Inspirit AI critique: 'a little bit scammy'",
+      "Kode With Klossy endorsement with insider knowledge (Jenny was IA)"
+    ],
+    "insider_access_examples": [
+      "Current Stanford student network",
+      "Sister in Hack Club",
+      "Role at Kode With Klossy",
+      "Friends at Stanford ACES"
+    ]
+  },
+
+  "questions_by_phase": {
+    "discovery_questions": [
+      "What are some of your passions? What do you hope to do, and what are your goals?",
+      "How would you say that your classes and academics are going?",
+      "I'd love to learn more about some of the things that you're involved in",
+      "Can you tell me a little bit more about that?",
+      "What are some of the things you want to work on before I present my opinion?"
+    ],
+    "narrative_questions": [
+      "Does that make sense to you? [after presenting 3 hubs framework]",
+      "It seems like you're very interested in [X]...can you tell me more?",
+      "Have you ever thought about [specific action]?",
+      "Is this something that you'd like to explore further?"
+    ],
+    "strategy_questions": [
+      "Are you thinking about taking standardized testing anytime?",
+      "What do you think you struggle with the most on the SAT?",
+      "Have you ever been involved in research?",
+      "Have you heard of [specific program]?"
+    ],
+    "execution_questions": [
+      "How is your relationship with your teachers right now?",
+      "By the end of high school, how many APs do forecast taking?",
+      "Do you want to stay on the West Coast, or go to the East Coast?",
+      "How big of a school do you want?"
+    ]
+  },
+
+  "archetype_specific_patterns": {
+    "for_well_rounded_late_starters": {
+      "lead_with": "Web framework for connecting scattered activities",
+      "emphasize": "Urgency (critical year) + Depth over breadth + National recognition priority",
+      "avoid": "Adding more activities, generic advice about 'finding your spike'",
+      "key_deliverables": [
+        "3 hubs framework customized to student",
+        "Integration project ideas (specific, not generic)",
+        "National-level award strategy",
+        "Prestigious summer program targeting"
+      ]
+    }
+  },
+
+  "success_metrics_defined": {
+    "test_scores": {
+      "sat": "1550+",
+      "psat": "1500+ (National Merit eligibility in California)"
+    },
+    "course_rigor": {
+      "ap_total": "At least 12 AP classes by graduation"
+    },
+    "summer": {
+      "target": "Secure admission in at least 1 prestigious summer program",
+      "applications": "Apply to at least 5 programs"
+    },
+    "awards": {
+      "target": "At least one national/international award",
+      "common_app_slots": "Fill all 5 award slots"
+    },
+    "extracurriculars": {
+      "national_level": "At least 2 activities at national level",
+      "common_app_slots": "10 total activities"
+    }
+  },
+
+  "effectiveness_indicators": {
+    "narrative_clarity_improvement": 5,
+    "student_engagement": "high (responded positively, showed interest)",
+    "parent_satisfaction": "implied_high (mother present, no objections)",
+    "frameworks_resonated": true,
+    "immediate_value_demonstrated": true,
+    "conversion_likelihood": "high"
+  }
+}

@@ -1,0 +1,601 @@
+{
+  "student_id": "iqra_008",
+  "extraction_date": "2025-10-20",
+  "coach_id": "jenny_duan",
+  "additional_coaches": ["suraj_founder"],
+
+  "session_metadata": {
+    "student_archetype": "Emerging Service-Driven STEM Explorer",
+    "sub_archetype": "Late-Starting Community Engineer with Academic Recovery",
+    "grade_level": 10,
+    "session_duration_minutes": {
+      "session_1": 65,
+      "session_2": 75
+    },
+    "session_dates": {
+      "session_1": "2024-03-25",
+      "session_2": "2024-04-03"
+    },
+    "session_type": "2_session_assessment",
+    "school_type": "competitive_public",
+    "school_name": "Amador Valley High School",
+    "location": "Pleasanton, California (Bay Area)",
+    "student_readiness_score": 5.5,
+    "narrative_clarity_start": 2,
+    "narrative_clarity_end": 7,
+    "parent_involvement": "high",
+    "parent_present": "both_parents_on_calls",
+    "intended_major_stated": "Computer Science (parent-influenced)",
+    "intended_major_recommended": "Biomedical Engineering / Product Design / Computational Medicine",
+    "authentic_passion_level": 3,
+    "discovery_vs_prescriptive_ratio": "60_discovery_40_prescriptive",
+    "primary_challenge": "mismatch_between_stated_interest_and_actual_activities"
+  },
+
+  "student_profile": {
+    "academic_standing": {
+      "gpa": "mixed_as_bs_cs",
+      "freshman_year": "mostly As (3-4 As, rest Bs), C+ in math first semester, B in English",
+      "sophomore_year": "3 As (World History A+, Photography A, English A-), B in Honors Pre-calc, B in AP Human Geo, C in Physics",
+      "psat": 1280,
+      "sat_act": "not_yet_taken",
+      "aps_taken": 1,
+      "ap_scores": "AP Human Geo (in progress)",
+      "self_studying": "AP Environmental Science",
+      "course_rigor": "moderate_1_ap_sophomore",
+      "grade_trajectory": "needs_upward_trend",
+      "academic_strengths": ["World History", "English", "Photography"],
+      "academic_weaknesses": ["Physics (C)", "Math (Bs/C+)", "Pre-calc (B)"]
+    },
+    "involvement_level": "moderate_service_focused",
+    "starting_readiness": "partially_built_service_foundation",
+    "achievement_orientation": "emerging",
+    "execution_style": "needs_structure_and_guidance",
+    "passion_clarity": "exploring_mismatch_between_stated_and_actual",
+    "resource_access": "medium_high_bay_area",
+    "demographic": "south_asian_muslim_female_bay_area",
+    "competitive_context": "bay_area_competitive_public_school"
+  },
+
+  "key_challenges": [
+    {
+      "challenge": "Unclear 'Why' Behind Major Choice",
+      "quote": "Both of my parents are in the computer science field. So I'm like, surrounded by it... it's a really good like option that I'm keeping open minded to",
+      "severity": "critical",
+      "context": "CS interest based on parents, not demonstrated passion or activities"
+    },
+    {
+      "challenge": "Mismatch Between Stated Interest (CS) and Actual Activities (Public Health Service)",
+      "quote_jenny": "Where is the computer science here? How in high school did you get involved with computer science? And how have you nurtured that interest, if at all?",
+      "quote_iqra": "I'm planning on taking AP computer science A in twelfth grade senior year",
+      "severity": "critical",
+      "gap_identified": "No CS activities despite stating CS as major interest"
+    },
+    {
+      "challenge": "Academic Performance (#1 Biggest Concern)",
+      "quote_jenny": "I think if I'm going to be honest, the very number one biggest concern is your grades",
+      "current_state": "Mix of As, Bs, and one C in Physics",
+      "severity": "critical",
+      "opportunity": "Can show strong upward trajectory if improves junior year"
+    },
+    {
+      "challenge": "Limited Leadership Presence",
+      "quote_jenny": "Something that's kind of missing right now is a bit of leadership",
+      "current_state": "IHLYC aspiring to lead advocate (2 years out), no other leadership",
+      "severity": "high"
+    },
+    {
+      "challenge": "Lack of Strategic Thinking About Time/Priorities",
+      "example": "Asks about dual enrollment despite grade concerns",
+      "quote_jenny": "I don't think it's worth it for you to pursue dual enrollment right now... it's more important to improve your existing high school grades",
+      "severity": "medium"
+    }
+  ],
+
+  "breakthrough_moments": [
+    {
+      "timestamp": "session_2_minute_14",
+      "trigger": "Jenny's direct statement about grades",
+      "language": "I think if I'm going to be honest, the very number one biggest concern is your grades",
+      "student_response": "implicit_acceptance",
+      "significance": "Named the elephant in the room - student can't improve what isn't acknowledged",
+      "effectiveness": "very_high"
+    },
+    {
+      "timestamp": "session_2_minute_33",
+      "trigger": "Jenny's CS mismatch challenge",
+      "language": "Where is the computer science here? ...I do feel like a direct computer science path is going to be hard",
+      "coach_action": "Reality check on competitive positioning",
+      "significance": "Student realizes stated interest doesn't match profile",
+      "effectiveness": "high"
+    },
+    {
+      "timestamp": "session_2_minute_57",
+      "trigger": "Product Design introduction",
+      "language": "How do we design better thermometers? How do we design a more effective like Covid testing kit? How do we design a better heart Monitor?",
+      "student_response": "Yeah, that does sound interesting. I like how it like bridges the 2 majors itself",
+      "significance": "First genuine interest shown (not just polite agreement)",
+      "effectiveness": "high"
+    }
+  ],
+
+  "critical_interventions": [
+    {
+      "issue": "dual_enrollment_despite_grade_concerns",
+      "coach_response": "clear_recommendation_against_with_reasoning",
+      "language": "I don't think it's worth it for you to pursue dual enrollment right now, and the reason why I'm saying this is because I think with your current GPA, it's more important to improve your existing high school grades than to add on additional grades",
+      "rationale": "Time investment vs. return - focus on existing priorities first",
+      "alternative_provided": "Take Spanish 3 online or during summer if needed"
+    },
+    {
+      "issue": "science_olympiad_interest_as_late_starter",
+      "coach_response": "strong_recommendation_against",
+      "language": "If science Olympia doesn't win state, or if it's not winning awards at the State or national level. Then I'd say it's probably not worth your time... people who have been doing science Olympia typically start during middle school",
+      "rationale": "Starting disadvantage + time opportunity cost + unlikely to achieve meaningful recognition",
+      "alternative_provided": "Focus on existing activities and new strategic adds (Design Club, Youth Commission)"
+    },
+    {
+      "issue": "cs_major_application_strategy",
+      "coach_response": "major_pivot_recommendation",
+      "language": "I don't think that you should position your application straight into computer science because it's not strategic, because the people that you'll be your application will be compared against will have way more experience than you... I think the alternative path is applied to a major that will be similar to computer science",
+      "recommended_majors": ["Biomedical Computation", "Bioengineering", "Product Design"],
+      "rationale": "Leverage existing service/public health experience + differentiation from Bay Area Asian CS applicants",
+      "strategic_advantage": "Can still take CS classes and potentially transfer majors later"
+    }
+  ],
+
+  "narrative_development": {
+    "initial_clarity_score": 2,
+    "final_clarity_score": 7,
+    "initial_stated_interests": {
+      "major": "Computer Science (because parents do it)",
+      "also_considering": "Engineering (because friend at UCSB)",
+      "activities": "Service (Red Cross, American Cancer Society), Quantum Computing course, Journalism, Taekwondo"
+    },
+    "authentic_interests_discovered": {
+      "service": "Strong commitment to public health service (4hrs/week at Cancer Society, Red Cross work)",
+      "creation": "Wants to 'create things,' enjoys hands-on projects (building bridges, websites)",
+      "real_world_application": "Likes when physics teacher shows engineering applications",
+      "helping_others": "Feels 'pretty cool to be in charge and actually do something for different people'"
+    },
+    "final_narrative_synthesis": {
+      "primary": "Biomedical Engineering + Product Design with Service/Public Health Application",
+      "components": [
+        "Service Foundation (American Cancer Society, Red Cross, IHLYC humanitarian law)",
+        "Creation Interest (authentic desire to build, hands-on work)",
+        "Engineering Curiosity (real-world applications)",
+        "Strategic Positioning (differentiation from typical Bay Area CS applicants)"
+      ],
+      "articulation": "Passionate builder who wants to create meaningful solutions at the intersection of biomedical engineering, product design, and public health service. Unlike typical CS applicants, strength lies in authentic commitment to community health combined with interest in hands-on creation and engineering."
+    },
+    "narrative_bridges_built": {
+      "service_to_biomed": "American Cancer Society volunteer → healthcare focus",
+      "creation_to_product_design": "Wants to build things → design better medical devices",
+      "cs_to_computational_medicine": "Parent CS background + biomed interest → computational medicine as interdisciplinary path",
+      "identity_to_service": "Muslim identity → serve Muslim community through health tech"
+    },
+    "specific_project_vision": "Design improved medical devices for underserved communities (better thermometers, Covid testing kits, heart monitors, hospital design)"
+  },
+
+  "frameworks_introduced": [
+    {
+      "framework_name": "Upward Trajectory Reframe (Academic Recovery)",
+      "introduced_when": "After discussing current grades and concerns",
+      "introduction_language": "You have a really good opportunity to show a strong what like college admissions counselors or like college admissions. Readers call a strong upwards trajectory in your grades, and I think this is like a really good opportunity for you, because you can show, like, how you've improved over time",
+      "application_immediate": true,
+      "student_response": "shifts from defensive to motivated",
+      "effectiveness": "very_high",
+      "archetype_relevance": ["academic_recovery", "late_bloomers", "upward_trend_students"]
+    },
+    {
+      "framework_name": "Strategic Major Selection (Differentiation Positioning)",
+      "introduced_when": "After identifying CS interest-activity mismatch",
+      "introduction_language": "I don't think that you should position your application straight into computer science because it's not strategic... I think the alternative path is applied to a major that will be similar to computer science and will allow you to take like a lot of the same classes but with a more strategic focus",
+      "application_immediate": true,
+      "student_response": "genuine interest in alternative (product design)",
+      "effectiveness": "very_high",
+      "archetype_relevance": ["late_starters", "competitive_demographics", "mismatched_profiles"]
+    },
+    {
+      "framework_name": "Different League Positioning (Differentiation vs Competition)",
+      "introduced_when": "When discussing competitive Bay Area context",
+      "introduction_language": "You're not trying to compete with everyone else. You're trying to be in the League of your own... We need to help you stand out with extracurriculars and activities that are different",
+      "application_immediate": true,
+      "student_response": "shifts from comparison anxiety to focusing on unique strengths",
+      "effectiveness": "high",
+      "archetype_relevance": ["competitive_school_students", "students_feeling_behind", "bay_area"]
+    },
+    {
+      "framework_name": "Narrative-First Approach",
+      "introduced_when": "When explaining why exploring interests matters",
+      "introduction_language": "When you apply for a school, you're going to need to write like a why this major essay... And we right now, what we're doing is we're working on developing this narrative early, so that you're prepared for it when you're applying for colleges",
+      "application_immediate": true,
+      "student_response": "understands activities should connect to story",
+      "effectiveness": "high",
+      "archetype_relevance": ["all", "especially_unclear_narrative"]
+    },
+    {
+      "framework_name": "Spike Development (Depth > Breadth)",
+      "introduced_when": "When discussing Science Olympiad and dual enrollment",
+      "introduction_language": "It's better to concentrate your time on things that have the best or highest impact... If science Olympia doesn't win state... I'd say it's probably not worth your time",
+      "application_immediate": true,
+      "student_response": "starts thinking strategically about time allocation",
+      "effectiveness": "high",
+      "archetype_relevance": ["all", "especially_late_starters", "scattered_students"]
+    },
+    {
+      "framework_name": "Identity Integration (Cultural/Demographic Positioning)",
+      "introduced_when": "Throughout narrative development",
+      "introduction_language": "It is an unfortunate reality that sometimes students can get typified by admissions officers when they see a lot of students from similar demographics... as a bay area South Asian person applying for CS",
+      "suraj_addition": "How many Muslim girls from a Bay area kind of an environment are actually pursuing [unique path]?",
+      "application_immediate": true,
+      "student_response": "embraces identity as strategic asset",
+      "effectiveness": "very_high",
+      "archetype_relevance": ["competitive_demographics", "minority_identity_students"]
+    },
+    {
+      "framework_name": "Teacher Relationship as Strategic Asset",
+      "introduced_when": "When discussing grades and LOR needs",
+      "introduction_language": "Your relationship with your teachers is actually extremely important. And the reason why is because they write your letters of recommendation, not only for college, but also eventually for all the summer programs, all the awards",
+      "application_immediate": true,
+      "tactical_advice": ["Attend office hours weekly", "Use access period to sign up for teacher time", "Share interests beyond classwork"],
+      "effectiveness": "high",
+      "archetype_relevance": ["all", "especially_shy_students", "academic_recovery"]
+    },
+    {
+      "framework_name": "168-Hour Weekly Architecture",
+      "introduced_when": "End of session by Suraj (visual example shown)",
+      "introduction_language": "What is the power of 168 hours... without actually spending 40 h on Tiktok... the most important thing is to allocate that time on every track",
+      "application_immediate": false,
+      "application_timing": "Saved for ongoing coaching program",
+      "effectiveness": "high_when_properly_introduced",
+      "archetype_relevance": ["all", "especially_overcommitted", "needs_structure"]
+    },
+    {
+      "framework_name": "Time Investment ROI Analysis",
+      "introduced_when": "Multiple instances - dual enrollment, Science Olympiad",
+      "pattern": "Coach evaluates time cost vs. strategic benefit for each opportunity",
+      "decision_criteria": ["Does it advance narrative?", "Can student achieve meaningful recognition?", "What's opportunity cost?"],
+      "effectiveness": "very_high",
+      "archetype_relevance": ["late_starters", "time_constrained", "needs_prioritization"]
+    }
+  ],
+
+  "strategic_recommendations": {
+    "extracurriculars": {
+      "continue_and_deepen": [
+        "American Cancer Society Discovery Shop volunteer (4hrs/week Sundays) - leadership opportunity",
+        "Red Cross Club - pursue IHLYC Lead Advocate position (2-year commitment)",
+        "Continue service focus but connect to biomed narrative"
+      ],
+      "add_priority_1_critical": [
+        "Start Design Club at school (leadership + aligns with product design direction)",
+        "Join or lead in Girls Who Code (maintain CS connection, pursue mentorship role)",
+        "Pursue Youth Commission (Pleasanton or Alameda) for local government leadership",
+        "Develop passion project: biomed + design with community service angle"
+      ],
+      "add_priority_2_important": [
+        "Robotics team (if interested in hands-on engineering)",
+        "Research mentorship with local university professor (Stanford/Berkeley in biomedical ethics or product design)"
+      ],
+      "avoid_or_drop": [
+        "Science Olympiad (late starter disadvantage, time investment not worth it)",
+        "Dual enrollment (focus on improving existing grades first)",
+        "Investment Club (doesn't align with emerging narrative)",
+        "Adding more breadth activities"
+      ],
+      "strategic_positioning": "Service-first STEM developer leveraging public health experience for differentiation"
+    },
+    "awards": {
+      "tier_1_must_apply": [
+        "National Presidential Service Award Gold (100+ hours milestone - achievable)",
+        "NCWIT Aspirations in Computing (focus on impact story)",
+        "Congressional App Challenge"
+      ],
+      "tier_2_highly_recommended": [
+        "YoungArts Design Award (if developing design skills)",
+        "Quantum Computing Competitions/Hackathons (differentiation - fewer competitors)",
+        "Science Olympiad Medals (only if team wins state-level)"
+      ],
+      "tier_3_time_permitting": [
+        "DECA Awards (if participates in technology/entrepreneurship competitions)",
+        "Local/regional health innovation competitions"
+      ],
+      "target": "1-2 meaningful national awards, several regional/local recognitions"
+    },
+    "summer_programs": {
+      "sophomore_summer_2024": [
+        "Kode With Klossy (free, accessible, 2-week sessions - APPLY IMMEDIATELY)",
+        "Red Cross Leadership Summit (already applied - one week)",
+        "Research Spanish 3 online options for summer completion"
+      ],
+      "junior_summer_2025": [
+        "Stanford Institute of Medicine Research Program (SIMR) - TOP PRIORITY",
+        "Stanford AI in Medical Imaging Research",
+        "GeneLab by NASA (space + biology intersection)",
+        "BioTech Summer Experience at Lawrence Livermore National Lab"
+      ],
+      "application_strategy": "Apply to 5-15 programs to secure 1-2 acceptances",
+      "timeline": "Most applications close spring of sophomore year - FAST TURNAROUND NEEDED"
+    },
+    "course_rigor": {
+      "junior_year_plan": [
+        "AP Calculus",
+        "AP Statistics",
+        "AP Psychology",
+        "AP Language",
+        "Intro to Engineering (weighted, Project Lead The Way pathway)",
+        "Regular US History",
+        "Journalism (0-period)"
+      ],
+      "spanish_strategy": "Take Spanish 3 online (BYU or similar) or during summer to meet recommendation without sacrificing engineering sequence",
+      "senior_year": [
+        "AP Computer Science A (maintains CS connection)",
+        "Principles of Engineering (weighted, continuation of pathway)",
+        "Additional APs as appropriate"
+      ],
+      "target": "4 APs junior year, strong grades (all As or A-minus) to show upward trajectory"
+    },
+    "testing": {
+      "sat_plan": "Take first attempt spring/summer after sophomore year to establish baseline",
+      "psat_junior": "Prepare for National Merit eligibility",
+      "target_sat": "1450+ (implied but not explicitly stated)",
+      "prep_strategy": "Begin SAT prep early junior year, mentioned but not detailed"
+    },
+    "teacher_relationships": {
+      "current_state": "Admits no strong relationships currently",
+      "action_plan": [
+        "Attend physics teacher office hours weekly (address grade concern + build relationship)",
+        "Use access period (2x/week, 45-min) to sign up for teacher time",
+        "Start conversations in English and World History (current strengths)",
+        "Share interests beyond classwork with 2-3 key teachers"
+      ],
+      "target": "2-3 teachers who can write strong LORs by end of junior year",
+      "strategic_value": "LORs can provide context for grade trajectory and explain growth"
+    },
+    "passion_project": {
+      "concept": "Biomed + design project with community service application",
+      "examples": [
+        "Design improved medical device for underserved community",
+        "Build health education platform for Muslim girls in STEM",
+        "Create telemedicine solution for local clinic",
+        "Design better Covid testing kit with accessibility focus",
+        "Develop app for health tracking in underserved populations"
+      ],
+      "timeline": "Begin brainstorming sophomore spring, develop summer, launch fall of junior year",
+      "success_metric": "Measurable community impact by fall of senior year"
+    },
+    "identity_integration": {
+      "muslim_identity": "Leverage as unique positioning - Muslim girl in STEM serving Muslim community",
+      "specific_integration": [
+        "Volunteer focus on Muslim girls in STEM education",
+        "Passion project addresses Muslim community health needs",
+        "Leadership in interfaith or cultural organizations",
+        "Essays explore intersection of faith, service, and STEM"
+      ],
+      "strategic_value": "Creates rare combination - Bay Area Muslim girl pursuing quantum computing + biomed + service"
+    }
+  },
+
+  "coaching_tactics_observed": {
+    "rapport_building": [
+      "Casual warmth ('Hi girl! How's it going')",
+      "Cultural sensitivity (Ramadan break offer unprompted)",
+      "Normalizing struggles ('When I was in high school, AP Testing was hardest for me')",
+      "Validating emotions ('It's totally normal to still be figuring it out')",
+      "Personal anecdotes (Kode With Klossy experience, Stanford background)"
+    ],
+    "probing_techniques": [
+      "Iterative probing until authentic passion emerges (CS interest → 5+ follow-ups → reveals service is real passion)",
+      "Behavioral evidence testing ('Have you taken any CS classes?' → reveals gap between stated and actual)",
+      "Temporal depth ('How long ago did this interest start?')",
+      "Comparative questions ('Do you like digital or physical better?')",
+      "Hypothetical future ('Would you be interested in joining this team?')"
+    ],
+    "confrontation_tactics": [
+      "Direct honesty wrapped in constructive framing ('I think if I'm going to be honest, the very number one biggest concern is your grades')",
+      "Reality checks about competition ('As a bay area South Asian person applying for CS, there's a lot of people from your demographic')",
+      "Challenging surface answers ('Where is the computer science here?')",
+      "Demographic awareness without tokenization ('It is an unfortunate reality...')"
+    ],
+    "reframing_tactics": [
+      "Weakness as opportunity (Bs/Cs → upward trajectory opportunity)",
+      "Mismatch as differentiation (No CS activities → leverage public health instead)",
+      "Competitive context as strategic positioning (Bay Area Asian CS → Different League positioning)",
+      "Late start as focused depth (Not trying to catch up, creating unique path)"
+    ],
+    "motivation_techniques": [
+      "Confidence building ('You have very ambitious goals and I want to help you reach them')",
+      "Partnership language ('We can work through this')",
+      "Celebrating initiative ('That's really impressive' about quantum computing self-enrollment)",
+      "Future visioning ('How do we design better hospitals, thermometers, Covid testing kits')",
+      "Balanced urgency ('Time is of the essence' paired with 'You still have time to explore')"
+    ],
+    "parent_management": [
+      "Professional boundary (Jenny handles assessment, Suraj handles business discussion)",
+      "Student-centric approach (always asks student directly, not parents)",
+      "Transparency (explains reasoning for recommendations)",
+      "Cultural competency (understands immigrant family dynamics)"
+    ],
+    "meta_coaching": [
+      "Explaining WHY asking questions ('I'm questioning you like how an admissions officer would')",
+      "Connecting to future requirements ('When you apply, you'll need to write why this major essay')",
+      "Revealing thought process ('The reason why we're having this conversation is...')",
+      "Teaching strategic thinking (not just giving answers)"
+    ]
+  },
+
+  "timeline_and_priorities": {
+    "immediate_next_30_days_spring_sophomore": [
+      "Improve grades (target A-/A by end of semester) - PRIORITY #1",
+      "Start attending teacher office hours weekly (Physics, Math)",
+      "Apply to Kode With Klossy (still open, rolling admissions)",
+      "Research Pleasanton Youth Commission and submit inquiry",
+      "Begin brainstorming passion project ideas"
+    ],
+    "next_90_days_through_summer_2024": [
+      "Take SAT first attempt (establish baseline)",
+      "Participate in Red Cross summer camp + any accepted programs",
+      "Complete Spanish 3 online",
+      "Develop passion project concept with specific community need identified",
+      "Research Design Club formation process for fall"
+    ],
+    "fall_junior_year_2024": [
+      "Launch Design Club OR secure leadership role in Girls Who Code",
+      "Become IHLYC Lead Advocate",
+      "Begin passion project implementation",
+      "Maintain all A/A-minus grades (demonstrate upward trajectory)",
+      "Join Youth Commission if accepted"
+    ],
+    "spring_junior_year_2025": [
+      "Continue strong grades (sustained improvement required)",
+      "Apply to 5+ biomedical summer programs (SIMR, GeneLab, etc)",
+      "Submit passion project for 1-2 awards/competitions",
+      "Retake SAT (target 1450+)",
+      "Build relationships with 2-3 teachers for LORs",
+      "Apply for Presidential Service Award Gold (100+ hours)"
+    ],
+    "summer_junior_2025": [
+      "Participate in prestigious biomedical research program",
+      "Expand passion project impact with measurable outcomes",
+      "Begin college essay drafts using narrative developed",
+      "Visit/research target colleges"
+    ],
+    "senior_fall_2025": [
+      "Submit early applications highlighting upward trajectory + unique biomed/design/service narrative",
+      "Continue passion project leadership and document impact",
+      "Maintain senior year grades",
+      "Submit additional award applications"
+    ]
+  },
+
+  "meta_coaching_moments": {
+    "explaining_narrative_importance": "When you apply for a school, you're going to need to write like a why this major essay... we're working on developing this narrative early",
+    "admissions_officer_perspective": "I'm questioning you like, kind of like, how an admissions officer would view your profile",
+    "teacher_relationship_value": "They write your letters of recommendation, not only for college, but also eventually for all the summer programs, all the awards",
+    "competitive_context_framing": "It is an unfortunate reality that sometimes students can get typified by admissions officers when they see a lot of students from similar demographics",
+    "time_sensitivity": "Pretty much half of your high school experience is already up, and so the time is very limited"
+  },
+
+  "knowledge_moat_insights": {
+    "proprietary_frameworks": [
+      "Upward Trajectory Reframe for academic recovery students",
+      "Strategic Major Selection (apply to aligned alternative, not reach major)",
+      "Different League Positioning (differentiation vs. competition mindset)",
+      "Identity Integration as strategic asset (Muslim + female + STEM + service)",
+      "Time Investment ROI Analysis (explicit opportunity cost evaluation)",
+      "Narrative-First Approach (activities serve story, not resume)",
+      "Teacher Relationship as Strategic Asset (LORs for programs + colleges + awards)",
+      "Spike Development over breadth (depth > breadth for late starters)"
+    ],
+    "insider_knowledge_examples": [
+      "Biomedical Computation, Bioengineering, Product Design as strategic CS alternatives",
+      "Pleasanton Youth Commission vacancies filled twice/year",
+      "Kode With Klossy 2-week free program with multiple summer sessions",
+      "Apply 5-15 summer programs to secure 1-2 acceptances (numbers game)",
+      "Presidential Service Award Gold at 100 hours (achievable milestone)",
+      "Access period at Amador Valley HS (2x/week, 45-min) for teacher relationships",
+      "Quantum computing as less saturated competition space vs. traditional CS"
+    ],
+    "competitive_moats": [
+      "Archetype-specific adaptive coaching (different approach for late starter vs. high achiever)",
+      "Real-time competitive intelligence (Bay Area South Asian CS = saturated)",
+      "Multi-coach specialist team (biomedical coach + design coach assignments)",
+      "3-year longitudinal engagement (narrative development takes years)",
+      "Comparative archetype analysis (Suraj shows Huda spike vs. Anushka checklist profiles)",
+      "Proactive 'NO' advice (dual enrollment, Science Olympiad - courage to discourage)",
+      "Cultural competency (Ramadan sensitivity, Muslim identity integration)"
+    ]
+  },
+
+  "critical_gaps_identified": {
+    "in_session_and_gameplan": [
+      "No specific SAT/ACT prep plan detailed (mentioned but not operationalized)",
+      "Teacher relationship strategy mentioned but not detailed (which 2-3 teachers? specific conversation strategies?)",
+      "Passion project concept discussed but not developed (needs specific community need identification)",
+      "Testing timeline vague (when exactly to take SAT? how many attempts planned?)",
+      "College list development not discussed (which schools match biomedical engineering + service profile?)",
+      "Essay strategy not addressed (what to write about given narrative?)",
+      "Authenticity development monitoring not detailed (how to track if biomed interest becomes genuine?)"
+    ],
+    "follow_up_needed": [
+      "90-day check-in on biomed/product design interest (is genuine excitement developing?)",
+      "Grade trajectory monitoring (quarterly check on upward trend)",
+      "Teacher relationship progress (have meaningful interactions started?)",
+      "Passion project development (community need identified? project scoped?)",
+      "Spanish 3 completion plan (which online program? when to start?)",
+      "Design Club formation support (finding advisor, navigating approval process)"
+    ]
+  },
+
+  "success_metrics_defined": {
+    "immediate_30_days": {
+      "grades": "End sophomore year with upward trend (target all A-/A)",
+      "relationships": "Attend office hours at least 1x for physics and 1x for math",
+      "applications": "Submit Kode With Klossy application + Youth Commission inquiry"
+    },
+    "end_sophomore_year": {
+      "academic": "Clear upward trajectory visible, GPA improved from mixed As/Bs/Cs",
+      "testing": "SAT baseline established (even if not target score yet)",
+      "activities": "Summer program secured, Spanish 3 plan confirmed"
+    },
+    "end_junior_year": {
+      "academic": "All A/A-minus grades maintained, strong upward trajectory from freshman year",
+      "testing": "SAT 1450+, PSAT 1400+ for National Merit consideration",
+      "leadership": "2-3 leadership positions secured (IHLYC Lead Advocate, Design Club founder/Girls Who Code leader, Youth Commission member)",
+      "passion_project": "Launched with early measurable impact",
+      "awards": "1-2 regional/national awards (Presidential Service Gold, NCWIT, or similar)",
+      "relationships": "2-3 teachers ready to write strong LORs"
+    },
+    "college_applications": {
+      "narrative": "Coherent biomed/product design/service story evident throughout application",
+      "differentiation": "Positioned as service-driven biomed engineer, NOT generic CS applicant",
+      "growth_story": "Clear upward trajectory from Bs/Cs to As demonstrates resilience",
+      "unique_positioning": "Muslim girl in Bay Area pursuing biomed + service = rare combination"
+    }
+  },
+
+  "archetype_specific_patterns": {
+    "for_emerging_service_driven_stem_explorers": {
+      "lead_with": "Extended discovery to find authentic passion vs. stated interest",
+      "emphasize": "Upward trajectory opportunity, strategic major pivot, identity as asset, service foundation as differentiator",
+      "avoid": "Accepting stated CS interest at face value, adding more activities without narrative alignment, traditional CS competition path",
+      "key_deliverables": [
+        "Major pivot from CS to biomedical/design with clear rationale",
+        "Upward trajectory framing for grade concerns",
+        "Identity integration strategy (Muslim + female + STEM + service)",
+        "Specific biomedical programs and local leadership opportunities",
+        "Teacher relationship action plan for LOR support",
+        "Passion project concept at service + tech intersection"
+      ],
+      "unique_challenges": [
+        "Mismatch between stated interest and actual activities",
+        "Academic recovery needed (Bs/Cs require upward trend)",
+        "Late start in STEM ECs despite stated STEM interest",
+        "Parent influence on major choice vs. student's authentic interests",
+        "Competitive demographic (Bay Area Asian) in saturated major (CS)"
+      ]
+    }
+  },
+
+  "effectiveness_indicators": {
+    "narrative_clarity_improvement": 5,
+    "student_engagement": "moderate initially, increased when product design introduced",
+    "parent_satisfaction": "very_high (both parents stayed engaged, Suraj provided detailed examples)",
+    "frameworks_resonated": true,
+    "immediate_value_demonstrated": true,
+    "conversion_likelihood": "very_high",
+    "authenticity_development_needed": "medium (student needs to explore biomedical interest to ensure becomes genuine)",
+    "grade_improvement_critical": "yes (without upward trajectory, even great narrative won't overcome academic weakness)"
+  },
+
+  "data_sources": {
+    "transcript_available": true,
+    "gameplan_available": true,
+    "session_count": 2,
+    "gameplan_length": "9 pages comprehensive report",
+    "total_session_time": "140 minutes (2 sessions)",
+    "coaches_present": 2,
+    "quote_accuracy": "high (full transcripts available)"
+  }
+}

@@ -29,12 +29,45 @@ const HeaderTitle = styled.h2`
   margin: 0;
   font-size: 20px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 const HeaderSubtitle = styled.p`
   margin: 8px 0 0 0;
   font-size: 14px;
   opacity: 0.9;
+`;
+
+const V152Toggle = styled.button<{ $active: boolean }>`
+  padding: 6px 12px;
+  background: ${props => props.$active ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.2)'};
+  color: ${props => props.$active ? '#FF4A23' : 'white'};
+  border: 1px solid ${props => props.$active ? 'white' : 'rgba(255, 255, 255, 0.3)'};
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.9);
+    color: #FF4A23;
+  }
+`;
+
+const QualityBadge = styled.div<{ $score: number }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: ${props => props.$score >= 8 ? '#10b981' : props.$score >= 7 ? '#f59e0b' : '#ef4444'};
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 6px;
 `;
 
 const MessagesContainer = styled.div`
@@ -246,12 +279,20 @@ export function AIChat() {
   const { user } = useAuth();
   const [input, setInput] = useState('');
   const [assessmentMode, setAssessmentMode] = useState<AssessmentMode>('normal');
+  const [useV152, setUseV152] = useState(true); // v15.2 enabled by default
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const studentId = user?.id || 'huda-2025';
 
-  const { messages, loading, currentAgent, sendMessage } = useAgentChat({
+  const { messages, loading, currentAgent, sendMessage, v152Metadata } = useAgentChat({
     studentId,
+    useV152,
+    studentContext: {
+      archetype: 'STEM_innovator',
+      grade: 12,
+      burnout_level: 5,
+      recent_topics: messages.slice(-5).map(m => m.content).filter((_, i) => i % 2 === 0), // Last 5 user queries
+    },
     onError: (error) => {
       console.error('Chat error:', error);
     },

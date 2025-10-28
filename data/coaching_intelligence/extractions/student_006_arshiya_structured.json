@@ -1,0 +1,622 @@
+{
+  "student_id": "arshiya_006",
+  "extraction_date": "2025-10-20",
+  "coach_id": "jenny_duan",
+  "session_date": "2024-09-14",
+
+  "session_metadata": {
+    "student_archetype": "High-Achiever Late-Starter from Ultra-Competitive Environment",
+    "sub_archetype": "Late-Stage Differentiator / Multi-Talented Junior Needing Synthesis",
+    "grade_level": 11,
+    "session_number": 1,
+    "session_duration_minutes": 60,
+    "session_type": "360_assessment_initial",
+    "school_type": "ultra_competitive_private",
+    "school_name": "Private school (name not specified)",
+    "location": "Not specified",
+    "student_readiness_score": 7.0,
+    "academic_strength_score": 8.5,
+    "extracurricular_depth_score": 6.0,
+    "narrative_clarity_start": 4.0,
+    "narrative_clarity_end": 5.5,
+    "parent_involvement": "high",
+    "parent_email": "Neelam Raheja (provided)",
+    "intended_major": "Computer Science (with policy/ethics angle)",
+    "career_goal": "Tech + Policy intersection (AI ethics, police technology)",
+    "time_to_applications": "~12 months (junior year)",
+    "data_limitations": "Assessment session transcript not available; analysis based on GamePlan notes and resource URLs shared",
+    "program_enrollment": "24-week comprehensive coaching program"
+  },
+
+  "student_profile": {
+    "academic_standing": {
+      "gpa_weighted": 4.7,
+      "gpa_unweighted": 3.91,
+      "class_rank_percentile": "Top 10-15%",
+      "study_efficiency": "Study less than peers for same grades",
+      "work_style": "Works well under high pressure",
+      "current_courses_junior": [
+        "Honors Chemistry",
+        "AP Physics 1",
+        "AP World History",
+        "AP Statistics",
+        "French 4",
+        "AP Computer Science Principles",
+        "AP English Language and Composition"
+      ],
+      "course_count_junior": "7 AP/Honors (intentionally 'lighter' year to focus on ECs)",
+      "sophomore_courses": "6 APs + 1 Honors",
+      "freshman_courses": "3 Honors + 3 APs + 1 regular",
+      "projected_ap_total": "13+ by graduation",
+      "grade_weaknesses": [
+        "A- in French 3 (sophomore)",
+        "A- in French 2 (freshman)",
+        "A- in Honors Language and Composition",
+        "A- in Digital Art"
+      ],
+      "course_rigor": "extremely_high"
+    },
+    "involvement_level": "high_breadth_moderate_depth",
+    "extracurricular_activities": [
+      {
+        "activity": "Axon Internship",
+        "role": "Software Engineering Intern",
+        "focus": "Police body cameras and tasers",
+        "alignment": "Tech + policy + social justice intersection",
+        "uniqueness": "Very high - niche police technology",
+        "priority": "HIGH - spike component"
+      },
+      {
+        "activity": "ASDRP Research",
+        "focus": "AI and healthcare",
+        "status": "In progress",
+        "alignment": "STEM depth, research capability",
+        "priority": "HIGH - spike component"
+      },
+      {
+        "activity": "Bollywood Dance",
+        "role": "Captain + Social Media Manager",
+        "started": "Age 5",
+        "additional_role": "Teaches younger kids",
+        "alignment": "Cultural leadership, authenticity",
+        "uniqueness": "High - cultural differentiation",
+        "priority": "HIGH - spike component"
+      },
+      {
+        "activity": "CS Peer Tutor",
+        "alignment": "Demonstrates mastery + service",
+        "priority": "MEDIUM - supports STEM narrative"
+      },
+      {
+        "activity": "Science Olympiad",
+        "role": "Subject Officer - Engineering/Technology",
+        "achievement": "Ranks 15-20 in anatomy/physiology",
+        "alignment": "STEM breadth",
+        "concern": "Top 15-20 is solid but not standout",
+        "priority": "MEDIUM - maintain but not centerpiece"
+      },
+      {
+        "activity": "Girl Scout Gold Award",
+        "status": "Prep in progress",
+        "concern": "Very common among high-achievers",
+        "opportunity": "Theme around AI ethics or police accountability to connect to spike",
+        "priority": "MEDIUM"
+      },
+      {
+        "activity": "Middle School Science Bowl Leadership",
+        "status": "Ongoing",
+        "concern": "Impact unclear, potential time drain",
+        "priority": "LOW - consider dropping"
+      },
+      {
+        "activity": "PVSA Gold",
+        "award": "Presidential Volunteer Service Award",
+        "status": "Achieved",
+        "note": "Solid baseline but common"
+      }
+    ],
+    "leadership_roles": "Multiple (Dance Captain, Science Olympiad Officer, CS Tutor, Science Bowl)",
+    "awards": "PVSA Gold (Presidential Volunteer Service Award)",
+    "starting_readiness": "partially_built_needs_differentiation",
+    "achievement_orientation": "high_achiever",
+    "execution_style": "self_directed_strategic_guidance_needed",
+    "passion_clarity": "multiple_interests_needing_synthesis",
+    "resource_access": "very_high",
+    "personality_traits": [
+      "Passive-aggressive competitiveness since 5th grade",
+      "Works well under high pressure",
+      "Efficient studier (study less than peers for same grades)"
+    ]
+  },
+
+  "key_challenges": [
+    {
+      "challenge": "Differentiation in Ultra-Competitive Environment",
+      "context": "Private ultra-competitive school where peers likely have 16 APs, abundant ECs, strong test scores",
+      "quote_from_user": "standing out among so many strong profile in a well resourced school is key",
+      "severity": "critical",
+      "priority": "P0",
+      "strategic_implication": "Strong stats/ECs are baseline, not differentiator - need unique narrative angle"
+    },
+    {
+      "challenge": "Narrative Synthesis - Scattered Interests",
+      "description": "Three distinct interest areas: (1) AI/Healthcare research (ASDRP), (2) Police technology internship (Axon), (3) Bollywood dance leadership + cultural identity",
+      "concern": "No clear through-line yet articulated",
+      "risk": "Appears scattered rather than deeply passionate",
+      "severity": "high",
+      "priority": "P0"
+    },
+    {
+      "challenge": "Late Start on Strategic Positioning",
+      "description": "Junior year is late to begin comprehensive college coaching",
+      "time_constraint": "Limited time to build new initiatives, win major awards, or develop deeper spike",
+      "strategic_approach": "Must work with existing foundation rather than building from scratch",
+      "severity": "high",
+      "priority": "P0"
+    },
+    {
+      "challenge": "Maximizing Existing Activities",
+      "description": "Multiple activities in progress but strategic rationale unclear",
+      "examples": [
+        "Science Olympiad: ranks 15-20 (solid but not standout)",
+        "Girl Scout Gold Award: common among high-achievers",
+        "Middle school science bowl: impact unclear"
+      ],
+      "strategic_need": "Prioritize depth over breadth",
+      "severity": "medium",
+      "priority": "P1"
+    },
+    {
+      "challenge": "Time Management Under Intense Load",
+      "description": "7 AP/Honors courses + 6+ significant ECs",
+      "concern": "Despite efficiency in studying, bandwidth is finite",
+      "strategic_need": "Strategically drop/deprioritize activities",
+      "severity": "medium",
+      "priority": "P1",
+      "noted_in_gameplan": "Time Management listed as area to address"
+    },
+    {
+      "challenge": "Missing Testing Strategy",
+      "description": "No mention of SAT/ACT scores or testing plan in GamePlan",
+      "timing_concern": "Junior year = must test in fall/winter",
+      "severity": "critical",
+      "priority": "P0",
+      "note": "CRITICAL GAP to address in Session 2"
+    }
+  ],
+
+  "narrative_development": {
+    "initial_clarity_score": 4.0,
+    "final_clarity_score": 5.5,
+    "current_interests_as_presented": {
+      "stem_cs": "Peer tutor, AP CSP, research (ASDRP - AI + healthcare)",
+      "dance_culture": "Bollywood dance since age 5, captain, teaches younger kids, social media manager",
+      "social_impact_policy": "Axon internship (police body cameras/tasers), Science Olympiad"
+    },
+    "emerging_narrative_synthesis": {
+      "through_line_v1": "Technologist with Cultural Roots Using AI to Address Social Justice",
+      "through_line_v2": "A South Asian technologist bridging her cultural heritage with her passion for using AI responsibly in systems that impact communities - from healthcare algorithms to police accountability technology. Her Bollywood dance leadership reflects the same commitment: preserving cultural knowledge while empowering the next generation.",
+      "spike_articulation": "South Asian technologist applying AI ethically in systems that impact communities - from healthcare algorithms to police accountability - while preserving cultural heritage through Bollywood dance leadership",
+      "differentiation_angle": "Interdisciplinary (AI + Policy + Culture), authentic cultural perspective, emerging policy niche (AI in law enforcement), dual expression (technical depth AND artistic/cultural leadership), teaching/mentorship"
+    },
+    "potential_essay_angles": [
+      "Cultural identity informing approach to technology ethics",
+      "Specific moment at Axon that revealed passion for AI + policy",
+      "Teaching Bollywood dance as metaphor for bridging tradition and innovation",
+      "Competitive nature driving both technical achievement and artistic expression"
+    ],
+    "differentiation_vs_typical_applicants": {
+      "common_profiles": [
+        "CS student with generic tech internship",
+        "Research student with standard paper",
+        "Dance student focused only on arts"
+      ],
+      "arshiya_unique": [
+        "Interdisciplinary: AI + Policy + Culture (rare combination)",
+        "Authentic cultural perspective: South Asian heritage informing tech ethics approach",
+        "Emerging policy niche: AI in law enforcement (timely, specific, real-world aware)",
+        "Dual expression: Technical depth AND artistic/cultural leadership",
+        "Teaching/mentorship: CS tutor + teaches younger kids dance (mastery + service)"
+      ]
+    }
+  },
+
+  "frameworks_introduced": [
+    {
+      "framework_name": "Resource Curation Strategy",
+      "description": "Proactively sharing 10+ specific, relevant opportunities rather than general advice",
+      "introduced_when": "During strategic planning phase of Session 1",
+      "application_immediate": true,
+      "effectiveness": "high",
+      "student_archetype_relevance": ["late_start", "high_achiever", "ultra_competitive_school"],
+      "resources_shared": [
+        "LA Justice Fund",
+        "Distinguished Young Women",
+        "Future of Policing resources",
+        "CA Police Chiefs AI resources",
+        "Aspirations in Computing Award",
+        "AI legislation article",
+        "YoungArts Dance",
+        "India Cultural Center YouthSava",
+        "Notre Dame Leadership Seminars",
+        "Disney Dreamers Academy"
+      ],
+      "strategic_rationale": "Immediate action orientation, spans multiple domains (STEM, arts, culture, leadership, policy), mix of reach and attainable, timing-aware for late-starters"
+    },
+    {
+      "framework_name": "Deep Diagnostic Questioning",
+      "description": "Extracting highly specific details about courses, grades, EC roles, and personality beyond surface-level answers",
+      "purpose": "Build comprehensive profile revealing differentiation opportunities",
+      "student_archetype_relevance": ["all"],
+      "key_principles": [
+        "Never accept surface-level answers",
+        "Probe for numbers, titles, specific achievements",
+        "Ask about weaknesses and struggles, not just strengths",
+        "Explore personality traits and work style",
+        "Document exact course names, grade breakdowns, EC specifics"
+      ],
+      "example_progression": {
+        "surface": "I do dance",
+        "level_2": "I do Bollywood dance",
+        "level_3": "I've done Bollywood dance since age 5",
+        "level_4": "I'm captain of the Bollywood dance team",
+        "level_5": "I'm captain, manage social media, and teach younger kids"
+      },
+      "effectiveness": "very_high"
+    },
+    {
+      "framework_name": "Tier-Based Award Targeting",
+      "description": "Categorizing award opportunities by alignment, prestige, and time investment",
+      "student_archetype_relevance": ["late_start", "high_achiever"],
+      "tier_system": {
+        "tier_1_must_apply": "Directly aligned with spike + attainable + prestigious",
+        "tier_2_highly_recommended": "Prestige/scholarship + reasonable alignment",
+        "tier_3_time_permitting": "Development opportunity but not critical path"
+      },
+      "arshiya_application": {
+        "tier_1": ["YoungArts Dance", "Aspirations in Computing Award"],
+        "tier_2": ["Distinguished Young Women", "India Cultural Center YouthSava"],
+        "tier_3": ["Notre Dame Leadership Seminars", "Disney Dreamers Academy"]
+      },
+      "effectiveness": "high",
+      "introduced_when": "Session 1 via resource sharing"
+    },
+    {
+      "framework_name": "Strategic Activity Pruning (Implied)",
+      "description": "Identifying what to keep, deepen, maintain, or drop based on spike alignment and time constraints",
+      "introduced_when": "Implied in Session 1, likely explicit in Session 2",
+      "student_archetype_relevance": ["late_start", "multi_talented"],
+      "key_principle": "Depth over breadth, especially when time-constrained",
+      "decision_matrix": {
+        "DEEPEN": "High spike alignment + leadership role + unique",
+        "MAINTAIN": "Solid but not unique + time investment reasonable",
+        "DROP": "Generic + shallow involvement + doesn't align with spike"
+      },
+      "arshiya_specific": {
+        "high_priority_deepen": ["Axon internship", "ASDRP research", "Bollywood dance captain"],
+        "medium_priority_maintain": ["Science Olympiad", "Girl Scout Gold Award"],
+        "evaluate_for_dropping": ["Middle school science bowl"]
+      }
+    },
+    {
+      "framework_name": "Time Management / 168-Hour Framework",
+      "description": "Strategic bandwidth allocation and activity prioritization",
+      "introduced_when": "Noted as area to address in Session 1",
+      "student_archetype_relevance": ["late_start", "high_achiever", "time_constrained"],
+      "key_principle": "Student noted: 'Study less than peers for same grades' = efficiency leverage point, room for strategic EC focus",
+      "strategic_approach": "Map all commitments, identify optimization opportunities, strategic activity pruning to create bandwidth for spike-deepening",
+      "effectiveness": "TBD - framework introduced but application details not yet documented"
+    }
+  ],
+
+  "strategic_recommendations": {
+    "extracurriculars": {
+      "high_priority_deepen": [
+        {
+          "activity": "Axon Internship",
+          "current": "Software Engineering Intern",
+          "action": "Produce specific deliverable (project writeup, feature launch, document impact)",
+          "strategic_rationale": "Unique tech+policy positioning, rare opportunity, demonstrates real-world application, police technology is niche vs. generic SWE intern",
+          "priority": "HIGH"
+        },
+        {
+          "activity": "ASDRP Research (AI + Healthcare)",
+          "current": "In progress",
+          "action": "Publish paper, present findings, enter competitions (Regeneron, ISEF)",
+          "strategic_rationale": "Demonstrates research capability, complements Axon work, shows AI interest spans multiple domains",
+          "priority": "HIGH"
+        },
+        {
+          "activity": "Bollywood Dance Captain/Teacher",
+          "current": "Captain, social media manager, teaches younger kids",
+          "action": "Scale impact (YoungArts application, cultural festival organization, quantify # students taught)",
+          "strategic_rationale": "Authentic differentiation, leadership demonstration, community impact, cultural spike validation",
+          "priority": "HIGH"
+        }
+      ],
+      "medium_priority_maintain": [
+        {
+          "activity": "Science Olympiad",
+          "current": "Subject officer, ranks 15-20 in anatomy/physiology",
+          "strategic_concern": "Top 15-20 is solid but not standout at ultra-competitive school",
+          "recommendation": "Maintain for consistency, but don't make centerpiece",
+          "priority": "MEDIUM"
+        },
+        {
+          "activity": "Girl Scout Gold Award",
+          "current": "Prep in progress",
+          "concern": "Very common among high-achievers",
+          "differentiation_opportunity": "Theme Gold Award around AI ethics or police accountability (connect to spike)",
+          "priority": "MEDIUM"
+        }
+      ],
+      "evaluate_for_dropping": [
+        {
+          "activity": "Middle School Science Bowl Leadership",
+          "concern": "Impact unclear, time investment vs. college application value may not justify",
+          "recommendation": "Unless deeply meaningful, could be strategic cut to focus on higher-impact activities",
+          "priority": "LOW"
+        }
+      ],
+      "avoid_adding": [
+        "More 'breadth' activities",
+        "Prestigious programs that don't align with emerging narrative",
+        "Activities that would dilute time from four core commitments"
+      ]
+    },
+    "awards": {
+      "tier_1_must_apply": [
+        {
+          "award": "Aspirations in Computing Award",
+          "url": "https://www.aspirations.org/award-programs/aic-high-school-award",
+          "why": "CS + women in tech, matches peer tutor role and research",
+          "strategic_rationale": "Prestigious, attainable, reinforces STEM narrative",
+          "timeline": "Application deadline typically fall"
+        },
+        {
+          "award": "YoungArts - Dance",
+          "url": "https://youngarts.org/discipline/dance/",
+          "why": "Validates Bollywood dance as serious artistic pursuit",
+          "strategic_rationale": "National recognition, prestigious program, differentiates from pure STEM narrative",
+          "challenge": "Highly competitive, requires strong portfolio",
+          "timeline": "Fall application"
+        },
+        {
+          "award": "India Cultural Center YouthSava",
+          "url": "https://www.indiacc.org/youthsava/",
+          "why": "Cultural heritage, community connection, dance/performance",
+          "strategic_rationale": "Reinforces authentic cultural identity, less competitive than YoungArts (good backup)"
+        }
+      ],
+      "tier_2_apply_selectively": [
+        {
+          "award": "Distinguished Young Women",
+          "url": "https://distinguishedyw.org/apply",
+          "why": "Prestigious, scholarship opportunity, recognizes well-rounded achievement",
+          "strategic_rationale": "Traditional 'impressive' award that complements technical narrative",
+          "consideration": "May require significant time commitment for interview/competition process"
+        },
+        {
+          "award": "LA Justice Fund",
+          "url": "https://www.lajf.org/apply2024",
+          "why": "Potential connection to police reform/social justice angle",
+          "strategic_rationale": "If can connect AI ethics + police accountability to social justice work, strong alignment"
+        }
+      ],
+      "tier_3_time_permitting": [
+        {
+          "program": "Notre Dame Leadership Seminars",
+          "url": "https://precollege.nd.edu/leadership-seminars/",
+          "why": "Summer enrichment, leadership development, prestigious brand",
+          "consideration": "Cost/time vs. benefit - summer might be better spent deepening research or Axon work"
+        },
+        {
+          "program": "Disney Dreamers Academy",
+          "url": "https://www.disneydreamersacademy.com/",
+          "why": "Inspirational program, diverse cohort",
+          "strategic_rationale": "Less clear alignment with spike, but interesting opportunity",
+          "priority": "Lower unless deeply meaningful"
+        }
+      ],
+      "current_awards": ["PVSA Gold (Presidential Volunteer Service Award) - solid baseline, common among high-achievers, shows service commitment but not differentiating"]
+    },
+    "summer_strategy": {
+      "recommended_approach": "Given late start (junior year), summers should prioritize: (1) Deepening existing spikes over exploring new areas, (2) Producing tangible outputs (research paper, dance showcase, project launch), (3) Selective prestigious programs that enhance narrative, not distract from it",
+      "option_A": "Continue/expand Axon internship (build portfolio, produce deliverable)",
+      "option_B": "Independent project combining AI + policy + culture (showcase interdisciplinary thinking)",
+      "option_C": "Selective prestigious program IF directly aligned (AI ethics program > generic leadership)",
+      "option_D": "Advanced dance intensive IF pursuing YoungArts seriously",
+      "avoid": "Generic summer programs that don't deepen spike or provide unique experiences"
+    },
+    "academic_strategy": {
+      "senior_year_plan": "5-6 APs maintaining rigor, prioritize CS + math/science APs aligned with intended major, continue French (4-year language commitment valuable)",
+      "testing_strategy": "CRITICAL GAP - must address SAT/ACT plan immediately in Session 2",
+      "grade_protection": "Continue French 4 junior year to show commitment (despite A- in French 2/3), senior year French 5/AP French is optional depending on junior year performance",
+      "ap_testing_priority": "With 13+ APs projected, must score well to justify rigor - Priority: 5s in CS, Physics, Calc (if taken), other STEM to support technical narrative"
+    },
+    "time_management": {
+      "current_load": "7 AP/Honors courses + 6+ significant ECs",
+      "efficiency_leverage": "Study less than peers for same grades = efficiency advantage, can handle intense schedule",
+      "pressure_response": "Works well under high pressure = can handle aggressive timeline",
+      "strategic_approach": "168-hour weekly architecture - map all commitments and identify optimization opportunities",
+      "pruning_candidates": "Middle school science bowl (if limited impact), generic service hours (if not aligned)",
+      "bandwidth_allocation": "Prioritize hours toward Axon deliverables, research publication, dance program growth"
+    }
+  },
+
+  "coaching_tactics_observed": {
+    "rapport_building": [
+      "Created environment where student felt safe being honest about grade imperfections (A- in French)",
+      "Validated competitive nature as normal in high-achieving environment",
+      "Acknowledged challenge of standing out in ultra-competitive school",
+      "Non-judgmental tone when discussing weaknesses"
+    ],
+    "probing_techniques": [
+      "Persistent, curious follow-up questioning to extract specific details",
+      "Not just 'I do dance' → 'Since age 5, Bollywood specifically, teach younger kids, captain, social media manager'",
+      "Not just 'good grades' → '4.7W/3.91UW, top 10-15%, study less than peers for same grades'",
+      "Not just 'Axon intern' → 'Body cameras and tasers for police'",
+      "Probing pattern: Initial question → Follow-up on duration → Style specifics → Role details → Additional responsibilities"
+    ],
+    "reframing_tactics": [
+      "Likely reframe: 'I'm late starting' → 'You have strong foundation already built. Now we're optimizing and differentiating.'",
+      "Likely reframe: 'I only got A- in French' → 'Four years of language shows commitment. One A- doesn't define your transcript.'",
+      "Likely reframe: 'I'm involved in too many activities' → 'You have multiple authentic passions. Now we synthesize them into compelling narrative.'",
+      "Likely reframe: 'My school is so competitive' → 'Competition means you've developed resilience. Your unique combination of CS + culture + policy will differentiate you.'"
+    ],
+    "motivation_techniques": [
+      "Resource curation creates action orientation (specific URLs to visit)",
+      "Showing possibilities (10+ opportunities aligned with interests)",
+      "Balancing reach and realistic options (YoungArts + India Cultural Center)",
+      "Likely messaging: 'Students who get into top schools have clear spike and narrative' → urgency",
+      "Likely messaging: 'Your Axon internship is unique' → confidence building"
+    ],
+    "parent_management": [
+      "Parent email prominently listed (high investment in 24-week program)",
+      "Likely managing parent anxiety about late start and ultra-competitive environment",
+      "Likely messaging to parents: 'Arshiya has strong foundation - we're now optimizing'",
+      "Likely messaging: 'Quality and narrative matter more than sheer quantity of activities'",
+      "Likely messaging: 'Strategic focus will yield better outcomes than panic-adding more activities'"
+    ]
+  },
+
+  "timeline_and_priorities": {
+    "immediate_next_4_weeks": {
+      "tier_1_critical": [
+        "Review and prioritize award applications",
+        "Schedule SAT/ACT testing dates (CRITICAL GAP)",
+        "Document current Axon internship projects for portfolio",
+        "Begin ASDRP research paper writing"
+      ]
+    },
+    "short_term_3_months_through_dec_2024": {
+      "tier_1_critical": [
+        "Submit Tier 1 award applications (YoungArts, Aspirations in Computing)",
+        "Complete ASDRP research paper first draft",
+        "Take SAT/ACT",
+        "Achieve specific Science Olympiad placement"
+      ],
+      "tier_2_important": [
+        "Expand Bollywood dance program to [X] students",
+        "Apply to Tier 2 awards (Distinguished Young Women, India Cultural Center)"
+      ]
+    },
+    "medium_term_6_months_through_mar_2025": {
+      "tier_1_critical": [
+        "Win/place in [X] awards (with specific targets)",
+        "Publish ASDRP research or enter major competition",
+        "Secure Girl Scout Gold Award approval",
+        "Achieve target SAT/ACT score",
+        "Draft Common App personal statement"
+      ]
+    },
+    "long_term_12_months_through_application_season": {
+      "tier_1_critical": [
+        "Complete Gold Award project",
+        "Submit early applications to [X] schools",
+        "Have 2-3 major awards/recognitions to report",
+        "Maintain 3.9+ UW GPA through senior fall",
+        "Produce strong Axon internship outcome/deliverable"
+      ]
+    }
+  },
+
+  "critical_gaps_to_address": {
+    "immediate_priorities": [
+      {
+        "gap": "SAT/ACT Testing Strategy",
+        "severity": "CRITICAL",
+        "description": "No mention of test scores or testing plan; junior year = must test in fall/winter",
+        "action": "Session 2 must address testing timeline",
+        "priority": "P0"
+      },
+      {
+        "gap": "College List Development",
+        "severity": "HIGH",
+        "description": "No target schools mentioned; without college list, can't calibrate strategy",
+        "action": "Develop preliminary reach/target/safety list by Session 2-3",
+        "priority": "P0"
+      },
+      {
+        "gap": "Narrative Finalization",
+        "severity": "HIGH",
+        "description": "'Target Profile we can build' section is blank in GamePlan",
+        "action": "Session 2 must articulate clear 2-3 sentence spike statement",
+        "priority": "P0"
+      },
+      {
+        "gap": "Measurable Outcomes",
+        "severity": "MEDIUM",
+        "description": "No specific goals or metrics defined; what does success look like in 3/6/12 months?",
+        "action": "Create milestone table with concrete outcomes and deadlines",
+        "priority": "P1"
+      },
+      {
+        "gap": "Strategic Activity Decisions",
+        "severity": "MEDIUM",
+        "description": "Which ECs to deepen vs. maintain vs. drop? How many hours per week on each?",
+        "action": "Create activity priority matrix with time allocation",
+        "priority": "P1"
+      },
+      {
+        "gap": "Girl Scout Gold Award Theme",
+        "severity": "LOW",
+        "description": "Working on prereq but no theme/project mentioned; opportunity to align with spike",
+        "action": "Discuss gold award concept that reinforces narrative (AI ethics? Police accountability? Cultural project?)",
+        "priority": "P2"
+      },
+      {
+        "gap": "Essay Angle Brainstorming",
+        "severity": "MEDIUM",
+        "description": "No mention of essay strategy or potential topics; given late start, essay is crucial differentiator",
+        "action": "Identify 3-5 potential essay angles by Session 2-3",
+        "priority": "P1"
+      }
+    ]
+  },
+
+  "archetype_specific_patterns": {
+    "for_late_starting_high_achievers_ultra_competitive": {
+      "lead_with": "Narrative synthesis (must articulate spike quickly), Time optimization (depth over breadth), Competitive differentiation (what makes YOU unique in THIS environment)",
+      "emphasize": "Synthesis over exploration, Leveraging existing foundation vs. building new, Strategic activity pruning, Quick wins (awards in 3-6 months), Essay as differentiator",
+      "avoid": "Adding more activities, Long-term exploration, Starting from scratch initiatives, Generic prestigious programs that don't align",
+      "key_deliverables": [
+        "Clear spike articulation within first month",
+        "Activity hub organization (3-4 core activities)",
+        "Tier-based award targeting with near-term deadlines",
+        "Measurable 3/6/12 month milestones",
+        "Strategic activity cuts to create bandwidth"
+      ]
+    }
+  },
+
+  "success_metrics_defined": {
+    "short_term_3_months": {
+      "narrative": "Clear narrative articulated",
+      "awards": "3-5 award applications submitted",
+      "activities": "Strategic activity cuts made (focusing time on spike)"
+    },
+    "medium_term_6_months": {
+      "awards": "Win 1-2 meaningful awards/recognitions",
+      "spike_depth": "Axon project deliverables, ASDRP research publication/competition entry",
+      "testing": "SAT/ACT at target score",
+      "gold_award": "Girl Scout Gold Award approved/in progress"
+    },
+    "long_term_12_months": {
+      "admissions": "Acceptance to 1+ reach schools",
+      "differentiation": "Clear differentiation from peers in same school",
+      "essay": "Compelling essay narrative synthesizing interests",
+      "outcomes": "2-3 major recognitions to report in applications"
+    }
+  },
+
+  "effectiveness_indicators": {
+    "narrative_clarity_improvement": 1.5,
+    "student_engagement": "high (shared detailed profile info, personality traits, grade weaknesses)",
+    "parent_satisfaction": "high (enrolled in 24-week program, parent actively engaged)",
+    "frameworks_resonated": "TBD - Session 1 is data collection phase",
+    "immediate_value_demonstrated": "high (10+ resources shared, immediate action items)",
+    "resource_curation_impact": "very_high (specific, aligned opportunities across multiple domains)",
+    "session_1_completion": "partial (data collected, resources shared, but narrative/metrics/timeline incomplete - Session 2 needed)"
+  }
+}

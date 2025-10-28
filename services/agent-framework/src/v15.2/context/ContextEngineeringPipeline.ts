@@ -84,7 +84,7 @@ export class ContextEngineeringPipeline {
   private async getFewShotExamples(
     query: string,
     intent: IntentType,
-    topK: number = 3
+    topK: number = parseInt(process.env.V15_2_FEW_SHOT_COUNT || '3')
   ): Promise<FewShotExample[]> {
     try {
       // Map intent to Pinecone namespace

@@ -1,0 +1,654 @@
+{
+  "student_id": "aarav_009",
+  "extraction_date": "2025-10-20",
+  "coach_id": "jenny_duan",
+  "additional_coaches": ["siraj_founder", "rishi_specialist"],
+
+  "session_metadata": {
+    "student_archetype": "High-Achiever Early Explorer",
+    "sub_archetype": "Parent-Driven Multi-Talented",
+    "grade_level": 8,
+    "session_duration_minutes": {
+      "session_1": 90,
+      "session_2": 60
+    },
+    "session_dates": {
+      "session_1": "2024-04-16",
+      "session_2": "2024-04-24"
+    },
+    "session_type": "2_session_assessment",
+    "school_type": "competitive_private",
+    "school_name": "BASIS Independent Silicon Valley (deciding vs Bellarmine)",
+    "location": "Bay Area, California",
+    "student_readiness_score": 6.5,
+    "narrative_clarity_start": 3,
+    "narrative_clarity_end": 7,
+    "parent_involvement": "very_high",
+    "parent_present": "father_highly_involved",
+    "intended_major_stated": "Computer Science",
+    "intended_major_recommended": "Computer Science / Data Science (but strategic positioning as Environmental Science or Sustainability major for applications)",
+    "authentic_passion_level": 5,
+    "discovery_vs_prescriptive_ratio": "70_discovery_30_prescriptive",
+    "primary_challenge": "parent_driven_activities_scattered_profile_cookie_cutter_risk"
+  },
+
+  "student_profile": {
+    "academic_standing": {
+      "gpa": "strong_implied_3.8_plus",
+      "current_grade": "8th grade",
+      "school": "BASIS Independent Silicon Valley",
+      "courses_8th_grade": ["Chemistry", "Biology", "Physics", "Algebra 2", "Spanish 1B", "Logic", "English", "History"],
+      "course_rigor": "high_taking_algebra_2_in_8th_grade",
+      "standardized_tests": "none_yet_8th_grade",
+      "aps_planned": {
+        "freshman_year": 2,
+        "total_by_graduation_basis": "15 APs (if BASIS)",
+        "total_by_graduation_bellarmine": "6-9 APs (if Bellarmine)"
+      }
+    },
+    "involvement_level": "high_but_scattered",
+    "starting_readiness": "partially_built_unfocused",
+    "achievement_orientation": "high_achiever",
+    "execution_style": "needs_structure_parent_directed",
+    "passion_clarity": "exploring_3_to_7_after_sessions",
+    "resource_access": "very_high",
+    "demographic": "bay_area_asian_male_tech_parent",
+    "competitive_context": "most_saturated_demographic_cs_applicant",
+    "time_constraints": "basketball_10hr_week_piano_desired_28hr_week_school_7.30am_5pm"
+  },
+
+  "key_challenges": [
+    {
+      "challenge": "Lack of Cohesive Narrative Connecting Disparate Activities",
+      "quote": "Based on our initial conversation. What really stood out to me the most was your a couple of interest. So programming interest, piano interest. And this need for leadership. I think those were the 3 things that stood out to the most to me... But you're not specific yet about what kind of impact do you want to have in the world",
+      "severity": "critical",
+      "context": "Activities span CS, piano (Level 6), basketball, climate change, no connecting thread"
+    },
+    {
+      "challenge": "Parent-Driven vs. Authentic Interest",
+      "quote_father": "We? We thought at the beginning, yeah, we were not like very sure at that time about this whole process. We just had this in our mind that if you are part of Decca you'd be you'll have an edge",
+      "quote_siraj": "99% of tech Bay area pairs... They all want to do cyber security because their parents are Cpos and Svps... you're actually harming your child",
+      "severity": "critical",
+      "evidence": "Father answers many questions directed to student, reveals decisions made by 'we' not student"
+    },
+    {
+      "challenge": "Time Management with Unsustainable Schedule",
+      "quote_father_basketball": "basketball... 3 days training every day used to come at 2 and 2h training in the night and then the weekend the entire weekend used to go for games Saturday the whole day would be on the games",
+      "quote_father_piano": "his teacher has told him to invest 4h a day [in summer]",
+      "quote_father_basis": "if we start taking more electives and extracurricular, his day will start at the 7 30 Am. in the morning, and will end at 5 Pm",
+      "severity": "high",
+      "calculation": "Basketball (10hr/week) + Piano (28hr/week desired) + School (50hr/week) = unsustainable"
+    },
+    {
+      "challenge": "Cookie-Cutter Bay Area Asian Male CS Profile Risk",
+      "quote_jenny": "coming from the Bay area and being person a South Asian male interested in Cs. It's very easy to get stereotyped by admissions officers and to get typified because there are so many applicants with similar backgrounds",
+      "quote_siraj": "Everyone's got this, I can show you like every Bay area kind of a profile. Has a model. UN has a Deca has a robotics club. How do you stand out. It's it's just not possible",
+      "severity": "critical",
+      "competitive_disadvantage": "CS acceptance rate ~2-3% vs other majors ~5-7% at top schools"
+    },
+    {
+      "challenge": "Lack of Leadership Roles and Measurable Impact",
+      "evidence": "Machine Learning Club participant (not founder/president), Basketball team member (trying out, no leadership), Piano performer (not instructor/mentor)",
+      "severity": "high",
+      "gap": "No club president, founder, captain, or quantifiable impact demonstrated"
+    }
+  ],
+
+  "breakthrough_moments": [
+    {
+      "timestamp": "session_1_minute_35",
+      "trigger": "Jenny's climate change specificity question",
+      "language": "what specifically about climate change do you wanna address? I know climate change is really big",
+      "student_initial": "I haven't really like, look taught into what part of climate change I want to help fix",
+      "jenny_provides_examples": "some students like to focus on, like the Antarctic region. Some people like to focus on food waste",
+      "student_breakthrough": "just really like limiting like toxic gases and like managing that like output, like from factories for cars, trucks, transportation",
+      "significance": "First time student gets SPECIFIC instead of generic - toxic gases, factories, transportation",
+      "effectiveness": "high"
+    },
+    {
+      "timestamp": "session_1_minute_40",
+      "trigger": "How would you tackle it question",
+      "language": "And how do you see yourself tackling this problem?",
+      "student_response": "we could use data points and gather information from the usage of different power plans and different type, the overall transportation industry. And we could make recommendations",
+      "significance": "Student UNPROMPTED connects CS skills to climate problem - shows authentic integration",
+      "effectiveness": "very_high"
+    },
+    {
+      "timestamp": "session_2_minute_30",
+      "trigger": "Jenny makes climate + CS concrete",
+      "language": "this kind of reminds me of is the United States right now is passing a major initiative to transition to green energy... creating some type of algorithm or system to measure emissions and to track that over time",
+      "student_response": "Yeah, I think that's a that's a really good idea. And that's what I was thinking about, like creating databases and gathering those information",
+      "significance": "Student says 'that's what I was thinking' - validates narrative is AUTHENTIC not coached",
+      "effectiveness": "very_high"
+    },
+    {
+      "timestamp": "session_2_minute_60",
+      "trigger": "Piano repurposing - podcast option",
+      "language": "starting a podcast or like a Youtube channel or a Tiktok channel [about classical music]",
+      "student_response": "I think the podcasting I really connected with me like sharing different my knowledge about classical music, with other. The youth",
+      "significance": "First time student shows ENTHUSIASM - 'really connected with me' - emotional resonance",
+      "effectiveness": "high"
+    },
+    {
+      "timestamp": "session_1_minute_80",
+      "trigger": "Siraj's cookie cutter reality check",
+      "language": "Everyone's got this, I can show you like every Bay area kind of a profile. Has a model. UN has a Deca has a robotics club. How do you stand out. It's it's just not possible",
+      "parent_response": "Implicit acceptance - stops pushing Deca",
+      "significance": "Created urgency and clarity about differentiation need",
+      "effectiveness": "high"
+    }
+  ],
+
+  "critical_interventions": [
+    {
+      "issue": "deca_participation_parent_driven",
+      "coach_response": "strong_recommendation_against",
+      "language": "Decca might be a comparative disadvantage, because you're going in with people who are pre business, who do want to go into that. And you are maybe using Deca as an opportunity to learn business. But these people are using Deca as an opportunity to demonstrate their aptitude and business",
+      "rationale": "Comparative disadvantage - competing with students who have business as primary spike vs. learning opportunity",
+      "alternative_provided": "Youth Commission (unique), business skills through entrepreneurship project"
+    },
+    {
+      "issue": "piano_4hr_per_day_expectation",
+      "coach_response": "reality_check_with_reframe",
+      "language": "I don't think that reaching level level 10 will have a significant impact on your application... unless you're competing internationally unless you're playing at Carnegie Hall... many people play piano... But I think what we can do on piano is, turn that into an opportunity for you to demonstrate leadership and service",
+      "rationale": "Level 10 doesn't differentiate, unsustainable time commitment (28hr/week), need leadership layer instead",
+      "alternative_provided": "Classical music podcast for youth, volunteer performances, radio show",
+      "time_negotiation": "From 4hr/day to 1.5-2hr/day"
+    },
+    {
+      "issue": "generic_volunteer_clubs",
+      "coach_response": "strong_recommendation_against",
+      "language": "I would say, let's not do any volunteer clubs, because the thing with volunteering is, I think, a misconception. Is that what matters is the number of hours. But I think what is more important is your tangible impact in your leadership in an organization",
+      "rationale": "Hours don't matter, leadership and impact matter - volunteer clubs = 'just a body helping out'",
+      "alternative_provided": "Youth Commission, environmental nonprofit board, leadership in specific cause"
+    },
+    {
+      "issue": "cs_major_direct_application",
+      "coach_response": "strategic_positioning_alternative",
+      "language_siraj": "Now, with AI and everything else... you come in through [non-CS major]... People are getting through general education and sex education... There are majors that are coming up which are not competitive or sustainability",
+      "recommended_strategy": "Apply as Environmental Science or Sustainability major (lower competition), maintain CS connection through data science angle, option to transfer to CS later",
+      "rationale": "CS acceptance ~2-3% vs other majors ~5-7%, Bay Area Asian male most competitive pool"
+    }
+  ],
+
+  "narrative_development": {
+    "initial_clarity_score": 3,
+    "final_clarity_score": 7,
+    "initial_stated_interests": {
+      "cs": "I've liked coding like ever since, like first grade... I really like solving problems with code",
+      "piano": "I started playing piano for many years. I'm 5 years old... planning to take level 8 exam",
+      "basketball": "yeah, I'm probably gonna travel the school team",
+      "climate_change": "eventually, maybe contributing to the end of climate change",
+      "helping_people": "helping other people obtain like a better lifestyle, like getting homeless people off the streets"
+    },
+    "discovery_process": {
+      "round_1_broad": "What is biggest problem in world? → Climate change, helping people",
+      "round_2_narrow_climate": "What specifically? → Toxic gases, emissions from factories, transportation",
+      "round_3_application": "How tackle it? → Data points, gather information from power plants, make recommendations",
+      "round_4_cs_subfield": "What type coding? → Algorithms, machine learning, data science (NOT web/app dev)",
+      "round_5_separate_biomed": "Interested in medicine? → No, interested in data science aspect (ML model used health data circumstantially)"
+    },
+    "authentic_interests_discovered": {
+      "cs_core": "Data science and machine learning for problem-solving (NOT medicine, NOT general CS)",
+      "climate_specific": "Air quality monitoring, emissions tracking from transportation and industry",
+      "piano_authentic": "Listening to classical music on YouTube/Spotify, wants to share knowledge with youth",
+      "basketball_authentic": "Playing the sport, watching games, knowing team facts (NOT college-level serious)"
+    },
+    "final_narrative_synthesis": {
+      "primary": "Data Science & Machine Learning for Environmental Emissions Monitoring",
+      "components": [
+        "CS/Data Science technical foundation",
+        "Environmental impact focus (air quality, toxic gases, emissions)",
+        "Method: Building algorithms and databases to track pollution",
+        "Leadership through piano (classical music education podcast)",
+        "Community impact through basketball (youth mentorship)"
+      ],
+      "articulation": "Student who uses data science and machine learning to tackle environmental challenges, specifically air quality monitoring and emissions tracking. Combines technical aptitude with interdisciplinary interests (music, athletics) and demonstrates leadership through sharing knowledge (classical music podcast) and community service (basketball mentorship)."
+    },
+    "narrative_bridges_built": {
+      "cs_to_climate": "Use data science algorithms to create emissions tracking databases",
+      "piano_to_leadership": "Classical music podcast educating youth → demonstrates communication + cultural appreciation",
+      "basketball_to_impact": "Mentorship program for younger/low-income kids → demonstrates service through existing skill",
+      "scattered_to_cohesive": "All activities become vehicles for leadership and impact, not just participation"
+    },
+    "differentiation_strategy": {
+      "avoid_cookie_cutter": "NO Deca, NO Model UN, NO Robotics Club, NO generic volunteer clubs",
+      "unique_activities": "Santa Clara County Youth Commission, IoT air quality sensors with Raspberry Pi, Classical music podcast",
+      "strategic_major_positioning": "Apply as Environmental Science/Sustainability (not CS) to avoid most competitive pool",
+      "depth_over_breadth": "2-3 pre-professional, 2-3 service, 2-3 leadership = 10 activities total"
+    }
+  },
+
+  "frameworks_introduced": [
+    {
+      "framework_name": "168-Hour Weekly Architecture",
+      "introduced_when": "Session 1, when discussing time management with basketball + piano overcommitment",
+      "introduction_language": "time management is the most challenging thing. And for our long term students, one of the first exercises we do is we call it 1 68h, where 168h is the number of hours in a week. So something we do with our long term students is, we actually break down every single hour and see like, where are people spending their time",
+      "application_immediate": false,
+      "application_timing": "For long-term coaching program",
+      "purpose": "Reveal actual time allocation, identify time waste (15hr/week social media, 8hr/week games), force prioritization",
+      "effectiveness": "high_when_applied",
+      "archetype_relevance": ["all", "especially_overcommitted"]
+    },
+    {
+      "framework_name": "10 Activities Framework (Common App Portfolio)",
+      "introduced_when": "Session 1, ~35 minutes in, after understanding current activities",
+      "introduction_language": "on the common application. You get room for about 10 extra curriculars... the ratio that people fill... is about 2 or 3 pre-professional clubs. 2 or 3 community service or impact related clubs. And then 2 or 3 things that demonstrate your leadership and other personal qualities",
+      "application_immediate": true,
+      "student_response": "Started thinking in portfolio terms",
+      "effectiveness": "very_high",
+      "archetype_relevance": ["all"]
+    },
+    {
+      "framework_name": "Aptitude + Passion + Impact (3 Components Framework)",
+      "introduced_when": "Session 1, ~45 minutes in, when family focused on 'what activities look good'",
+      "introduction_language": "the 3 components of a successful college application are aptitude, passion, and impact. So aptitude is, you know, demonstrated through things like your standardized test scores your grades, your letters of recommendation. Passion is brought out... through your extracurriculars... And they really colleges really wanna understand that you're doing this, not because someone told you to, not because you think that it'll get you into college, but because you genuinely find them valuable",
+      "key_message": "you don't want to just get into a college, you wanna become the type of person that goes to that school that you wanna go to",
+      "application_immediate": true,
+      "effectiveness": "very_high",
+      "archetype_relevance": ["all", "especially_parent_driven"]
+    },
+    {
+      "framework_name": "Cookie Cutter vs. Unique Profile Differentiation",
+      "introduced_when": "Session 1, when discussing Deca and Bay Area Asian male CS challenge",
+      "introduction_language": "coming from the Bay area and being person a South Asian male interested in Cs. It's very easy to get stereotyped by admissions officers and to get typified because there are so many applicants with similar backgrounds interested in the same things. So that's why it's important for us to use extracurriculars to make you stand out and to stand out. It means not necessarily doing things that everyone else is doing",
+      "siraj_extension": "Everyone's got this, I can show you like every Bay area kind of a profile. Has a model. UN has a Deca has a robotics club. How do you stand out. It's it's just not possible",
+      "key_principle": "the way you stand out is easy. The easiest way is just, don't do what others are doing",
+      "application_immediate": true,
+      "effectiveness": "very_high",
+      "archetype_relevance": ["bay_area", "competitive_demographics", "asian_male_cs"]
+    },
+    {
+      "framework_name": "Impact Through Leadership, Not Hours",
+      "introduced_when": "Session 1, when student mentioned volunteering",
+      "introduction_language": "I would say, let's not do any volunteer clubs, because the thing with volunteering is, I think, a misconception. Is that what matters is the number of hours. But I think what is more important is your tangible impact in your leadership in an organization. And I feel like a lot of the times when people do volunteer clubs. They're basically just like a body helping out and putting in a number of hours. But I think colleges actually don't really care about that",
+      "application_immediate": true,
+      "effectiveness": "high",
+      "archetype_relevance": ["all"]
+    },
+    {
+      "framework_name": "Free Programs > Paid Programs (Summer Strategy)",
+      "introduced_when": "Session 2, discussing summer programs",
+      "introduction_language": "What you want to avoid is these paid summer programs that basically you you go into like... learn an AI skill... But you pay a very expensive amount. And it's basically like pay to win... What you actually want to optimize for our free summer programs. So summer programs that will actually fly you out there, pay for your stay, pay for your entire instruction... those types of programs some people call them like the ticket to Iv",
+      "key_insight": "Free → merit-based → competitive → prestigious (counterintuitive)",
+      "examples": "RSI, SSP vs. paid AI bootcamps",
+      "application_immediate": false,
+      "application_timing": "Junior year summer",
+      "effectiveness": "very_high",
+      "archetype_relevance": ["high_resource_families", "all"]
+    },
+    {
+      "framework_name": "30% Academics / 70% Impact (Siraj's Philosophy)",
+      "introduced_when": "End of Session 1, when parent focused on academics",
+      "introduction_language": "30%. Not more than that [academics]... 70% of the profile is all non academics and extra critical that really helps you stand out... The thing that really stands out are these big ticket items, right? Which is building a business, doing, publishing a research paper, doing a few things that are actually going to drive the biggest community impact",
+      "key_insight": "academics... is really a defensive play. Just to say that don't filter me out because I am an academically disciplined student that's about it",
+      "application_immediate": true,
+      "effectiveness": "very_high",
+      "archetype_relevance": ["academic_obsessed_parents", "high_achievers"]
+    },
+    {
+      "framework_name": "Comparative Advantage Positioning",
+      "introduced_when": "Session 1, discussing Deca and activity selection",
+      "introduction_language": "Decca might be a comparative disadvantage, because you're going in with people who are pre business, who do want to go into that... not everyone is on like a Youth City Commission... do things that other people don't do, that you could have the highest impact leadership and comparative advantage in",
+      "application_immediate": true,
+      "effectiveness": "high",
+      "archetype_relevance": ["all"]
+    },
+    {
+      "framework_name": "Repurposing Existing Skills for Leadership",
+      "introduced_when": "Session 2, discussing piano and basketball transformation",
+      "introduction_language_piano": "I don't think that reaching level level 10 will have a significant impact... But I think what we can do on piano is, turn that into an opportunity for you to demonstrate leadership and service",
+      "introduction_language_basketball": "you could start like a basketball mentorship or coaching program for like younger kids, maybe especially from like lower income backgrounds",
+      "key_insight": "Keep existing commitments BUT add leadership layer - don't quit, repurpose",
+      "application_immediate": true,
+      "effectiveness": "very_high",
+      "archetype_relevance": ["overcommitted_students", "athletes_musicians"]
+    },
+    {
+      "framework_name": "Strategic Major Selection (Non-CS Entry Point)",
+      "introduced_when": "Session 2, Siraj's extended explanation",
+      "introduction_language": "Now, with AI and everything else... you come in through [non-CS major]... People are getting through general education and sex education. Right? That's what I said. There are majors that are coming up which are not competitive or sustainability",
+      "example": "my daughter... She did not even enter as design. She entered, as you know, one of the community kind of projects public policy",
+      "application_immediate": false,
+      "application_timing": "College application strategy junior/senior year",
+      "effectiveness": "very_high",
+      "archetype_relevance": ["competitive_demographics", "cs_applicants"]
+    }
+  ],
+
+  "strategic_recommendations": {
+    "extracurriculars": {
+      "tier_1_critical": [
+        "Computer Science Research with University Professor (UC Berkeley, Stanford, UC Davis, SJSU) - Start freshman summer/fall",
+        "Santa Clara County Youth Commission - Apply freshman year (15-member commission, unique leadership)",
+        "Environmental IoT Project - Air quality monitoring with Raspberry Pi sensors, app/website for real-time data"
+      ],
+      "tier_2_important": [
+        "Competitive Programming - USACO (Bronze → Silver → Gold progression), start Leetcode practice",
+        "Machine Learning Club - Continue but take leadership role OR start Environmental ML club",
+        "Classical Music Podcast for Youth - Share knowledge about composers, music history (10-min episodes)"
+      ],
+      "tier_3_if_time": [
+        "Basketball Youth Mentorship - Summer camp/program for younger kids from low-income backgrounds",
+        "Environmental Club Leadership - Lead existing club OR start 'Environmental Tech Solutions' club"
+      ],
+      "avoid_or_drop": [
+        "Deca (comparative disadvantage, too competitive with business-focused students)",
+        "Generic volunteer clubs (hours don't matter, no leadership)",
+        "Speech & Debate (requires massive time investment, comparative disadvantage vs. students who started middle school)",
+        "Public speaking club (instruction not practice, Youth Commission provides real speaking)",
+        "Excessive piano practice (reduce from 4hr/day to 1.5-2hr/day, Level 10 doesn't differentiate)"
+      ],
+      "strategy": "depth_over_breadth_unique_activities_10_total"
+    },
+    "awards": {
+      "tier_1_must_pursue": [
+        "USACO (USA Computing Olympiad) - Bronze → Silver → Gold by junior year",
+        "Research Publication - Through university professor collaboration, submit to competitions"
+      ],
+      "tier_2_highly_recommended": [
+        "Regeneron Science Talent Search (STS) - After research project complete",
+        "YoungArts Competition (Piano) - ONE music recognition",
+        "Environmental Grants - For air quality IoT project (EPA grants, local foundations)"
+      ],
+      "tier_3_consider": [
+        "CyberPatriot (if exploring cybersecurity)",
+        "TEAMS USA (multi-disciplinary engineering)",
+        "Bay Area Piano Competitions (regional recognition)"
+      ],
+      "target": "USACO Gold + 1-2 research publications + 1 environmental project recognition"
+    },
+    "summer_programs": {
+      "freshman_sophomore_summer": {
+        "strategy": "EXPLORATION not resume-building",
+        "activities": [
+          "Community college CS courses (explore subfields: web dev, app dev, cybersecurity, quantum)",
+          "Independent environmental IoT project development",
+          "Leetcode practice for USACO preparation",
+          "Piano podcast pilot episodes"
+        ],
+        "avoid": "Paid AI bootcamps, inspirit.ai, expensive upskilling programs"
+      },
+      "junior_summer_target": [
+        "RSI (Research Science Institute) - ~80 students worldwide, FREE, MIT-hosted",
+        "SSP (Summer Science Program) - ~200 students globally, FREE/scholarship",
+        "Physics of Atomic Nuclei (if physics interest emerges)"
+      ],
+      "conditional": [
+        "LaunchX (entrepreneurship) - ONLY if genuine business interest, $10K cost",
+        "NASA Internships - Junior/senior summer",
+        "Stanford Jazz Camp - ONLY if exploring jazz specifically"
+      ]
+    },
+    "course_rigor": {
+      "school_decision": "BASIS vs Bellarmine - Recommend BASIS if can maintain 3.8+ GPA (more competitive, better preparation)",
+      "basis_path": {
+        "total_aps": "15 APs by graduation",
+        "breakdown": "2 (fresh) + 4 (soph) + 7 (junior) + 2 (senior)",
+        "key_courses": "AP CS Principles (9th), AP CS A (10th), AP Calc BC (11th), AP English Lang (11th), AP Spanish (11th)",
+        "summer_pe": "$3,160 to free up schedule during year"
+      },
+      "bellarmine_path": {
+        "total_aps": "6-9 APs by graduation",
+        "breakdown": "0 (fresh) + 1-2 (soph) + 3-4 (junior) + 2-3 (senior)",
+        "key_courses": "AP Calc BC (10th if accelerated), AP CS A (11th), AP English Lit (11th)",
+        "religious_studies": "6 semesters required"
+      },
+      "foreign_language_critical": "4 years Spanish (through AP junior year) - Stanford strongly recommends 4 years",
+      "gpa_priority": "3.8+ GPA more important than maximum AP count"
+    },
+    "testing": {
+      "sat_plan": "First attempt spring/summer after freshman year (establish baseline)",
+      "target_sat": "1500+",
+      "psat_junior": "Prepare for National Merit eligibility"
+    },
+    "differentiation": {
+      "unique_positioning": "Data scientist tackling environmental emissions through IoT + algorithms, NOT generic 'CS student interested in climate'",
+      "avoid_cookie_cutter": "NO to activities everyone does (Deca, Model UN, Robotics, generic volunteer clubs)",
+      "strategic_major": "Apply as Environmental Science or Sustainability (lower competition pool), NOT direct CS application"
+    }
+  },
+
+  "coaching_tactics_observed": {
+    "rapport_building": [
+      "Mirroring language ('I was also a pianist')",
+      "Validating unusual interests (Roblox, anime → potential game dev)",
+      "Acknowledging overwhelm ('Or if not, I can help you research it')",
+      "Normalizing uncertainty ('You don't have to have it all figured out')",
+      "Celebrating decisions ('that's really cool')"
+    ],
+    "probing_techniques": [
+      "'What specifically about [broad issue]?' (forces narrowing)",
+      "'How do you see yourself tackling this problem?' (tests concrete thinking)",
+      "'Are you interested in [A] or is it more [B] aspect?' (separates circumstantial from genuine)",
+      "'What about [activity] is interesting to you? Why do you like it?' (finds emotional connection)",
+      "'Do you plan to continue in college?' (assesses commitment level)",
+      "Multiple-choice probing ('Do you like web dev, app dev, or algorithms?') when student stuck"
+    ],
+    "reframing_tactics": [
+      "'I don't have time' → '168-hour framework - you have more time than you think'",
+      "'Piano isn't getting me into college' → 'Piano is leadership opportunity (podcast)'",
+      "'BASIS too competitive' → 'BASIS prepares you better if you can maintain GPA'",
+      "'Too many interests' → 'Interdisciplinary strength'",
+      "'Starting late (8th grade)' → 'Right on time, early start advantage'",
+      "'Not good enough at basketball' → 'Best player on weaker team = faster leadership'"
+    ],
+    "motivation_techniques": [
+      "Affirming current strengths ('seems like you're interested in research')",
+      "'You can do this' language ('your interests are the starting point')",
+      "Highlighting natural strengths ('you're a good public speaker')",
+      "Comparative advantage framing ('You're already good at this')",
+      "Time-limited opportunities ('Start now OR miss window for RSI applications')",
+      "Competitive reality check (Bay Area Asian male CS = disadvantage, must act strategically)",
+      "Building blocks ('Research now → competitive programs later')",
+      "Overwhelm reduction ('It's okay not to know', 'We'll figure it out together')"
+    ],
+    "parent_management": [
+      "Let parent speak, then redirect to student ('go ahead' to student)",
+      "Use parent's words as diagnostic data (Deca answer reveals parent-driven nature)",
+      "Educate parent directly ('Level 10 doesn't matter unless Carnegie Hall')",
+      "Provide alternatives parent can accept (repurpose piano, don't quit)",
+      "Empower student decision (school choice - 'then it seems your decision is already made')",
+      "Siraj manages expectations upfront (Session 1: 'Don't dilute with tactical questions')",
+      "Siraj provides brutal honesty ('you're actually harming your child' with parent-driven activities)",
+      "Division of labor: Jenny = student coach, Siraj = parent manager"
+    ],
+    "adaptive_behavior": [
+      "When student confused: Provide examples, offer to research together",
+      "When student gives short answer: Drill down with follow-ups, look for connection to goals",
+      "When student shows resistance: Accept commitment, reframe value, add leadership layer (don't fight)",
+      "When student highly engaged: Immediately make it concrete, provide specific next steps",
+      "When parent interrupts: Let them finish, use info as data, redirect back to student gracefully"
+    ]
+  },
+
+  "timeline_and_priorities": {
+    "immediate_3_months_summer_2024": {
+      "tier_1_critical": [
+        "School decision finalized (BASIS vs Bellarmine)",
+        "Start CS exploration (community college course OR online course exploring subfields)",
+        "Begin Leetcode practice (20-30 problems by end of summer)"
+      ],
+      "tier_2_important": [
+        "Piano practice adjustment (from 4hr/day to 1.5-2hr/day)",
+        "Environmental IoT project research phase 1 (written proposal for Raspberry Pi sensors)"
+      ]
+    },
+    "next_6_months_mid_freshman": {
+      "tier_1_critical": [
+        "Connect with university professor (email 5-10 professors at Stanford/UCB/UCSC/SJSU for research mentorship)",
+        "USACO Bronze achievement (pass Bronze by end of freshman year)",
+        "Apply to Santa Clara County Youth Commission"
+      ],
+      "tier_2_important": [
+        "Join/start Environmental Club (attend 3 meetings, identify leadership opportunity)",
+        "Piano podcast planning (content calendar, pilot episode)"
+      ]
+    },
+    "12_months_end_freshman_summer_2025": {
+      "tier_1_critical": [
+        "Research project underway (6-9 months into assistantship, early draft of paper)",
+        "Environmental IoT prototype (working Raspberry Pi sensor, tested in 1-2 locations)",
+        "USACO Silver (reach goal, realistic by sophomore year)"
+      ],
+      "tier_2_important": [
+        "Basketball team + informal mentoring started",
+        "Course performance (3.8+ GPA, 4-5 on all AP exams)",
+        "Formalize summer basketball camp plan for 2026"
+      ]
+    },
+    "by_junior_year_college_applications": {
+      "research": "1-2 research papers submitted/published, presented at science fair/conference, strong LOR from professor",
+      "computing": "USACO Gold (reach: Platinum), significant GitHub portfolio, AP CS A: 5",
+      "leadership": "2 years Youth Commission OR equivalent, founded environmental club OR VP/President role, Piano podcast: 50+ episodes",
+      "impact": "Air quality network deployed 3+ locations, partnership with city/county agency OR basketball program served 50+ youth",
+      "academic": "3.8+ unweighted GPA, 10-15 APs (BASIS) or 6-9 APs (Bellarmine), SAT 1500+"
+    }
+  },
+
+  "meta_coaching_moments": {
+    "explaining_assessment_structure": "I know there are top of mind pain points that every parent has... summer plans. Ap course selection... don't worry about that. The only reason we don't want to add that is because it dilutes away the core thing that we are looking for",
+    "connecting_school_choice_to_values": "what type of atmosphere do you feel like you will be able to thrive better in... Okay, then it seems like your decision is already made",
+    "why_piano_level_doesnt_matter": "I don't think that reaching level 10 will have a significant impact... unless you're competing internationally unless you're playing at Carnegie Hall... many people play piano",
+    "narrative_over_checklist": "you don't want to just get into a college, you wanna become the type of person that goes to that school that you wanna go to",
+    "why_differentiation_matters": "coming from the Bay area and being person a South Asian male interested in Cs. It's very easy to get stereotyped... So that's why it's important for us to use extracurriculars to make you stand out",
+    "correction_course_adjustment": "Session 2 - I think you know, we actually kind of flipped the model... I would actually love Jenny for us to go back to our kind of really framework and roots"
+  },
+
+  "knowledge_moat_insights": {
+    "proprietary_frameworks": [
+      "168-Hour Weekly Architecture",
+      "10 Activities Framework (2-3 pre-professional, 2-3 service, 2-3 leadership)",
+      "Aptitude + Passion + Impact (3 Components)",
+      "Cookie Cutter vs Unique Profile Differentiation",
+      "Impact Through Leadership, Not Hours",
+      "Free Programs > Paid Programs",
+      "30% Academics / 70% Impact",
+      "Comparative Advantage Positioning",
+      "Repurposing Existing Skills for Leadership",
+      "Strategic Major Selection (Non-CS Entry Point)"
+    ],
+    "candid_program_assessments": [
+      "Deca: 'Comparative disadvantage' for non-business students - AVOID",
+      "inspirit.ai: Paid AI bootcamp - AVOID (pay-to-win)",
+      "Generic volunteer clubs: 'Just a body helping out' - AVOID",
+      "Speech & Debate: 'Requires massive time investment, comparative disadvantage' - AVOID for late-starters",
+      "RSI/SSP: 'Ticket to Ivy' - FREE programs, highly selective - TARGET",
+      "Youth Commission: Unique, not common - RECOMMENDED",
+      "LaunchX: Entrepreneurship, but $10K and dilutes CS narrative - CONDITIONAL"
+    ],
+    "insider_access_examples": [
+      "Current Stanford student (Jenny)",
+      "Stanford admits network (Jenny: 'I can count at least like 10 SSP graduates at Stanford')",
+      "Founder's daughter (Siraj: applied public policy, now at design school)"
+    ],
+    "demographic_specific_strategies": [
+      "Bay Area Asian Male CS applicants: AVOID typical activities (Deca, Model UN, Robotics), DO unique activities (Youth Commission, specific environmental IoT), CONSIDER non-CS major application (Environmental Science, Sustainability)",
+      "High-resource families: Focus on FREE competitive programs (RSI, SSP) NOT paid programs, demonstrate merit not just resources",
+      "Parent-driven students: Extra emphasis on authentic interest discovery, parent education about harm of forcing activities"
+    ]
+  },
+
+  "questions_by_phase": {
+    "discovery_questions": [
+      "where you're from, what grade you're in and what school you go to",
+      "what do you like about basis? And why are you considering switching?",
+      "How has the environment at basis been like for you?",
+      "what classes you're enrolled in right now, and what you're planning to take next year",
+      "how long you've been playing piano, and to the extent of your involvement",
+      "how else do you spend your time? What are some of the other activities that you do?",
+      "in your day to day life, what do you like to spend the most time doing? (doesn't have to be school related)",
+      "where did this [interest] start from, and how have you seen it grow over time?"
+    ],
+    "narrative_questions": [
+      "what is the biggest problem in the world that you think you would want to solve one day eventually?",
+      "what specifically about [broad issue] do you want to address?",
+      "how do you see yourself tackling this problem?",
+      "are you interested in [adjacent field] or is it more the [core interest] aspect?",
+      "what about [activity] is interesting to you? Why do you like it?",
+      "do you plan to [continue activity] in college? Do you want to [activity] professionally?",
+      "what type of atmosphere do you feel like you will be able to thrive better in?"
+    ],
+    "strategy_questions": [
+      "have you ever tried [opportunity]? Or do you know what [opportunity] is?",
+      "do you know if [your school] has [opportunity/resource]?",
+      "are there any [type of clubs] that you find interesting at your school?",
+      "is this actually the area you're most interested in? Or are you more interested in [alternatives]?",
+      "have you heard of [prestigious program like RSI/SSP]?"
+    ],
+    "execution_questions": [
+      "do you think it's possible to [goal] without [excessive commitment]? Maybe [reasonable alternative]?",
+      "how do you feel about [specific recommendation]?",
+      "what's stopping you from [decision]? Or why are you still hung up on [alternative]?"
+    ]
+  },
+
+  "archetype_specific_patterns": {
+    "for_high_achiever_early_explorers": {
+      "lead_with": "Discovery phase (70% discovery vs 30% prescriptive), explore authentic interests vs parent-driven",
+      "emphasize": "Differentiation from cookie-cutter, strategic subtraction over addition, time management frameworks",
+      "avoid": "Too many tactics early, overwhelming with urgent timeline (they have time), adding more activities",
+      "key_deliverables": [
+        "Cohesive narrative connecting disparate interests",
+        "Strategic activity reduction (drop Deca, reduce piano hours)",
+        "Unique positioning (Youth Commission, specific IoT project, NOT generic volunteer)",
+        "Parent education (30/70 framework, free>paid, leadership>hours)"
+      ]
+    },
+    "for_parent_driven_multi_talented": {
+      "parent_management_critical": true,
+      "siraj_involvement_high": "Manages parent expectations, provides extended philosophy explanations, brutal honesty",
+      "jenny_focuses_on_student": "Discovers student's authentic interests, empowers student decisions, builds rapport",
+      "common_interventions": [
+        "Against parent-suggested activities (Deca)",
+        "Negotiating unsustainable expectations (piano 4hr/day → 1.5-2hr/day)",
+        "Educating about what actually differentiates (Level 10 ≠ Carnegie Hall)"
+      ]
+    }
+  },
+
+  "success_metrics_defined": {
+    "academic": {
+      "gpa": "3.8+ unweighted",
+      "sat": "1500+",
+      "ap_count": "10-15 (BASIS) or 6-9 (Bellarmine)",
+      "ap_scores": "4-5 on all exams"
+    },
+    "computing": {
+      "usaco": "Gold by junior year (reach: Platinum)",
+      "ap_cs_a": "5",
+      "github": "Significant portfolio with environmental projects"
+    },
+    "research": {
+      "papers": "1-2 submitted or published",
+      "presentations": "Science fair OR academic conference",
+      "lor": "Strong letter from research professor"
+    },
+    "leadership": {
+      "youth_commission": "2 years on commission OR equivalent leadership role",
+      "club_leadership": "Founded environmental club OR VP/President",
+      "piano_podcast": "50+ episodes, measurable audience"
+    },
+    "impact": {
+      "environmental_project": "Air quality network deployed in 3+ locations, partnership with city/county agency",
+      "basketball_mentorship": "Program served 50+ youth (if pursuing this track)"
+    },
+    "summer": {
+      "prestigious_program": "Admitted to RSI, SSP, or equivalent by junior summer",
+      "application_count": "5-15 programs to secure 1-2 acceptances"
+    }
+  },
+
+  "effectiveness_indicators": {
+    "narrative_clarity_improvement": 4,
+    "student_engagement": "moderate_to_high (showed enthusiasm for podcast, climate project, but father often spoke more)",
+    "parent_satisfaction": "implied_high (father present both sessions, no objections, bought into recommendations)",
+    "frameworks_resonated": true,
+    "immediate_value_demonstrated": true,
+    "conversion_likelihood": "high",
+    "breakthrough_moments_count": 4,
+    "authentic_interest_discovered": "yes (data science for air quality, classical music sharing, basketball mentorship)",
+    "parent_driven_activities_identified": "yes (Deca, excessive piano practice)",
+    "strategic_differentiation_achieved": "yes (unique activities identified, cookie-cutter avoided)"
+  }
+}

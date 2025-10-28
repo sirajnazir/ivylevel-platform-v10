@@ -1,0 +1,859 @@
+{
+  "student_id": "hiba_004",
+  "extraction_date": "2025-10-20",
+  "coach_id": "jenny_duan",
+  "execution_coach_assigned": "noor",
+  "additional_reviewing_coaches": ["elyse"],
+
+  "session_metadata": {
+    "student_archetype": "Freshman Explorer - Undecided STEM",
+    "sub_archetype": "Early-Stage Multi-Interest STEM Student / Foundational Builder with Convergence Needed",
+    "grade_level": 9,
+    "session_date": "2025-04-29",
+    "session_duration_minutes": 60,
+    "session_type": "360_assessment",
+    "school_type": "public",
+    "school_name": "Mountain House High School",
+    "school_ranking": "#210 in California (top 20%)",
+    "location": "Mountain House, California",
+    "student_readiness_score": 4.5,
+    "academic_excellence_score": 5.5,
+    "extracurricular_impact_score": 3.5,
+    "personal_story_score": 5.0,
+    "institutional_fit_score": 4.0,
+    "narrative_clarity_start": 2,
+    "narrative_clarity_end": 2,
+    "narrative_clarity_target": 8,
+    "parent_involvement": "high_support",
+    "intended_major": "Chemical Engineering (preliminary, exploring)",
+    "time_to_applications": "3+ years",
+    "data_limitations": "Assessment session transcript not available; analysis based on GamePlan document and coach prep transcript"
+  },
+
+  "student_profile": {
+    "academic_standing": {
+      "gpa": 3.8,
+      "gpa_type": "unweighted",
+      "semester_one_performance": "All A's except B in Biology",
+      "current_courses": ["Math 1 (integrated algebra/geometry)", "Spanish 1", "All regular classes"],
+      "planned_sophomore_courses": ["All honors courses", "AP Human Geography", "Two engineering classes", "Math 2 Honors", "Spanish 2"],
+      "ap_count_planned": "5-7 by graduation",
+      "course_rigor": "currently_low_planning_increase",
+      "academic_support": "Weekly math tutoring since 2nd grade",
+      "testing_planned": "PSAT in 10th grade"
+    },
+    "involvement_level": "minimal_just_starting",
+    "extracurricular_activities": [
+      "Track and field (mid-distance: 800m, 1600m) - started this year",
+      "Planning to join cross country in fall",
+      "Occasional volunteering at Animal Rescue of Tracy",
+      "Mosque volunteering (food pantry, special needs program - planning consistent weekly)",
+      "Planning to join MSA next year"
+    ],
+    "leadership_roles": 0,
+    "awards": 0,
+    "starting_readiness": "early_exploration_phase",
+    "achievement_orientation": "steady",
+    "execution_style": "needs_structure",
+    "passion_clarity": "exploring_multiple_interests",
+    "resource_access": "medium_high",
+    "personal_qualities": ["funny", "good listener", "empathetic", "adaptable"],
+    "family_background": {
+      "immigrant_status": true,
+      "immigrant_origin": "India",
+      "immigration_age": 4,
+      "religious_identity": "Muslim American",
+      "cultural_context": "Immigrant family with test-focused background",
+      "parental_education": "College educated (father mentioned)",
+      "parental_involvement": "High - father present in assessment"
+    }
+  },
+
+  "key_challenges": [
+    {
+      "challenge": "Lack of clear academic/career direction",
+      "quote": "Hiba does not yet know what she's interested in. She doesn't have a narrative",
+      "severity": "high",
+      "priority": "P0 - Highest ROI",
+      "timeline_to_address": "Phase 1 (Freshman-Sophomore), by December 2025"
+    },
+    {
+      "challenge": "Limited extracurricular depth and leadership",
+      "description": "Limited extracurricular engagement at present; needs development of leadership roles; lacks consistent commitment to specific activities; minimal measurable impact",
+      "current_score": "3.5/10 on Extracurricular Impact Assessment",
+      "severity": "critical",
+      "priority": "P0 - Highest ROI",
+      "feasibility": "HIGH - Three full years to develop depth",
+      "expected_impact": "Could transform profile from sparse to compelling with 3-4 significant activities showing progression and leadership"
+    },
+    {
+      "challenge": "Insufficient course rigor",
+      "quote": "Heba is enrolled in all regular classes",
+      "description": "Currently below competitive range for top UCs, which typically seek 4.0+ weighted GPAs with multiple AP courses",
+      "severity": "high",
+      "priority": "P0 - Highest ROI",
+      "feasibility": "HIGH - Can transition to honors/AP sophomore year",
+      "expected_impact": "Essential for competitive consideration at target schools"
+    },
+    {
+      "challenge": "No comparative advantage activities",
+      "quote": "The Ecs that Heba is a part of don't show her comparative advantage. For example, track Kiba does track for fun, but doesn't seem to dedicate significant time or energy to it. She should choose things that she willing to put in to invest effort to be best in",
+      "severity": "medium",
+      "priority": "P0",
+      "mitigation": "Either deepen commitment to current activities OR pivot to activities with comparative advantage potential"
+    },
+    {
+      "challenge": "Undeveloped self-awareness",
+      "description": "Currently unclear about personal strengths and unique qualities; opportunity to showcase growth through increased self-awareness",
+      "evidence": "When asked about strengths, mentioned being 'funny' and 'good at listening to others' - needs deeper exploration",
+      "severity": "medium",
+      "priority": "P0 - Highest ROI",
+      "feasibility": "HIGH - Coaching can develop this",
+      "expected_impact": "Essential for authentic narrative and essay development"
+    },
+    {
+      "challenge": "Lack of academic competitions/honors",
+      "severity": "low_to_medium",
+      "priority": "P1 - Medium Priority (Future Year)",
+      "rationale": "Supplements academics but not essential for all successful applicants; can be addressed in Phase 2"
+    }
+  ],
+
+  "narrative_development": {
+    "initial_clarity_score": 2,
+    "final_clarity_score": 2,
+    "target_clarity_score": 8,
+    "development_phase": "pre_exploration",
+    "current_state": "Multiple interests without convergence; influenced by external factors (cousin in chemical engineering)",
+    "interests_stated": {
+      "primary": "Chemical engineering (influenced by cousin's path)",
+      "interest_depth": "More interested in chemistry aspect than engineering component",
+      "industry_vs_research": "Prefers industry over research",
+      "other_engineering_types": "Open to civil, mechanical, aerospace - but NOT electrical",
+      "additional_interests": ["Healthcare", "Animal sciences", "Potentially CS (father's suggestion)"]
+    },
+    "personal_background_assets": [
+      "Muslim American identity - NACAC data: 78% of selective colleges consider religious diversity a 'standout factor'",
+      "Educational adaptability through school transitions (Mountain House ↔ Fremont)",
+      "Immigrant journey from India at age 4",
+      "Genuine interests in chemical engineering",
+      "Thoughtful reading choices (The Five People You Meet in Heaven)",
+      "Natural interpersonal strengths (funny, good listener)",
+      "Empathy (special needs volunteering)"
+    ],
+    "planned_discovery_process": {
+      "method": "Structured multi-pathway exploration",
+      "activities": [
+        "Create LinkedIn profile for professional networking",
+        "Interview 3-5 healthcare professionals",
+        "Interview veterinarians/animal rescue professionals",
+        "Interview 2-3 chemical engineers",
+        "Document findings in reflection journal or blog"
+      ],
+      "timeline": "Summer 2025 - Fall 2025 (6-8 months)",
+      "outcome_target": "By December 2025: Determined 2-3 specific academic areas of focus"
+    },
+    "potential_narrative_directions": [
+      {
+        "direction": "Healthcare + Empathy",
+        "evidence": "Special needs volunteering interest, healthcare exploration",
+        "supporting_activities": "HOSA, pre-health programs, Care 4 Kids Club"
+      },
+      {
+        "direction": "Animal Sciences + Advocacy",
+        "evidence": "Animal shelter volunteering, interest in animal sciences",
+        "supporting_activities": "Animal welfare club, veterinary shadowing"
+      },
+      {
+        "direction": "Chemical Engineering + Applications",
+        "evidence": "Chemistry interest, cousin influence, industry preference over research",
+        "supporting_activities": "Chemistry Olympiad, chemical engineering exploration"
+      },
+      {
+        "direction": "Interdisciplinary STEM",
+        "evidence": "Multiple interests across healthcare, animal sciences, engineering",
+        "supporting_activities": "Cross-disciplinary project (e.g., chemistry applications in animal healthcare)"
+      }
+    ],
+    "strategic_positioning": "Muslim American woman bringing diverse perspective to STEM field to address underrepresented communities (potential future narrative once interests converge)",
+    "differentiation_angle": "Integration of personal identity (Muslim American, immigrant, school transitions) with authentic STEM passion and community impact"
+  },
+
+  "frameworks_introduced": [
+    {
+      "framework_name": "Holistic Admissions Factors Table",
+      "introduced_when": "Early in GamePlan, in 'A Must Read for Immigrant Families' section",
+      "introduction_language": "Based on extensive research of admission data from top universities, the following table outlines the key factors in selective college admissions for both UC system schools and Ivies, T20 universities",
+      "framework_structure": {
+        "table": {
+          "columns": ["Admissions Factor", "UC System Weight", "Ivies/T20 Weight", "What This Means For Hiba"],
+          "rows": ["Academic Achievement (40-45% vs 30-35%)", "Extracurricular Impact (25-30% vs 30-35%)", "Personal Character (20-25% vs 20-25%)", "Institutional Priorities (5-10% vs 10-15%)"]
+        }
+      },
+      "application_immediate": true,
+      "student_response": "Not captured (assessment transcript unavailable)",
+      "effectiveness": "High - resets family expectations from test-focused to holistic",
+      "purpose": "Shift immigrant family mindset from purely academic to comprehensive profile building",
+      "positioned_as": "Educational primer, data-backed",
+      "data_sources": ["UC Comprehensive Review", "College Admission Research", "Common App Analysis", "Harvard Admissions Lawsuit Data"]
+    },
+    {
+      "framework_name": "School Context Analysis",
+      "introduced_when": "After holistic admissions explanation, before student assessment",
+      "introduction_language": "Mountain House High School Context: School Profile, Type and Ranking, Academic Performance...",
+      "key_insights": [
+        "15-25% of Mountain House students typically gain UC admission",
+        "2-7% reach highly selective private universities (vs. 10-15% from elite prep schools)"
+      ],
+      "application_immediate": true,
+      "effectiveness": "High - sets realistic baseline and competitive context",
+      "purpose": "Explain why 'typical' performance isn't enough; student needs to exceed MHHS baseline",
+      "competitive_framing": "While MHHS provides a solid foundation, you'll need to demonstrate significant initiative and excellence beyond standard offerings to be competitive at the most selective institutions"
+    },
+    {
+      "framework_name": "Profile Readiness Scoring System",
+      "introduced_when": "After strengths analysis, before weaknesses",
+      "introduction_language": "Based on comprehensive analysis of admission criteria, Mountain House High School context, and typical successful applicant profiles for your target schools",
+      "structure": {
+        "overall_score": "4.5/10",
+        "subscores": [
+          "Academic Excellence Assessment: 5.5/10",
+          "Extracurricular Impact Assessment: 3.5/10",
+          "Personal Story Assessment: 5.0/10",
+          "Institutional Fit/Major Planning Assessment: 4.0/10"
+        ],
+        "disclaimer": "Important Note: This score reflects your freshman status with significant time to develop. It is designed to identify improvement areas, not to demotivate you or judge your outcomes in future."
+      },
+      "application_immediate": true,
+      "effectiveness": "Very high - creates objective baseline without demoralizing",
+      "purpose": "Quantify current standing and identify gaps",
+      "key_insight": "Gap is opportunity, not limitation"
+    },
+    {
+      "framework_name": "ROI-Prioritized Weakness Analysis",
+      "introduced_when": "After readiness scoring",
+      "introduction_language": "Below are the top weak spots prioritized based on three key factors: (1) impact potential on admissions decisions, (2) development potential over the next three years, and (3) standout value from other applicants at Mountain House High School",
+      "structure": {
+        "priority_levels": ["P0: Highest Priority Weak Spots (Highest ROI)", "P1: Medium Priority Weak Spots (Medium ROI and/or Future Year Priority)"],
+        "table_format": {
+          "columns": ["Weak Spot", "Why High Priority", "Feasibility", "Expected Impact"]
+        }
+      },
+      "application_immediate": true,
+      "effectiveness": "Very high - focuses efforts on highest-impact improvements",
+      "purpose": "Prevent overwhelm by prioritizing limited time/energy",
+      "key_insight": "Some gaps labeled 'Medium Priority/Future Year' so freshman doesn't try to fix everything immediately"
+    },
+    {
+      "framework_name": "Three-Phase Development Model",
+      "introduced_when": "In roadmap section (after immediate summer plan)",
+      "introduction_language": "Your Ivylevel prep program follows a working backward from outcomes framework",
+      "phases": [
+        {
+          "name": "Phase 1: Exploration & Convergence",
+          "grade_levels": "Freshman-Sophomore",
+          "coaching_cadence": "Bi-weekly",
+          "goals": ["Identify potential academic pathways", "Establish foundational activities", "Begin building relationships"],
+          "expected_outcomes_by": "December 2025"
+        },
+        {
+          "name": "Phase 2: Deepening & Achieving",
+          "grade_levels": "Sophomore-Junior",
+          "coaching_cadence": "Weekly",
+          "goals": ["Narrow focus to 1-2 pathways", "Develop measurable leadership impact", "Create passion projects"],
+          "expected_outcomes_by": "Fall 2026"
+        },
+        {
+          "name": "Phase 3: Excellence & Application Strategy",
+          "grade_levels": "Junior-Senior",
+          "coaching_cadence": "Weekly (2x+ during applications)",
+          "goals": ["Demonstrate academic excellence", "Maximize leadership impact", "Refine college list", "Develop compelling narrative"],
+          "expected_outcomes_by": "Summer 2027"
+        }
+      ],
+      "application_immediate": false,
+      "effectiveness": "High - makes 4-year journey feel structured and achievable",
+      "purpose": "Show long-term progression that matches developmental appropriateness"
+    },
+    {
+      "framework_name": "Expected Outcomes with Specific Dates",
+      "introduced_when": "Throughout all phases",
+      "introduction_language": "Expected Outcomes By [Specific Date]:",
+      "structure": {
+        "format": "By [Month Year]: [Outcome 1], [Outcome 2], [Outcome 3]",
+        "specificity": "Quantified (5+ interviews), Qualified (determined direction), Measurable (GPA maintained)"
+      },
+      "examples": [
+        "By December 2025: Determined 2-3 specific academic areas of focus",
+        "By Fall 2026: Secured officer role in at least one organization",
+        "By Summer 2027: Achieved 1400+ SAT or 32+ ACT"
+      ],
+      "application_immediate": true,
+      "effectiveness": "High - creates accountability checkpoints",
+      "purpose": "Make abstract goals concrete and time-bound"
+    },
+    {
+      "framework_name": "Data-Backed Strategy Recommendations",
+      "introduced_when": "Throughout GamePlan",
+      "pattern": "[Recommendation] — [Data backing] ([Source])",
+      "examples": [
+        "Students with focused commitment to 2-3 areas achieve 41% higher acceptance rates (NACAC)",
+        "Harvard prioritizes 'depth, not breadth' with 3+ years of commitment showing 3.4× better admission odds",
+        "Documented engagement increases admission offers by 27% (Journal of College Admission)",
+        "NACAC data: 78% of selective colleges consider religious diversity a 'standout factor'",
+        "Students effectively contextualizing school transitions achieve comparable admission rates despite lower test scores"
+      ],
+      "application_immediate": true,
+      "effectiveness": "Very high - builds credibility through evidence",
+      "purpose": "Especially important for families from cultures that value data/research"
+    },
+    {
+      "framework_name": "Authentic Passion Framework",
+      "introduced_when": "Multiple times throughout GamePlan",
+      "introduction_language": "Remember – always prioritize choices that genuinely reflect your authentic passions and personal journey",
+      "key_statement": "Doing 3-5 deeply meaningful activities with consistent commitment will significantly strengthen your application compared to pursuing numerous achievements lacking personal connection",
+      "application_immediate": true,
+      "effectiveness": "High - prevents resume padding mentality",
+      "purpose": "Ensure genuine interest drives choices, maintain authenticity, prevent burnout"
+    },
+    {
+      "framework_name": "Comparative Advantage Assessment",
+      "introduced_when": "When evaluating current activities",
+      "introduction_language": "The Ecs that [Student] is a part of don't show her comparative advantage",
+      "evaluation_question": "Can you be the best at this, or among the best?",
+      "decision_criteria": "If not, either (1) increase commitment to become best, or (2) pivot to activity where you can excel",
+      "example": "Track 'for fun' without dedication → not comparative advantage",
+      "application_immediate": true,
+      "effectiveness": "High - helps student make hard choices about what to drop",
+      "purpose": "Prioritize depth/excellence over breadth/participation",
+      "tough_love_framework": true
+    }
+  ],
+
+  "strategic_recommendations": {
+    "extracurriculars": {
+      "continue_and_deepen": [
+        "Track and Cross Country - aim for measurable personal improvement, not just participation",
+        "Animal Rescue of Tracy - establish consistent weekly schedule, document hours and responsibilities",
+        "Special needs program at mosque - begin consistent weekly volunteering, document impact"
+      ],
+      "add": [
+        "MSA (Muslim Student Association) - join next year",
+        "Science club or HOSA (depending on interest direction)",
+        "Engineering club (or start one)",
+        "Competition team (Science Olympiad, Chemistry Olympiad) - reconnect with 5th grade experience"
+      ],
+      "consider_dropping": [
+        "Track IF cannot commit to competitive level or measurable improvement (comparative advantage assessment)"
+      ],
+      "strategy": "Establish 3-4 core activities with consistent weekly involvement; depth over breadth",
+      "target_by_december_2025": "3-4 core activities established",
+      "target_by_fall_2026": "Secured officer role or project lead in at least one organization"
+    },
+    "awards": {
+      "priority_level": "P1 - Medium Priority (Future Year)",
+      "recommended_competitions": [
+        "Science Olympiad (reconnect from 5th grade experience)",
+        "Chemistry Olympiad (USNCO)",
+        "HOSA competitions (if healthcare direction)",
+        "Mock trial",
+        "Science Bowl"
+      ],
+      "other_awards": ["Service awards", "School awards", "Essay contests and scholarships"],
+      "rationale": "Supplements academics but not essential for all successful applicants; Feasibility MEDIUM; Expected Impact: Would add prestige elements to application and highlight academic strengths",
+      "timeline": "Exploration Phase 1 (freshman), serious participation Phase 2-3 (sophomore-junior)"
+    },
+    "summer_programs": {
+      "summer_2025_immediate": {
+        "computer_science_exploration": [
+          "Kode with Klossy Waitlist Application",
+          "Girls Who Code Waitlist Application",
+          "Oasis for Girls Program",
+          "CS50 or Khan Academy (self-paced alternatives)"
+        ],
+        "animal_sciences": [
+          "Animal Rescue of Tracy (structured commitment)",
+          "Canine Kindness Volunteer Opportunity (therapy dogs + healthcare exposure)",
+          "Social Media Manager role at animal welfare org"
+        ],
+        "academic": [
+          "US History at community college (demonstrates initiative; UCs recognize dual enrollment)"
+        ],
+        "rationale": "Father suggested CS exploration; programming valuable across engineering fields; multiple pathways align with exploration phase"
+      },
+      "summer_2026": {
+        "pre_health": ["Stanford Medical Youth Science Program", "UPenn Pre-Health Programs"],
+        "animal_sciences": ["UC Davis Young Scholars Program", "Cornell CUVET Program"],
+        "chemical_engineering": ["MIT MITES", "COSMOS at UC campuses"],
+        "alternatives": ["Community college courses in target field", "Local research or internship opportunities", "Independent project development"]
+      },
+      "strategy": "Summer 2025 = exploration across multiple fields; Summer 2026 = selective programs in refined interest areas"
+    },
+    "course_rigor": {
+      "sophomore_year": {
+        "courses": ["All honors courses", "AP Human Geography", "Two engineering classes", "Math 2 Honors", "Spanish 2", "Consider AP Biology or AP Chemistry depending on direction"],
+        "target": "Maintain 3.8+ unweighted GPA while increasing course rigor"
+      },
+      "junior_year": {
+        "courses": ["3-4 AP courses aligned with refined interests", "AP Biology OR AP Chemistry", "AP Psychology (fits healthcare/mental health)", "Continue foreign language all 4 years"],
+        "target": "4.0+ weighted GPA"
+      },
+      "general_strategy": "Focus on good grades in the hardest classes possible; take foreign language classes all 4 years; focus on course rigor when possible (APs, honors, etc.)",
+      "additional_planning": "US History at community college (Summer 2025) demonstrates initiative",
+      "target_by_graduation": "5-7 AP courses; maintained/improved GPA; demonstrated consistent rigor"
+    },
+    "differentiation": {
+      "personal_background_assets": [
+        "Muslim American identity (diversity standout factor - 78% of selective colleges consider religious diversity)",
+        "Immigrant journey from India at age 4",
+        "School transitions (Mountain House ↔ Fremont) showing adaptability",
+        "Natural empathy and interpersonal strengths"
+      ],
+      "academic_differentiation": "Once interests converge: depth in chosen field through projects, research, competitions",
+      "vs_typical_mhhs_student": "Most MHHS students: good grades but limited ECs and no distinctive narrative. Hiba will differentiate through: (1) early EC depth development, (2) compelling personal narrative integrating identity, (3) specialized knowledge in chosen field",
+      "authentic_passion_emphasis": "Doing 3-5 deeply meaningful activities with consistent commitment will significantly strengthen application compared to pursuing numerous achievements lacking personal connection"
+    },
+    "leadership": {
+      "priority": "P0 - Highest (but Phase 2 focus)",
+      "progression": "Participant → Contributor → Project Lead → Officer/Founder",
+      "freshman_year": "Take on small project management responsibilities in existing activities",
+      "sophomore_year": "Pursue officer position or start club aligned with interests",
+      "target_by_fall_2026": "Secured officer role or project lead in at least one organization with quantifiable impact",
+      "success_metrics": [
+        "Set quantifiable goals (increase membership by 25%, raise $1,000+, reach 200+ community members)",
+        "Train minimum 2 underclassmen for succession planning",
+        "Document 5+ hours weekly dedicated to leadership responsibilities"
+      ]
+    },
+    "self_awareness_development": {
+      "priority": "P0 - Highest",
+      "activities": [
+        "Work with coach on identity exploration exercises",
+        "After each experience (interview, volunteering, program), reflect: What did I learn about myself?",
+        "Identify values through activity: Which moments made you proud? When did you feel most 'you'?",
+        "Document in journal: strengths, weaknesses, passions, values",
+        "Connect personal identity (Muslim American, immigrant, school transitions) to academic/career interests"
+      ],
+      "timeline": "Ongoing throughout all phases, intensifies in Phase 2-3",
+      "target": "Can articulate 5+ specific personal strengths with supporting examples; has clear personal narrative by junior year"
+    }
+  },
+
+  "coaching_tactics_observed": {
+    "note": "Limited to GamePlan document analysis; actual session tactics not captured",
+    "rapport_building": [
+      "Personal address throughout document ('Dear Hiba and family', 'Hiba, I have carefully researched...')",
+      "Validation language ('impressed by your strong academic foundation, genuine curiosity')",
+      "Acknowledging family context (entire section for immigrant families)",
+      "Empathy language ('It was a pleasure meeting you and your family')",
+      "Credibility establishment (coach credentials upfront)"
+    ],
+    "probing_techniques_inferred": [
+      "Why questions (Why chemical engineering? → revealed cousin influence)",
+      "What aspect questions (Chemistry vs. engineering? → revealed preference for chemistry)",
+      "Industry vs. research (→ revealed industry preference)",
+      "Other types (→ revealed open to civil/mechanical/aerospace, NOT electrical)",
+      "How often/What's your role (→ revealed 'for fun' vs. committed participation)"
+    ],
+    "reframing_tactics": [
+      "School transitions as strength (adaptability) vs. weakness",
+      "Undecided as natural exploration phase vs. weakness",
+      "Limited activities as starting point with time to develop vs. failure",
+      "Regular classes as foundation for future rigor vs. inadequacy",
+      "Multiple interests as exploration asset vs. unfocused liability"
+    ],
+    "motivation_techniques": [
+      "Data-backed possibility ('76% of admits show clear interest-activity connections')",
+      "Clear pathways (three-phase roadmap)",
+      "Personal investment ('I have carefully researched and handpicked...')",
+      "Balance urgency with reassurance ('As a 9th grader, you have an exceptional opportunity')",
+      "Breaking down overwhelming goals (3-6-12 month milestones)",
+      "Confidence statement ('I'm confident you'll become an exceptional candidate')"
+    ],
+    "parent_management": [
+      "Acknowledging parental concerns (entire 'Must Read for Immigrant Families' section)",
+      "Validating parental input ('Your dad's suggestion to keep options open, including exploring CS, is excellent advice')",
+      "Educating parents (holistic admissions table, extracurricular importance)",
+      "Setting expectations ('This is an initial directional document that will evolve')",
+      "Balancing parent vs. student autonomy (GamePlan addressed to 'Hiba and family' but coach assignment emphasizes relatable mentor for HIBA)"
+    ],
+    "data_integration": [
+      "Every major claim backed by source (NACAC, College Board, Journal of College Admission, etc.)",
+      "School-specific statistics (Mountain House HS admission rates)",
+      "Admission factor weights (UC vs. Ivies/T20)",
+      "Success rates tied to behaviors (41% higher acceptance with focused commitment)"
+    ]
+  },
+
+  "timeline_and_priorities": {
+    "immediate_next_3_months": {
+      "may_july_2025": [
+        "Submit waitlist applications for Kode with Klossy, Girls Who Code",
+        "Submit Oasis for Girls summer program application",
+        "Complete US History community college course with A grade",
+        "Establish consistent bi-weekly volunteering at animal shelter",
+        "Begin LinkedIn profile creation for professional networking"
+      ]
+    },
+    "next_6_months": {
+      "may_october_2025": [
+        "Conduct 5+ informational interviews with professionals",
+        "Join MSA and one academic club at school",
+        "Begin planning potential club to start (animal advocacy or pre-health)",
+        "Create activity tracking/documentation system",
+        "Explore Chemistry Olympiad or Science Olympiad options"
+      ]
+    },
+    "next_12_months": {
+      "may_2025_may_2026": [
+        "Complete 'Career Exploration Blog/Vlog' documenting professional interviews",
+        "Launch one signature initiative/project",
+        "Secure one leadership position or significant responsibility",
+        "Determine 2-3 primary academic focus areas",
+        "Apply to selective summer 2026 programs",
+        "Begin SAT/ACT preparation"
+      ]
+    },
+    "phase_1_outcomes": {
+      "by_december_2025": [
+        "Academic Clarity: Determined 2-3 specific academic areas of focus",
+        "Extracurricular Foundation: Established 3-4 core activities",
+        "Professional Exposure: Completed 5+ informational interviews",
+        "Initial Portfolio: Created documentation system"
+      ]
+    },
+    "phase_2_outcomes": {
+      "by_fall_2026": [
+        "Academic Direction: Selected course pathway with 3-4 AP courses",
+        "Leadership Position: Secured officer role in one organization",
+        "Signature Achievement: Launched impactful project in area of interest",
+        "Specialized Experience: Completed selective summer program"
+      ]
+    },
+    "phase_3_outcomes": {
+      "by_summer_2027": [
+        "Competitive Academics: 3.8+ GPA, 1400+ SAT or 32+ ACT",
+        "Leadership Results: Quantifiable impact metrics",
+        "College Direction: Finalized tiered college list",
+        "Application Strategy: Developed clear personal narrative"
+      ]
+    },
+    "prioritization_logic": {
+      "p0_highest_priority": [
+        "Lack of Extracurricular Depth & Commitment (HIGH priority, HIGH feasibility)",
+        "Academic Course Rigor (HIGH priority, HIGH feasibility)",
+        "Undecided Academic Direction (HIGH priority, HIGH feasibility)",
+        "Limited Leadership Experience (HIGH priority, MEDIUM-HIGH feasibility)",
+        "Undeveloped Self-Awareness (HIGH priority, HIGH feasibility)"
+      ],
+      "p1_medium_priority": [
+        "Lack of Academic Competitions/Honors (MEDIUM priority, MEDIUM feasibility)",
+        "Standardized Testing (Important but future year)"
+      ],
+      "rationale": "Prioritized based on: (1) impact potential on admissions, (2) development potential over 3 years, (3) standout value vs. other MHHS applicants"
+    }
+  },
+
+  "meta_coaching_moments": {
+    "note": "Extracted from GamePlan document, not live session",
+    "explaining_assessment_purpose": "Working backwards from outcomes framework; comprehensive analysis of admission criteria, MHHS context, and typical successful applicant profiles",
+    "holistic_admissions_education": "Entire section titled 'A Must Read for Immigrant Families: The US UG College Admissions' explaining holistic approach",
+    "setting_expectations_about_evolution": "Important Note: This is an initial directional document that will evolve as you progress through your high school journey... The true value lies not in this static roadmap but in consistent planning & execution with your coach",
+    "authentic_passion_emphasis": "Repeated throughout: 'Remember – always prioritize choices that genuinely reflect your authentic passions and personal journey'",
+    "explaining_readiness_score": "Important Note: This score reflects your freshman status with significant time to develop. It is designed to identify improvement areas, not to demotivate you or judge your outcomes in future",
+    "coach_match_rationale": "We have identified one of our top interdisciplinary coaches Noor... Her similar relatable muslim American immigrant girl will inspire you in the journey"
+  },
+
+  "knowledge_moat_insights": {
+    "proprietary_frameworks": [
+      "ROI-Based Weakness Prioritization (P0 vs P1 based on admission impact, feasibility, standout value)",
+      "School-Specific Competitive Positioning (MHHS: 15-25% UC admission, 2-7% reach selective privates vs. 10-15% from elite prep)",
+      "Phase-Appropriate Strategy (Exploration → Deepening → Excellence aligned with grade level)",
+      "Cultural Context Integration (Muslim American identity positioned with NACAC data: 78% consider religious diversity)",
+      "Comparative Advantage Framework ('Can you be the best?' decision criteria for activity selection)",
+      "Data-Backed Recommendations (every claim backed by NACAC, College Board, research sources)",
+      "Time-Bound Expected Outcomes (By December 2025, By Fall 2026, By Summer 2027)",
+      "Integrated Multi-Year Roadmap (3 phases with coaching cadence adjustments)",
+      "Profile Readiness Quantification (4.5/10 with 4 subscores and competitive benchmarks)",
+      "Authentic Passion Guardrail (repeated emphasis on genuine interests over resume padding)"
+    ],
+    "proprietary_tactics": [
+      "Positive Framing Before Critique (4-6 strengths listed before weaknesses)",
+      "Disclaimer to Prevent Demoralization (every challenging section includes 'Important Note')",
+      "Personalized Coach Matching (Noor matched for shared Muslim American immigrant background)",
+      "Handpicked Opportunities with Links (time-intensive research per student with direct URLs)",
+      "Data Integration Throughout (NACAC, college-specific, research data with citations)",
+      "'Working Backwards' Framework (start with desired outcome and reverse-engineer requirements)"
+    ],
+    "hard_to_replicate_strategies": [
+      "School-Specific Context Database (data on Mountain House HS ranking, admission rates, competitive positioning)",
+      "Archetype-Based Playbooks (different templates for 'Freshman Explorer' vs. 'Late-Starter Junior' vs. 'High-Achiever')",
+      "Multi-Coach Team Review (Jenny + Noor + Elyse collaborative approach)",
+      "Execution Coach Specialization (Noor's Stanford CS/human bio/neuro background specifically matched)",
+      "Integrated Multi-Year Coaching System (bi-weekly/weekly cadence over 3+ years)",
+      "Quantified Profile Readiness System (scoring methodology calibrated to competitive benchmarks)",
+      "Phase-Appropriate Strategy (different approaches for Exploration vs. Deepening vs. Excellence phases)"
+    ],
+    "candid_program_assessments": [
+      "Kode with Klossy: Waitlist application recommended - 'designed specifically for girls'",
+      "Girls Who Code: Waitlist application - alternative to Kode with Klossy",
+      "Stanford Medical Youth Science Program: Selective summer 2026 target",
+      "MIT MITES: Chemical engineering pathway",
+      "COSMOS at UC campuses: Multiple STEM pathways",
+      "Community college dual enrollment: 'UCs especially recognize dual enrollment courses as rigorous academic preparation; dual enrollment increases selective admission likelihood by 56% (College Board)'"
+    ],
+    "insider_access_examples": [
+      "Mountain House High School specific data (15-25% UC admission, 2-7% selective privates)",
+      "School ranking context (#210 in California)",
+      "Target school specific data (Boston University, UC Berkeley, etc.)",
+      "Coach pool with diverse backgrounds (Noor: Stanford CS/human bio/neuro, Muslim American immigrant)"
+    ]
+  },
+
+  "questions_by_phase": {
+    "note": "Inferred from GamePlan outputs, actual assessment questions not captured",
+    "discovery_phase_inferred": [
+      "What are you interested in studying? → Revealed chemical engineering",
+      "Why chemical engineering? → Revealed cousin influence",
+      "Which aspect interests you? → Revealed chemistry > engineering",
+      "Industry vs. research? → Revealed industry preference",
+      "Other engineering types? → Revealed civil/mechanical/aerospace OK, NOT electrical",
+      "What do you do for extracurricular activities? → Revealed track, animal shelter, mosque",
+      "How often? What's your role? → Revealed 'for fun' vs. committed participation",
+      "What are your target schools? → Boston College, BU, UC Berkeley, UCs, T50",
+      "What are your strengths? → 'Funny', 'good at listening to others'",
+      "What does your family think? → Father mentioned CS possibility"
+    ],
+    "narrative_development_questions_planned": [
+      {
+        "question_template": "After your interviews with [professionals], what surprised you most?",
+        "purpose": "Help student identify authentic interests from exploration",
+        "timing": "Phase 1, after informational interviews"
+      },
+      {
+        "question_template": "When you're working with animals vs. studying chemistry, which feels more 'you'?",
+        "purpose": "Help student feel into authentic passion",
+        "timing": "Phase 1-2 convergence period"
+      },
+      {
+        "question_template": "What problem in the world makes you angry or keeps you up at night?",
+        "purpose": "Identify cause-driven narrative angle",
+        "timing": "Phase 2"
+      },
+      {
+        "question_template": "If you had to connect your interest in [X] with your experience as a Muslim American immigrant, what would that story be?",
+        "purpose": "Help integrate personal identity with academic interests",
+        "timing": "Phase 2-3"
+      }
+    ],
+    "strategy_questions": [
+      "Of all the activities you're doing, which one would you keep if you could only keep one?",
+      "What would it take for you to become the best at [activity] in your school/region?",
+      "If you started a club tomorrow, what problem would it solve?"
+    ],
+    "execution_questions": [
+      "What did you accomplish this week toward your goals?",
+      "What got in the way of completing [action item]?",
+      "On a scale of 1-10, how excited are you about [activity/program]?",
+      "What did you learn about yourself from [experience]?",
+      "How has your thinking changed about [career path] after exploring it?"
+    ]
+  },
+
+  "archetype_specific_patterns": {
+    "for_freshman_explorer_undecided_stem": {
+      "lead_with": "Exploration phase emphasis (longest, most detailed)",
+      "emphasize": "Multiple pathway exploration, convergence by sophomore year, bi-weekly coaching (more structure)",
+      "avoid": "Forcing narrative prematurely, overwhelming with specialization pressure, expecting depth before exploration",
+      "key_deliverables": [
+        "ROI prioritization (P0 vs P1)",
+        "Three-phase roadmap (Exploration → Deepening → Excellence)",
+        "Time-bound expected outcomes",
+        "Multiple pathway exploration plan (interviews, shadowing, documentation)",
+        "Profile readiness baseline with growth trajectory"
+      ],
+      "coaching_cadence": "Bi-weekly freshman-sophomore (more structure needed); Weekly junior onward",
+      "session_focus_by_phase": {
+        "phase_1": "Exploration guidance, accountability for trying new things, reflection on experiences",
+        "phase_2": "Convergence decisions, leadership development, project planning",
+        "phase_3": "Application strategy, essay development, college list refinement"
+      },
+      "family_management_critical": "HIGH - immigrant family needs mindset shift from test-focused to holistic",
+      "key_success_indicators": [
+        "Student can articulate why they're doing each activity",
+        "Student shows increasing clarity about interests over time",
+        "Student takes initiative without being asked",
+        "Student's activities are coherent and building toward something"
+      ]
+    }
+  },
+
+  "success_metrics_defined": {
+    "academics": {
+      "gpa_target": "Maintain 3.8+ unweighted; achieve 4.0+ weighted by junior year",
+      "testing_target": "1400+ SAT or 32+ ACT by Summer 2027",
+      "course_rigor": "5-7 AP courses by graduation; honors track sophomore year",
+      "additional": "US History community college course (Summer 2025); dual enrollment courses demonstrate initiative"
+    },
+    "extracurriculars": {
+      "by_december_2025": "Established 3-4 core activities with consistent weekly involvement",
+      "by_fall_2026": "Secured officer role or project lead in at least one organization with quantifiable impact",
+      "leadership_metrics": ["Increase membership by 25%", "Raise $1,000+", "Reach 200+ community members", "Train minimum 2 underclassmen"],
+      "documentation": "5+ hours weekly dedicated to leadership responsibilities"
+    },
+    "exploration": {
+      "by_december_2025": "Completed 5+ informational interviews with professionals across interest areas",
+      "outcome": "Determined 2-3 specific academic areas of focus with supporting evidence"
+    },
+    "summer": {
+      "summer_2025": "Completed US History at community college; established consistent volunteering; explored CS programs",
+      "summer_2026": "Completed selective summer program or equivalent (research, internship, independent project)",
+      "measurement": "Documented summer experiences with reflection on learning outcomes"
+    },
+    "awards": {
+      "by_junior_year": "Registered for Chemistry Olympiad or Science Olympiad with completed preparation materials",
+      "target": "Ideally 1-2 regional/national awards by application time"
+    },
+    "narrative": {
+      "by_summer_2027": "Developed clear personal narrative with supporting evidence across activities",
+      "components": "Can articulate 5+ specific personal strengths with examples; integration of personal identity with chosen field"
+    },
+    "self_awareness": {
+      "ongoing": "After each experience, reflect on: What did I learn about myself?",
+      "by_junior_year": "Can articulate personal values, strengths, weaknesses, passions with supporting examples"
+    }
+  },
+
+  "effectiveness_indicators": {
+    "narrative_clarity_improvement": 0,
+    "note": "No improvement yet as student is pre-exploration; target improvement: 2 → 8 by junior year",
+    "student_engagement": "Not captured (assessment transcript unavailable)",
+    "parent_satisfaction": "Not captured",
+    "frameworks_resonated": "Not captured",
+    "immediate_value_demonstrated": true,
+    "gameplan_comprehensiveness": "Very high - 20 pages, detailed 3-year roadmap",
+    "personalization_level": "High - school context, family background, personal assets integrated throughout",
+    "unique_insights_identified": [
+      "Undecided is natural for freshman (not weakness)",
+      "Multiple interests require convergence strategy",
+      "Track 'for fun' lacks comparative advantage",
+      "Muslim American identity is standout factor with data backing",
+      "School transitions can be positioned as adaptability strength",
+      "Father's CS suggestion is valuable exploration path"
+    ]
+  },
+
+  "cross_student_comparisons": {
+    "vs_anoushka": {
+      "similarities": [
+        "High academic standing (both 3.8-4.0 GPA)",
+        "Multiple STEM interests requiring focus",
+        "Need for national recognition/standout activities",
+        "Cookie-cutter profile risk",
+        "Both have unique personal assets (Anoushka: music, Hiba: Muslim American identity)"
+      ],
+      "differences": [
+        "Anoushka 11th grade (late starter, urgency) vs. Hiba 9th grade (early explorer, time for exploration)",
+        "Anoushka has scattered activities vs. Hiba has minimal activities",
+        "Anoushka self-directed vs. Hiba needs structure",
+        "Anoushka clear major (CS) vs. Hiba undecided",
+        "Anoushka competitive Bay Area school vs. Hiba moderately competitive MHHS"
+      ],
+      "framework_overlap": [
+        "Cookie-cutter profile diagnosis",
+        "Academic foundation first",
+        "Depth over breadth"
+      ],
+      "framework_differences": [
+        "Anoushka: Web metaphor, Woman in STEM (gender strategy)",
+        "Hiba: Three-phase exploration model, ROI prioritization, comparative advantage assessment"
+      ]
+    },
+    "vs_aaryan": {
+      "similarities": [
+        "Both 9th grade (early explorers)",
+        "Both undecided/unclear passion (Aaryan: parent-driven business, Hiba: cousin-influenced engineering)",
+        "Both need structure and scaffolding",
+        "Both need extensive exploration phase",
+        "Both have parent-influenced interests requiring validation"
+      ],
+      "differences": [
+        "Aaryan: Bay Area private school, high resources vs. Hiba: Central Valley public school, medium-high resources",
+        "Aaryan: Male, Indian, CS/tennis stereotype vs. Hiba: Female, Muslim American, immigrant narrative asset",
+        "Aaryan had breakthrough moment (space) vs. Hiba pre-breakthrough",
+        "Aaryan: Introverted but engaged father vs. Hiba: Not specified but engaged family"
+      ],
+      "framework_overlap": [
+        "Three-phase development model (both freshman)",
+        "Authentic passion emphasis",
+        "Parent management (immigrant families)",
+        "Bi-weekly coaching for structure"
+      ],
+      "framework_differences": [
+        "Aaryan: 'Just for fun' breakthrough question, anti-pattern library (Bay Area specific), competition tier list",
+        "Hiba: ROI prioritization framework, school context positioning, comparative advantage assessment"
+      ]
+    },
+    "unique_to_hiba": {
+      "archetype": "Freshman Explorer - Undecided STEM (similar to Aaryan but different context)",
+      "unique_challenges": [
+        "Attending moderately competitive school (not elite prep, not struggling) requiring strategic positioning",
+        "Muslim American identity requires sensitive cultural integration",
+        "Multiple STEM interests across very different fields (engineering, healthcare, animal sciences, CS)",
+        "Comparative advantage issue with current activities (track 'for fun')"
+      ],
+      "unique_assets": [
+        "Religious diversity standout factor (78% of colleges value)",
+        "School transitions showing adaptability",
+        "Natural empathy (special needs volunteering)",
+        "3+ years to develop profile (time advantage)"
+      ]
+    }
+  },
+
+  "session_quality_notes": {
+    "strengths": [
+      "Extremely comprehensive GamePlan (20 pages, detailed 3-year roadmap)",
+      "Data-driven throughout (NACAC, College Board, research sources cited)",
+      "Personalized coach matching (Noor's shared background)",
+      "School-specific context (MHHS admission rates, competitive positioning)",
+      "Cultural sensitivity (entire section for immigrant families)",
+      "ROI prioritization prevents overwhelm (P0 vs P1)",
+      "Phase-appropriate strategy (exploration emphasis for freshman)",
+      "Authentic passion guardrail repeated throughout",
+      "Time-bound milestones create accountability"
+    ],
+    "limitations": [
+      "Assessment session transcript not available (limits insight into live coaching tactics)",
+      "GamePlan is static document (evolution through coaching not captured)",
+      "Student's actual responses and engagement level not documented",
+      "Breakthrough moments (if any) not captured",
+      "Parent dynamics during session not observed"
+    ],
+    "unique_aspects": [
+      "ROI-based prioritization framework (P0 vs P1 with explicit criteria)",
+      "Profile readiness scoring (4.5/10 with 4 subscores)",
+      "School context section (MHHS statistics vs. elite prep schools)",
+      "Comparative advantage framework for activity selection",
+      "Three-phase development model aligned with grade progression",
+      "Extensive cultural context education for immigrant family"
+    ]
+  },
+
+  "target_schools": [
+    "Boston University",
+    "Boston College",
+    "UC Berkeley",
+    "UCLA",
+    "UC Davis",
+    "UC Irvine",
+    "UC Santa Barbara",
+    "Top 20 schools (aspirational)"
+  ],
+
+  "media_interests_captured": {
+    "movies": ["Clueless", "27 Dresses", "Interstellar (not explicitly mentioned for Hiba but would be good to probe)"],
+    "books": ["The Five People You Meet in Heaven"],
+    "note": "These interests suggest thoughtful/philosophical side (Five People) and lighter interests (Clueless, 27 Dresses)"
+  }
+}

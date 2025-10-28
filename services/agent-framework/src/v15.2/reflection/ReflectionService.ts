@@ -25,15 +25,21 @@ export class ReflectionService {
   private critic: ChatAnthropic; // Claude critiques quality
 
   constructor() {
+    // Use best models by default (configurable via env)
+    const producerModel = process.env.V15_2_PRODUCER_MODEL || 'gpt-4o';
+    const producerTemp = parseFloat(process.env.V15_2_PRODUCER_TEMPERATURE || '0.7');
+    const criticModel = process.env.V15_2_CRITIC_MODEL || 'claude-3-5-sonnet-20241022';
+    const criticTemp = parseFloat(process.env.V15_2_CRITIC_TEMPERATURE || '0');
+
     this.producer = new ChatOpenAI({
-      modelName: 'gpt-4-turbo',
-      temperature: 0.7, // Slightly creative for strategy
+      modelName: producerModel,
+      temperature: producerTemp,
       openAIApiKey: process.env.OPENAI_API_KEY!,
     });
 
     this.critic = new ChatAnthropic({
-      modelName: 'claude-3-5-sonnet-20241022',
-      temperature: 0, // Strict for critique
+      modelName: criticModel,
+      temperature: criticTemp,
       anthropicApiKey: process.env.ANTHROPIC_API_KEY!,
     });
   }
@@ -46,8 +52,8 @@ export class ReflectionService {
     studentId: string,
     sessionId: string,
     query: string,
-    maxIterations: number = 3,
-    qualityThreshold: number = 7.5
+    maxIterations: number = parseInt(process.env.V15_2_MAX_ITERATIONS || '3'),
+    qualityThreshold: number = parseFloat(process.env.V15_2_QUALITY_THRESHOLD || '7.5')
   ): Promise<ReflectionResult> {
     const startTime = Date.now();
     const iterations: ReflectionIteration[] = [];
@@ -82,9 +88,9 @@ export class ReflectionService {
       const iteration: ReflectionIteration = {
         iteration_number: iterationNumber,
         producer_response: producerResponse,
-        producer_model: 'gpt-4-turbo',
+        producer_model: process.env.V15_2_PRODUCER_MODEL || 'gpt-4o',
         critic_feedback: critique.feedback,
-        critic_model: 'claude-3-5-sonnet-20241022',
+        critic_model: process.env.V15_2_CRITIC_MODEL || 'claude-3-5-sonnet-20241022',
         quality_scores: critique.quality_scores,
         improvement_suggestions: critique.improvement_suggestions,
         passed_quality_gate: passedQualityGate,
@@ -100,9 +106,9 @@ export class ReflectionService {
         query,
         iteration_number: iterationNumber,
         producer_response: producerResponse,
-        producer_model: 'gpt-4-turbo',
+        producer_model: process.env.V15_2_PRODUCER_MODEL || 'gpt-4o',
         critic_feedback: critique.feedback,
-        critic_model: 'claude-3-5-sonnet-20241022',
+        critic_model: process.env.V15_2_CRITIC_MODEL || 'claude-3-5-sonnet-20241022',
         quality_scores: critique.quality_scores,
         improvement_suggestions: critique.improvement_suggestions,
         passed_quality_gate: passedQualityGate,
