@@ -22,13 +22,13 @@ import type {
 
 export class ReflectionService {
   private producer: ChatOpenAI; // GPT-4 generates strategy
-  private critic: ChatAnthropic; // Claude critiques quality
+  private critic: ChatOpenAI | ChatAnthropic; // GPT-4 or Claude critiques quality
 
   constructor() {
     // Use best models by default (configurable via env)
     const producerModel = process.env.V15_2_PRODUCER_MODEL || 'gpt-4o';
     const producerTemp = parseFloat(process.env.V15_2_PRODUCER_TEMPERATURE || '0.7');
-    const criticModel = process.env.V15_2_CRITIC_MODEL || 'claude-3-5-sonnet-20241022';
+    const criticModel = process.env.V15_2_CRITIC_MODEL || 'gpt-4o';
     const criticTemp = parseFloat(process.env.V15_2_CRITIC_TEMPERATURE || '0');
 
     this.producer = new ChatOpenAI({
@@ -37,11 +37,20 @@ export class ReflectionService {
       openAIApiKey: process.env.OPENAI_API_KEY!,
     });
 
-    this.critic = new ChatAnthropic({
-      modelName: criticModel,
-      temperature: criticTemp,
-      anthropicApiKey: process.env.ANTHROPIC_API_KEY!,
-    });
+    // Use GPT-4o for critic (Claude models not working with LangChain)
+    if (criticModel.startsWith('claude')) {
+      this.critic = new ChatAnthropic({
+        modelName: criticModel,
+        temperature: criticTemp,
+        anthropicApiKey: process.env.ANTHROPIC_API_KEY!,
+      });
+    } else {
+      this.critic = new ChatOpenAI({
+        modelName: criticModel,
+        temperature: criticTemp,
+        openAIApiKey: process.env.OPENAI_API_KEY!,
+      });
+    }
   }
 
   /**
@@ -90,7 +99,7 @@ export class ReflectionService {
         producer_response: producerResponse,
         producer_model: process.env.V15_2_PRODUCER_MODEL || 'gpt-4o',
         critic_feedback: critique.feedback,
-        critic_model: process.env.V15_2_CRITIC_MODEL || 'claude-3-5-sonnet-20241022',
+        critic_model: process.env.V15_2_CRITIC_MODEL || 'claude-3-5-sonnet-20240620',
         quality_scores: critique.quality_scores,
         improvement_suggestions: critique.improvement_suggestions,
         passed_quality_gate: passedQualityGate,
@@ -108,7 +117,7 @@ export class ReflectionService {
         producer_response: producerResponse,
         producer_model: process.env.V15_2_PRODUCER_MODEL || 'gpt-4o',
         critic_feedback: critique.feedback,
-        critic_model: process.env.V15_2_CRITIC_MODEL || 'claude-3-5-sonnet-20241022',
+        critic_model: process.env.V15_2_CRITIC_MODEL || 'claude-3-5-sonnet-20240620',
         quality_scores: critique.quality_scores,
         improvement_suggestions: critique.improvement_suggestions,
         passed_quality_gate: passedQualityGate,
@@ -167,10 +176,7 @@ export class ReflectionService {
     quality_scores: QualityScores;
     improvement_suggestions: string[];
   }> {
-    const critiquePrompt = ChatPromptTemplate.fromMessages([
-      [
-        'system',
-        `You are a rigorous quality critic for college admissions coaching responses.
+    const critiquePrompt = `You are a rigorous quality critic for college admissions coaching responses.
 
 Evaluate the response on 4 criteria (score each 0-10):
 
@@ -194,7 +200,7 @@ Evaluate the response on 4 criteria (score each 0-10):
    - 5: Mentions IvyScore but no prioritization
    - 0: No IvyScore consideration
 
-Respond in JSON format:
+Respond ONLY with valid JSON (no markdown, no code blocks):
 {
   "actionable": <score 0-10>,
   "empathetic": <score 0-10>,
@@ -202,20 +208,16 @@ Respond in JSON format:
   "ivyscore_optimal": <score 0-10>,
   "feedback": "<2-3 sentence overall assessment>",
   "improvement_suggestions": ["<specific improvement 1>", "<specific improvement 2>"]
-}`,
-      ],
-      [
-        'user',
-        `Original Query: {query}\n\nResponse to Critique:\n{response}\n\nProvide your JSON critique:`,
-      ],
-    ]);
+}
 
-    const critiqueResult = await this.critic.invoke(
-      await critiquePrompt.formatMessages({
-        query: originalQuery,
-        response,
-      })
-    );
+Original Query: ${originalQuery}
+
+Response to Critique:
+${response}
+
+Provide your JSON critique:`;
+
+    const critiqueResult = await this.critic.invoke(critiquePrompt);
 
     // Parse JSON response from Claude
     const critiqueText = critiqueResult.content as string;
