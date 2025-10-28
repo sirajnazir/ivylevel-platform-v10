@@ -883,6 +883,267 @@ class V10ApiService {
     if (!response.ok) throw new Error(`Failed to fetch action plans summary: ${response.statusText}`);
     return response.json();
   }
+
+  // ============================================================================
+  // v12.0 GAME PLAN API METHODS
+  // ============================================================================
+
+  /**
+   * Get complete game plan for student
+   * v12.0 endpoint
+   */
+  async getGamePlan(studentId: string): Promise<any> {
+    const url = `${this.baseUrl}/students/${studentId}/game-plan`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Game plan not found');
+      }
+      throw new Error(`Failed to fetch game plan: ${response.statusText}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Get specific phase details
+   * v12.0 endpoint
+   */
+  async getGamePlanPhase(studentId: string, phaseId: string): Promise<any> {
+    const url = `${this.baseUrl}/students/${studentId}/game-plan/phases/${phaseId}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch phase: ${response.statusText}`);
+    return response.json();
+  }
+
+  /**
+   * Get opportunities (programs, awards, competitions)
+   * v12.0 endpoint
+   */
+  async getOpportunities(
+    studentId: string,
+    params?: {
+      priority?: string;
+      status?: string;
+      category?: string;
+      deadline_before?: string;
+      deadline_after?: string;
+    }
+  ): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.priority) queryParams.append('priority', params.priority);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.deadline_before) queryParams.append('deadline_before', params.deadline_before);
+    if (params?.deadline_after) queryParams.append('deadline_after', params.deadline_after);
+
+    const url = `${this.baseUrl}/students/${studentId}/opportunities?${queryParams}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch opportunities: ${response.statusText}`);
+    return response.json();
+  }
+
+  /**
+   * Get milestones
+   * v12.0 endpoint
+   */
+  async getMilestones(
+    studentId: string,
+    params?: {
+      phase_id?: string;
+      status?: string;
+      target_week_start?: number;
+      target_week_end?: number;
+    }
+  ): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.phase_id) queryParams.append('phase_id', params.phase_id);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.target_week_start) queryParams.append('target_week_start', params.target_week_start.toString());
+    if (params?.target_week_end) queryParams.append('target_week_end', params.target_week_end.toString());
+
+    const url = `${this.baseUrl}/students/${studentId}/milestones?${queryParams}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch milestones: ${response.statusText}`);
+    return response.json();
+  }
+
+  /**
+   * Get tactical plans
+   * v12.0 endpoint
+   */
+  async getTacticalPlans(
+    studentId: string,
+    params?: {
+      phase_id?: string;
+      priority?: string;
+      status?: string;
+    }
+  ): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.phase_id) queryParams.append('phase_id', params.phase_id);
+    if (params?.priority) queryParams.append('priority', params.priority);
+    if (params?.status) queryParams.append('status', params.status);
+
+    const url = `${this.baseUrl}/students/${studentId}/tactical-plans?${queryParams}`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch tactical plans: ${response.statusText}`);
+    return response.json();
+  }
+
+  /**
+   * Get application components
+   * v12.0 endpoint
+   */
+  async getApplicationComponents(studentId: string): Promise<any> {
+    const url = `${this.baseUrl}/students/${studentId}/application-components`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch application components: ${response.statusText}`);
+    return response.json();
+  }
+
+  /**
+   * Get game plan links for a specific week (used in Preparation tab)
+   * v12.0 endpoint
+   */
+  async getWeekGamePlanLinks(studentId: string, weekNumber: number): Promise<any> {
+    const url = `${this.baseUrl}/students/${studentId}/weeks/${weekNumber}/game-plan-links`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Failed to fetch week game plan links: ${response.statusText}`);
+    return response.json();
+  }
+
+  /**
+   * Get comprehensive assessment data for student
+   * Includes:
+   * - Ivy+ Ready Score (overall)
+   * - Three Pillar Model (Aptitude, Passion, Service, Identity)
+   * - Dimensional Scores (Academic, EC, Service, Narrative, Application)
+   * - Standout Strengths (8 strengths with evidence)
+   * - Weak Spots (5 weak spots with priority/ROI/status)
+   * - Historical Score Progression
+   * - Admissions Rubric Correlation
+   *
+   * v12.1 endpoint
+   */
+  async getAssessment(studentId: string): Promise<AssessmentData> {
+    const url = `${this.baseUrl}/students/${studentId}/assessment`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Assessment data not found - Game plan not created yet');
+      }
+      throw new Error(`Failed to fetch assessment: ${response.statusText}`);
+    }
+    return response.json();
+  }
+}
+
+// ============================================================================
+// v12.1: ASSESSMENT TYPES
+// ============================================================================
+
+export interface PillarScore {
+  score: number;
+  maxScore: number;
+  percentage: number;
+  weight: number;
+  contribution: number;
+  strength: string;
+  evidence: string;
+}
+
+export interface DimensionalScore {
+  dimension: string;
+  score: number;
+  percentile: number | null;
+  tier: string;
+  subfactors: any[];
+}
+
+export interface Strength {
+  id: string;
+  title: string;
+  dimension: string;
+  description: string;
+  evidenceIds: string[];
+  impact: string;
+  roiScore: number;
+}
+
+export interface WeakSpot {
+  id: string;
+  title: string;
+  priority: string;
+  roiScore: number;
+  status: string;
+  tacticalPlan: string;
+  targetWeeks: string | null;
+  progressNote: string;
+}
+
+export interface ScoreProgression {
+  weekNumber: number;
+  overallScore: number;
+  date: string;
+  milestone: string | null;
+}
+
+export interface AdmissionsRubricFactor {
+  name: string;
+  weight: number;
+  score: number;
+}
+
+export interface AdmissionsRubricCategory {
+  score: number;
+  tier: string;
+  factors: AdmissionsRubricFactor[];
+  description?: string;
+}
+
+export interface AdmissionsRubric {
+  academicIndex: AdmissionsRubricCategory;
+  extracurricularRating: AdmissionsRubricCategory;
+  personalQualities: AdmissionsRubricCategory;
+  recommendationStrength: AdmissionsRubricCategory;
+  overallAdmissionsScore: {
+    score: number;
+    tier: string;
+    admitProbability: string;
+    targetSchools: string[];
+  };
+}
+
+export interface AssessmentData {
+  studentId: string;
+  gamePlanId: string;
+  version: number;
+  lastUpdated: string;
+
+  ivyReadyScore: {
+    overall: number;
+    tier: string;
+    t20Level: string;
+    changeVs180Days: number;
+  };
+
+  pillars: {
+    aptitude: PillarScore;
+    passion: PillarScore;
+    service: PillarScore;
+    identity: PillarScore;
+  };
+
+  dimensionalScores: DimensionalScore[];
+  strengths: Strength[];
+  weakSpots: WeakSpot[];
+  scoreProgression: ScoreProgression[];
+  admissionsRubric: AdmissionsRubric;
+
+  schoolContext: any;
+  familyContext: any;
+  uniqueStory: string;
+  potentialSpikes: string[];
 }
 
 // Export singleton instance
