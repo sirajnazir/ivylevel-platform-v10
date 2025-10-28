@@ -15,3 +15,6 @@ export * from './UniversalAgent';
 
 // Concrete implementations
 export * from './implementations';
+
+// Memory Store (Pinecone)
+export * from './PineconeMemoryStore';
