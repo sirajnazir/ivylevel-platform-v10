@@ -174,7 +174,7 @@ const DimensionName = styled.div`
   margin-bottom: 8px;
 `;
 
-const DimensionScore = styled.div<{ tier: string }>`
+const DimensionScore = styled.div<{ $tier: string }>`
   font-size: 24px;
   font-weight: 700;
   color: ${props => {
@@ -185,7 +185,7 @@ const DimensionScore = styled.div<{ tier: string }>`
       'Silver': '#6b7280',
       'Bronze': '#92400e'
     };
-    return tierColors[props.tier] || '#333';
+    return tierColors[props.$tier] || '#333';
   }};
   display: flex;
   align-items: center;
@@ -267,7 +267,7 @@ const WeakSpotsGrid = styled.div`
   gap: 16px;
 `;
 
-const WeakSpotCard = styled.div<{ priority: string }>`
+const WeakSpotCard = styled.div<{ $priority: string }>`
   padding: 16px;
   background: ${props => {
     const priorityColors: Record<string, string> = {
@@ -275,7 +275,7 @@ const WeakSpotCard = styled.div<{ priority: string }>`
       'P1': '#fed7aa',
       'P2': '#e0e7ff'
     };
-    return priorityColors[props.priority] || '#f3f4f6';
+    return priorityColors[props.$priority] || '#f3f4f6';
   }};
   border-radius: 8px;
   border: 1px solid ${props => {
@@ -284,7 +284,7 @@ const WeakSpotCard = styled.div<{ priority: string }>`
       'P1': '#fb923c',
       'P2': '#a5b4fc'
     };
-    return borderColors[props.priority] || '#d1d5db';
+    return borderColors[props.$priority] || '#d1d5db';
   }};
 `;
 
@@ -302,12 +302,12 @@ const WeakSpotTitle = styled.div`
   flex: 1;
 `;
 
-const WeakSpotStatus = styled.span<{ status: string }>`
+const WeakSpotStatus = styled.span<{ $status: string }>`
   font-size: 11px;
   font-weight: 600;
   padding: 4px 8px;
-  background: ${props => props.status === 'RESOLVED' ? '#d1fae5' : '#fecaca'};
-  color: ${props => props.status === 'RESOLVED' ? '#065f46' : '#991b1b'};
+  background: ${props => props.$status === 'RESOLVED' ? '#d1fae5' : '#fecaca'};
+  color: ${props => props.$status === 'RESOLVED' ? '#065f46' : '#991b1b'};
   border-radius: 4px;
   white-space: nowrap;
 `;
@@ -318,7 +318,7 @@ const PriorityRow = styled.div`
   margin-bottom: 12px;
 `;
 
-const PriorityBadge = styled.span<{ priority: string }>`
+const PriorityBadge = styled.span<{ $priority: string }>`
   font-size: 12px;
   font-weight: 700;
   padding: 4px 8px;
@@ -328,7 +328,7 @@ const PriorityBadge = styled.span<{ priority: string }>`
       'P1': '#fb923c',
       'P2': '#a5b4fc'
     };
-    return bgColors[props.priority] || '#d1d5db';
+    return bgColors[props.$priority] || '#d1d5db';
   }};
   color: ${props => {
     const textColors: Record<string, string> = {
@@ -336,7 +336,7 @@ const PriorityBadge = styled.span<{ priority: string }>`
       'P1': '#7c2d12',
       'P2': '#3730a3'
     };
-    return textColors[props.priority] || '#374151';
+    return textColors[props.$priority] || '#374151';
   }};
   border-radius: 4px;
 `;
@@ -361,14 +361,14 @@ const AdmissionsRubricCard = styled.div`
   color: white;
 `;
 
-const RubricRow = styled.div<{ highlight?: boolean }>`
+const RubricRow = styled.div<{ $highlight?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 12px 0;
-  border-bottom: ${props => props.highlight ? '2px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)'};
-  font-weight: ${props => props.highlight ? '700' : '500'};
-  font-size: ${props => props.highlight ? '18px' : '15px'};
+  border-bottom: ${props => props.$highlight ? '2px solid rgba(255,255,255,0.3)' : '1px solid rgba(255,255,255,0.1)'};
+  font-weight: ${props => props.$highlight ? '700' : '500'};
+  font-size: ${props => props.$highlight ? '18px' : '15px'};
 `;
 
 const RubricLabel = styled.span`
@@ -550,7 +550,7 @@ export function StudentDashboard() {
                     score_change: v12AssessmentData.ivyReadyScore.changeVs180Days,
                     achievement_level: v12AssessmentData.ivyReadyScore.tier.toUpperCase() as 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND',
                     target_gap: 100 - v12AssessmentData.ivyReadyScore.overall,
-                    tier_probability: v12AssessmentData.admissionsRubric.overallAdmitProbability
+                    tier_probability: 0.20  // From overallAdmissionsScore.admitProbability "15-25%"
                   } : undefined}
                   isLoading={assessmentLoading}
                 />
@@ -563,7 +563,7 @@ export function StudentDashboard() {
                     score_change: v12AssessmentData.ivyReadyScore.changeVs180Days,
                     achievement_level: v12AssessmentData.ivyReadyScore.tier.toUpperCase() as 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND',
                     target_gap: 100 - v12AssessmentData.ivyReadyScore.overall,
-                    tier_probability: v12AssessmentData.admissionsRubric.overallAdmitProbability
+                    tier_probability: 0.20  // From overallAdmissionsScore.admitProbability "15-25%"
                   } : undefined}
                   assessmentData={assessmentData}
                   isLoading={assessmentLoading}
@@ -595,7 +595,7 @@ export function StudentDashboard() {
                   {v12AssessmentData.dimensionalScores.map((dim, idx) => (
                     <DimensionCard key={idx}>
                       <DimensionName>{dim.dimension}</DimensionName>
-                      <DimensionScore tier={dim.tier}>
+                      <DimensionScore $tier={dim.tier}>
                         {dim.score}%
                         <DimensionTier>{dim.tier}</DimensionTier>
                       </DimensionScore>
@@ -633,13 +633,13 @@ export function StudentDashboard() {
                 <SectionTitle>🎯 Focus Areas</SectionTitle>
                 <WeakSpotsGrid>
                   {v12AssessmentData.weakSpots.map((weakSpot, idx) => (
-                    <WeakSpotCard key={weakSpot.id} priority={weakSpot.priority}>
+                    <WeakSpotCard key={weakSpot.id} $priority={weakSpot.priority}>
                       <WeakSpotHeader>
                         <WeakSpotTitle>{weakSpot.title}</WeakSpotTitle>
-                        <WeakSpotStatus status={weakSpot.status}>{weakSpot.status}</WeakSpotStatus>
+                        <WeakSpotStatus $status={weakSpot.status}>{weakSpot.status}</WeakSpotStatus>
                       </WeakSpotHeader>
                       <PriorityRow>
-                        <PriorityBadge priority={weakSpot.priority}>{weakSpot.priority}</PriorityBadge>
+                        <PriorityBadge $priority={weakSpot.priority}>{weakSpot.priority}</PriorityBadge>
                         <ROIScore>ROI: {weakSpot.roiScore}/10</ROIScore>
                       </PriorityRow>
                       <TacticalPlan>{weakSpot.tacticalPlan}</TacticalPlan>
@@ -659,27 +659,27 @@ export function StudentDashboard() {
                 <AdmissionsRubricCard>
                   <RubricRow>
                     <RubricLabel>Academic Index</RubricLabel>
-                    <RubricScore>{v12AssessmentData.admissionsRubric.academicIndex}</RubricScore>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.academicIndex.score}</RubricScore>
                   </RubricRow>
                   <RubricRow>
                     <RubricLabel>Extracurricular Rating</RubricLabel>
-                    <RubricScore>{v12AssessmentData.admissionsRubric.extracurricularRating}</RubricScore>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.extracurricularRating.score}</RubricScore>
                   </RubricRow>
                   <RubricRow>
                     <RubricLabel>Personal Qualities</RubricLabel>
-                    <RubricScore>{v12AssessmentData.admissionsRubric.personalQualities}</RubricScore>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.personalQualities.score}</RubricScore>
                   </RubricRow>
                   <RubricRow>
                     <RubricLabel>Recommendation Strength</RubricLabel>
-                    <RubricScore>{v12AssessmentData.admissionsRubric.recommendationStrength}</RubricScore>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.recommendationStrength.score}</RubricScore>
                   </RubricRow>
                   <RubricDivider />
-                  <RubricRow highlight>
+                  <RubricRow $highlight>
                     <RubricLabel>Overall Admit Probability</RubricLabel>
-                    <RubricScore>{Math.round(v12AssessmentData.admissionsRubric.overallAdmitProbability * 100)}%</RubricScore>
+                    <RubricScore>{v12AssessmentData.admissionsRubric.overallAdmissionsScore.admitProbability}</RubricScore>
                   </RubricRow>
                   <TargetSchools>
-                    <strong>Target Schools:</strong> {v12AssessmentData.admissionsRubric.targetSchoolTier}
+                    <strong>Target Schools:</strong> {v12AssessmentData.admissionsRubric.overallAdmissionsScore.targetSchools.join(', ')}
                   </TargetSchools>
                 </AdmissionsRubricCard>
               </AssessmentSection>
