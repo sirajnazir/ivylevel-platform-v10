@@ -408,13 +408,19 @@ export function v10Router(pool: Pool): Router {
 
   // ============================================================================
   // GAP 3: TIMELINE VISUALIZATION API
+  // ⚠️  DEPRECATED: This GAP has been superseded by v13.1 Growth Transformations
+  // The timeline route is now implemented at line 1742 with a new schema
+  // This entire section (lines 409-587) is commented out to avoid conflicts
   // ============================================================================
 
-  /**
-   * GET /students/:id/timeline
-   * Get timeline events with optional filtering
-   * Query params: event_type, start_date, end_date, limit
-   */
+  /*
+  // OLD IMPLEMENTATION - DEPRECATED
+  // This route conflicts with v13.1 Growth Transformations
+  //
+  // GET /students/:id/timeline
+  // Get timeline events with optional filtering
+  // Query params: event_type, start_date, end_date, limit
+  //
   router.get('/students/:id/timeline', async (req: Request, res: Response) => {
     try {
       const studentId = req.params.id;
@@ -489,10 +495,10 @@ export function v10Router(pool: Pool): Router {
     }
   });
 
-  /**
-   * POST /students/:id/timeline
-   * Create a new timeline event
-   */
+  //
+  // POST /students/:id/timeline
+  // Create a new timeline event
+  //
   router.post('/students/:id/timeline', async (req: Request, res: Response) => {
     try {
       const studentId = req.params.id;
@@ -539,11 +545,11 @@ export function v10Router(pool: Pool): Router {
     }
   });
 
-  /**
-   * GET /students/:id/timeline/summary
-   * Get timeline statistics and summary
-   * Uses materialized view mv_timeline_summary
-   */
+  //
+  // GET /students/:id/timeline/summary
+  // Get timeline statistics and summary
+  // Uses materialized view mv_timeline_summary
+  //
   router.get('/students/:id/timeline/summary', async (req: Request, res: Response) => {
     try {
       const studentId = req.params.id;
@@ -585,6 +591,8 @@ export function v10Router(pool: Pool): Router {
       });
     }
   });
+  */
+  // END OF DEPRECATED GAP 3 - USE v13.1 Growth Transformations instead
 
   // ============================================================================
   // GAP 4: APPLICATION MANAGER API

@@ -22,6 +22,7 @@ import { TaskManager } from "../v10/TaskManager";
 import { TimelineView } from "../v10/TimelineView";
 import { ProjectsView } from "../v10/ProjectsView";
 import { WeeklyVitals } from "../v10/WeeklyVitals";
+import { GrowthTransformationsTab } from "../v10/GrowthTransformationsTab";
 import { v10Api, type AssessmentData } from "../../utils/v10ApiService";
 
 const Container = styled.div`
@@ -840,6 +841,17 @@ export function StudentDashboard() {
             </div>
           </div>
         );
+
+      case 'growth_transformations':
+        // v13.1: Growth Transformations Timeline
+        if (!studentId) {
+          return (
+            <div style={{ padding: '20px', color: '#666', textAlign: 'center' }}>
+              Loading student data...
+            </div>
+          );
+        }
+        return <GrowthTransformationsTab studentId={studentId} />;
 
       case 'application_old':
         return (

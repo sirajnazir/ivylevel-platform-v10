@@ -1,9 +1,185 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v13.0
+**Document Version:** v14.0
 **Last Updated:** 2025-10-28
-**Current Version:** v13.0 - Enhanced Assessment Tab with Real Data + Dynamic Scoring
+**Current Version:** v14.0 - Enhanced Growth Journey & Real Data
 **Status:** ✅ PRODUCTION READY - COMPLETE & VERIFIED
+
+---
+
+## v14.0 - Enhanced Growth Transformations Timeline with Complete 2-Year Journey (2025-10-28)
+
+**Focus:** Comprehensive Growth Journey Tab with timeline data enrichment showing complete 2-year college prep transformation
+
+### Summary
+
+v14.0 enriches the Growth Transformations Timeline with 30 new transformation events extracted from existing data sources (growth_events, vital_facts, kb_items, weekly_vitals), creating a balanced 93-event timeline spanning 2023-2025. The release addresses the gap identified in v13.1 where the timeline was heavily skewed toward 2024-2025 applications (56 out of 63 events) with minimal 2023-2024 preparation/transformation content. Now shows complete journey: Foundation year (2023) → Build year (2024) → Decision year (2025).
+
+### Frontend Changes - Growth Transformations Tab
+
+**File Created:** `unified-frontend/apps/unified-app/src/components/v10/GrowthTransformationsTab.tsx` (486 lines)
+
+**Key Features:**
+
+1. **Event-Type-Specific Styling** (lines 245-275)
+   - Color-coded events: Growth (purple), Academic (teal), Projects (indigo), Awards (gold), Programs (pink), Applications (green/red/yellow), Phase Transitions (orange)
+   - Icon system: 🌟 (growth), 📊 (academic), 🚀 (project), 🏆 (award), 🎯 (program), 🎓 (application), 🔄 (transition)
+   - Impact-based border colors: major (green), moderate (yellow), minor (red)
+
+2. **Year-Based Timeline Grouping** (lines 310-323)
+   - Events grouped by year with descending sort (2025 → 2024 → 2023)
+   - Vertical timeline with connecting line
+   - Circular event markers positioned on timeline spine
+
+3. **Stats Summary Bar** (lines 407-434)
+   - Total events count, Applications count, Breakthroughs count, Journey start date
+   - Real-time calculations from API response
+   - Event type distribution display
+
+4. **Interactive Timeline Display** (lines 436-480)
+   - Hover effects with elevation and translation
+   - Expandable event cards with full descriptions
+   - Metadata badges for event types, subtypes, impact levels
+   - Date formatting with readable month/day/year
+
+### Backend Changes - Timeline Enrichment Migration
+
+**File Created:** `scripts/migration_v14_to_v32/13_enrich_timeline_transformations.sql` (414 lines)
+
+**Data Sources Enriched:**
+
+1. **HGTI Growth Events** (8 events from growth_events table)
+   - Jun 2023: Breakthrough - Self Image (digital storyteller identity synthesis)
+   - Jul 2023: Growth - Time Management Framework (168-hour audit)
+   - Sep 2023: Growth - Building Confidence (NCWIT positioning)
+   - Jan 2024: Breakthrough - College Positioning Clarity (Stanford AI ethics alignment)
+   - Mar 2024: Breakthrough - Self Image (community service integration)
+   - Aug 2024: Growth - Building Confidence (course selection strategy)
+   - Dec 2024: Growth - Managing Expectations (parent dynamics navigation)
+   - May 2025: Breakthrough - Self Image (final culmination, 219 sessions)
+
+2. **SAT Progression Milestones** (3 events from vital_facts table)
+   - Jan 2024: SAT Baseline 1360 (91st percentile)
+   - Mar 2024: SAT Progress 1480 (+120 points, 98th percentile)
+   - Apr 2024: SAT Final 1530 (+170 points total, 99th percentile)
+
+3. **Major Awards** (6 events from kb_items table)
+   - Mar 2024: NCWIT National Awardee + NorCal Regional Winner
+   - Jun 2024: Mountain House HS Computer Science CTE Award
+   - Jul 2024: AP Scholar with Distinction + Games for Change Writing Impact Award
+   - Sep 2024: College Board National Rural & Small Town Award
+
+4. **Project Scaling Milestones** (8 events extracted from weekly_vitals + kb_items)
+   - Jan 2023: Founded Empowering AI Nonprofit
+   - Feb 2023: Launched Synthoria AI Ethics Game
+   - Aug 2023: Empowering AI $5K fundraising milestone
+   - Jan 2024: Founded Folklift Youth Journalism
+   - Mar 2024: Empowering AI 15 cities + $10K raised
+   - Mar 2024: Synthoria 200 classes, 6,400 students
+   - Mar 2024: Folklift first articles published
+   - Jul 2024: Empowering AI peak - 44 cities + $23K raised
+
+5. **Summer Programs** (5 events from kb_items table)
+   - Jun-Jul 2024: Notre Dame Leadership Seminars, Bank of America Student Leaders, Yale YYGS, AAJA JCamp, AI Scholars
+
+### Frontend Integration
+
+**Files Modified:**
+
+1. **`unified-frontend/apps/unified-app/src/components/student/Header.tsx`** (lines 165-171)
+   - Added "Growth Journey" navigation tab between Application and Sessions tabs
+   - Tab routing to 'growth_transformations' view
+
+2. **`unified-frontend/apps/unified-app/src/components/student/StudentDashboard.tsx`** (lines 25, 845-854)
+   - Imported GrowthTransformationsTab component
+   - Added case handler for 'growth_transformations' activeTab
+   - Renders timeline with studentId prop
+
+### Backend Route Fix
+
+**File Modified:** `services/agent-framework/src/routes/v10.0.ts` (lines 409-594)
+
+**Issue Resolved:**
+- Old GAP 3 timeline route (line 418) was intercepting requests and querying deprecated schema (week_number, icon, color columns)
+- Caused "column does not exist" errors blocking new v13.1 timeline route (line 1742)
+
+**Fix Applied:**
+- Commented out entire GAP 3 section (185 lines) with deprecation notice
+- New v13.1 route now handles all timeline requests with current schema
+- Maintains backward compatibility through ON CONFLICT DO NOTHING in migrations
+
+### Timeline Event Distribution
+
+**Before v14.0:** 63 events
+- application: 56 (89%)
+- growth_event: 3 (5%)
+- phase_transition: 4 (6%)
+
+**After v14.0:** 93 events
+- application: 56 (60%)
+- growth_event: 11 (12%)
+- project: 8 (9%)
+- award: 6 (6%)
+- program: 5 (5%)
+- phase_transition: 4 (4%)
+- academic: 3 (3%)
+
+### Year Distribution
+
+- **2023:** 8 events (Foundation year - projects founded, initial breakthroughs)
+- **2024:** 63 events (Build year - scaling, awards, SAT progression, applications)
+- **2025:** 22 events (Decision year - college decisions, final breakthrough)
+
+### Technical Implementation Details
+
+**Migration Script Execution:**
+```sql
+-- Extracted 8 HGTI growth events with transformation deltas and breakthrough flags
+-- Extracted 3 SAT progression events with score improvements and percentile ranks
+-- Extracted 6 major awards with national/regional scope
+-- Extracted 8 project milestones with scaling metrics (fundraising, reach, impact)
+-- Extracted 5 summer programs with dates
+-- Total: 30 new events added to timeline_events table
+-- Result: 93 total events (63 original + 30 enriched)
+```
+
+**Data Accuracy Verification:**
+- All 93 events display correctly in UI with proper dates, descriptions, and metadata
+- Event type colors and icons render accurately
+- Stats summary calculates correctly (Applications: 56, Breakthroughs: 11)
+- Year grouping shows balanced distribution across 2023-2025
+- No duplicate or missing events
+
+### Files Modified
+
+- `unified-frontend/apps/unified-app/src/components/v10/GrowthTransformationsTab.tsx` (new file, 486 lines)
+- `unified-frontend/apps/unified-app/src/components/student/Header.tsx` (lines 165-171)
+- `unified-frontend/apps/unified-app/src/components/student/StudentDashboard.tsx` (lines 25, 845-854)
+- `services/agent-framework/src/routes/v10.0.ts` (lines 409-594 commented out)
+- `scripts/migration_v14_to_v32/13_enrich_timeline_transformations.sql` (new file, 414 lines)
+- `docs/MASTER_PROD_TECH_SPEC.md` (v14.0 version update)
+- `docs/PROD_DB_ARCH.md` (v14.0 version update)
+- `docs/PROD_FEATURE_RELEASE_DETAILS.md` (v14.0 section added)
+
+### Impact
+
+**User-Facing Changes:**
+- Students now see complete 2-year transformation journey, not just application outcomes
+- Balanced timeline showing qualitative growth (breakthroughs) + quantitative progress (SAT, awards, projects)
+- Clear visual progression: Foundation → Build → Decision phases
+- Comprehensive storytelling: from initial identity synthesis through scaling impact projects to college admissions
+
+**Technical Benefits:**
+- First-principles data enrichment: no schema changes, just intelligent extraction from existing tables
+- Reusable migration pattern for future students' timeline enrichment
+- Demonstrates HGTI scoring system integration (transformation deltas, breakthrough flags)
+- Validates universal schema design (works for any student type - STEM, Arts, Athletics)
+
+**Data Quality:**
+- All 30 new events verified against source tables (growth_events, vital_facts, kb_items, weekly_vitals)
+- Accurate dates, descriptions, metadata
+- Proper event type classification and impact levels
+- No data duplication or integrity issues
 
 ---
 
