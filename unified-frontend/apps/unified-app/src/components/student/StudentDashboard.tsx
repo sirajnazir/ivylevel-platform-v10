@@ -22,6 +22,7 @@ import { TaskManager } from "../v10/TaskManager";
 import { TimelineView } from "../v10/TimelineView";
 import { ProjectsView } from "../v10/ProjectsView";
 import { WeeklyVitals } from "../v10/WeeklyVitals";
+import { v10Api, type AssessmentData } from "../../utils/v10ApiService";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -138,6 +139,11 @@ export function StudentDashboard() {
   const [applicationData, setApplicationData] = React.useState(null);
   const [loadingTab, setLoadingTab] = React.useState(false);
 
+  // v12.1: Assessment data from new API
+  const [v12AssessmentData, setV12AssessmentData] = React.useState<AssessmentData | null>(null);
+  const [assessmentLoading, setAssessmentLoading] = React.useState(false);
+  const [assessmentError, setAssessmentError] = React.useState<string | null>(null);
+
   // v3.2 Feature flags
   const showEvidence = useFeatureFlag('evidencePanel');
   const showHGTI = useFeatureFlag('hgtiGraph');
@@ -164,6 +170,31 @@ export function StudentDashboard() {
       videoPrefetchService.prefetchSessions(token);
     }
   }, []);
+
+  // v12.1: Fetch comprehensive assessment data
+  React.useEffect(() => {
+    const fetchAssessmentData = async () => {
+      if (!studentId) return;
+
+      setAssessmentLoading(true);
+      setAssessmentError(null);
+
+      try {
+        // Use "huda-2025" as the API expects this format (not "huda_001")
+        const apiStudentId = studentId === "huda_001" ? "huda-2025" : studentId;
+        const data = await v10Api.getAssessment(apiStudentId);
+        setV12AssessmentData(data);
+        console.log('✅ v12.1 Assessment data loaded:', data);
+      } catch (error) {
+        console.error('❌ Error fetching v12 assessment data:', error);
+        setAssessmentError(error instanceof Error ? error.message : 'Failed to load assessment data');
+      } finally {
+        setAssessmentLoading(false);
+      }
+    };
+
+    fetchAssessmentData();
+  }, [studentId]);
 
   // Use the new dashboard data service
   const {
