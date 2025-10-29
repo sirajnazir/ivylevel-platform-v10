@@ -70,7 +70,7 @@ export class PineconeMemoryStore<TMemory = any> implements MemoryStore<TMemory> 
   ) {
     this.client = new Pinecone({
       apiKey: config.apiKey,
-      environment: config.environment,
+      // Note: environment property removed in Pinecone SDK v3.x
     });
     this.namespace = config.namespace || 'default';
     this.embeddingService = embeddingService;

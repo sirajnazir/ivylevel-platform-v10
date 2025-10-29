@@ -85,9 +85,12 @@ export class CoachingIntelligenceLoader implements IntelligenceLoader<CoachingIn
   private dataDirectory: string;
 
   constructor(dataDirectory?: string) {
-    // Default to project data directory
+    // Default to repository root data directory
+    // process.cwd() = /Users/snazir/ivylevel-platform-v10/services/agent-framework
+    // We need: /Users/snazir/ivylevel-platform-v10/data/coaching_intelligence/extractions
     this.dataDirectory = dataDirectory || path.join(
       process.cwd(),
+      '../..',  // Go up two levels to repository root
       'data',
       'coaching_intelligence',
       'extractions'
@@ -225,7 +228,10 @@ export class CoachingIntelligenceLoader implements IntelligenceLoader<CoachingIn
         if (!tacticsMap.has(category)) {
           tacticsMap.set(category, new Set());
         }
-        tactics.forEach(t => tacticsMap.get(category)!.add(t));
+        // Safety check: tactics might not be an array in some files
+        if (Array.isArray(tactics)) {
+          tactics.forEach(t => tacticsMap.get(category)!.add(t));
+        }
       });
     });
 
@@ -244,7 +250,10 @@ export class CoachingIntelligenceLoader implements IntelligenceLoader<CoachingIn
         if (!questionsMap.has(phase)) {
           questionsMap.set(phase, new Set());
         }
-        questions.forEach(q => questionsMap.get(phase)!.add(q));
+        // Safety check: questions might not be an array in some files
+        if (Array.isArray(questions)) {
+          questions.forEach(q => questionsMap.get(phase)!.add(q));
+        }
       });
     });
 

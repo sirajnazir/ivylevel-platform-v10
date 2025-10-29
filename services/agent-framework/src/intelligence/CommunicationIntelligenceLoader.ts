@@ -137,8 +137,12 @@ export class CommunicationIntelligenceLoader implements IntelligenceLoader<Coach
   private dataDirectory: string;
 
   constructor(dataDirectory?: string) {
+    // Default to repository root data/eq directory
+    // process.cwd() = /Users/snazir/ivylevel-platform-v10/services/agent-framework
+    // We need: /Users/snazir/ivylevel-platform-v10/data/eq
     this.dataDirectory = dataDirectory || path.join(
       process.cwd(),
+      '../..',  // Go up two levels to repository root
       'data',
       'eq'
     );

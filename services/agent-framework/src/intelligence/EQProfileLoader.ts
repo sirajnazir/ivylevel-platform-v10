@@ -127,8 +127,12 @@ export class EQProfileLoader implements IntelligenceLoader<EQProfile> {
 
   constructor(db: any, dataDirectory?: string) {
     this.db = db;
+    // Default to repository root data directory
+    // process.cwd() = /Users/snazir/ivylevel-platform-v10/services/agent-framework
+    // We need: /Users/snazir/ivylevel-platform-v10/data/eq_profiles
     this.dataDirectory = dataDirectory || path.join(
       process.cwd(),
+      '../..',  // Go up two levels to repository root
       'data',
       'eq_profiles'
     );

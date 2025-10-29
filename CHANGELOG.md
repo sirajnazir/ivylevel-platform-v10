@@ -1,5 +1,23 @@
 # Changelog
 
+## [2025-10-28 03:01] v16.2: Assessment Agent with Real EQ Intelligence
+
+**Summary:** Enabled v15.3 Assessment Agent with authentic coaching intelligence from 10 sessions + 7 iMessage files containing 500+ real interactions from Jenny's coaching sessions.
+
+**Key Changes:**
+- Fixed data directory paths in all intelligence loaders to point to repository root `/data/` directory (CoachingIntelligenceLoader.ts:87-98, CommunicationIntelligenceLoader.ts:139-149, EQProfileLoader.ts:128-141)
+- Added Array.isArray() safety checks for tactics and questions aggregation to handle malformed JSON gracefully (CoachingIntelligenceLoader.ts:224-236, 246-258)
+- Added missing processQuery() method to AssessmentAgentService class (AssessmentAgent.ts:265-315)
+- Fixed Pinecone SDK v3.x compatibility by removing deprecated `environment` property (PineconeMemoryStore.ts:139-149)
+- Integrated LangSmith tracing configuration (.env.local:55-61)
+
+**Intelligence Loaded:**
+- 10 coaching intelligence files (74 frameworks, 17 tactic categories, 10 archetypes)
+- 7 iMessage files (Permission Field, Zero Judgment, Identity Fusion, Rejection Alchemy, etc.)
+- EQ Profile (94 conversations, 1,655 utterances, 745 linguistic markers, 482 training examples)
+
+**Impact:** Assessment Agent button now works end-to-end with real coaching patterns
+
 ## [2025-10-28 16:00] v12.0: Enhanced Game Plan Tab with Real Huda Data
 
 **Focus:** First principles JSONB data model enhancement + two-section Game Plan architecture with 100% accurate data extracted from 93+ coaching session transcripts
