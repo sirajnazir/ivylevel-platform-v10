@@ -1,11 +1,11 @@
 # IvyLevel Platform - Master Production Technical Specification
 # v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v12.1 → v13.0 → v14.0 Growth Journey
 
-**Document Version:** v14.0
+**Document Version:** v16.0
 **Last Updated:** 2025-10-28
-**Status:** ✅ PRODUCTION READY - ENHANCED GROWTH TRANSFORMATIONS TIMELINE WITH COMPLETE 2-YEAR JOURNEY
-**Platform Version:** v14.0 (Growth Journey Tab + Timeline Enrichment with Real Transformation Data)
-**Architecture:** Multi-Agent with Zero-Hallucination + Production Infrastructure + Complete Game Plan Feature + Interactive Assessment Visualization + Comprehensive Growth Transformations Timeline
+**Status:** ✅ PRODUCTION READY - FINAL FRONTEND + BACKEND + AUTH BASELINE
+**Platform Version:** v16.0 (Clean Production Baseline - Frontend/Backend/Auth Single Source of Truth)
+**Architecture:** Multi-Agent with Zero-Hallucination + Production Infrastructure + Unified Authentication + v15.2 Enhanced Chat
 
 ---
 
@@ -3496,3 +3496,343 @@ The IvyLevel Platform v10 has been analyzed against state-of-the-art agentic des
 ---
 
 **Production Status:** ✅ READY - Complete dynamic visualization with mathematical precision
+
+---
+
+## v16.0 - Final Production Baseline (Frontend + Backend + Auth)
+
+**Release Date:** 2025-10-28
+**Focus:** Clean production baseline with single source of truth for frontend, backend, and authentication
+
+### Overview
+
+v16.0 establishes the FINAL production configuration for frontend, backend, and authentication. This release removes all mock/test implementations and consolidates on a single, working production stack.
+
+### Production Stack (Single Source of Truth)
+
+#### **Frontend Application**
+- **Location:** `/unified-frontend/apps/unified-app/`
+- **Port:** 5173
+- **Framework:** Vite + React + TypeScript
+- **Entry Point:** `src/main.tsx`
+- **Routing:** React Router v6
+- **Styling:** Styled Components
+
+**Key Files:**
+- `src/App.tsx` - Main application component
+- `src/components/student/StudentDashboard.tsx` - Student dashboard (main UI)
+- `src/components/student/AIChat.tsx` - Enhanced AI chat with v15.2 integration
+- `src/hooks/useAuth.tsx` - Authentication hook (uses simpleAuthService)
+- `src/services/auth/simpleAuthService.ts` - Production auth service (connects to backend)
+
+**Environment Configuration:**
+```bash
+# /unified-frontend/apps/unified-app/.env
+VITE_API_URL=http://localhost:8787
+VITE_AGENT_API_URL=http://localhost:8787
+```
+
+**Proxy Configuration:**
+```typescript
+// vite.config.ts
+server: {
+  port: 5173,
+  proxy: {
+    '/api': {
+      target: 'http://localhost:8787',
+      changeOrigin: true,
+      secure: false,
+    },
+  },
+}
+```
+
+#### **Backend Server**
+- **Location:** `/services/agent-framework/src/server-utfa.ts`
+- **Port:** 8787
+- **Framework:** Express + TypeScript
+- **Entry Point:** `server-utfa.ts`
+- **Database:** PostgreSQL (localhost:5432)
+
+**Mounted Routes:**
+- `/enum` - Universal enumerations (enumsRouter)
+- `/` - Snapshot routes (v3.7.1)
+- `/` - v3.2 routes (Evidence chips, HGTI)
+- `/` - v10.0 routes (6 UI/UX gaps)
+- `/` - v12.0 routes (Game Plan)
+- `/api/v15.2` - v15.2 routes (LangChain LCEL orchestration)
+- `/api/auth` - Authentication routes (PRODUCTION AUTH)
+
+**Key Backend Files:**
+- `src/server-utfa.ts:415-432` - Server initialization and port binding (8787)
+- `src/routes/auth.ts:255-265` - Production login endpoint (returns student_id)
+- `src/utils/jwt.ts` - JWT token generation and validation
+- `src/db/pool.ts` - PostgreSQL connection pool
+
+**Startup Command:**
+```bash
+cd /Users/snazir/ivylevel-platform-v10/services/agent-framework
+PORT=8787 npx tsx src/server-utfa.ts
+```
+
+#### **Authentication System (PRODUCTION)**
+
+**Service:** `simpleAuthService.ts` (replaces all Cognito/Firebase/Mock auth)
+
+**Flow:**
+```
+1. User enters credentials (hudasir4j@gmail.com / Password123)
+2. Frontend: simpleAuthService.login() → POST /api/auth/login
+3. Backend: routes/auth.ts validates password with bcrypt
+4. Backend: Returns JWT tokens + student data
+5. Frontend: Stores tokens in localStorage
+6. Frontend: Sets user with student_id: "huda-2025"
+7. All API calls include: Authorization: Bearer {access_token}
+```
+
+**Auth Endpoints:**
+- `POST /api/auth/login` - Login (email + password) → Returns tokens + student data
+- `POST /api/auth/logout` - Logout (clears tokens)
+- `GET /api/auth/me` - Get current user (validates JWT)
+
+**Backend Auth Implementation** (`routes/auth.ts:200-265`):
+```typescript
+// Verify password with bcrypt
+const passwordValid = await comparePassword(password, student.password_hash);
+
+// Generate JWT tokens
+const tokens = generateTokenPair(
+  student.student_id,  // userId
+  student.primary_coach_id || student.student_id,  // coachId
+  student.email,
+  'student'
+);
+
+// Return tokens + student profile
+return res.status(200).json({
+  ...tokens,
+  student: {
+    user_id: student.student_id,      // e.g., "huda-2025"
+    student_id: student.student_id,   // e.g., "huda-2025"
+    email: student.email,              // e.g., "hudasir4j@gmail.com"
+    name: student.name,                // e.g., "Huda A."
+    role: 'student',
+    last_login_at: new Date().toISOString(),
+  },
+});
+```
+
+**Frontend Auth Hook** (`useAuth.tsx:64-80`):
+```typescript
+const login = async (email: string, password: string) => {
+  const result = await simpleAuthService.login(email, password);
+  if (result.success && result.user) {
+    setUser(result.user);  // user.student_id = "huda-2025"
+  }
+  return result;
+};
+
+const logout = async () => {
+  await simpleAuthService.logout();
+  setUser(null);
+};
+```
+
+#### **Production Credentials**
+
+**Test Account (Huda):**
+```
+Email: hudasir4j@gmail.com
+Password: Password123
+Student ID: huda-2025
+Password Hash: $2b$10$Y31Ysf4E8XSZdtNCPTvsDO3WvN86RcxzznvfrzpUgX8zpPufX3beS
+```
+
+**Database:**
+```sql
+-- students table
+SELECT student_id, email, password_hash, name 
+FROM students 
+WHERE email = 'hudasir4j@gmail.com';
+
+-- Result:
+-- student_id: huda-2025
+-- email: hudasir4j@gmail.com
+-- name: Huda A.
+-- password_hash: (bcrypt hash for "Password123")
+```
+
+#### **AI Chat Integration**
+
+**Component:** `src/components/student/AIChat.tsx`
+**Backend:** v15.2 routes (`/api/v15.2/chat`)
+**Features:**
+- v15.2 toggle (Multi-Agent with LangChain LCEL + Quality Gates)
+- 9 specialized agents (Admissions, College List, Essay, ECs, etc.)
+- Real-time quality scores
+- Student context integration
+
+**Agent Routing:**
+```typescript
+const studentId = user?.student_id || user?.id || 'huda-2025';
+
+const { messages, loading, currentAgent, sendMessage, v152Metadata } = useAgentChat({
+  studentId,
+  useV152: true,  // v15.2 enabled by default
+  studentContext: {
+    archetype: 'STEM_innovator',
+    grade: 12,
+    burnout_level: 5,
+    recent_topics: [],
+  },
+});
+```
+
+### Removed/Archived Components
+
+**❌ Removed (No Longer Used):**
+1. `/apps/test-chat-ui` - Old test UI (port 8787) - DO NOT USE
+2. `cognitoAuthService.ts` - Now wrapper around simpleAuthService (for compatibility only)
+3. `useAuthMock.tsx` - Deleted (was causing login failures)
+4. Firebase auth - Not in use
+5. Port 3004 - Old incorrect backend port
+6. Port 4101 - Old agent API reference  
+7. Port 8000 - Old API reference
+
+**✅ Archived (Available but Disabled):**
+1. v15.3 Assessment Agent - Temporarily disabled (Unicode syntax errors in AssessmentPlanner.ts)
+   - Location: `/services/agent-framework/archive/2025-10-28-v15.3-temp/`
+   - Will be re-enabled in v16.1 after fixing smart quotes
+
+### Directory Structure (Production Only)
+
+```
+ivylevel-platform-v10/
+├── unified-frontend/apps/unified-app/        # ✅ PRODUCTION FRONTEND (port 5173)
+│   ├── src/
+│   │   ├── main.tsx                          # Entry point
+│   │   ├── App.tsx                           # Main app
+│   │   ├── hooks/useAuth.tsx                 # Auth hook (uses simpleAuthService)
+│   │   ├── services/auth/
+│   │   │   ├── simpleAuthService.ts          # ✅ PRODUCTION AUTH
+│   │   │   └── cognitoAuthService.ts         # Wrapper (compatibility only)
+│   │   └── components/student/
+│   │       ├── StudentDashboard.tsx          # Main dashboard
+│   │       └── AIChat.tsx                    # v15.2 chat
+│   ├── .env                                  # VITE_API_URL=http://localhost:8787
+│   └── vite.config.ts                        # Proxy to 8787
+│
+├── services/agent-framework/                 # ✅ PRODUCTION BACKEND (port 8787)
+│   ├── src/
+│   │   ├── server-utfa.ts                    # ✅ Main server (port 8787)
+│   │   ├── routes/
+│   │   │   ├── auth.ts                       # ✅ PRODUCTION AUTH ROUTES
+│   │   │   ├── v15.2.ts                      # v15.2 LangChain routes
+│   │   │   └── [other routes]
+│   │   ├── utils/jwt.ts                      # JWT token management
+│   │   └── db/pool.ts                        # PostgreSQL connection
+│   └── archive/2025-10-28-v15.3-temp/        # v15.3 agents (temporarily disabled)
+│
+└── apps/test-chat-ui/                        # ❌ DO NOT USE (old test UI)
+```
+
+### Valid Ports (v16.0)
+
+```
+✅ 5173  - Frontend (unified-app)
+✅ 8787  - Backend (server-utfa.ts)
+✅ 5432  - PostgreSQL database
+
+❌ 3004  - INVALID (old backend port)
+❌ 4101  - INVALID (old agent API)
+❌ 8000  - INVALID (old API reference)
+```
+
+### Startup Procedure (Production)
+
+```bash
+# 1. Start Backend (Terminal 1)
+cd /Users/snazir/ivylevel-platform-v10/services/agent-framework
+PORT=8787 npx tsx src/server-utfa.ts
+
+# Verify backend is running:
+# - Should see: "KBv6 Namespaces (validated at boot)"
+# - curl http://localhost:8787/health → {"ok":true}
+
+# 2. Start Frontend (Terminal 2)
+cd /Users/snazir/ivylevel-platform-v10/unified-frontend/apps/unified-app
+npm run dev
+
+# Verify frontend is running:
+# - Should see: "Local: http://localhost:5173/"
+
+# 3. Access Application
+# Open browser: http://localhost:5173
+# Login: hudasir4j@gmail.com / Password123
+```
+
+### Testing Checklist
+
+```
+✅ Backend starts on port 8787
+✅ Frontend starts on port 5173
+✅ Login with hudasir4j@gmail.com / Password123 succeeds
+✅ User object has student_id: "huda-2025"
+✅ AI Chat loads with v15.2 toggle
+✅ Can send messages to AI agents
+✅ No errors about useAuthMock or cognitoAuthService
+✅ No attempts to connect to ports 3004, 4101, or 8000
+```
+
+### Files Modified in v16.0
+
+**Frontend:**
+- `unified-frontend/apps/unified-app/src/hooks/useAuth.tsx` - Updated to use simpleAuthService
+- `unified-frontend/apps/unified-app/src/services/auth/simpleAuthService.ts` - Created (new production auth)
+- `unified-frontend/apps/unified-app/src/services/auth/cognitoAuthService.ts` - Converted to wrapper
+- `unified-frontend/apps/unified-app/.env` - Updated VITE_API_URL to port 8787
+- `unified-frontend/apps/unified-app/vite.config.ts` - Updated proxy to port 8787
+- All auth components updated to import from useAuth (not useAuthMock)
+
+**Backend:**
+- `services/agent-framework/src/server-utfa.ts:31-32` - v15.3 import commented out (temporarily)
+- `services/agent-framework/src/server-utfa.ts:78-79` - v15.3 routes commented out (temporarily)
+- Database: Updated password hash for hudasir4j@gmail.com
+
+**Archived:**
+- `services/agent-framework/src/agents/v15.3/` → `archive/2025-10-28-v15.3-temp/`
+- `services/agent-framework/src/routes/v15.3.ts` → `archive/2025-10-28-v15.3-temp/`
+
+### Next Steps (v16.1)
+
+1. Fix Unicode smart quotes in `primitives/AssessmentPlanner.ts`
+2. Re-enable v15.3 Assessment Agent
+3. Add Assessment button back to AI Chat UI
+4. Test Universal Agent Architecture with 6-phase lifecycle
+
+---
+
+## v16.0 File Reference
+
+**Production Frontend:**
+- `/unified-frontend/apps/unified-app/src/main.tsx` - Entry point
+- `/unified-frontend/apps/unified-app/src/App.tsx` - Main app
+- `/unified-frontend/apps/unified-app/src/hooks/useAuth.tsx:64-80` - Auth hook
+- `/unified-frontend/apps/unified-app/src/services/auth/simpleAuthService.ts:58-113` - Production auth service
+- `/unified-frontend/apps/unified-app/src/components/student/StudentDashboard.tsx:982` - Mounts AIChat
+- `/unified-frontend/apps/unified-app/src/components/student/AIChat.tsx:301-326` - v15.2 chat integration
+- `/unified-frontend/apps/unified-app/.env:15,18` - API URLs (port 8787)
+- `/unified-frontend/apps/unified-app/vite.config.ts:28-36` - Proxy config
+
+**Production Backend:**
+- `/services/agent-framework/src/server-utfa.ts:415-432` - Server init (port 8787)
+- `/services/agent-framework/src/routes/auth.ts:200-265` - Production login
+- `/services/agent-framework/src/routes/v15.2.ts:18-70` - v15.2 chat endpoint
+- `/services/agent-framework/src/utils/jwt.ts` - JWT management
+- `/services/agent-framework/src/db/pool.ts` - Database connection
+
+**Database:**
+- Table: `students` (student_id, email, password_hash, name)
+- Test User: huda-2025 (hudasir4j@gmail.com)
+
+---

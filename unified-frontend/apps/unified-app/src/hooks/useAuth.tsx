@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { cognitoAuthService } from '../services/auth/cognitoAuthService';
+import { simpleAuthService } from '../services/auth/simpleAuthService';
 
 interface User {
   id: string;
@@ -47,22 +47,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const loadUser = async () => {
     setIsLoading(true);
     try {
-      const currentUser = cognitoAuthService.getCurrentUser();
-      if (currentUser && cognitoAuthService.isAuthenticated()) {
-        // Try to validate session, but don't fail if backend is down
-        try {
-          const isValid = await cognitoAuthService.validateSession();
-          if (isValid) {
-            setUser(currentUser);
-          } else {
-            setUser(null);
-            await cognitoAuthService.logout();
-          }
-        } catch (validationError) {
-          // Backend might be down, but we have a token so keep user logged in
-          console.warn('Session validation failed, using cached user:', validationError);
-          setUser(currentUser);
-        }
+      const currentUser = simpleAuthService.getCurrentUser();
+      if (currentUser && simpleAuthService.isAuthenticated()) {
+        setUser(currentUser);
       } else {
         setUser(null);
       }
@@ -75,7 +62,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const login = async (email: string, password: string) => {
-    const result = await cognitoAuthService.login(email, password);
+    const result = await simpleAuthService.login(email, password);
     if (result.success && result.user) {
       setUser(result.user);
     }
@@ -83,13 +70,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = async () => {
-    await cognitoAuthService.logout();
+    await simpleAuthService.logout();
     setUser(null);
   };
 
   const register = async (data: any) => {
-    const result = await cognitoAuthService.register(data);
-    return result;
+    // Simple auth doesn't support registration yet
+    return { success: false, error: 'Registration not supported' };
   };
 
   const updateUser = (updatedUser: User) => {

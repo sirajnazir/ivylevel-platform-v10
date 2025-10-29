@@ -10,7 +10,6 @@
 // ============================================================================
 
 export type IntentType =
-  | 'interactive_assessment' // Autonomous 360° assessment session with structured phases
   | 'gameplan_strategy'
   | 'ec_discovery'
   | 'essay_help'
