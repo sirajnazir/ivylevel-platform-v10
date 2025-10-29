@@ -5,8 +5,9 @@
  * - Initialize agents with dependencies (EventBus, Pool, FactStore)
  * - Register event handlers
  * - Provide singleton access to agents
+ * - Initialize IntelligenceRegistry with all intelligence types
  *
- * Updated: 2025-10-29 (v18.0 - Fact-First Architecture)
+ * Updated: 2025-10-29 (v18.1 - Intelligence Types Architecture)
  */
 
 import { Pool } from 'pg';
@@ -14,8 +15,11 @@ import { EventBus } from '../events/EventBus.js';
 import { GamePlanAgent } from './v18/GamePlanAgentRefactored.js';
 import { AssessmentAgent } from './v18/AssessmentAgentRefactored.js';
 import { ExtracurricularsAgentRefactored } from './v18/ExtracurricularsAgentRefactored.js';
+import { AwardsAgentRefactored } from './v18/AwardsAgentRefactored.js';
+import { SummerProgramsAgentRefactored } from './v18/SummerProgramsAgentRefactored.js';
 import { initializeFactStore } from '../facts/initializeFactStore.js';
 import { FactStore } from '../facts/FactStore.js';
+import { IntelligenceRegistry } from '../intelligence/IntelligenceRegistry.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 
 const log = createLogger('agent-registry');
@@ -30,6 +34,8 @@ export class AgentRegistry {
   private gamePlanAgent: GamePlanAgent | null = null;
   private assessmentAgent: AssessmentAgent | null = null;
   private extracurricularsAgent: ExtracurricularsAgentRefactored | null = null;
+  private awardsAgent: AwardsAgentRefactored | null = null;
+  private summerProgramsAgent: SummerProgramsAgentRefactored | null = null;
   private eventBus: EventBus | null = null;
   private pool: Pool | null = null;
   private factStore: FactStore | null = null;
@@ -50,7 +56,7 @@ export class AgentRegistry {
 
   /**
    * Initialize all agents with dependencies
-   * v18.0: Uses Fact-First Architecture with FactStore
+   * v18.1: Uses Fact-First Architecture with FactStore + Intelligence Types
    */
   async initialize(pool: Pool): Promise<void> {
     log.event('agent_registry.initialize_start', {});
@@ -64,23 +70,62 @@ export class AgentRegistry {
       log.event('agent_registry.initialize_fact_store', {});
       this.factStore = initializeFactStore(pool);
 
+      // Initialize IntelligenceRegistry with all intelligence types
+      log.event('agent_registry.initialize_intelligence_registry', {});
+      IntelligenceRegistry.initialize();
+      log.event('agent_registry.intelligence_registry_ready', {
+        intelligence_types_count: IntelligenceRegistry.count(),
+        universal_types: IntelligenceRegistry.getByCategory('UNIVERSAL').length,
+        domain_types: IntelligenceRegistry.getByCategory('DOMAIN_SPECIFIC').length,
+      });
+
       // Initialize GamePlanAgent v18 with FactStore
       this.gamePlanAgent = new GamePlanAgent(this.factStore);
-      this.gamePlanAgent.initializeEventBus(this.eventBus, pool);
+      // GamePlanAgent uses old BaseAgent pattern with EventBus
+      if (typeof (this.gamePlanAgent as any).initializeEventBus === 'function') {
+        (this.gamePlanAgent as any).initializeEventBus(this.eventBus, pool);
+      }
 
       // Initialize AssessmentAgent v18 with FactStore
       this.assessmentAgent = new AssessmentAgent(this.factStore);
-      this.assessmentAgent.initializeEventBus(this.eventBus, pool);
+      // AssessmentAgent uses old BaseAgent pattern with EventBus
+      if (typeof (this.assessmentAgent as any).initializeEventBus === 'function') {
+        (this.assessmentAgent as any).initializeEventBus(this.eventBus, pool);
+      }
 
       // Initialize ExtracurricularsAgent v18 with FactStore
       this.extracurricularsAgent = new ExtracurricularsAgentRefactored(this.factStore);
-      this.extracurricularsAgent.initializeEventBus(this.eventBus, pool);
+      // ExtracurricularsAgent uses new fact-first BaseAgent (no EventBus)
+
+      // Initialize AwardsAgent v18.1 with FactStore
+      log.event('agent_registry.initialize_awards_agent', {});
+      this.awardsAgent = new AwardsAgentRefactored(this.factStore);
+      // AwardsAgent uses new BaseAgentWithIntelligence (no EventBus)
+      log.event('agent_registry.awards_agent_ready', {
+        intelligence_types_loaded: this.awardsAgent ? 3 : 0, // TYPE-020, TYPE-023, TYPE-027
+      });
+
+      // Initialize SummerProgramsAgent v19.0 with FactStore (NEW)
+      log.event('agent_registry.initialize_summer_programs_agent', {});
+      this.summerProgramsAgent = new SummerProgramsAgentRefactored(this.factStore);
+      // SummerProgramsAgent uses new BaseAgentWithIntelligence (no EventBus)
+      log.event('agent_registry.summer_programs_agent_ready', {
+        intelligence_types_loaded: this.summerProgramsAgent ? 3 : 0, // TYPE-020, TYPE-028, TYPE-029, TYPE-030
+      });
 
       log.event('agent_registry.initialize_complete', {
-        agents_initialized: ['GamePlanAgent-v18', 'AssessmentAgent-v18', 'ExtracurricularsAgent-v18'],
+        agents_initialized: [
+          'GamePlanAgent-v18',
+          'AssessmentAgent-v18',
+          'ExtracurricularsAgent-v18',
+          'AwardsAgent-v18.1',
+          'SummerProgramsAgent-v19.0',
+        ],
         event_bus_ready: true,
         fact_store_ready: true,
+        intelligence_registry_ready: true,
         fact_sources_registered: this.factStore.getRegisteredCategories().length,
+        intelligence_types_registered: IntelligenceRegistry.count(),
       });
     } catch (error) {
       log.error('agent_registry.initialize_error', {
@@ -118,6 +163,26 @@ export class AgentRegistry {
       throw new Error('ExtracurricularsAgent not initialized. Call initialize() first.');
     }
     return this.extracurricularsAgent;
+  }
+
+  /**
+   * Get AwardsAgent instance
+   */
+  getAwardsAgent(): AwardsAgentRefactored {
+    if (!this.awardsAgent) {
+      throw new Error('AwardsAgent not initialized. Call initialize() first.');
+    }
+    return this.awardsAgent;
+  }
+
+  /**
+   * Get SummerProgramsAgent instance
+   */
+  getSummerProgramsAgent(): SummerProgramsAgentRefactored {
+    if (!this.summerProgramsAgent) {
+      throw new Error('SummerProgramsAgent not initialized. Call initialize() first.');
+    }
+    return this.summerProgramsAgent;
   }
 
   /**
@@ -160,7 +225,7 @@ export class AgentRegistry {
 
   /**
    * Route query to appropriate agent
-   * v18.0: Simple routing logic - routes queries based on intent
+   * v18.1: Routes queries based on intent with Awards Agent support
    */
   async routeQuery(params: {
     student_id: string;
@@ -181,7 +246,82 @@ export class AgentRegistry {
 
     const lowerQuery = query.toLowerCase();
 
-    // Check for extracurriculars queries (highest priority for EC-specific terms)
+    // Check for awards queries (highest priority for award-specific terms)
+    const isAwardsQuery =
+      lowerQuery.includes('award') ||
+      lowerQuery.includes('competition') ||
+      lowerQuery.includes('honor') ||
+      lowerQuery.includes('recognition') ||
+      lowerQuery.includes('win') ||
+      lowerQuery.includes('ncwit') ||
+      lowerQuery.includes('congressional app') ||
+      lowerQuery.includes('scholastic') ||
+      lowerQuery.includes('quick win') ||
+      lowerQuery.includes('momentum') ||
+      lowerQuery.includes('what awards');
+
+    if (isAwardsQuery) {
+      // Route to AwardsAgent
+      const awardsAgent = this.getAwardsAgent();
+      const result = await awardsAgent.handleQuery({
+        entity_id: student_id,
+        query,
+        session_id,
+      });
+
+      return {
+        response: result.response,
+        agent_used: 'AwardsAgent-v18.1',
+        metadata: {
+          ...result.metadata,
+          facts_used_count: result.facts_used.length,
+          validation_score: result.validation_score,
+          intelligence_triggered: result.triggered_intelligence || [],
+        },
+      };
+    }
+
+    // Check for summer programs queries (v19.0 - NEW)
+    const isSummerProgramsQuery =
+      lowerQuery.includes('summer program') ||
+      lowerQuery.includes('summer course') ||
+      lowerQuery.includes('summer opportunity') ||
+      lowerQuery.includes('summer research') ||
+      lowerQuery.includes('summer plan') ||
+      lowerQuery.includes('summer activit') ||
+      lowerQuery.includes('program recommend') ||
+      lowerQuery.includes('which program') ||
+      lowerQuery.includes('what program') ||
+      lowerQuery.includes('mit launch') ||
+      lowerQuery.includes('rsi') ||
+      lowerQuery.includes('columbia science') ||
+      lowerQuery.includes('garcia') ||
+      lowerQuery.includes('sstp') ||
+      lowerQuery.includes('yygs') ||
+      lowerQuery.includes('tasp');
+
+    if (isSummerProgramsQuery) {
+      // Route to SummerProgramsAgent
+      const summerProgramsAgent = this.getSummerProgramsAgent();
+      const result = await summerProgramsAgent.handleQuery({
+        entity_id: student_id,
+        query,
+        session_id,
+      });
+
+      return {
+        response: result.response,
+        agent_used: 'SummerProgramsAgent-v19.0',
+        metadata: {
+          ...result.metadata,
+          facts_used_count: result.facts_used.length,
+          validation_score: result.validation_score,
+          intelligence_triggered: result.triggered_intelligence || [],
+        },
+      };
+    }
+
+    // Check for extracurriculars queries (high priority for EC-specific terms)
     const isExtracurricularsQuery =
       lowerQuery.includes('extracurricular') ||
       lowerQuery.includes('activities list') ||
@@ -267,11 +407,17 @@ export class AgentRegistry {
 
     // Default fallback: return helpful message
     return {
-      response: "I can help you with:\n• Game plan and strategic roadmap\n• Profile assessment and strengths\n• Extracurriculars portfolio optimization\n\nTry asking: 'What is my game plan?', 'Show me my assessment', or 'How can I improve my extracurriculars?'",
+      response: "I can help you with:\n• Game plan and strategic roadmap\n• Profile assessment and strengths\n• Extracurriculars portfolio optimization\n• Award recommendations and quick wins strategy\n• Summer program selection and application strategy (NEW in v19.0)\n\nTry asking: 'What is my game plan?', 'Show me my assessment', 'How can I improve my extracurriculars?', 'What awards should I apply to?', or 'What summer programs should I apply to?'",
       agent_used: 'agent-registry-fallback',
       metadata: {
         intent: 'unknown',
-        available_agents: ['GamePlanAgent-v18', 'AssessmentAgent-v18', 'ExtracurricularsAgent-v18'],
+        available_agents: [
+          'GamePlanAgent-v18',
+          'AssessmentAgent-v18',
+          'ExtracurricularsAgent-v18',
+          'AwardsAgent-v18.1',
+          'SummerProgramsAgent-v19.0',
+        ],
       },
     };
   }
