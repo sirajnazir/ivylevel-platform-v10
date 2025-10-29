@@ -31,9 +31,12 @@ import { v12Router } from './routes/v12.0.js';
 import { v152Router } from './routes/v15.2.js';
 import { v153Router } from './routes/v15.3.js'; // v16.1 - Real EQ intelligence integrated
 import { v170Router } from './routes/v17.0.js'; // v17.0 - Full orchestration with StrategyOrchestrator
+import { v18Router } from './routes/v18.0.js'; // v18.0 - GamePlan dynamic adaptive features
 import { assertIndexParity } from './retrieval/pinecone.js';
 import { CFG } from './config/env.js';
 import authRouter from './routes/auth.js';
+import { AgentRegistry } from './agents/registry.js';
+import { scheduleQuarterlyReviewJob } from './cron/quarterly-review-job.js';
 
 const app = express();
 
@@ -81,6 +84,9 @@ app.use('/api/v15.3', v153Router); // v16.1 - Real EQ intelligence from iMessage
 
 // Mount v17.0 routes (Enhanced Assessment Agent with Full Orchestration)
 app.use('/api/v17.0', v170Router); // v17.0 - Complete v15.2 orchestration pipeline
+
+// Mount v18.0 routes (GamePlan Dynamic Adaptive Features)
+app.use('/api/v18', v18Router(pool)); // v18.0 - Revisions, quarterly reviews, events, parallel plans
 
 // Mount auth routes
 app.use('/api/auth', authRouter);
@@ -435,6 +441,17 @@ const port = process.env.PORT || 8787;
 
     // Assert index/embedding parity (fails fast on mismatch)
     await assertIndexParity(3072, 'text-embedding-3-large');
+
+    // Initialize Agent Registry (v18.0 - GamePlanAgent with EventBus)
+    console.log('[BOOT] Initializing Agent Registry...');
+    const agentRegistry = AgentRegistry.getInstance();
+    await agentRegistry.initialize(pool);
+    console.log('[BOOT] Agent Registry initialized successfully');
+
+    // Schedule Quarterly Review Cron Job (v18.0)
+    console.log('[BOOT] Scheduling Quarterly Review Cron Job...');
+    scheduleQuarterlyReviewJob(pool);
+    console.log('[BOOT] Quarterly Review Cron Job scheduled (daily at 9:00 AM)');
 
     // Start server after validation passes
     app.listen(port, () => {
