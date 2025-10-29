@@ -13,6 +13,7 @@
 
 import OpenAI from 'openai';
 import { Pinecone } from '@pinecone-database/pinecone';
+import { getGroundingFacts as getGroundingFactsFromDB } from '../services/studentDataService.js';
 
 // Engineered context output
 export interface EngineeredContext {
@@ -199,34 +200,14 @@ export class ContextEngineeringPipeline {
     studentId: string,
     state: StudentContextInput['state']
   ): Promise<string[]> {
-    // In production, this would query the database
-    // For now, use the state provided
+    // Query real database for SQL-grounded facts
+    const dbFacts = await getGroundingFactsFromDB(studentId);
 
-    const facts: string[] = [
-      `Student ID: ${studentId}`,
-      `GPA: ${state.gpa}`,
-    ];
+    // Add calculated state metrics
+    dbFacts.push(`Burnout level: ${Math.round(state.burnout_level * 100)}%`);
+    dbFacts.push(`Momentum: ${Math.round(state.momentum * 100)}%`);
 
-    if (state.test_scores?.sat) {
-      facts.push(`SAT: ${state.test_scores.sat}`);
-    }
-
-    if (state.test_scores?.act) {
-      facts.push(`ACT: ${state.test_scores.act}`);
-    }
-
-    if (state.ec_count !== undefined) {
-      facts.push(`Extracurriculars: ${state.ec_count} activities`);
-    }
-
-    if (state.leadership_positions !== undefined) {
-      facts.push(`Leadership positions: ${state.leadership_positions}`);
-    }
-
-    facts.push(`Burnout level: ${Math.round(state.burnout_level * 100)}%`);
-    facts.push(`Momentum: ${Math.round(state.momentum * 100)}%`);
-
-    return facts;
+    return dbFacts;
   }
 
   /**

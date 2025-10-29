@@ -10,9 +10,14 @@
  */
 
 import OpenAI from 'openai';
-import { IntentRouterService, StudentContext } from '../routing/IntentRouterService';
-import { ContextEngineeringPipeline, CoachPersona, StudentContextInput } from '../context/ContextEngineeringPipeline';
-import { ReflectionService } from '../reflection/ReflectionService';
+import { IntentRouterService, StudentContext } from '../routing/IntentRouterService.js';
+import { ContextEngineeringPipeline, CoachPersona, StudentContextInput } from '../context/ContextEngineeringPipeline.js';
+import { ReflectionService } from '../reflection/ReflectionService.js';
+import {
+  getStudentContext as getStudentContextFromDB,
+  getStudentContextInput as getStudentContextInputFromDB,
+  getCoachPersona as getCoachPersonaFromDB,
+} from '../services/studentDataService.js';
 
 // Strategy execution input
 export interface StrategyExecutionInput {
@@ -251,63 +256,24 @@ Please provide coaching advice that matches YOUR style while staying grounded in
    * Get student context for intent classification
    */
   private async getStudentContext(studentId: string): Promise<StudentContext> {
-    // In production, query database
-    // For now, use defaults
-    return {
-      student_id: studentId,
-      archetype: 'high_achiever',
-      grade: 11,
-      burnout_level: 0.35,
-    };
+    // Query real database for student context
+    return await getStudentContextFromDB(studentId);
   }
 
   /**
    * Get student context input for context engineering
    */
   private async getStudentContextInput(studentId: string): Promise<StudentContextInput> {
-    // In production, query database
-    // For now, use defaults
-    return {
-      student_id: studentId,
-      current_query: '',
-      archetype: 'high_achiever',
-      state: {
-        burnout_level: 0.35,
-        momentum: 0.75,
-        gpa: 3.98,
-        test_scores: { sat: 1520 },
-        ec_count: 12,
-        leadership_positions: 4,
-      },
-    };
+    // Query real database for detailed student context
+    return await getStudentContextInputFromDB(studentId);
   }
 
   /**
    * Get coach persona (EQ profile)
    */
   private async getCoachPersona(coachId: string): Promise<CoachPersona> {
-    // In production, query database or load from file
-    // For now, use Jenny's default profile
-    return {
-      coach_id: coachId,
-      coach_name: 'Jenny',
-      eq_profile: {
-        warmth: 0.85,
-        directness: 0.70,
-        humor: 0.65,
-        empathy: 0.90,
-        cheerfulness: 0.80,
-      },
-      linguistic_style: {
-        formality: 0.4,
-        enthusiasm: 0.8,
-        emoji_use: true,
-      },
-      intervention_style: {
-        directive_ratio: 0.4,
-        socratic_ratio: 0.6,
-      },
-    };
+    // Query real database for coach persona
+    return await getCoachPersonaFromDB(coachId);
   }
 }
 
