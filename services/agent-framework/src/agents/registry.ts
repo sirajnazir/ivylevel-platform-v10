@@ -13,6 +13,7 @@ import { Pool } from 'pg';
 import { EventBus } from '../events/EventBus.js';
 import { GamePlanAgent } from './v18/GamePlanAgentRefactored.js';
 import { AssessmentAgent } from './v18/AssessmentAgentRefactored.js';
+import { ExtracurricularsAgentRefactored } from './v18/ExtracurricularsAgentRefactored.js';
 import { initializeFactStore } from '../facts/initializeFactStore.js';
 import { FactStore } from '../facts/FactStore.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
@@ -28,6 +29,7 @@ export class AgentRegistry {
 
   private gamePlanAgent: GamePlanAgent | null = null;
   private assessmentAgent: AssessmentAgent | null = null;
+  private extracurricularsAgent: ExtracurricularsAgentRefactored | null = null;
   private eventBus: EventBus | null = null;
   private pool: Pool | null = null;
   private factStore: FactStore | null = null;
@@ -70,8 +72,12 @@ export class AgentRegistry {
       this.assessmentAgent = new AssessmentAgent(this.factStore);
       this.assessmentAgent.initializeEventBus(this.eventBus, pool);
 
+      // Initialize ExtracurricularsAgent v18 with FactStore
+      this.extracurricularsAgent = new ExtracurricularsAgentRefactored(this.factStore);
+      this.extracurricularsAgent.initializeEventBus(this.eventBus, pool);
+
       log.event('agent_registry.initialize_complete', {
-        agents_initialized: ['GamePlanAgent-v18', 'AssessmentAgent-v18'],
+        agents_initialized: ['GamePlanAgent-v18', 'AssessmentAgent-v18', 'ExtracurricularsAgent-v18'],
         event_bus_ready: true,
         fact_store_ready: true,
         fact_sources_registered: this.factStore.getRegisteredCategories().length,
@@ -102,6 +108,16 @@ export class AgentRegistry {
       throw new Error('AssessmentAgent not initialized. Call initialize() first.');
     }
     return this.assessmentAgent;
+  }
+
+  /**
+   * Get ExtracurricularsAgent instance
+   */
+  getExtracurricularsAgent(): ExtracurricularsAgentRefactored {
+    if (!this.extracurricularsAgent) {
+      throw new Error('ExtracurricularsAgent not initialized. Call initialize() first.');
+    }
+    return this.extracurricularsAgent;
   }
 
   /**
@@ -165,14 +181,43 @@ export class AgentRegistry {
 
     const lowerQuery = query.toLowerCase();
 
+    // Check for extracurriculars queries (highest priority for EC-specific terms)
+    const isExtracurricularsQuery =
+      lowerQuery.includes('extracurricular') ||
+      lowerQuery.includes('activities list') ||
+      lowerQuery.includes('ec portfolio') ||
+      lowerQuery.includes('cookie cutter') ||
+      lowerQuery.includes('narrative alignment') ||
+      lowerQuery.includes('tier classification') ||
+      lowerQuery.includes('improve my activities');
+
+    if (isExtracurricularsQuery) {
+      // Route to ExtracurricularsAgent
+      const ecAgent = this.getExtracurricularsAgent();
+      const result = await ecAgent.handleQuery({
+        entity_id: student_id,
+        query,
+        session_id,
+      });
+
+      return {
+        response: result.response,
+        agent_used: 'ExtracurricularsAgent-v18',
+        metadata: {
+          ...result.metadata,
+          facts_used_count: result.facts_used.length,
+          validation_score: result.validation_score,
+        },
+      };
+    }
+
     // Check for assessment queries
     const isAssessmentQuery =
       lowerQuery.includes('assessment') ||
       lowerQuery.includes('evaluate') ||
       lowerQuery.includes('strengths') ||
       lowerQuery.includes('weaknesses') ||
-      lowerQuery.includes('profile') ||
-      lowerQuery.includes('activities');
+      lowerQuery.includes('profile');
 
     if (isAssessmentQuery) {
 
@@ -222,11 +267,11 @@ export class AgentRegistry {
 
     // Default fallback: return helpful message
     return {
-      response: "I can help you with:\n• Game plan and strategic roadmap\n• Profile assessment and strengths\n\nTry asking: 'What is my game plan?' or 'Show me my assessment.'",
+      response: "I can help you with:\n• Game plan and strategic roadmap\n• Profile assessment and strengths\n• Extracurriculars portfolio optimization\n\nTry asking: 'What is my game plan?', 'Show me my assessment', or 'How can I improve my extracurriculars?'",
       agent_used: 'agent-registry-fallback',
       metadata: {
         intent: 'unknown',
-        available_agents: ['GamePlanAgent-v18', 'AssessmentAgent-v18'],
+        available_agents: ['GamePlanAgent-v18', 'AssessmentAgent-v18', 'ExtracurricularsAgent-v18'],
       },
     };
   }

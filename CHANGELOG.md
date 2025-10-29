@@ -1,8 +1,8 @@
 # Changelog
 
-## [2025-10-29 20:00] v18.0: Fact-First Architecture with Universal Primitives
+## [2025-10-29 22:00] v18.0: Fact-First Architecture + ExtracurricularsAgent (70+ Coaching Intelligence Chips)
 
-**Summary:** Architectural revolution - Eliminate hallucination at the system level through universal Fact-First primitives. Refactored GamePlanAgent and AssessmentAgent to extend BaseAgent abstract class, enforcing fact-only responses with full provenance tracking. Zero-hallucination guaranteed by design.
+**Summary:** Architectural revolution - Eliminate hallucination at the system level through universal Fact-First primitives. Refactored GamePlanAgent, AssessmentAgent, and ExtracurricularsAgent to extend BaseAgent abstract class, enforcing fact-only responses with full provenance tracking. Added comprehensive Coaching Intelligence Catalog with 70+ frameworks extracted from 93 weeks of real coaching data. Zero-hallucination guaranteed by design.
 
 **Core Architecture - 4 Universal Primitives:**
 1. **FactStore** (services/agent-framework/src/facts/FactStore.ts - 139 lines) - Central registry for all facts across sources
@@ -20,13 +20,17 @@
 - services/agent-framework/src/facts/sources/PostgresFactSource.ts (283 lines) - DB facts
 - services/agent-framework/src/agents/v18/GamePlanAgentRefactored.ts (350+ lines) - Refactored
 - services/agent-framework/src/agents/v18/AssessmentAgentRefactored.ts (300+ lines) - Refactored
+- services/agent-framework/src/agents/v18/ExtracurricularsAgentRefactored.ts (850+ lines) - NEW EC Agent
 
 **Modified Files:**
-- services/agent-framework/src/agents/registry.ts:16-17,62-71 - FactStore integration
+- services/agent-framework/src/agents/registry.ts:16,32,76-77,116-121,185-212 - FactStore + EC Agent integration
 
 **Documentation Created:**
 - docs/agents/GAMEPLAN_AGENT_TECH_SPEC.md (1,962 lines) - Complete gold standard spec with Knowledge Moat & Scalability sections
-- docs/PROD_FEATURE_RELEASE_DETAILS.md - Updated with v18.0 section
+- docs/agents/EXTRACURRICULARS_AGENT_TECH_SPEC.md (32,000+ words) - NEW EC Agent spec with 70+ coaching intelligence chips
+- docs/COACHING_INTELLIGENCE_CATALOG_SPEC.md (Previously created) - Intelligence chip schema and storage strategy
+- docs/AGENT_INTELLIGENCE_EXTRACTION_PROMPT.md (Previously created) - Reusable intelligence extraction template
+- docs/PROD_FEATURE_RELEASE_DETAILS.md - Updated with v18.0 ExtracurricularsAgent section
 - CHANGELOG.md - This entry
 
 **BaseAgent Enforcement:**
@@ -51,7 +55,21 @@
 **Agent Refactoring Status:**
 - ✅ GamePlanAgent v18.0 - Refactored, extends BaseAgent
 - ✅ AssessmentAgent v18.0 - Refactored, extends BaseAgent
-- ⏳ Remaining 8 agents - Awaiting refactoring (ExtracurricularsAgent, AwardsAgent, EssayAgent, CollegeListAgent, ScholarshipAgent, WeeklyExecutionAgent, AdmissionsAgent, SummerProgramsAgent)
+- ✅ ExtracurricularsAgent v18.0 - NEW, extends BaseAgent, 70+ coaching intelligence chips integrated
+- ⏳ Remaining 7 agents - Awaiting refactoring (AwardsAgent, EssayAgent, CollegeListAgent, ScholarshipAgent, WeeklyExecutionAgent, AdmissionsAgent, SummerProgramsAgent)
+
+**ExtracurricularsAgent Intelligence (70+ Frameworks):**
+- Tier 1 Foundational (6 chips): Profile Trinity, 10 Activities Framework, 168-Hour Architecture, Narrative Coherence, Cookie-Cutter Detection, Exploration→Selection→Depth
+- Tier 2 Tactical (18 chips): Task Multiplication 5X, Formalization Ladder, 10-50 Rule, Synchronous Send, Role Threat, and 13 more
+- Tier 3 Meta-Intelligence (12 chips): Strategic Pivot Protocol (48-72h), Award Arbitrage System, Impact Scaling Hierarchy, Cookie-Cutter Confrontation, and 8 more
+- Tier 4 Measurement (5 chips): Tier Classification (T1-T4), EC-Narrative Alignment Score, Metric Ladder (M0→M4), Hours Reality Check, Leadership Title Engineering
+
+**EC Agent Core Capabilities:**
+- Portfolio Audit: Tier classification (T1-T4), cookie-cutter detection, narrative alignment scoring
+- Profile Trinity Evaluation: Aptitude × Passion × Service scoring with gap identification
+- Time Architecture: 168-Hour reality check validates claimed hours vs. availability
+- Gap Analysis: Trinity gaps, leadership gaps, impact gaps with prioritized fixes
+- Strategic Recommendations: Activity addition, pruning, impact escalation, pivoting with timelines
 
 **Example Validation:**
 ```typescript
@@ -63,7 +81,7 @@
 }
 ```
 
-**Next:** v18.1 will refactor remaining 8 agents to extend BaseAgent
+**Next:** v18.1 will refactor remaining 7 agents to extend BaseAgent (AwardsAgent priority, then EssayAgent)
 
 ---
 
