@@ -1,11 +1,11 @@
 # IvyLevel Platform - Production Database Architecture
 # v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v13.0 → v14.0 Growth Journey
 
-**Document Version:** v14.0
-**Last Updated:** 2025-10-28
-**Status:** ✅ PRODUCTION READY - Enhanced Growth Transformations Timeline with Complete 2-Year Journey
+**Document Version:** v18.0
+**Last Updated:** 2025-10-29
+**Status:** ✅ PRODUCTION READY - Fact-First Architecture Database Integration
 **Database:** PostgreSQL 14+
-**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.8 Universal Academic Schema + v11.0 Action Plans + v12.0 Game Plan JSONB + v13.0 Assessment Visualization + v14.0 Timeline Enrichment
+**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.8 Universal Academic Schema + v11.0 Action Plans + v12.0 Game Plan JSONB + v13.0 Assessment Visualization + v14.0 Timeline Enrichment + v18.0 FactStore Integration
 
 ---
 
@@ -25,11 +25,13 @@ This is the **single source of truth** for IvyLevel's production database schema
 10. **v12.0** - Game Plan JSONB data model enhancement (NO schema changes)
 11. **v13.0** - Assessment Tab visualization (NO schema changes - UI only)
 12. **v14.0** - Timeline Events enrichment with 30 new transformation milestones
-13. **Current Tables & Views** - What actually exists in production
-14. **Sample Data** - Real Jenny-Huda data with complete Common App submission + Game Plan + Enriched Timeline
-15. **Verified Data Integrity** - Comprehensive testing validates all queries
+13. **v18.0** - FactStore Integration with PostgresFactSource for Fact-First Architecture (NO schema changes - enhanced data access layer)
+14. **Current Tables & Views** - What actually exists in production
+15. **Sample Data** - Real Jenny-Huda data with complete Common App submission + Game Plan + Enriched Timeline
+16. **Verified Data Integrity** - Comprehensive testing validates all queries
+17. **Fact-First Data Access** - PostgresFactSource extracts facts from existing tables with complete provenance tracking
 
-**Key Principle:** All data references use REAL student data from Huda's actual UNC Chapel Hill Early Action submission (student_id: 'huda-2025'). Universal schema design enables support for any student type (STEM, Arts, Athletics, IB) while maintaining complete accuracy with final college applications. v14.0 enriches existing timeline_events table with 30 transformation milestones extracted from growth_events, vital_facts, kb_items, and weekly_vitals - demonstrating first-principles data enrichment: comprehensive timeline population WITHOUT schema changes, just intelligent data extraction and migration.
+**Key Principle:** All data references use REAL student data from Huda's actual UNC Chapel Hill Early Action submission (student_id: 'huda-2025'). Universal schema design enables support for any student type (STEM, Arts, Athletics, IB) while maintaining complete accuracy with final college applications. v14.0 enriches existing timeline_events table with 30 transformation milestones extracted from growth_events, vital_facts, kb_items, and weekly_vitals. v18.0 adds Fact-First data access layer (PostgresFactSource) that extracts structured facts from existing tables with complete provenance tracking - demonstrating zero-hallucination data access WITHOUT schema changes, just intelligent fact extraction and validation.
 
 ---
 
@@ -1890,6 +1892,19 @@ v15_003_student_context_intelligence.sql (Oct 2024, Week 15)
 v15_004_weekly_execution_infrastructure.sql (Oct 2024, Week 15)
   - Created execution_checklist table
   - Status: ⚠️ PARTIAL (table exists, weekly execution agent incomplete)
+
+v18.0 Fact-First Data Access Layer (Oct 2024)
+  - NO SCHEMA CHANGES - Enhanced data access only
+  - Created PostgresFactSource (services/agent-framework/src/facts/sources/PostgresFactSource.ts - 283 lines)
+  - Fact extraction from existing tables:
+    * game_plans.profile_assessment → ASSESSMENT_DATA facts (narrative, weak_spots, strengths)
+    * game_plans.extracurricular_activities → ACTIVITY_DATA facts (10 activities with hours, roles, metrics)
+    * vital_facts → STUDENT_PROFILE facts (demographics, GPA, test scores)
+    * kb_items → AWARDS, PROGRAMS facts (enumeration data)
+  - Full provenance tracking (source_id, source_table, timestamp, confidence_score)
+  - FactStore registry integrates all fact sources (internal DB + future external APIs)
+  - Zero hallucination enforcement: All agent responses validated against facts
+  - Status: ✅ COMPLETE (3 agents refactored: GamePlan, Assessment, Extracurriculars)
 ```
 
 ---

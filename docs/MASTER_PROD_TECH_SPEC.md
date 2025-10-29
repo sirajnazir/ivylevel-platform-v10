@@ -3,9 +3,9 @@
 
 **Document Version:** v18.0
 **Last Updated:** 2025-10-29
-**Status:** ✅ PRODUCTION READY - DYNAMIC ADAPTIVE GAMEPLAN AGENT DEPLOYED
-**Platform Version:** v18.0 (GamePlan Agent with Dynamic Adaptive Primitives + Event-Driven Architecture)
-**Architecture:** Universal Agent Framework + Multi-Agent + Zero-Hallucination + Production Infrastructure + Unified Authentication + v15.2 Enhanced Chat + v18.0 Dynamic GamePlan
+**Status:** ✅ PRODUCTION READY - FACT-FIRST ARCHITECTURE + 3 AGENTS REFACTORED
+**Platform Version:** v18.0 (Fact-First Architecture + ExtracurricularsAgent with 70+ Coaching Intelligence Chips)
+**Architecture:** Fact-First Universal Primitives + BaseAgent Abstract Class + Zero-Hallucination by Design + FactStore Registry + 3 v18.0 Agents (GamePlan, Assessment, Extracurriculars) + Coaching Intelligence Catalog
 
 ---
 
@@ -27,7 +27,8 @@ This is the **single source of truth** for IvyLevel's production technical archi
 12. **v12.1** - Comprehensive Ivy+ Ready Scoring Assessment API (Backend + Frontend Integration)
 13. **v13.0** - Enhanced Assessment Tab UI with Dynamic Scoring Visualization (Circular Progress Rings + Real-Time Calculations)
 14. **v14.0** - Enhanced Growth Transformations Timeline with Complete 2-Year Journey (Growth Journey Tab + Timeline Data Enrichment)
-15. **Current State** - Production-ready with comprehensive Growth Journey visualization: 93 timeline events spanning 2023-2025 showing complete college prep transformation. Includes 11 HGTI breakthrough moments, 8 project scaling milestones (Empowering AI: $0→$23K, Synthoria: 150→6,400 students), 3 SAT progression events (1360→1530), 6 major awards, 5 summer programs, 56 applications, and 4 phase transitions. Event-type-specific color coding, year-based grouping, interactive timeline display with stats summary. All data extracted from growth_events, vital_facts, kb_items, and weekly_vitals tables.
+15. **v18.0** - Fact-First Architecture with Universal Primitives + ExtracurricularsAgent (Zero Hallucination by Design + 70+ Coaching Intelligence Chips)
+16. **Current State** - Production-ready with Fact-First architecture enforcing zero hallucination at system level. 3 agents refactored (GamePlan, Assessment, Extracurriculars) extending BaseAgent abstract class. ExtracurricularsAgent powered by 70+ coaching frameworks extracted from 93 weeks of real coaching data: Profile Trinity evaluation, Cookie-Cutter Detection, 168-Hour Architecture, Task Multiplication (5X Formula), Strategic Pivot Protocol (48-72h), Award Arbitrage System, Impact Scaling Hierarchy (M0→M4). All agent responses validated against FactStore registry with complete provenance tracking. Comprehensive Growth Journey visualization with 93 timeline events remains active.
 
 **Key Principle:** v14.0 is ADDITIVE - All previous layers (v14 → v13.0) preserved and enhanced with Growth Transformations Timeline featuring comprehensive 2-year journey data enrichment (30 new transformation events added) balanced across Foundation (2023), Build (2024), and Decision (2025) phases with full qualitative + quantitative transformation tracking.
 
@@ -1115,20 +1116,37 @@ const getAOPerspectivesTool = {
 ```
 services/agent-framework/
 ├── src/
-│   ├── agents/                      # 8 specialist agents (1 autonomous + 7 reactive)
-│   │   ├── AssessmentAgent.ts       # 531 lines (AUTONOMOUS - event-driven)
-│   │   ├── GamePlanAgent.ts         # 148 lines
-│   │   ├── CollegeListAgent.ts      # 265 lines
-│   │   ├── EssayAgent.ts            # 230 lines (Week 11)
-│   │   ├── AdmissionsAgent.ts       # 272 lines (Week 11)
-│   │   ├── ExtracurricularsAgent.ts # 171 lines
-│   │   ├── AwardsAgent.ts           # 195 lines
-│   │   ├── SummerProgramsAgent.ts   # 223 lines
-│   │   └── AutonomousGamePlanAgent.ts # 588 lines (Week 15, partial - superseded by AssessmentAgent)
+│   ├── agents/                      # Agent architecture (v18.0 Fact-First)
+│   │   ├── BaseAgent.ts             # 120 lines - v18.0 Universal abstract class (ENFORCES FACT-FIRST)
+│   │   ├── registry.ts              # 280 lines - Agent initialization & routing
+│   │   │
+│   │   ├── v18/                     # v18.0 Fact-First Refactored Agents (3 COMPLETE, 7 PENDING)
+│   │   │   ├── GamePlanAgentRefactored.ts         # 350+ lines ✅ v18.0
+│   │   │   ├── AssessmentAgentRefactored.ts       # 300+ lines ✅ v18.0
+│   │   │   └── ExtracurricularsAgentRefactored.ts # 850+ lines ✅ v18.0 NEW (70+ coaching intelligence chips)
+│   │   │
+│   │   └── [LEGACY - Pre-v18.0 agents]
+│   │       ├── AssessmentAgent.ts       # 531 lines (SUPERSEDED by v18/AssessmentAgentRefactored.ts)
+│   │       ├── GamePlanAgent.ts         # 148 lines (SUPERSEDED by v18/GamePlanAgentRefactored.ts)
+│   │       ├── CollegeListAgent.ts      # 265 lines (PENDING v18.0 refactor)
+│   │       ├── EssayAgent.ts            # 230 lines (PENDING v18.0 refactor)
+│   │       ├── AdmissionsAgent.ts       # 272 lines (PENDING v18.0 refactor)
+│   │       ├── ExtracurricularsAgent.ts # 171 lines (SUPERSEDED by v18/ExtracurricularsAgentRefactored.ts)
+│   │       ├── AwardsAgent.ts           # 195 lines (PENDING v18.0 refactor - NEXT PRIORITY)
+│   │       └── SummerProgramsAgent.ts   # 223 lines (PENDING v18.0 refactor)
 │   │
-│   ├── core/                        # Core agent framework
-│   │   ├── BaseAgent.ts             # 409 lines - Base class
-│   │   ├── AgentRegistry.ts         # 89 lines - Agent routing
+│   ├── facts/                       # v18.0 Fact-First Architecture (NEW)
+│   │   ├── FactStore.ts             # 139 lines - Central fact registry
+│   │   ├── FactSet.ts               # 110 lines - Type-safe fact utilities
+│   │   ├── FactValidator.ts         # 191 lines - Hallucination prevention
+│   │   ├── types.ts                 # 80 lines - Fact interfaces
+│   │   ├── initializeFactStore.ts   # 61 lines - Initialization
+│   │   └── sources/
+│   │       └── PostgresFactSource.ts # 283 lines - Database fact provider
+│   │
+│   ├── core/                        # Core agent framework (LEGACY - Pre-v18.0)
+│   │   ├── BaseAgent.ts             # 409 lines - SUPERSEDED by agents/BaseAgent.ts (v18.0)
+│   │   ├── AgentRegistry.ts         # 89 lines - SUPERSEDED by agents/registry.ts (v18.0)
 │   │   ├── SessionManager.ts        # 362 lines - Session mgmt
 │   │   └── types.ts                 # 245 lines - TypeScript types
 │   │
