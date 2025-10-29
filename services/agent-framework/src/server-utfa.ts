@@ -30,6 +30,7 @@ import { v10Router } from './routes/v10.0.js';
 import { v12Router } from './routes/v12.0.js';
 import { v152Router } from './routes/v15.2.js';
 import { v153Router } from './routes/v15.3.js'; // v16.1 - Real EQ intelligence integrated
+import { v170Router } from './routes/v17.0.js'; // v17.0 - Full orchestration with StrategyOrchestrator
 import { assertIndexParity } from './retrieval/pinecone.js';
 import { CFG } from './config/env.js';
 import authRouter from './routes/auth.js';
@@ -77,6 +78,9 @@ app.use('/api/v15.2', v152Router);
 
 // Mount v15.3 routes (Universal Agent Architecture + Assessment Agent)
 app.use('/api/v15.3', v153Router); // v16.1 - Real EQ intelligence from iMessages
+
+// Mount v17.0 routes (Enhanced Assessment Agent with Full Orchestration)
+app.use('/api/v17.0', v170Router); // v17.0 - Complete v15.2 orchestration pipeline
 
 // Mount auth routes
 app.use('/api/auth', authRouter);

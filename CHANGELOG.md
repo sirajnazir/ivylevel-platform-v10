@@ -1,5 +1,32 @@
 # Changelog
 
+## [2025-10-28 06:15] v17.1: Assessment Agent Integration with API Routes
+
+**Summary:** Connected v17.0 StrategyOrchestrator to production HTTP endpoints. Created `/api/v17.0/assessment/chat` route with full orchestration pipeline, streaming support, health checks, and version info. Enables real frontend integration and testing with actual student accounts. Zero breaking changes to existing v15.3 endpoints.
+
+**New API Routes (services/agent-framework/src/routes/v17.0.ts):**
+- POST /api/v17.0/assessment/chat - Full orchestration with metadata (intent, quality_score, iterations, latency)
+- POST /api/v17.0/assessment/chat/streaming - Server-Sent Events for real-time UX
+- GET /api/v17.0/health - Orchestrator health check
+- GET /api/v17.0/version - Feature list and quality targets
+- GET /api/v17.0/features - Comparison with v15.3
+
+**Server Integration (services/agent-framework/src/server-utfa.ts):**
+- Line 33: Import v170Router
+- Line 83: Mount at /api/v17.0
+
+**Feature Flag:** USE_V17_ORCHESTRATOR env var for gradual rollout (default: false)
+
+**Impact:**
+- Frontend can now test with real Huda account
+- Performance metrics collection operational
+- Quality score tracking enabled
+- Existing v15.3 unchanged, both endpoints coexist
+
+**Next:** v17.2 will connect to real Postgres database and measure quality/latency targets
+
+---
+
 ## [2025-10-28 05:30] v17.0: Complete Assessment Agent with v15.2 Core Services
 
 **Summary:** Implemented all v15.2 core services for production-grade coaching orchestration. Delivered complete Priority 1: Intent routing with GPT-3.5-turbo, context engineering with Pinecone semantic search, producer-critic reflection with GPT-4+Claude, end-to-end strategy orchestration, and intelligent caching for 40-60% cost savings.
