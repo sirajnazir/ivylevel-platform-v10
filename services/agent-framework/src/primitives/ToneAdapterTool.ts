@@ -257,10 +257,10 @@ export class ToneAdapterTool implements Tool<ToneAdapterInput, ToneAdapterOutput
 
     // Add warmth markers
     const warmthPhrases = [
-      'I hear you',
-      'That makes total sense',
-      'I really appreciate you sharing that',
-      'You're not alone in feeling this way',
+      "I hear you",
+      "That makes total sense",
+      "I really appreciate you sharing that",
+      "You are not alone in feeling this way",
     ];
 
     // Find opportunities to inject warmth

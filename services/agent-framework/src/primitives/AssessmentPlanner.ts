@@ -1,17 +1,24 @@
 /**
- * v15.3 Assessment Planner
+ * v15.3 Assessment Planner - Built with Real EQ Intelligence
  *
  * Date: 2025-10-28
- * Purpose: Autonomous 4-phase assessment planning with 27-layer execution
+ * Purpose: Autonomous 4-phase assessment planning with Jenny's real coaching patterns
  * Architecture: Implements Planner<AssessmentGoal, AssessmentPhase>
  *
- * Assessment Flow (Jenny's proven pattern from 11 real sessions):
- * 1. Discovery Phase (Layers 1-7): Rapport + initial data gathering
- * 2. Narrative Phase (Layers 8-15): Identity fusion + story extraction
- * 3. Strategy Phase (Layers 16-22): Gap analysis + prioritization
- * 4. Time Phase (Layers 23-27): Timeline + next steps
+ * Intelligence Source: 7 iMessage extractions from Jenny's real coaching sessions
+ * - jenny_eq_extract_imsg_1.json: Initial trust building + vulnerability modeling
+ * - jenny_eq_extract_imsg_2.json: Celebration science + crisis navigation
+ * - jenny_eq_extract_imsg_3.json: Rejection alchemy + vulnerability dosing
+ * - jenny_eq_extract_imsg_4.json: Cultural fluency + strategic role guidance
+ * - jenny_eq_extract_imsg_5.json: Strategic silence + question deflection
+ * - jenny_eq_extract_imsg_6.json: Rejection sandwich + protocol rebellion
+ * - jenny_eq_extract_imsg_7.json: Complete 3-year transformation architecture
  *
- * Critical Moment: Minute 12:53 - Synthesis (identity creation from chaos)
+ * Assessment Flow (4 phases):
+ * 1. Discovery Phase: Rapport + initial data gathering (warmth, normalization)
+ * 2. Narrative Phase: Identity fusion + story extraction (specificity, identity reinforcement)
+ * 3. Strategy Phase: Gap analysis + prioritization (strategic thinking)
+ * 4. Time Phase: Timeline + next steps (future pacing, action orientation)
  *
  * @module primitives/AssessmentPlanner
  */
@@ -43,9 +50,9 @@ export interface AssessmentPhase {
   objectives: string[];          // What to accomplish
   frameworks_to_introduce: string[];  // Which frameworks apply
   tactics_to_use: string[];      // Which coaching tactics
-  questions_to_ask: string[];    // Phase-specific questions
+  questions_to_ask: string[];    // Phase-specific questions (from real Jenny data)
   success_criteria: string[];    // How to know phase succeeded
-  synthesis_required: boolean;   // True for phase 2 (minute 12:53)
+  synthesis_required: boolean;   // True for phase 2
 }
 
 export interface AssessmentPlan {
@@ -55,7 +62,7 @@ export interface AssessmentPlan {
   estimated_duration_minutes: number;  // ~40-50 minutes
   coaching_intelligence_used: string[];  // Which student profiles referenced
   eq_adaptations: any;           // EQ adjustments based on context
-  synthesis_moment_timing: string;  // "Phase 2, minute 12:53"
+  synthesis_moment_timing: string;  // "Phase 2"
 }
 
 // ============================================================================
@@ -65,7 +72,7 @@ export interface AssessmentPlan {
 /**
  * AssessmentPlanner: Autonomous 4-phase assessment orchestration
  *
- * Uses coaching intelligence from 11 real sessions to plan optimal assessment flow
+ * Uses real coaching intelligence from Jenny's iMessage conversations
  */
 export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhase> {
   private coachingIntelligence: CoachingIntelligence[] = [];
@@ -144,15 +151,20 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
   /**
    * Phase 1: Discovery (Layers 1-7)
    * Objective: Build rapport + gather initial diagnostic data
+   *
+   * Real patterns from jenny_eq_extract_imsg_1.json:
+   * - Warmth + enthusiasm in first contact
+   * - Zero judgment on apologies
+   * - Constraint reframing through identity
    */
   private async planDiscoveryPhase(
     goal: AssessmentGoal,
     context?: any
   ): Promise<AssessmentPhase> {
-    // Get relevant questions from coaching intelligence
+    // Get relevant questions from coaching intelligence or use real Jenny questions
     const questions = this.getQuestionsForPhase('discovery');
 
-    // Get frameworks that apply early (e.g., Growth Mindset)
+    // Get frameworks that apply early
     const frameworks = this.getFrameworksForPhase('discovery');
 
     // Get tactics for rapport building
@@ -164,13 +176,13 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
       layers: [1, 2, 3, 4, 5, 6, 7],
       duration_estimate_minutes: 10,
       objectives: [
-        'Establish credibility in 27 seconds',
-        'Build psychological safety',
-        'Gather diagnostic data (personality, capacity, social style)',
-        'Identify initial interests and passions',
-        'Assess parent anxiety level',
+        'Establish credibility and warmth immediately',
+        'Build psychological safety through vulnerability modeling',
+        'Gather diagnostic data (personality, capacity, interests)',
+        'Identify initial passion areas',
+        'Assess family context and dynamics',
         'Understand current academic standing',
-        'Probe for hidden barriers',
+        'Probe for constraints or barriers',
       ],
       frameworks_to_introduce: frameworks,
       tactics_to_use: tactics,
@@ -188,7 +200,11 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
   /**
    * Phase 2: Narrative (Layers 8-15)
    * Objective: Extract identity fusion + unique positioning
-   * CRITICAL: Minute 12:53 - Synthesis moment (identity from chaos)
+   *
+   * Real patterns from jenny_eq_extract_imsg_2.json + 3.json:
+   * - Celebration calibration (!! matching student energy)
+   * - Identity expansion through reframing
+   * - Validation without investigation
    */
   private async planNarrativePhase(
     goal: AssessmentGoal,
@@ -208,8 +224,8 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
         'Identify narrative thread connecting experiences',
         'Discover unique positioning vs peers',
         'Uncover authentic passion (not parent-driven)',
-        'Find identity fusion (e.g., Film × CS → Digital Storyteller)',
-        '🎯 SYNTHESIS MOMENT (minute 12:53): Create identity from chaos',
+        'Find identity fusion (e.g., Film x CS = Digital Storyteller)',
+        'SYNTHESIS MOMENT: Create identity from chaos',
         'Validate identity resonance with student',
         'Establish confidence trajectory',
       ],
@@ -223,13 +239,18 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
         'Unique positioning vs peers clear',
         'Student expresses excitement about identity',
       ],
-      synthesis_required: true,  // 🔥 CRITICAL MOMENT
+      synthesis_required: true,  // Critical moment
     };
   }
 
   /**
    * Phase 3: Strategy (Layers 16-22)
    * Objective: Gap analysis + strategic prioritization
+   *
+   * Real patterns from jenny_eq_extract_imsg_4.json:
+   * - Gentle push toward growth with effort reframe
+   * - Strategic overwhelm then pause pattern
+   * - Question deflection (never tells, always asks)
    */
   private async planStrategyPhase(
     goal: AssessmentGoal,
@@ -245,12 +266,12 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
       layers: [16, 17, 18, 19, 20, 21, 22],
       duration_estimate_minutes: 12,
       objectives: [
-        'Calculate rubric scores (current vs target = 25)',
+        'Calculate rubric scores (current vs target)',
         'Identify gap and priority areas',
         'Determine high-ROI opportunities',
         'Assess time architecture (weeks remaining)',
         'Recommend strategic interventions',
-        'Prioritize based on impact × feasibility',
+        'Prioritize based on impact x feasibility',
         'Identify barriers to execution',
       ],
       frameworks_to_introduce: frameworks,
@@ -270,6 +291,11 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
   /**
    * Phase 4: Time (Layers 23-27)
    * Objective: Timeline + immediate next steps
+   *
+   * Real patterns from jenny_eq_extract_imsg_6.json + 7.json:
+   * - Celebration explosion for major wins
+   * - Immediate pivot after rejection < 24hrs
+   * - Forward momentum with "we" language
    */
   private async planTimePhase(
     goal: AssessmentGoal,
@@ -300,7 +326,7 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
         'Timeline clearly visualized',
         'Next steps concrete and actionable',
         'Student commits to first actions',
-        'Assessment → GamePlan handoff triggered',
+        'Assessment to GamePlan handoff triggered',
         'Student leaves energized and clear',
       ],
       synthesis_required: false,
@@ -308,11 +334,11 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
   }
 
   // ============================================================================
-  // INTELLIGENCE LOOKUP METHODS
+  // INTELLIGENCE LOOKUP METHODS (Real Jenny Data)
   // ============================================================================
 
   /**
-   * Get questions for assessment phase from coaching intelligence
+   * Get questions for assessment phase from real Jenny conversations
    */
   private getQuestionsForPhase(phase: string): string[] {
     if (this.coachingIntelligence.length === 0) {
@@ -409,32 +435,36 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
   }
 
   // ============================================================================
-  // DEFAULT FALLBACKS (when coaching intelligence not available)
+  // DEFAULT QUESTIONS (Real Jenny Patterns from iMessage Extractions)
   // ============================================================================
 
   private getDefaultQuestionsForPhase(phase: string): string[] {
     const defaults: Record<string, string[]> = {
       discovery: [
         'Tell me about yourself - what are you passionate about?',
-        'What's your current academic standing?',
         'What do your parents think about your college process?',
         'What are your initial thoughts about what you want to study?',
+        'What does your current schedule look like?',
+        'Are there any constraints or challenges you are facing right now?',
       ],
       narrative: [
-        'I'm noticing a pattern here - you seem to connect A and B. Does that resonate?',
         'What draws you to both X and Y?',
-        'If you could create your own major, what would it be?',
+        'How about expanding to woman-owned businesses? Since you are a woman interested in entrepreneurship, it could be a good fit!',
         'What makes you different from other students interested in this field?',
+        'Do you think she is the most representative for you?',
+        'If you could create your own major, what would it be?',
       ],
       strategy: [
         'Looking at where you are now vs where you need to be, what do you think the priorities are?',
-        'What's preventing you from achieving X right now?',
+        'What is preventing you from achieving X right now?',
         'If you had to pick one thing to focus on in the next 2 weeks, what would have the biggest impact?',
+        'I think education and outreach!! Bigger role plus aligns with your passion for education. Does not have to be high effort.',
       ],
       time: [
         'What are you going to do in the next week based on what we discussed?',
         'What would success look like 2 weeks from now?',
         'What support do you need from me to make this happen?',
+        'Can you check if you are eligible for the Questbridge scholarship?',
       ],
     };
 
@@ -443,10 +473,10 @@ export class AssessmentPlanner implements Planner<AssessmentGoal, AssessmentPhas
 
   private getDefaultFrameworksForPhase(phase: string): string[] {
     const defaults: Record<string, string[]> = {
-      discovery: ['Growth Mindset Framework', 'Trust-Building Framework'],
-      narrative: ['Narrative Identity Framework', 'Unique Positioning Framework', 'Identity Fusion Framework'],
-      strategy: ['Gap Analysis Framework', 'Strategic Prioritization Framework'],
-      time: ['Time Architecture Framework', 'Commitment Framework'],
+      discovery: ['Permission Field Framework', 'Zero Judgment Framework', 'Vulnerability Modeling Framework'],
+      narrative: ['Narrative Identity Framework', 'Unique Positioning Framework', 'Identity Seed Architecture Framework'],
+      strategy: ['Gap Analysis Framework', 'Strategic Prioritization Framework', 'Strategic Overwhelm Calibrated Framework'],
+      time: ['Time Architecture Framework', 'Commitment Framework', 'Rejection Sandwich Framework'],
     };
 
     return defaults[phase] || [];
