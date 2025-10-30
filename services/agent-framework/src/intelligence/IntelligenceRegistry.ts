@@ -47,6 +47,10 @@ import { SeasonalEnergyAllocation } from './types/TYPE-060-SeasonalEnergyAllocat
 import { MultiAgentDelegation } from './types/TYPE-061-MultiAgentDelegation.js';
 import { QualitativeTransformation } from './types/TYPE-062-QualitativeTransformation.js';
 import { ProgressVelocity } from './types/TYPE-063-ProgressVelocity.js';
+import { FourPhaseAssessmentFlow } from './types/TYPE-080-FourPhaseAssessmentFlow.js';
+import { IvyScoreCalculation } from './types/TYPE-081-IvyScoreCalculation.js';
+import { GapAnalysisEngine } from './types/TYPE-082-GapAnalysisEngine.js';
+import { PotentialIndicatorExtraction } from './types/TYPE-083-PotentialIndicatorExtraction.js';
 import { ScholarshipSelectionMatrix } from './types/TYPE-031-ScholarshipSelectionMatrix.js';
 import { ApplicationTimelineStrategy } from './types/TYPE-032-ApplicationTimelineStrategy.js';
 import { FinancialAidIntelligence } from './types/TYPE-033-FinancialAidIntelligence.js';
@@ -170,6 +174,12 @@ export class IntelligenceRegistry {
     this.register(new MultiAgentDelegation());       // TYPE-061 ✅ Complete (v20.1)
     this.register(new QualitativeTransformation());  // TYPE-062 ✅ Complete (v20.5)
     this.register(new ProgressVelocity());           // TYPE-063 ✅ Complete (v20.1)
+
+    // Register DOMAIN-SPECIFIC intelligence types (AssessmentAgent) - v23.0
+    this.register(new FourPhaseAssessmentFlow());       // TYPE-080 ✅ Complete (v23.0)
+    this.register(new IvyScoreCalculation());           // TYPE-081 ✅ Complete (v23.0)
+    this.register(new GapAnalysisEngine());             // TYPE-082 ✅ Complete (v23.0)
+    this.register(new PotentialIndicatorExtraction());  // TYPE-083 ✅ Complete (v23.0)
 
     this.initialized = true;
 
