@@ -46,7 +46,7 @@
  * Version: v18.0
  */
 
-import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet } from './BaseIntelligenceType.js';
+import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet, FactCategory } from './BaseIntelligenceType.js';
 
 /**
  * Quarter definition
@@ -141,11 +141,11 @@ export class TimelineArchitecture implements IntelligenceType {
    * Process timeline architecture
    */
   async process(query: AgentQuery, facts: FactSet): Promise<IntelligenceResult> {
-    const studentId = query.student_id;
+    const studentId = query.entity_id;
 
     // Extract timeline context from facts
-    const profileFacts = facts.facts.filter(f => f.category === 'STUDENT_PROFILE');
-    const assessmentFacts = facts.facts.filter(f => f.category === 'ASSESSMENT_DATA');
+    const profileFacts = facts.getFactsByCategory(FactCategory.STUDENT_PROFILE);
+    const assessmentFacts = facts.getFactsByCategory(FactCategory.ASSESSMENT_DATA);
 
     // Calculate current week in 93-week framework
     const currentWeek = this.calculateCurrentWeek(profileFacts);
@@ -188,6 +188,7 @@ export class TimelineArchitecture implements IntelligenceType {
 
     return {
       type_id: this.type_id,
+      component: 'timeline_architecture',
       triggered: true,
       confidence: 0.95,
       data: result,

@@ -48,7 +48,7 @@
  * Version: v18.0
  */
 
-import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet } from './BaseIntelligenceType.js';
+import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet, FactCategory } from './BaseIntelligenceType.js';
 
 /**
  * Weak spot (rubric gap)
@@ -142,11 +142,11 @@ export class WeakSpotPrioritization implements IntelligenceType {
    * Process weak spot prioritization
    */
   async process(query: AgentQuery, facts: FactSet): Promise<IntelligenceResult> {
-    const studentId = query.student_id;
+    const studentId = query.entity_id;
 
     // Extract facts
-    const assessmentFacts = facts.facts.filter(f => f.category === 'ASSESSMENT_DATA');
-    const profileFacts = facts.facts.filter(f => f.category === 'STUDENT_PROFILE');
+    const assessmentFacts = facts.getFactsByCategory(FactCategory.ASSESSMENT_DATA);
+    const profileFacts = facts.getFactsByCategory(FactCategory.STUDENT_PROFILE);
 
     // Extract rubric gaps and grade level
     const assessmentData = assessmentFacts[0]?.data || {};
@@ -193,6 +193,7 @@ export class WeakSpotPrioritization implements IntelligenceType {
 
     return {
       type_id: this.type_id,
+      component: 'weak_spot_prioritization',
       triggered: true,
       confidence: 0.95,
       data: result,

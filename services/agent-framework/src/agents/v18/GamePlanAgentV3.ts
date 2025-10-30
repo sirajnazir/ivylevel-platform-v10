@@ -82,7 +82,7 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
         if (IntelligenceRegistry.has(typeId)) {
           this.DOMAIN_INTELLIGENCE.push(IntelligenceRegistry.get(typeId));
         } else {
-          log.warn('gameplan_agent.missing_intelligence_type', { type_id: typeId });
+          log.event('gameplan_agent.missing_intelligence_type', { type_id: typeId }, 'warn');
         }
       }
 

@@ -122,22 +122,40 @@ interface TimeMathematicianResult {
 // TIME MATHEMATICIAN INTELLIGENCE
 // ============================================================================
 
-export class TimeMathematician extends IntelligenceType {
-  constructor() {
-    super(
-      'TYPE-007',
-      'Time Mathematician',
-      'DOMAIN_SPECIFIC',
-      'GamePlanAgent',
-      [
-        'Calculates realistic weekly hour allocations using 168-hour framework',
-        'Identifies overcommitment and capacity constraints',
-        'Computes ROI-per-hour for activity optimization',
-        'Recommends activity cuts/swaps based on rubric impact vs time cost',
-        'Generates quarterly time architecture with feasibility checks',
-      ]
-    );
-  }
+export class TimeMathematician implements IntelligenceType {
+  type_id = 'TYPE-007';
+  name = 'Time Mathematician';
+  category: 'UNIVERSAL' | 'DOMAIN_SPECIFIC' = 'DOMAIN_SPECIFIC';
+  description = 'Calculates realistic weekly hour allocations using 168-hour framework and ROI-per-hour optimization';
+
+  components = {
+    framework: {
+      name: '168-Hour Weekly Framework',
+      description: 'Fixed (116h) + Discretionary (52h) = Total (168h)',
+      mental_model: 'Every hour is an investment - calculate ROI per hour to optimize capacity',
+    },
+    tactics: [
+      {
+        name: 'Capacity Mapping',
+        description: 'Map all commitments to weekly hours and identify overcommitment',
+        steps: [
+          'Calculate fixed hours (sleep, school, meals)',
+          'Sum discretionary commitments',
+          'Compare to 52h discretionary target',
+          'Flag overcommitment (>52h)',
+        ],
+      },
+    ],
+    techniques: [],
+    chips: [],
+    metrics: {
+      success_criteria: ['Feasible time allocation', 'High-ROI activities prioritized', 'Buffer time maintained'],
+      validation: 'Weekly allocation is ≤100% of discretionary hours',
+    },
+    triggers: {
+      conditions: ['time', 'hours', 'capacity', 'overcommit', 'schedule'],
+    },
+  };
 
   // ==========================================================================
   // CORE CONSTANTS
@@ -232,8 +250,8 @@ export class TimeMathematician extends IntelligenceType {
   // MAIN INTELLIGENCE INTERFACE
   // ==========================================================================
 
-  async process(facts: FactSet, query: AgentQuery): Promise<TimeMathematicianResult> {
-    const studentId = query.student_id;
+  async process(query: AgentQuery, facts: FactSet): Promise<any> {
+    const studentId = query.entity_id;
     const currentQuarter = this.extractCurrentQuarter(facts, query);
 
     // Extract all student commitments
@@ -256,14 +274,22 @@ export class TimeMathematician extends IntelligenceType {
     const summary = this.generateSummary(timePlans);
     const nextActions = this.generateNextActions(timePlans, feasibility);
 
-    return {
+    const result: TimeMathematicianResult = {
       student_id: studentId,
       current_quarter: currentQuarter,
       time_plans: timePlans,
       overall_feasibility: feasibility.status,
       critical_capacity_quarters: feasibility.critical_quarters,
       summary,
-      next_actions,
+      next_actions: nextActions,
+    };
+
+    return {
+      type_id: this.type_id,
+      component: 'time_mathematician',
+      triggered: true,
+      confidence: 0.9,
+      data: result,
     };
   }
 

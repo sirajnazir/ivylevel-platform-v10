@@ -45,7 +45,7 @@
  * Version: v18.0
  */
 
-import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet } from './BaseIntelligenceType.js';
+import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet, FactCategory } from './BaseIntelligenceType.js';
 
 /**
  * Target profile synthesis (strategic positioning)
@@ -106,12 +106,12 @@ export class GamePlanSynthesis implements IntelligenceType {
    * Process game plan synthesis
    */
   async process(query: AgentQuery, facts: FactSet): Promise<IntelligenceResult> {
-    const studentId = query.student_id;
+    const studentId = query.entity_id;
 
     // Extract assessment facts
-    const assessmentFacts = facts.facts.filter(f => f.category === 'ASSESSMENT_DATA');
-    const activityFacts = facts.facts.filter(f => f.category === 'ACTIVITY_DATA');
-    const profileFacts = facts.facts.filter(f => f.category === 'STUDENT_PROFILE');
+    const assessmentFacts = facts.getFactsByCategory(FactCategory.ASSESSMENT_DATA);
+    const activityFacts = facts.getFactsByCategory(FactCategory.ACTIVITY_DATA);
+    const profileFacts = facts.getFactsByCategory(FactCategory.STUDENT_PROFILE);
 
     // Synthesize target profile (IDENTITY + APTITUDE + PASSION + SERVICE)
     const targetProfile = this.synthesizeTargetProfile(assessmentFacts, activityFacts, profileFacts);
@@ -154,6 +154,7 @@ export class GamePlanSynthesis implements IntelligenceType {
 
     return {
       type_id: this.type_id,
+      component: 'game_plan_synthesis',
       triggered: true,
       confidence: 0.95,
       data: result,
