@@ -19,6 +19,8 @@
  */
 
 import { IntelligenceType } from './types/BaseIntelligenceType.js';
+import { GamePlanSynthesis } from './types/TYPE-001-GamePlanSynthesis.js';
+import { TimelineArchitecture as GamePlanTimelineArchitecture } from './types/TYPE-003-TimelineArchitecture.js';
 import { AwardArbitrageSystem } from './types/AwardArbitrageSystem.js';
 import { OpportunityPipeline } from './types/OpportunityPipeline.js';
 import { QuickWinsStrategy } from './types/QuickWinsStrategy.js';
@@ -123,6 +125,12 @@ export class IntelligenceRegistry {
     // Register UNIVERSAL intelligence types
     // TODO: Add TYPE-005, TYPE-010, TYPE-011, TYPE-012, TYPE-018, TYPE-021
     this.register(new OpportunityPipeline());  // TYPE-020
+
+    // Register DOMAIN-SPECIFIC intelligence types (GamePlanAgent) - v18.0
+    this.register(new GamePlanSynthesis());             // TYPE-001 ✅ Complete (v18.0)
+    this.register(new GamePlanTimelineArchitecture());  // TYPE-003 ✅ Complete (v18.0)
+    // TODO: TYPE-002 (Weak Spot Prioritization), TYPE-004 (Multi-Path Convergence),
+    //       TYPE-006 (Quarterly Adaptation), TYPE-007 (Time Mathematician)
 
     // Register DOMAIN-SPECIFIC intelligence types (Awards Agent)
     this.register(new AwardArbitrageSystem()); // TYPE-023
