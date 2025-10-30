@@ -27,6 +27,7 @@ import { QuarterlyAdaptation } from './types/TYPE-006-QuarterlyAdaptation.js';
 import { TimeMathematician } from './types/TYPE-007-TimeMathematician.js';
 import { AwardArbitrageSystem } from './types/AwardArbitrageSystem.js';
 import { OpportunityPipeline } from './types/OpportunityPipeline.js';
+import { ProgramCompetitionCascade } from './types/TYPE-031-ProgramCompetitionCascade.js';
 import { QuickWinsStrategy } from './types/QuickWinsStrategy.js';
 import { ProgramSelectionMatrix } from './types/TYPE-028-ProgramSelectionMatrix.js';
 import { ProgramApplicationStrategy } from './types/TYPE-029-ProgramApplicationStrategy.js';
@@ -128,7 +129,8 @@ export class IntelligenceRegistry {
 
     // Register UNIVERSAL intelligence types
     // TODO: Add TYPE-005, TYPE-010, TYPE-011, TYPE-012, TYPE-018, TYPE-021
-    this.register(new OpportunityPipeline());  // TYPE-020
+    this.register(new OpportunityPipeline());        // TYPE-020 ✅ Complete
+    this.register(new ProgramCompetitionCascade());  // TYPE-031 ✅ Complete (v19.1)
 
     // Register DOMAIN-SPECIFIC intelligence types (GamePlanAgent) - v18.0
     this.register(new GamePlanSynthesis());             // TYPE-001 ✅ Complete (v18.0)
