@@ -29,19 +29,17 @@ import { ExecutionLadderNavigation } from './types/TYPE-049-ExecutionLadderNavig
 import { OutcomeEngineering } from './types/TYPE-050-OutcomeEngineering.js';
 import { TaskDecomposition } from './types/TYPE-051-TaskDecomposition.js';
 import { PortfolioOperatingCadence } from './types/TYPE-052-PortfolioOperatingCadence.js';
+import { TimeArchitecture } from './types/TYPE-053-TimeArchitecture.js';
+import { MetricLadder } from './types/TYPE-054-MetricLadder.js';
+import { BlockingDetection } from './types/TYPE-055-BlockingDetection.js';
+import { LoREngineering } from './types/TYPE-056-LoREngineering.js';
+import { ProofEngineering } from './types/TYPE-057-ProofEngineering.js';
+import { ApplicationMasteryRail } from './types/TYPE-058-ApplicationMasteryRail.js';
+import { NarrativeHarmonization } from './types/TYPE-059-NarrativeHarmonization.js';
+import { SeasonalEnergyAllocation } from './types/TYPE-060-SeasonalEnergyAllocation.js';
 import { MultiAgentDelegation } from './types/TYPE-061-MultiAgentDelegation.js';
+import { QualitativeTransformation } from './types/TYPE-062-QualitativeTransformation.js';
 import { ProgressVelocity } from './types/TYPE-063-ProgressVelocity.js';
-import {
-  TimeArchitecture,
-  MetricLadderInstrumentation,
-  BlockingDetection,
-  LoREngineering,
-  ProofEngineering,
-  ApplicationMasteryRail,
-  NarrativeHarmonization,
-  SeasonalEnergyAllocation,
-  QualitativeTransformation,
-} from './types/TYPE-051-063-Stubs.js';
 import { ScholarshipSelectionMatrix } from './types/TYPE-031-ScholarshipSelectionMatrix.js';
 import { ApplicationTimelineStrategy } from './types/TYPE-032-ApplicationTimelineStrategy.js';
 import { FinancialAidIntelligence } from './types/TYPE-033-FinancialAidIntelligence.js';
@@ -140,21 +138,21 @@ export class IntelligenceRegistry {
     this.register(new ApplicationTimelineStrategy()); // TYPE-032
     this.register(new FinancialAidIntelligence());    // TYPE-033
 
-    // Register DOMAIN-SPECIFIC intelligence types (ExecutionAgent) - v20.0 + v20.1
+    // Register DOMAIN-SPECIFIC intelligence types (ExecutionAgent) - v20.0-v20.5
     this.register(new ExecutionLadderNavigation());  // TYPE-049 ✅ Complete (v20.0)
     this.register(new OutcomeEngineering());         // TYPE-050 ✅ Complete (v20.0)
     this.register(new TaskDecomposition());          // TYPE-051 ✅ Complete (v20.1)
     this.register(new PortfolioOperatingCadence());  // TYPE-052 ✅ Complete (v20.1)
-    this.register(new TimeArchitecture());           // TYPE-053 🚧 Stub (expand in v20.2)
-    this.register(new MetricLadderInstrumentation());// TYPE-054 🚧 Stub (expand in v20.2)
-    this.register(new BlockingDetection());          // TYPE-055 🚧 Stub (expand in v20.3)
-    this.register(new LoREngineering());             // TYPE-056 🚧 Stub (expand in v20.3)
-    this.register(new ProofEngineering());           // TYPE-057 🚧 Stub (expand in v20.4)
-    this.register(new ApplicationMasteryRail());     // TYPE-058 🚧 Stub (expand in v20.4)
-    this.register(new NarrativeHarmonization());     // TYPE-059 🚧 Stub (expand in v20.5)
-    this.register(new SeasonalEnergyAllocation());   // TYPE-060 🚧 Stub (expand in v20.5)
+    this.register(new TimeArchitecture());           // TYPE-053 ✅ Complete (v20.2)
+    this.register(new MetricLadder());               // TYPE-054 ✅ Complete (v20.2)
+    this.register(new BlockingDetection());          // TYPE-055 ✅ Complete (v20.3)
+    this.register(new LoREngineering());             // TYPE-056 ✅ Complete (v20.3)
+    this.register(new ProofEngineering());           // TYPE-057 ✅ Complete (v20.4)
+    this.register(new ApplicationMasteryRail());     // TYPE-058 ✅ Complete (v20.4)
+    this.register(new NarrativeHarmonization());     // TYPE-059 ✅ Complete (v20.5)
+    this.register(new SeasonalEnergyAllocation());   // TYPE-060 ✅ Complete (v20.5)
     this.register(new MultiAgentDelegation());       // TYPE-061 ✅ Complete (v20.1)
-    this.register(new QualitativeTransformation());  // TYPE-062 🚧 Stub (expand in v20.5)
+    this.register(new QualitativeTransformation());  // TYPE-062 ✅ Complete (v20.5)
     this.register(new ProgressVelocity());           // TYPE-063 ✅ Complete (v20.1)
 
     this.initialized = true;
