@@ -4,8 +4,11 @@
 **Status:** Active Tracking - P0 & P2 Parked, Ready for Full Multi-Agent Implementation
 **Priority System:** P0 (Critical) → P1 (High) → P2 (Medium) → P3 (Low)
 
-**Current Focus:** Complete all 10 agent implementations with Intelligence Types Architecture (v3.0)
-**Parked Until All Agents Complete:**
+**Current Focus:** Complete 7 CORE student development agents (9th-11th grade, 3+ years value)
+**Strategic Decision:** Deprioritize college apps agents (EssayAgent, CollegeListAgent, AdmissionsAgent) - use traditional tools instead
+**See:** PRIORITY_ROADMAP_REFOCUSED.md for full rationale
+
+**Parked Until Core Agents Complete:**
 - P0: jenny_v11_eq fine-tuning (2-3 weeks)
 - P1: Real-Time Student Calibration (CalibrationFactSource + CalibrationLearningService)
 - P1: Universal Intelligence Types implementation (7 types)
@@ -1011,12 +1014,15 @@ Expand 3 intelligence types:
 - ⏸️ P2: v17.0 latency optimization (1 week)
 
 ### Next Milestone
-**Full Multi-Agent Platform Implementation**
-- Complete all 10 Foundation Agents (GamePlan, ECs, Awards, Essays, Colleges, Programs, Scholarships, Admissions, Weekly Execution, Assessment)
-- Implement multi-agent routing and handoffs
-- Build agent orchestration layer
-- Create agent management dashboard
-- Test end-to-end multi-agent workflows
+**Core Student Development Platform (7 Agents for 9th-11th Grade)**
+- ✅ Complete: ExtracurricularsAgent, AwardsAgent, SummerProgramsAgent, ScholarshipsAgent (v18.0-v21.0)
+- 🚧 In Progress: ExecutionAgent v20.1 (40% complete, 6/16 intelligence types)
+- 📋 Next: Complete ExecutionAgent v20.2-v20.5 (8 intelligence types remaining)
+- 📋 After: Refresh GamePlanAgent + AssessmentAgent to v3.0 Intelligence Types Architecture
+- ⏸️ Deprioritized: EssayAgent, CollegeListAgent, AdmissionsAgent (use traditional tools instead)
+
+**Rationale**: Focus on 3+ YEARS of student development (9th-11th) vs. 3 MONTHS of college apps (12th fall).
+Traditional tools (Essays.ai, Scoir, consultants) handle apps phase well. Jenny's Knowledge Moat is in the development phase.
 
 ### Next Review Date
 **After Multi-Agent Platform Complete** - Then revisit parked P0/P2 items for quality enhancements
