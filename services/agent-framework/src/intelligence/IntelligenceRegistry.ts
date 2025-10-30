@@ -25,6 +25,23 @@ import { QuickWinsStrategy } from './types/QuickWinsStrategy.js';
 import { ProgramSelectionMatrix } from './types/TYPE-028-ProgramSelectionMatrix.js';
 import { ProgramApplicationStrategy } from './types/TYPE-029-ProgramApplicationStrategy.js';
 import { CostBenefitIntelligence } from './types/TYPE-030-CostBenefitIntelligence.js';
+import { ExecutionLadderNavigation } from './types/TYPE-049-ExecutionLadderNavigation.js';
+import { OutcomeEngineering } from './types/TYPE-050-OutcomeEngineering.js';
+import {
+  TaskDecomposition,
+  PortfolioOperatingCadence,
+  TimeArchitecture,
+  MetricLadderInstrumentation,
+  BlockingDetection,
+  LoREngineering,
+  ProofEngineering,
+  ApplicationMasteryRail,
+  NarrativeHarmonization,
+  SeasonalEnergyAllocation,
+  MultiAgentDelegation,
+  QualitativeTransformation,
+  ProgressVelocity,
+} from './types/TYPE-051-063-Stubs.js';
 
 /**
  * Global registry for intelligence type instances
@@ -115,7 +132,22 @@ export class IntelligenceRegistry {
     this.register(new ProgramApplicationStrategy()); // TYPE-029
     this.register(new CostBenefitIntelligence());    // TYPE-030
 
-    // TODO: Add more intelligence types as they're implemented
+    // Register DOMAIN-SPECIFIC intelligence types (ExecutionAgent) - v20.0
+    this.register(new ExecutionLadderNavigation());  // TYPE-049 ✅ Complete
+    this.register(new OutcomeEngineering());         // TYPE-050 ✅ Complete
+    this.register(new TaskDecomposition());          // TYPE-051 🚧 Stub (expand in v20.1)
+    this.register(new PortfolioOperatingCadence());  // TYPE-052 🚧 Stub (expand in v20.1)
+    this.register(new TimeArchitecture());           // TYPE-053 🚧 Stub (expand in v20.2)
+    this.register(new MetricLadderInstrumentation());// TYPE-054 🚧 Stub (expand in v20.2)
+    this.register(new BlockingDetection());          // TYPE-055 🚧 Stub (expand in v20.3)
+    this.register(new LoREngineering());             // TYPE-056 🚧 Stub (expand in v20.3)
+    this.register(new ProofEngineering());           // TYPE-057 🚧 Stub (expand in v20.4)
+    this.register(new ApplicationMasteryRail());     // TYPE-058 🚧 Stub (expand in v20.4)
+    this.register(new NarrativeHarmonization());     // TYPE-059 🚧 Stub (expand in v20.5)
+    this.register(new SeasonalEnergyAllocation());   // TYPE-060 🚧 Stub (expand in v20.5)
+    this.register(new MultiAgentDelegation());       // TYPE-061 🚧 Stub (expand in v20.1 - HIGH PRIORITY)
+    this.register(new QualitativeTransformation());  // TYPE-062 🚧 Stub (expand in v20.5)
+    this.register(new ProgressVelocity());           // TYPE-063 🚧 Stub (expand in v20.1 - HIGH PRIORITY)
 
     this.initialized = true;
 

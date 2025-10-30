@@ -435,7 +435,325 @@ Student B (low absorption, overwhelm signals):
 
 ---
 
-### 3. Foundation Agents Architecture Spec - Reverse Engineering
+### 4. v20.1-v20.5: ExecutionAgent Intelligence Types Expansion
+
+**Date Added:** 2025-10-29
+**Context:** Post-v20.0 Foundation - 12 stub intelligence types ready for full implementation
+
+**Current State (v20.0):**
+- ExecutionAgent deployed with 2 complete intelligence types:
+  - TYPE-049: Execution Ladder Navigation (557 lines) - ✅ Complete
+  - TYPE-050: Outcome Engineering (406 lines) - ✅ Complete
+- 12 stub implementations (TYPE-051 through TYPE-063) returning framework descriptions only
+- Agent operational with basic ladder positioning + outcome generation
+- Stubs marked with version targets: v20.1 (4 types), v20.2 (2 types), v20.3 (2 types), v20.4 (2 types), v20.5 (2 types)
+
+**Gap Identified:**
+ExecutionAgent is Jenny's digital twin - the master orchestrator for weekly tactical execution. Currently limited to ladder positioning and outcome generation. Missing 12 critical execution frameworks extracted from 93-week coaching intelligence:
+
+1. **Weekly Operating Rhythm** (TYPE-051, TYPE-052) - How to structure weekly sprints
+2. **Capacity Management** (TYPE-053, TYPE-054) - Time allocation + metric tracking
+3. **Blocking & Recovery** (TYPE-055, TYPE-056) - Stall detection + LoR engineering
+4. **Proof Generation** (TYPE-057, TYPE-058) - Proofpack assembly + application throughput
+5. **Narrative & Energy** (TYPE-059, TYPE-060) - Story harmonization + seasonal pacing
+6. **Multi-Agent Coordination** (TYPE-061, TYPE-063) - Delegation + velocity tracking
+7. **Qualitative Transformation** (TYPE-062) - Confidence + grit measurement
+
+**Implementation Plan:**
+
+#### **Phase 1: v20.1 - Core Execution Primitives (1 week)**
+Expand 4 HIGH-PRIORITY intelligence types:
+
+**TYPE-051: Task Decomposition Intelligence**
+- **Framework:** 3-Level Hierarchy (Outcomes → ExecutionItems → Tasks)
+- **Algorithm:**
+  ```typescript
+  Outcome (P0/P1/P2/P3) → 2-4 ExecutionItems (5Ws: Who/What/When/Where/Why)
+  ExecutionItem → 3-8 Tasks (micro-steps with deadlines)
+  ```
+- **Data Source:** 62 execution chips (W000-FRAMEWORK-001)
+- **Output:** Structured task breakdown with dependency mapping
+- **Estimated Lines:** 350-400 lines
+
+**TYPE-052: Portfolio Operating Cadence**
+- **Framework:** Monday→Sunday Weekly Rhythm
+- **Algorithm:**
+  ```
+  Monday: Prioritize (P0/P1 selection)
+  Tue-Thu: Produce (deep work blocks)
+  Friday: Publish (share progress publicly)
+  Saturday: Propagate (amplify on social, email)
+  Sunday: Post-mortem (reflect, adjust next week)
+  ```
+- **Data Source:** W000-STRATEGY-002, W007 session transcript
+- **Output:** Day-by-day action plan with energy allocation
+- **Estimated Lines:** 300-350 lines
+
+**TYPE-061: Multi-Agent Delegation Intelligence** ⚡ HIGH PRIORITY
+- **Framework:** Specialist Agent Routing + Response Synthesis
+- **Algorithm:**
+  ```typescript
+  Detect specialist intent (awards, programs, ECs, gameplan)
+  → Delegate to specialist agent
+  → Synthesize response into weekly execution summary
+  → Return integrated action plan
+  ```
+- **Data Source:** W000-STRATEGY-015, cross-agent handoff patterns
+- **Output:** Delegated queries with integrated responses
+- **Estimated Lines:** 400-450 lines
+- **Critical:** Enables ExecutionAgent to orchestrate other agents
+
+**TYPE-063: Progress Velocity & Momentum** ⚡ HIGH PRIORITY
+- **Framework:** Completion Velocity Tracking
+- **Algorithm:**
+  ```
+  Velocity = Actual Completion / Expected Completion
+  >1.0 = ahead (celebrate!)
+  0.8-1.0 = on track (maintain)
+  <0.8 = at risk (escalate)
+  ```
+- **Data Source:** W000-STRATEGY-021, weekly progress snapshots
+- **Output:** Velocity score + momentum indicators + acceleration recommendations
+- **Estimated Lines:** 350-400 lines
+
+**Database Schema Changes (v20.1):**
+```sql
+-- Migration 22: Task decomposition support
+ALTER TABLE tasks
+  ADD COLUMN parent_execution_item_id TEXT REFERENCES execution_items(item_id),
+  ADD COLUMN dependency_task_ids TEXT[],
+  ADD COLUMN estimated_effort_minutes INTEGER;
+
+-- Migration 23: Velocity tracking
+CREATE TABLE velocity_snapshots (
+  snapshot_id SERIAL PRIMARY KEY,
+  student_id TEXT NOT NULL,
+  week_number INTEGER NOT NULL,
+  expected_completion_count INTEGER,
+  actual_completion_count INTEGER,
+  velocity_score NUMERIC, -- actual / expected
+  momentum_indicator TEXT, -- 'accelerating' | 'steady' | 'decelerating'
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**Estimated Effort:** 1 week (4 types × ~350 lines each = ~1400 lines total)
+
+---
+
+#### **Phase 2: v20.2 - Capacity Management (4-5 days)**
+Expand 2 intelligence types:
+
+**TYPE-053: Time Architecture & Capacity**
+- **Framework:** 168-Hour Weekly Framework
+- **Algorithm:**
+  ```
+  168 hours/week = Fixed (school 40h + sleep 56h + family 20h = 116h)
+                   + Available (52h discretionary)
+  Available = Deep Work (30h) + Social (10h) + Buffer (12h)
+  ```
+- **Data Source:** W007 session transcript, time capacity assessment
+- **Output:** Time allocation plan with capacity stress testing
+- **Estimated Lines:** 400-450 lines
+
+**TYPE-054: Metric Ladder Instrumentation**
+- **Framework:** M0→M4 Milestone Tracking
+- **Algorithm:**
+  ```
+  M0: Setup complete (GitHub, website, basic demo)
+  M1: 1 user (friend/family validation)
+  M2: 10 users (local network growth)
+  M3: 100 users (viral loop working)
+  M4: 1,000 users (product-market fit)
+
+  Each milestone = proof requirements + evidence artifacts
+  ```
+- **Data Source:** W000-FRAMEWORK-004, project growth tracking
+- **Output:** Current milestone + next proof requirements + trajectory estimate
+- **Estimated Lines:** 350-400 lines
+
+**Estimated Effort:** 4-5 days (2 types × ~400 lines each = ~800 lines total)
+
+---
+
+#### **Phase 3: v20.3 - Blocking & Recovery (4-5 days)**
+Expand 2 intelligence types:
+
+**TYPE-055: Blocking Detection & Escalation**
+- **Framework:** 2-Cycle Stall Triggers
+- **Algorithm:**
+  ```
+  If task stalled 2+ weeks:
+    Escalation Playbook = Scope Cut OR Ally Recruit OR Deadline Swap
+
+  Scope Cut: Reduce to MVP (e.g., 10 users → 5 users)
+  Ally Recruit: Find collaborator (parent, friend, coach)
+  Deadline Swap: Move to next cycle (accept delay, adjust timeline)
+  ```
+- **Data Source:** W000-STRATEGY-012, blocking patterns from session transcripts
+- **Output:** Blocked tasks + escalation recommendations + timeline adjustments
+- **Estimated Lines:** 400-450 lines
+
+**TYPE-056: LoR Engineering**
+- **Framework:** 4-Touch Recommendation Letter Sequencing
+- **Algorithm:**
+  ```
+  Touch 1: Visibility (show up, contribute, ask smart questions)
+  Touch 2: Gratitude (thank for specific guidance, show impact)
+  Touch 3: Artifact (share project/paper, get feedback)
+  Touch 4: Formal Ask (request LoR with context packet)
+
+  Minimum 8 weeks between Touch 1 and Touch 4
+  ```
+- **Data Source:** W000-STRATEGY-008, LoR cultivation patterns
+- **Output:** LoR target list + touch sequence timelines + artifact readiness
+- **Estimated Lines:** 350-400 lines
+
+**Estimated Effort:** 4-5 days (2 types × ~400 lines each = ~800 lines total)
+
+---
+
+#### **Phase 4: v20.4 - Proof & Applications (4-5 days)**
+Expand 2 intelligence types:
+
+**TYPE-057: Proof Engineering**
+- **Framework:** Proofpack Assembly ("Proof Before Pitch")
+- **Algorithm:**
+  ```
+  Proofpack Components:
+  1. Hero Metric (e.g., "500 users in 3 months")
+  2. Timeline (project start → current state → future milestones)
+  3. Screenshots/Demos (visual proof of work)
+  4. User Quotes/Testimonials (social validation)
+  5. Links (GitHub, website, press mentions)
+  6. Maintenance Log (ongoing commitment proof)
+
+  Validation: Minimum 3/6 components before asking for support
+  ```
+- **Data Source:** W000-STRATEGY-013, proofpack assembly patterns
+- **Output:** Proofpack completeness score + missing artifacts + assembly checklist
+- **Estimated Lines:** 400-450 lines
+
+**TYPE-058: Application Mastery Rail**
+- **Framework:** 5-Lane Throughput Model
+- **Algorithm:**
+  ```
+  5 Parallel Lanes (work on all simultaneously):
+  1. Personal Essay Lane (Common App main essay)
+  2. Academic Lane (transcript, test scores, coursework)
+  3. EC Lane (Activities List + EC essay)
+  4. LoR Lane (recommendation letter cultivation)
+  5. Financial Lane (FAFSA, CSS Profile, scholarships)
+
+  Each lane = checklist + blockers + completion %
+  ```
+- **Data Source:** W000-FRAMEWORK-007, application throughput patterns
+- **Output:** 5-lane status dashboard + lane-specific next actions + bottleneck identification
+- **Estimated Lines:** 450-500 lines
+
+**Estimated Effort:** 4-5 days (2 types × ~450 lines each = ~900 lines total)
+
+---
+
+#### **Phase 5: v20.5 - Narrative & Qualitative (5-6 days)**
+Expand 3 intelligence types:
+
+**TYPE-059: Narrative Harmonization**
+- **Framework:** Thread Weave Across All Surfaces
+- **Algorithm:**
+  ```
+  Narrative Spine = Why (motivation) + Who (identity) + Impact (outcomes)
+
+  Weave across:
+  - Personal essay (main story)
+  - Activities List (proof of story)
+  - Supplemental essays (story angles)
+  - LoRs (external validation of story)
+  - Website/portfolio (visual story)
+
+  Consistency Check: All surfaces reinforce core narrative
+  ```
+- **Data Source:** W000-STRATEGY-016, narrative architecture patterns
+- **Output:** Narrative spine + surface-level weaving recommendations + consistency score
+- **Estimated Lines:** 400-450 lines
+
+**TYPE-060: Seasonal Energy Allocation**
+- **Framework:** Exploration→Exploitation Ratio per Phase
+- **Algorithm:**
+  ```
+  Phase 1-2 (9th-10th grade): 70% Explore / 30% Exploit
+    → Try many things, find passion, build foundation
+
+  Phase 3-4 (11th grade): 50% Explore / 50% Exploit
+    → Focus on proven interests, scale projects
+
+  Phase 5 (12th fall): 20% Explore / 80% Exploit
+    → Protect application throughput, finish strong
+  ```
+- **Data Source:** W000-STRATEGY-021, seasonal energy patterns
+- **Output:** Current phase + energy allocation recommendations + activity prioritization
+- **Estimated Lines:** 300-350 lines
+
+**TYPE-062: Qualitative Transformation Tracking**
+- **Framework:** Internal Growth Measurement
+- **Algorithm:**
+  ```
+  Track qualitative metrics:
+  - Confidence (1-10 scale) across domains
+  - Voice Authenticity (1-10 scale) in essays/communication
+  - Grit Examples (specific instances of perseverance)
+  - Self-Advocacy Growth (asking for help, expressing needs)
+
+  Compare: Week 1 baseline vs. Current week
+  ```
+- **Data Source:** W000-STRATEGY-019, qualitative transformation patterns
+- **Output:** Transformation timeline + growth areas + celebration moments
+- **Estimated Lines:** 350-400 lines
+
+**Estimated Effort:** 5-6 days (3 types × ~350 lines each = ~1050 lines total)
+
+---
+
+### **Summary: Full Expansion Roadmap**
+
+| Version | Intelligence Types | Focus | Estimated Effort | Total Lines |
+|---------|-------------------|-------|------------------|-------------|
+| v20.0 ✅ | TYPE-049, TYPE-050 (+ 12 stubs) | Foundation | 1 week | 1200 lines |
+| v20.1 | TYPE-051, TYPE-052, TYPE-061, TYPE-063 | Core Execution | 1 week | 1400 lines |
+| v20.2 | TYPE-053, TYPE-054 | Capacity Management | 4-5 days | 800 lines |
+| v20.3 | TYPE-055, TYPE-056 | Blocking & Recovery | 4-5 days | 800 lines |
+| v20.4 | TYPE-057, TYPE-058 | Proof & Applications | 4-5 days | 900 lines |
+| v20.5 | TYPE-059, TYPE-060, TYPE-062 | Narrative & Qualitative | 5-6 days | 1050 lines |
+| **TOTAL** | **16 Intelligence Types** | **Full ExecutionAgent** | **~4-5 weeks** | **~6150 lines** |
+
+**Expected Impact:**
+- Complete ExecutionAgent with all 15 execution frameworks from 93-week coaching intelligence
+- Jenny's Digital Twin fully operational as master orchestrator
+- Weekly action planning with proof generation, capacity management, blocking detection
+- Multi-agent delegation enabling cross-agent workflows
+- Qualitative transformation tracking (confidence, grit, voice)
+- Full application throughput management (5-lane model)
+
+**Dependencies:**
+- v20.0 ExecutionAgent Foundation (✅ complete)
+- Database migrations 22-23 (task decomposition + velocity tracking)
+- Existing agent implementations (for TYPE-061 delegation)
+
+**Owner:** TBD
+**Status:** 📋 **READY FOR IMPLEMENTATION** - Priority after v20.0 Foundation validated in production
+
+**References:**
+- Deep-dive analysis: `docs/agents/EXECUTION_AGENT_INTELLIGENCE_ARCHITECTURE.md` (500+ lines)
+- Stub implementations: `services/agent-framework/src/intelligence/types/TYPE-051-063-Stubs.ts`
+- ExecutionAgent: `services/agent-framework/src/agents/v18/ExecutionAgent.ts`
+- Complete implementations: `TYPE-049-ExecutionLadderNavigation.ts` (557 lines), `TYPE-050-OutcomeEngineering.ts` (406 lines)
+- Data source: `data/kb_intel_chips/exec-chips/EXEC_Intel_Chips_Batch_v2.jsonl` (62 chips)
+
+**Timeline:** Q4 2025 - Q1 2026 (incremental expansion after v20.0 production validation)
+
+---
+
+### 5. Foundation Agents Architecture Spec - Reverse Engineering
 
 **Current State:**
 - v17.0 Assessment Agent architecture implemented

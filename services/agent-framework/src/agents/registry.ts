@@ -17,6 +17,7 @@ import { AssessmentAgent } from './v18/AssessmentAgentRefactored.js';
 import { ExtracurricularsAgentRefactored } from './v18/ExtracurricularsAgentRefactored.js';
 import { AwardsAgentRefactored } from './v18/AwardsAgentRefactored.js';
 import { SummerProgramsAgentRefactored } from './v18/SummerProgramsAgentRefactored.js';
+import { ExecutionAgent } from './v18/ExecutionAgent.js';
 import { initializeFactStore } from '../facts/initializeFactStore.js';
 import { FactStore } from '../facts/FactStore.js';
 import { IntelligenceRegistry } from '../intelligence/IntelligenceRegistry.js';
@@ -36,6 +37,7 @@ export class AgentRegistry {
   private extracurricularsAgent: ExtracurricularsAgentRefactored | null = null;
   private awardsAgent: AwardsAgentRefactored | null = null;
   private summerProgramsAgent: SummerProgramsAgentRefactored | null = null;
+  private executionAgent: ExecutionAgent | null = null;
   private eventBus: EventBus | null = null;
   private pool: Pool | null = null;
   private factStore: FactStore | null = null;
@@ -113,6 +115,16 @@ export class AgentRegistry {
         intelligence_types_loaded: this.summerProgramsAgent ? 3 : 0, // TYPE-020, TYPE-028, TYPE-029, TYPE-030
       });
 
+      // Initialize ExecutionAgent v20.0 with FactStore (NEW)
+      log.event('agent_registry.initialize_execution_agent', {});
+      this.executionAgent = new ExecutionAgent(this.factStore);
+      // ExecutionAgent uses new BaseAgentWithIntelligence (no EventBus)
+      log.event('agent_registry.execution_agent_ready', {
+        intelligence_types_loaded: this.executionAgent ? 14 : 0, // TYPE-020, TYPE-049, TYPE-050, TYPE-051-063
+        complete_types: 2, // TYPE-049, TYPE-050
+        stub_types: 12, // TYPE-051-063
+      });
+
       log.event('agent_registry.initialize_complete', {
         agents_initialized: [
           'GamePlanAgent-v18',
@@ -120,6 +132,7 @@ export class AgentRegistry {
           'ExtracurricularsAgent-v18',
           'AwardsAgent-v18.1',
           'SummerProgramsAgent-v19.0',
+          'ExecutionAgent-v20.0',
         ],
         event_bus_ready: true,
         fact_store_ready: true,
@@ -183,6 +196,16 @@ export class AgentRegistry {
       throw new Error('SummerProgramsAgent not initialized. Call initialize() first.');
     }
     return this.summerProgramsAgent;
+  }
+
+  /**
+   * Get ExecutionAgent instance
+   */
+  getExecutionAgent(): ExecutionAgent {
+    if (!this.executionAgent) {
+      throw new Error('ExecutionAgent not initialized. Call initialize() first.');
+    }
+    return this.executionAgent;
   }
 
   /**
@@ -281,7 +304,47 @@ export class AgentRegistry {
       };
     }
 
-    // Check for summer programs queries (v19.0 - NEW)
+    // Check for execution queries (v20.0 - NEW)
+    const isExecutionQuery =
+      lowerQuery.includes('this week') ||
+      lowerQuery.includes('weekly plan') ||
+      lowerQuery.includes('weekly action') ||
+      lowerQuery.includes('execution') ||
+      lowerQuery.includes('what should i do') ||
+      lowerQuery.includes('what to do') ||
+      lowerQuery.includes('next steps') ||
+      lowerQuery.includes('getting things done') ||
+      lowerQuery.includes('gsd') ||
+      lowerQuery.includes('progress') ||
+      lowerQuery.includes('momentum') ||
+      lowerQuery.includes('outcome') ||
+      lowerQuery.includes('task') ||
+      lowerQuery.includes('action item') ||
+      lowerQuery.includes('ladder') ||
+      lowerQuery.includes('where am i');
+
+    if (isExecutionQuery) {
+      // Route to ExecutionAgent
+      const executionAgent = this.getExecutionAgent();
+      const result = await executionAgent.handleQuery({
+        entity_id: student_id,
+        query,
+        session_id,
+      });
+
+      return {
+        response: result.response,
+        agent_used: 'ExecutionAgent-v20.0',
+        metadata: {
+          ...result.metadata,
+          facts_used_count: result.facts_used.length,
+          validation_score: result.validation_score,
+          intelligence_triggered: result.triggered_intelligence || [],
+        },
+      };
+    }
+
+    // Check for summer programs queries (v19.0)
     const isSummerProgramsQuery =
       lowerQuery.includes('summer program') ||
       lowerQuery.includes('summer course') ||
@@ -407,11 +470,12 @@ export class AgentRegistry {
 
     // Default fallback: return helpful message
     return {
-      response: "I can help you with:\n• Game plan and strategic roadmap\n• Profile assessment and strengths\n• Extracurriculars portfolio optimization\n• Award recommendations and quick wins strategy\n• Summer program selection and application strategy (NEW in v19.0)\n\nTry asking: 'What is my game plan?', 'Show me my assessment', 'How can I improve my extracurriculars?', 'What awards should I apply to?', or 'What summer programs should I apply to?'",
+      response: "I can help you with:\n• Weekly execution and action planning (NEW in v20.0)\n• Game plan and strategic roadmap\n• Profile assessment and strengths\n• Extracurriculars portfolio optimization\n• Award recommendations and quick wins strategy\n• Summer program selection and application strategy\n\nTry asking: 'What should I do this week?', 'What is my game plan?', 'Show me my assessment', 'How can I improve my extracurriculars?', 'What awards should I apply to?', or 'What summer programs should I apply to?'",
       agent_used: 'agent-registry-fallback',
       metadata: {
         intent: 'unknown',
         available_agents: [
+          'ExecutionAgent-v20.0',
           'GamePlanAgent-v18',
           'AssessmentAgent-v18',
           'ExtracurricularsAgent-v18',
