@@ -325,6 +325,339 @@ ScholarshipsAgent completes the "Opportunity Discovery" suite:
 
 ---
 
+## v20.1 - ExecutionAgent Core Execution Primitives (2025-10-29)
+
+**Focus:** Expand ExecutionAgent with 4 HIGH-PRIORITY intelligence types for tactical weekly execution: Task Decomposition, Portfolio Operating Cadence, Multi-Agent Delegation, and Progress Velocity.
+
+### Summary
+
+v20.1 expands the **ExecutionAgent** with 4 complete intelligence types that enable full weekly execution orchestration:
+
+- **Task Decomposition (TYPE-051)** - 3-level hierarchy: Outcomes → ExecutionItems → Tasks with dependency mapping
+- **Portfolio Operating Cadence (TYPE-052)** - Monday→Sunday weekly rhythm with daily plans + time blocks
+- **Progress Velocity (TYPE-063)** - Completion velocity tracking with momentum indicators (accelerating/steady/decelerating/stalled)
+- **Multi-Agent Delegation (TYPE-061)** - Specialist agent routing + response synthesis into execution context
+- **ExecutionAgent Enhanced** - Full 8-section response synthesis integrating all 6 complete intelligence types
+- **Zero Hallucinations** - Fact-first enforcement maintained across all new types
+
+**Key Achievement:** ExecutionAgent now has complete weekly execution orchestration capability with task breakdown, daily rhythm, velocity tracking, and specialist delegation.
+
+### Core Intelligence Types Implemented
+
+#### TYPE-051: Task Decomposition Intelligence (DOMAIN_SPECIFIC) ✅ COMPLETE (v20.1)
+
+**Location:** `services/agent-framework/src/intelligence/types/TYPE-051-TaskDecomposition.ts` (580 lines)
+
+**Purpose:** Breaks down outcomes into 3-level execution hierarchy for weekly sprints
+
+**Algorithm:**
+```typescript
+/**
+ * 3-Level Hierarchy:
+ * Level 1: Outcome (P0/P1/P2/P3) - What needs to happen this week
+ * Level 2: ExecutionItems (2-4 per outcome) - 5Ws breakdown (Who/What/When/Where/Why)
+ * Level 3: Tasks (3-8 per item) - Micro-steps (15-90 minutes) with dependencies
+ *
+ * Capacity Check:
+ * - >25 hours/week = CRITICAL burnout risk
+ * - 20-25 hours = WARNING over capacity
+ * - 8-20 hours = healthy range
+ * - <8 hours = light week (add P2 stretch goal)
+ *
+ * Critical Path Calculation:
+ * - Topological sort with duration weighting
+ * - Identifies longest dependency chain
+ * - Highlights serial bottlenecks
+ */
+```
+
+**Features:**
+- Decomposes outcomes into execution items with 5Ws (Who/What/When/Where/Why)
+- Breaks execution items into 15-90 minute micro-tasks
+- Builds dependency graph with "blocks" relationships
+- Calculates critical path through task network
+- Capacity stress testing (warns if >20 hours planned)
+- Proof-before-pitch pattern validation
+- Recommendations for scope adjustments
+
+**Sample Decomposition:**
+- Outcome: "Complete Congressional App Challenge submission"
+  - ExecutionItem 1: "Record and edit 2-minute demo video" (4h)
+    - Task 1: Write demo script (45min)
+    - Task 2: Record 3-5 takes (60min)
+    - Task 3: Edit video to 2 minutes (90min)
+    - Task 4: Get feedback from 2 people (30min)
+    - Task 5: Make final edits (30min)
+  - ExecutionItem 2: "Write 500-word technical description" (3h)
+  - ExecutionItem 3: "Submit application via portal" (1h)
+
+#### TYPE-052: Portfolio Operating Cadence (DOMAIN_SPECIFIC) ✅ COMPLETE (v20.1)
+
+**Location:** `services/agent-framework/src/intelligence/types/TYPE-052-PortfolioOperatingCadence.ts` (470 lines)
+
+**Purpose:** Enforces Monday→Sunday weekly operating rhythm for consistent execution
+
+**Algorithm:**
+```typescript
+/**
+ * 7-Day Weekly Cadence:
+ * Monday: Prioritize (P0/P1 selection, week planning) - 3h admin
+ * Tuesday-Thursday: Produce (deep work blocks, artifact creation) - 5h/day deep work
+ * Friday: Publish (share progress publicly) - 2h deep work + 1h communication
+ * Saturday: Propagate (amplify on social, email distribution) - 3h communication
+ * Sunday: Post-mortem (reflect, adjust next week) - 1h review + rest
+ *
+ * Rhythm Health Score (0-10):
+ * - Deep work concentrated Tue-Thu (12-15h)
+ * - Friday has public proof target
+ * - Monday has 2-3h planning time
+ * - Weekend has <4h deep work (rest protection)
+ * - Sunday has reflection ritual
+ */
+```
+
+**Features:**
+- Daily plans with time blocks (2-4 hour deep work sessions)
+- Energy allocation by activity type (deep_work, admin, communication, rest)
+- Proof targets for each day (what evidence should be generated)
+- Phase-specific focus (prioritize/produce/publish/propagate/post_mortem)
+- Rhythm health assessment (warns about deep work imbalance, weekend burnout)
+- Pacing recommendations (sustainable 2-3 submissions/week)
+
+**Sample Monday Plan:**
+- 09:00-10:00: Review last week outcomes + velocity (medium energy)
+- 10:00-12:00: Select P0 outcome + break down execution items (high energy)
+- 19:00-20:00: Weekly sync with coach (medium energy)
+- Proof Target: Week plan document with P0/P1 outcomes + time blocks
+
+#### TYPE-063: Progress Velocity & Momentum (DOMAIN_SPECIFIC) ✅ COMPLETE (v20.1)
+
+**Location:** `services/agent-framework/src/intelligence/types/TYPE-063-ProgressVelocity.ts` (540 lines)
+
+**Purpose:** Tracks completion velocity and momentum to identify acceleration/deceleration patterns
+
+**Algorithm:**
+```typescript
+/**
+ * Velocity Formula:
+ * Velocity = Actual Completion / Expected Completion
+ * >1.0 = ahead of schedule (celebrate!)
+ * 0.8-1.0 = on track (maintain)
+ * <0.8 = at risk (escalate to coach)
+ *
+ * Momentum Indicators:
+ * - accelerating: velocity increasing week-over-week
+ * - steady: velocity stable (±10%)
+ * - decelerating: velocity decreasing week-over-week
+ * - stalled: velocity <0.5 mid-week
+ *
+ * Momentum Score (-10 to +10):
+ * - Week-over-week change: ±10% = ±1 point
+ * - Absolute velocity: >1.2 = +3, 1.0-1.2 = +2, 0.8-1.0 = +1, <0.5 = -3
+ * - Consistency streak: +1 point per week with velocity ≥0.8 (max +3)
+ *
+ * Recommendations Priority:
+ * - celebrate: momentum score ≥5, velocity ≥1.0
+ * - maintain: momentum score ≥0, velocity ≥0.8
+ * - adjust: momentum score <0 or velocity <0.8
+ * - escalate: momentum score <-5 (stalled)
+ */
+```
+
+**Features:**
+- Velocity snapshots (last 4-8 weeks with expected vs actual completion)
+- Velocity trend analysis (current, previous, week-over-week change, 4-week average)
+- Momentum analysis with contributing factors (velocity change, proof generation, streak)
+- At-risk indicators (velocity declining, no recent weeks ≥0.8, insufficient proof)
+- Momentum drivers (strong week-over-week improvement, consistency streak)
+- Capacity utilization analysis (20h/week = 100%, >25h = critical overcommitment)
+- Scope adjustment recommendations (cut P2/P3, reduce complexity, extend deadlines)
+
+#### TYPE-061: Multi-Agent Delegation Intelligence (DOMAIN_SPECIFIC) ✅ COMPLETE (v20.1)
+
+**Location:** `services/agent-framework/src/intelligence/types/TYPE-061-MultiAgentDelegation.ts` (480 lines)
+
+**Purpose:** Routes queries to specialist agents and synthesizes responses into execution summary
+
+**Algorithm:**
+```typescript
+/**
+ * Specialist Agent Routing:
+ * 1. Detect specialist intent from query keywords
+ * 2. Calculate confidence score (0.5 + matches * 0.2, max 1.0)
+ * 3. If confidence ≥0.7, prepare delegation request with execution context
+ * 4. ExecutionAgent calls specialist via AgentRegistry
+ * 5. Synthesize specialist response into weekly execution plan
+ * 6. Return integrated action plan with capacity check
+ *
+ * Specialist Agents:
+ * - GamePlanAgent: game plan, roadmap, quarterly, strategy, timeline
+ * - AssessmentAgent: assessment, evaluate, strengths, weaknesses, profile
+ * - ExtracurricularsAgent: extracurricular, activities list, ec portfolio, tier classification
+ * - AwardsAgent: award, competition, honor, ncwit, congressional app, quick win
+ * - SummerProgramsAgent: summer program, mit launch, rsi, columbia science, sstp
+ * - ScholarshipsAgent: scholarship, financial aid, efc, fafsa, css profile, aid package
+ *
+ * Execution Context (passed to specialist):
+ * - current_week_focus
+ * - current_p0_outcome
+ * - current_velocity
+ * - available_capacity_hours
+ */
+```
+
+**Features:**
+- Intent detection with keyword matching and confidence scoring
+- Query classification (specialist/execution/hybrid)
+- Delegation request preparation with execution context
+- Response synthesis into weekly execution plan
+- Capacity feasibility check (total hours vs available hours)
+- Integration rationale (why specialist recommendations fit into weekly plan)
+- Next steps extraction from specialist response
+
+**Sample Delegation Flow:**
+Query: "What awards should I apply to?"
+→ Detect: AwardsAgent (confidence: 0.9, keywords: [award, apply])
+→ Delegate: AwardsAgent.handleQuery() with execution context
+→ Synthesize: Extract 2-3 award applications as execution items
+→ Capacity Check: 10h required vs 12h available = ✅ Feasible
+→ Next Steps: [Submit Congressional App, Prepare NCWIT draft]
+
+### ExecutionAgent Enhancement
+
+**Location:** `services/agent-framework/src/agents/v18/ExecutionAgent.ts` (updated to 491 lines)
+
+**Changes:**
+- Updated header comment to reflect v20.1 status (6 complete types)
+- Enhanced `synthesizeResponse()` method with 8-section structure:
+  1. Progress Velocity (TYPE-063) - Momentum check first
+  2. Execution Ladder Position (TYPE-049) - Journey context
+  3. Outcome Engineering (TYPE-050) - This week's focus
+  4. Task Decomposition (TYPE-051) - Break down P0 outcome
+  5. Portfolio Operating Cadence (TYPE-052) - Daily rhythm
+  6. Multi-Agent Delegation (TYPE-061) - Specialist routing
+  7. Stub intelligence (remaining 8 types)
+  8. Next Actions Summary (integrated from all sources)
+
+- Added 4 new formatter methods:
+  - `formatProgressVelocity()` - Velocity + momentum + recommendations
+  - `formatTaskDecomposition()` - Outcomes → Items → Tasks breakdown
+  - `formatPortfolioCadence()` - Today's plan + weekly rhythm + health
+  - `formatDelegation()` - Specialist routing + integrated plan
+
+- Updated `formatNextActions()` to integrate velocity, tasks, cadence, ladder, outcomes
+
+**Response Flow:**
+```
+User: "What should I do this week?"
+→ ExecutionAgent triggers all 14 intelligence types
+→ TYPE-063: Velocity = 0.85 (on track, steady momentum)
+→ TYPE-049: Ladder = Rung 5 (ARTIFACTS phase)
+→ TYPE-050: Outcomes = 2 generated (P0: Congressional App, P1: Portfolio v2)
+→ TYPE-051: Tasks = 15 micro-tasks (total 12h)
+→ TYPE-052: Cadence = Tuesday (Produce phase, 5h deep work)
+→ TYPE-061: No specialist delegation needed (direct execution)
+→ Synthesis: 8-section response with prioritized next actions
+```
+
+### Intelligence Registry Updates
+
+**Location:** `services/agent-framework/src/intelligence/IntelligenceRegistry.ts`
+
+**Changes:**
+- Replaced stub imports for TYPE-051, TYPE-052, TYPE-061, TYPE-063 with complete implementations
+- Updated registration comments to show ✅ Complete (v20.1) status
+- Total intelligence types: 23 (1 UNIVERSAL + 22 DOMAIN_SPECIFIC)
+
+**Distribution:**
+- ExecutionAgent: 6 complete (TYPE-049, TYPE-050, TYPE-051, TYPE-052, TYPE-061, TYPE-063) + 8 stubs
+
+### Files Created/Modified
+
+**Intelligence Types (NEW):**
+- `services/agent-framework/src/intelligence/types/TYPE-051-TaskDecomposition.ts` (580 lines)
+- `services/agent-framework/src/intelligence/types/TYPE-052-PortfolioOperatingCadence.ts` (470 lines)
+- `services/agent-framework/src/intelligence/types/TYPE-061-MultiAgentDelegation.ts` (480 lines)
+- `services/agent-framework/src/intelligence/types/TYPE-063-ProgressVelocity.ts` (540 lines)
+
+**Total New Intelligence Code:** ~2070 lines
+
+**Agent (UPDATED):**
+- `services/agent-framework/src/agents/v18/ExecutionAgent.ts` - Enhanced synthesis with 8 sections + 4 new formatters
+
+**Registry (UPDATED):**
+- `services/agent-framework/src/intelligence/IntelligenceRegistry.ts` - Registered 4 new complete types
+
+**Documentation (UPDATED):**
+- `docs/PROD_FEATURE_RELEASE_DETAILS.md` - Added v20.1 section
+- `docs/MASTER_PROD_TECH_SPEC.md` - Version updated to v20.1
+- `docs/PROD_DB_ARCH.md` - Version updated to v20.1
+
+### Impact
+
+**User-Facing:**
+- Students asking "What should I do this week?" get complete tactical plan with:
+  - Velocity check (how am I performing?)
+  - Task breakdown (what are the micro-steps?)
+  - Daily rhythm (what should I do today?)
+  - Capacity validation (is this realistic?)
+- Weekly execution queries now produce 8-section comprehensive responses
+- Specialist delegation enables seamless handoff to Awards/Scholarships/Programs agents
+
+**Architecture:**
+- ExecutionAgent now has 6 complete intelligence types (was 2 in v20.0)
+- 8 stub types remaining for v20.2-v20.5 expansion
+- Platform total: 23 intelligence types (6 complete for ExecutionAgent + 3 each for Awards/Programs/Scholarships + 2 for GamePlan/Assessment + 8 stubs)
+
+**Performance:**
+- 3-level task decomposition prevents overwhelm (breaks 12h outcome into 15x 15-90 min tasks)
+- Portfolio cadence prevents burnout (protects weekend rest, concentrates deep work Tue-Thu)
+- Velocity tracking enables early intervention (escalate when <0.8 for 2+ weeks)
+- Capacity stress testing prevents overcommitment (warns at 20h, critical at 25h)
+
+### Migration
+
+No database migrations required in v20.1. Future v20.2 will require:
+```sql
+-- Migration 22: Task decomposition support (planned for v20.2)
+ALTER TABLE tasks
+  ADD COLUMN parent_execution_item_id TEXT,
+  ADD COLUMN dependency_task_ids TEXT[],
+  ADD COLUMN estimated_effort_minutes INTEGER;
+
+-- Migration 23: Velocity tracking (planned for v20.2)
+CREATE TABLE velocity_snapshots (
+  snapshot_id SERIAL PRIMARY KEY,
+  student_id TEXT NOT NULL,
+  week_number INTEGER NOT NULL,
+  expected_completion_count INTEGER,
+  actual_completion_count INTEGER,
+  velocity_score NUMERIC,
+  momentum_indicator TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### Strategic Context
+
+v20.1 completes Phase 1 of ExecutionAgent expansion roadmap (from BACKLOG_CRITICAL_ITEMS.md):
+
+**v20.1 Complete (4 types):**
+- ✅ TYPE-051: Task Decomposition
+- ✅ TYPE-052: Portfolio Operating Cadence
+- ✅ TYPE-061: Multi-Agent Delegation
+- ✅ TYPE-063: Progress Velocity
+
+**Next Phases:**
+- v20.2 (2 types): TYPE-053 Time Architecture, TYPE-054 Metric Ladder Instrumentation
+- v20.3 (2 types): TYPE-055 Blocking Detection, TYPE-056 LoR Engineering
+- v20.4 (2 types): TYPE-057 Proof Engineering, TYPE-058 Application Mastery Rail
+- v20.5 (2 types): TYPE-059 Narrative Harmonization, TYPE-060 Seasonal Energy Allocation
+
+**Platform Status:** 7 AGENTS OPERATIONAL + 23 INTELLIGENCE TYPES (15 complete + 8 stubs)
+
+---
+
 ## v20.0 - ExecutionAgent Foundation (2025-10-29)
 
 **Focus:** Jenny's Digital Twin for weekly tactical execution. Master orchestrator implementing 14 execution intelligence types (2 complete + 12 stubs) extracted from 93-week coaching intelligence.

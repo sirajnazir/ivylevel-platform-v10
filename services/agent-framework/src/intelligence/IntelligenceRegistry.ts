@@ -27,9 +27,11 @@ import { ProgramApplicationStrategy } from './types/TYPE-029-ProgramApplicationS
 import { CostBenefitIntelligence } from './types/TYPE-030-CostBenefitIntelligence.js';
 import { ExecutionLadderNavigation } from './types/TYPE-049-ExecutionLadderNavigation.js';
 import { OutcomeEngineering } from './types/TYPE-050-OutcomeEngineering.js';
+import { TaskDecomposition } from './types/TYPE-051-TaskDecomposition.js';
+import { PortfolioOperatingCadence } from './types/TYPE-052-PortfolioOperatingCadence.js';
+import { MultiAgentDelegation } from './types/TYPE-061-MultiAgentDelegation.js';
+import { ProgressVelocity } from './types/TYPE-063-ProgressVelocity.js';
 import {
-  TaskDecomposition,
-  PortfolioOperatingCadence,
   TimeArchitecture,
   MetricLadderInstrumentation,
   BlockingDetection,
@@ -38,9 +40,7 @@ import {
   ApplicationMasteryRail,
   NarrativeHarmonization,
   SeasonalEnergyAllocation,
-  MultiAgentDelegation,
   QualitativeTransformation,
-  ProgressVelocity,
 } from './types/TYPE-051-063-Stubs.js';
 import { ScholarshipSelectionMatrix } from './types/TYPE-031-ScholarshipSelectionMatrix.js';
 import { ApplicationTimelineStrategy } from './types/TYPE-032-ApplicationTimelineStrategy.js';
@@ -140,11 +140,11 @@ export class IntelligenceRegistry {
     this.register(new ApplicationTimelineStrategy()); // TYPE-032
     this.register(new FinancialAidIntelligence());    // TYPE-033
 
-    // Register DOMAIN-SPECIFIC intelligence types (ExecutionAgent) - v20.0
-    this.register(new ExecutionLadderNavigation());  // TYPE-049 ✅ Complete
-    this.register(new OutcomeEngineering());         // TYPE-050 ✅ Complete
-    this.register(new TaskDecomposition());          // TYPE-051 🚧 Stub (expand in v20.1)
-    this.register(new PortfolioOperatingCadence());  // TYPE-052 🚧 Stub (expand in v20.1)
+    // Register DOMAIN-SPECIFIC intelligence types (ExecutionAgent) - v20.0 + v20.1
+    this.register(new ExecutionLadderNavigation());  // TYPE-049 ✅ Complete (v20.0)
+    this.register(new OutcomeEngineering());         // TYPE-050 ✅ Complete (v20.0)
+    this.register(new TaskDecomposition());          // TYPE-051 ✅ Complete (v20.1)
+    this.register(new PortfolioOperatingCadence());  // TYPE-052 ✅ Complete (v20.1)
     this.register(new TimeArchitecture());           // TYPE-053 🚧 Stub (expand in v20.2)
     this.register(new MetricLadderInstrumentation());// TYPE-054 🚧 Stub (expand in v20.2)
     this.register(new BlockingDetection());          // TYPE-055 🚧 Stub (expand in v20.3)
@@ -153,9 +153,9 @@ export class IntelligenceRegistry {
     this.register(new ApplicationMasteryRail());     // TYPE-058 🚧 Stub (expand in v20.4)
     this.register(new NarrativeHarmonization());     // TYPE-059 🚧 Stub (expand in v20.5)
     this.register(new SeasonalEnergyAllocation());   // TYPE-060 🚧 Stub (expand in v20.5)
-    this.register(new MultiAgentDelegation());       // TYPE-061 🚧 Stub (expand in v20.1 - HIGH PRIORITY)
+    this.register(new MultiAgentDelegation());       // TYPE-061 ✅ Complete (v20.1)
     this.register(new QualitativeTransformation());  // TYPE-062 🚧 Stub (expand in v20.5)
-    this.register(new ProgressVelocity());           // TYPE-063 🚧 Stub (expand in v20.1 - HIGH PRIORITY)
+    this.register(new ProgressVelocity());           // TYPE-063 ✅ Complete (v20.1)
 
     this.initialized = true;
 
