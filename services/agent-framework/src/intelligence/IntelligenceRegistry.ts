@@ -20,7 +20,11 @@
 
 import { IntelligenceType } from './types/BaseIntelligenceType.js';
 import { GamePlanSynthesis } from './types/TYPE-001-GamePlanSynthesis.js';
+import { WeakSpotPrioritization } from './types/TYPE-002-WeakSpotPrioritization.js';
 import { TimelineArchitecture as GamePlanTimelineArchitecture } from './types/TYPE-003-TimelineArchitecture.js';
+import { MultiPathConvergence } from './types/TYPE-004-MultiPathConvergence.js';
+import { QuarterlyAdaptation } from './types/TYPE-006-QuarterlyAdaptation.js';
+import { TimeMathematician } from './types/TYPE-007-TimeMathematician.js';
 import { AwardArbitrageSystem } from './types/AwardArbitrageSystem.js';
 import { OpportunityPipeline } from './types/OpportunityPipeline.js';
 import { QuickWinsStrategy } from './types/QuickWinsStrategy.js';
@@ -128,9 +132,11 @@ export class IntelligenceRegistry {
 
     // Register DOMAIN-SPECIFIC intelligence types (GamePlanAgent) - v18.0
     this.register(new GamePlanSynthesis());             // TYPE-001 ✅ Complete (v18.0)
+    this.register(new WeakSpotPrioritization());        // TYPE-002 ✅ Complete (v18.0)
     this.register(new GamePlanTimelineArchitecture());  // TYPE-003 ✅ Complete (v18.0)
-    // TODO: TYPE-002 (Weak Spot Prioritization), TYPE-004 (Multi-Path Convergence),
-    //       TYPE-006 (Quarterly Adaptation), TYPE-007 (Time Mathematician)
+    this.register(new MultiPathConvergence());          // TYPE-004 ✅ Complete (v18.0)
+    this.register(new QuarterlyAdaptation());           // TYPE-006 ✅ Complete (v18.0)
+    this.register(new TimeMathematician());             // TYPE-007 ✅ Complete (v18.0)
 
     // Register DOMAIN-SPECIFIC intelligence types (Awards Agent)
     this.register(new AwardArbitrageSystem()); // TYPE-023
