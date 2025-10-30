@@ -42,6 +42,9 @@ import {
   QualitativeTransformation,
   ProgressVelocity,
 } from './types/TYPE-051-063-Stubs.js';
+import { ScholarshipSelectionMatrix } from './types/TYPE-031-ScholarshipSelectionMatrix.js';
+import { ApplicationTimelineStrategy } from './types/TYPE-032-ApplicationTimelineStrategy.js';
+import { FinancialAidIntelligence } from './types/TYPE-033-FinancialAidIntelligence.js';
 
 /**
  * Global registry for intelligence type instances
@@ -131,6 +134,11 @@ export class IntelligenceRegistry {
     this.register(new ProgramSelectionMatrix());    // TYPE-028
     this.register(new ProgramApplicationStrategy()); // TYPE-029
     this.register(new CostBenefitIntelligence());    // TYPE-030
+
+    // Register DOMAIN-SPECIFIC intelligence types (ScholarshipsAgent) - v21.0
+    this.register(new ScholarshipSelectionMatrix());  // TYPE-031
+    this.register(new ApplicationTimelineStrategy()); // TYPE-032
+    this.register(new FinancialAidIntelligence());    // TYPE-033
 
     // Register DOMAIN-SPECIFIC intelligence types (ExecutionAgent) - v20.0
     this.register(new ExecutionLadderNavigation());  // TYPE-049 ✅ Complete

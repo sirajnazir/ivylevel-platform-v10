@@ -18,6 +18,7 @@ import { ExtracurricularsAgentRefactored } from './v18/ExtracurricularsAgentRefa
 import { AwardsAgentRefactored } from './v18/AwardsAgentRefactored.js';
 import { SummerProgramsAgentRefactored } from './v18/SummerProgramsAgentRefactored.js';
 import { ExecutionAgent } from './v18/ExecutionAgent.js';
+import { ScholarshipsAgent } from './v18/ScholarshipsAgent.js';
 import { initializeFactStore } from '../facts/initializeFactStore.js';
 import { FactStore } from '../facts/FactStore.js';
 import { IntelligenceRegistry } from '../intelligence/IntelligenceRegistry.js';
@@ -38,6 +39,7 @@ export class AgentRegistry {
   private awardsAgent: AwardsAgentRefactored | null = null;
   private summerProgramsAgent: SummerProgramsAgentRefactored | null = null;
   private executionAgent: ExecutionAgent | null = null;
+  private scholarshipsAgent: ScholarshipsAgent | null = null;
   private eventBus: EventBus | null = null;
   private pool: Pool | null = null;
   private factStore: FactStore | null = null;
@@ -125,6 +127,14 @@ export class AgentRegistry {
         stub_types: 12, // TYPE-051-063
       });
 
+      // Initialize ScholarshipsAgent v21.0 with FactStore (NEW)
+      log.event('agent_registry.initialize_scholarships_agent', {});
+      this.scholarshipsAgent = new ScholarshipsAgent(this.factStore);
+      // ScholarshipsAgent uses new BaseAgentWithIntelligence (no EventBus)
+      log.event('agent_registry.scholarships_agent_ready', {
+        intelligence_types_loaded: this.scholarshipsAgent ? 3 : 0, // TYPE-031, TYPE-032, TYPE-033
+      });
+
       log.event('agent_registry.initialize_complete', {
         agents_initialized: [
           'GamePlanAgent-v18',
@@ -133,6 +143,7 @@ export class AgentRegistry {
           'AwardsAgent-v18.1',
           'SummerProgramsAgent-v19.0',
           'ExecutionAgent-v20.0',
+          'ScholarshipsAgent-v21.0',
         ],
         event_bus_ready: true,
         fact_store_ready: true,
@@ -206,6 +217,16 @@ export class AgentRegistry {
       throw new Error('ExecutionAgent not initialized. Call initialize() first.');
     }
     return this.executionAgent;
+  }
+
+  /**
+   * Get ScholarshipsAgent instance
+   */
+  getScholarshipsAgent(): ScholarshipsAgent {
+    if (!this.scholarshipsAgent) {
+      throw new Error('ScholarshipsAgent not initialized. Call initialize() first.');
+    }
+    return this.scholarshipsAgent;
   }
 
   /**
@@ -295,6 +316,43 @@ export class AgentRegistry {
       return {
         response: result.response,
         agent_used: 'AwardsAgent-v18.1',
+        metadata: {
+          ...result.metadata,
+          facts_used_count: result.facts_used.length,
+          validation_score: result.validation_score,
+          intelligence_triggered: result.triggered_intelligence || [],
+        },
+      };
+    }
+
+    // Check for scholarships queries (v21.0 - NEW)
+    const isScholarshipsQuery =
+      lowerQuery.includes('scholarship') ||
+      lowerQuery.includes('financial aid') ||
+      lowerQuery.includes('efc') ||
+      lowerQuery.includes('pell grant') ||
+      lowerQuery.includes('merit aid') ||
+      lowerQuery.includes('need-based') ||
+      lowerQuery.includes('fafsa') ||
+      lowerQuery.includes('css profile') ||
+      lowerQuery.includes('college cost') ||
+      lowerQuery.includes('aid package') ||
+      lowerQuery.includes('net price') ||
+      lowerQuery.includes('stacking') ||
+      lowerQuery.includes('pay for college');
+
+    if (isScholarshipsQuery) {
+      // Route to ScholarshipsAgent
+      const scholarshipsAgent = this.getScholarshipsAgent();
+      const result = await scholarshipsAgent.handleQuery({
+        entity_id: student_id,
+        query,
+        session_id,
+      });
+
+      return {
+        response: result.response,
+        agent_used: 'ScholarshipsAgent-v21.0',
         metadata: {
           ...result.metadata,
           facts_used_count: result.facts_used.length,
@@ -470,12 +528,13 @@ export class AgentRegistry {
 
     // Default fallback: return helpful message
     return {
-      response: "I can help you with:\n• Weekly execution and action planning (NEW in v20.0)\n• Game plan and strategic roadmap\n• Profile assessment and strengths\n• Extracurriculars portfolio optimization\n• Award recommendations and quick wins strategy\n• Summer program selection and application strategy\n\nTry asking: 'What should I do this week?', 'What is my game plan?', 'Show me my assessment', 'How can I improve my extracurriculars?', 'What awards should I apply to?', or 'What summer programs should I apply to?'",
+      response: "I can help you with:\n• Weekly execution and action planning\n• Scholarships and financial aid strategy (NEW in v21.0)\n• Game plan and strategic roadmap\n• Profile assessment and strengths\n• Extracurriculars portfolio optimization\n• Award recommendations and quick wins strategy\n• Summer program selection and application strategy\n\nTry asking: 'What should I do this week?', 'What scholarships should I apply to?', 'How much financial aid can I get?', 'What is my game plan?', 'Show me my assessment', 'How can I improve my extracurriculars?', 'What awards should I apply to?', or 'What summer programs should I apply to?'",
       agent_used: 'agent-registry-fallback',
       metadata: {
         intent: 'unknown',
         available_agents: [
           'ExecutionAgent-v20.0',
+          'ScholarshipsAgent-v21.0',
           'GamePlanAgent-v18',
           'AssessmentAgent-v18',
           'ExtracurricularsAgent-v18',
