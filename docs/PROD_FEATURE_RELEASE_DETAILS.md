@@ -1,9 +1,11 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v21.0
+**Document Version:** v20.1
 **Last Updated:** 2025-10-29
-**Current Version:** v21.0 - ScholarshipsAgent Foundation
+**Current Version:** v20.1 - ExecutionAgent Core Execution Primitives
 **Status:** ✅ PRODUCTION READY - 7 AGENTS OPERATIONAL + 23 INTELLIGENCE TYPES
+**Strategic Focus:** 7 Core Student Development Agents (9th-11th Grade, 3+ Years Value)
+**See:** PRIORITY_ROADMAP_REFOCUSED.md for strategic rationale (deprioritized college apps agents)
 
 ---
 
