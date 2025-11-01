@@ -27,6 +27,7 @@ import { Pool } from 'pg';
 import { AgentRegistry } from '../agents/registry.js';
 import { withApiKey, withRateLimit } from '../middleware/security.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
+import { V26AgentWrapper } from '../agents/V26AgentWrapper.js';
 
 const router = Router();
 const logger = createLogger('v26-multiagents');
@@ -35,6 +36,15 @@ const logger = createLogger('v26-multiagents');
  * Initialize router with dependencies
  */
 export function createV26MultiAgentsRouter(pool: Pool, agentRegistry: AgentRegistry): Router {
+  // Initialize V26AgentWrapper with intelligence-guided responses
+  const v26Wrapper = new V26AgentWrapper(agentRegistry);
+
+  logger.event('v26.router.initialized', {
+    v26_wrapper: 'enabled',
+    mode: 'intelligence_guided_new_student',
+    real_intelligence_frameworks: true,
+    clean_slate_context: true,
+  });
   // ============================================================================
   // POST /api/v26/session/start
   // ============================================================================
@@ -232,60 +242,26 @@ What would you like to focus on this week?`;
 
       const userMessage = userMessageResult.rows[0];
 
-      // Route to appropriate agent based on agentId
-      let agentResponse;
+      // Route to V26AgentWrapper (uses real agents with clean-slate student context)
       const startTime = Date.now();
 
-      if (agentId.includes('assessment')) {
-        const agent = agentRegistry.getAssessmentAgent();
-        agentResponse = await agent.handleQuery({
-          entity_id: student_id,
-          query: message,
-          session_id,
-        });
-      } else if (agentId.includes('gameplan')) {
-        const agent = agentRegistry.getGamePlanAgent();
-        agentResponse = await agent.handleGamePlanQuery({
-          student_id,
-          query: message,
-          session_id,
-        });
-      } else if (agentId.includes('execution')) {
-        const agent = agentRegistry.getExecutionAgent();
-        agentResponse = await agent.handleQuery({
-          entity_id: student_id,
-          query: message,
-          session_id,
-        });
-      } else if (agentId.includes('awards')) {
-        const agent = agentRegistry.getAwardsAgent();
-        agentResponse = await agent.handleQuery({
-          entity_id: student_id,
-          query: message,
-          session_id,
-        });
-      } else if (agentId.includes('programs')) {
-        const agent = agentRegistry.getSummerProgramsAgent();
-        agentResponse = await agent.handleQuery({
-          entity_id: student_id,
-          query: message,
-          session_id,
-        });
-      } else if (agentId.includes('scholarships')) {
-        const agent = agentRegistry.getScholarshipsAgent();
-        agentResponse = await agent.handleQuery({
-          entity_id: student_id,
-          query: message,
-          session_id,
-        });
-      } else {
-        return res.status(400).json({
-          error: 'Invalid agent_id',
-          message: `Agent ${agentId} is not recognized`,
-        });
-      }
+      const agentResponse = await v26Wrapper.handleQuery({
+        agent_id: agentId,
+        student_id,
+        session_id,
+        message,
+      });
 
       const processingTime = Date.now() - startTime;
+
+      // Log v26 context
+      logger.event('v26.agent.response_with_context', {
+        agent_id: agentId,
+        session_id,
+        is_new_student: agentResponse.v26_context.is_new_student,
+        facts_from_session: agentResponse.v26_context.facts_from_session,
+        facts_from_db: agentResponse.v26_context.facts_from_db,
+      });
 
       // Save agent response
       const agentMessageResult = await pool.query(
