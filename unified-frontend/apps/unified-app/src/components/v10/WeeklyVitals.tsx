@@ -446,12 +446,26 @@ interface WeeklyVitalsProps {
 
 export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
   const [weeks, setWeeks] = useState<WeeklyVitalsType[]>([]);
+  const [totalWeeksCount, setTotalWeeksCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'recent' | 'quarter' | 'all'>('recent');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [actionPlans, setActionPlans] = useState<Record<number, WeeklyActionPlan | null>>({});
   const [loadingActionPlans, setLoadingActionPlans] = useState(false);
   const [expandedActionPlans, setExpandedActionPlans] = useState<Record<number, boolean>>({});
+
+  // Load total weeks count once on mount
+  useEffect(() => {
+    const loadTotalCount = async () => {
+      try {
+        const data = await v10Api.getWeeklyVitals(studentId, { limit: 100 });
+        setTotalWeeksCount(data.weeks.length);
+      } catch (error) {
+        console.error('Failed to load total weeks count:', error);
+      }
+    };
+    loadTotalCount();
+  }, [studentId]);
 
   useEffect(() => {
     loadVitals();
@@ -674,7 +688,7 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
             $active={viewMode === 'all'}
             onClick={() => setViewMode('all')}
           >
-            All Weeks ({weeks.length})
+            All Weeks ({totalWeeksCount})
           </ViewButton>
         </ViewControls>
       </Header>
