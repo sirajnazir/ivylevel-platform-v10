@@ -722,6 +722,119 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
                 )}
               </div>
 
+              {/* Academic Profile */}
+              {week.academic_vitals && (
+                <CollapsibleSection>
+                  <SectionHeader onClick={() => toggleSection(week.week_number, 'academic')} $isExpanded={isSectionExpanded(week.week_number, 'academic')}>
+                    <SectionTitle>
+                      <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'academic')}>▶</ExpandIcon>
+                      Academic Profile
+                    </SectionTitle>
+                  </SectionHeader>
+                  <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'academic')}>
+                    {week.academic_vitals.gpa_weighted && (
+                      <VitalRow>
+                        <VitalLabel>GPA (Weighted)</VitalLabel>
+                        <VitalValue>{week.academic_vitals.gpa_weighted.toFixed(2)} / {week.academic_vitals.gpa_scale || 4.0}</VitalValue>
+                      </VitalRow>
+                    )}
+                    {week.academic_vitals.sat && (
+                      <VitalRow>
+                        <VitalLabel>SAT Score</VitalLabel>
+                        <VitalValue>{week.academic_vitals.sat.total} (EBRW: {week.academic_vitals.sat.ebrw}, Math: {week.academic_vitals.sat.math})</VitalValue>
+                      </VitalRow>
+                    )}
+                    {week.academic_vitals.ap_exams && week.academic_vitals.ap_exams.length > 0 && (
+                      <div style={{ marginTop: '12px' }}>
+                        <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px', fontWeight: 600 }}>
+                          AP Exams ({week.academic_vitals.ap_exams.length})
+                        </div>
+                        {week.academic_vitals.ap_exams.map((exam, idx) => (
+                          <div key={idx} style={{
+                            fontSize: '12px',
+                            padding: '4px 8px',
+                            background: '#f8f9fa',
+                            borderRadius: '4px',
+                            marginBottom: '4px',
+                            display: 'flex',
+                            justifyContent: 'space-between'
+                          }}>
+                            <span>{exam.subject}</span>
+                            <span style={{
+                              fontWeight: 600,
+                              color: exam.score === 5 ? '#28a745' : exam.score >= 4 ? '#FF5733' : '#6c757d'
+                            }}>
+                              Score: {exam.score}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {week.academic_vitals.current_courses && week.academic_vitals.current_courses.length > 0 && (
+                      <div style={{ marginTop: '12px' }}>
+                        <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px', fontWeight: 600 }}>
+                          Current Courses (Grade {week.academic_vitals.current_courses[0].year})
+                        </div>
+                        {week.academic_vitals.current_courses.map((term, termIdx) => (
+                          <div key={termIdx} style={{ marginBottom: '8px' }}>
+                            {term.courses.slice(0, 5).map((course, courseIdx) => (
+                              <div key={courseIdx} style={{
+                                fontSize: '11px',
+                                padding: '3px 6px',
+                                background: course.level === 'AP' || course.level === 'IB' ? '#fff3cd' : '#f8f9fa',
+                                borderRadius: '3px',
+                                marginBottom: '2px',
+                                display: 'flex',
+                                justifyContent: 'space-between'
+                              }}>
+                                <span>{course.title}</span>
+                                <span style={{
+                                  fontWeight: 600,
+                                  color: course.level === 'AP' || course.level === 'IB' ? '#FF5733' : '#6c757d',
+                                  fontSize: '10px'
+                                }}>
+                                  {course.level}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </SectionContent>
+                </CollapsibleSection>
+              )}
+
+              {/* Extracurriculars Section */}
+              {week.ec_details && week.ec_details.length > 0 && (
+                <CollapsibleSection>
+                  <SectionHeader onClick={() => toggleSection(week.week_number, 'ecs')} $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>
+                    <SectionTitle>
+                      <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>▶</ExpandIcon>
+                      Extracurriculars ({week.ec_details.length})
+                    </SectionTitle>
+                  </SectionHeader>
+                  <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>
+                    {week.ec_details.map(renderEC)}
+                  </SectionContent>
+                </CollapsibleSection>
+              )}
+
+              {/* Awards Section */}
+              {week.award_details && week.award_details.length > 0 && (
+                <CollapsibleSection>
+                  <SectionHeader onClick={() => toggleSection(week.week_number, 'awards')} $isExpanded={isSectionExpanded(week.week_number, 'awards')}>
+                    <SectionTitle>
+                      <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'awards')}>▶</ExpandIcon>
+                      Awards ({week.award_details.length})
+                    </SectionTitle>
+                  </SectionHeader>
+                  <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'awards')}>
+                    {week.award_details.map(renderAward)}
+                  </SectionContent>
+                </CollapsibleSection>
+              )}
+
               <ActionPlanToggle
                 $isExpanded={isActionPlanExpanded(week.week_number)}
                 onClick={() => toggleActionPlan(week.week_number)}
