@@ -13,12 +13,11 @@ import { AIChat } from "./AIChat";
 import { useDashboardData } from "../../hooks/useDashboardData";
 import { API_ENDPOINTS } from "../../config/api";
 import { videoPrefetchService } from "../../services/videoPrefetchService";
-import useAuth from "../../hooks/useAuthMock";
+import { useAuth } from "../../hooks/useAuth";
 import { EvidencePanel } from "../v3.2/EvidencePanel";
 import { HGTIScoreCard } from "../v3.2/HGTIScoreCard";
 import { MissingEvidenceCard } from "../v3.2/MissingEvidenceCard";
 import { useFeatureFlag } from "../../utils/featureFlags";
-import { TaskManager } from "../v10/TaskManager";
 import { TimelineView } from "../v10/TimelineView";
 import { ProjectsView } from "../v10/ProjectsView";
 import { WeeklyVitals } from "../v10/WeeklyVitals";
@@ -704,11 +703,6 @@ export function StudentDashboard() {
           <div>
             {/* Weekly Progress - Weekly action plan and vitals */}
             <WeeklyVitals studentId={studentId} />
-
-            {/* Tasks - Action items and deadlines */}
-            <div style={{ marginTop: '30px' }}>
-              <TaskManager studentId={studentId} />
-            </div>
           </div>
         );
 
