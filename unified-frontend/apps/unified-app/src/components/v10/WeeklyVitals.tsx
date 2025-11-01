@@ -45,33 +45,177 @@ const ViewButton = styled.button<{ $active?: boolean }>`
 
 const VitalsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
   margin-bottom: 30px;
+  max-width: 1800px;
+  margin: 0 auto 30px auto;
+
+  @media (max-width: 1600px) {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const WeekCardContainer = styled.div<{ $isExpanded?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: ${props => props.$isExpanded ? '0 8px 32px rgba(0,0,0,0.15)' : '0 4px 12px rgba(0,0,0,0.08)'};
+  border: 1px solid ${props => props.$isExpanded ? '#667eea' : '#e9ecef'};
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: ${props => props.$isExpanded
+      ? 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'
+      : 'linear-gradient(90deg, #FF5733 0%, #FFC300 100%)'};
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
 `;
 
 const VitalCard = styled.div`
-  background: white;
-  padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 `;
 
 const VitalHeader = styled.div`
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #e9ecef;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 `;
 
 const VitalTitle = styled.h3`
-  font-size: 18px;
-  margin: 0 0 8px 0;
-  color: #333;
+  font-size: 16px;
+  margin: 0;
+  color: #222;
+  font-weight: 700;
+  letter-spacing: -0.3px;
 `;
 
 const WeekInfo = styled.div`
+  font-size: 11px;
+  color: #888;
+  margin-top: 4px;
+  font-weight: 500;
+`;
+
+const CompactMetrics = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+`;
+
+const MetricBox = styled.div`
+  background: rgba(255, 87, 51, 0.05);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 87, 51, 0.1);
+`;
+
+const MetricLabel = styled.div`
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  font-weight: 600;
+`;
+
+const MetricValue = styled.div`
+  font-size: 18px;
+  font-weight: 700;
+  color: #FF5733;
+`;
+
+const ActionPlanToggle = styled.div<{ $isExpanded: boolean }>`
+  background: ${props => props.$isExpanded ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'};
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 13px;
-  color: #666;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: ${props => props.$isExpanded ? '0 4px 12px rgba(102, 126, 234, 0.3)' : '0 2px 8px rgba(245, 87, 108, 0.2)'};
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${props => props.$isExpanded ? '0 6px 16px rgba(102, 126, 234, 0.4)' : '0 4px 12px rgba(245, 87, 108, 0.3)'};
+  }
+`;
+
+const ToggleIcon = styled.span<{ $isExpanded: boolean }>`
+  transition: transform 0.3s ease;
+  transform: ${props => props.$isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'};
+  font-size: 16px;
+`;
+
+const ExpandedActionPlanSection = styled.div<{ $isExpanded: boolean }>`
+  max-height: ${props => props.$isExpanded ? '3000px' : '0'};
+  opacity: ${props => props.$isExpanded ? '1' : '0'};
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.4s ease 0.1s;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+  }
+`;
+
+const ActionPlanContent = styled.div`
+  padding: 24px 20px;
+  position: relative;
+  z-index: 1;
+
+  /* Override WeeklyActionPlanCard styles when embedded */
+  > div {
+    background: transparent !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    animation: none !important;
+  }
 `;
 
 const ProgressBar = styled.div`
@@ -307,6 +451,7 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [actionPlans, setActionPlans] = useState<Record<number, WeeklyActionPlan | null>>({});
   const [loadingActionPlans, setLoadingActionPlans] = useState(false);
+  const [expandedActionPlans, setExpandedActionPlans] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     loadVitals();
@@ -366,6 +511,17 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
   const isSectionExpanded = (weekNumber: number, section: string) => {
     const key = `${weekNumber}-${section}`;
     return expandedSections[key] || false;
+  };
+
+  const toggleActionPlan = (weekNumber: number) => {
+    setExpandedActionPlans(prev => ({
+      ...prev,
+      [weekNumber]: !prev[weekNumber]
+    }));
+  };
+
+  const isActionPlanExpanded = (weekNumber: number) => {
+    return expandedActionPlans[weekNumber] || false;
   };
 
   const formatMetric = (key: string, value: number) => {
@@ -524,296 +680,77 @@ export function WeeklyVitals({ studentId }: WeeklyVitalsProps) {
       </Header>
       <VitalsGrid>
         {weeks.map(week => (
-          <div key={week.week_number}>
-          <VitalCard>
-            <VitalHeader>
-              <VitalTitle>Week {week.week_number}</VitalTitle>
-              <WeekInfo>
-                {new Date(week.week_start).toLocaleDateString()} - {new Date(week.week_end).toLocaleDateString()}
-              </WeekInfo>
-              <div style={{ marginTop: '12px' }}>
-                <StatusBadge $status={week.progress_status}>{week.progress_status.replace('_', ' ')}</StatusBadge>
+          <WeekCardContainer key={week.week_number} $isExpanded={isActionPlanExpanded(week.week_number)}>
+            {/* Main Vital Card */}
+            <VitalCard>
+              <VitalHeader>
+                <div>
+                  <VitalTitle>Week {week.week_number}</VitalTitle>
+                  <WeekInfo>
+                    {new Date(week.week_start).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(week.week_end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </WeekInfo>
+                </div>
+                <StatusBadge $status={week.progress_status}>
+                  {week.progress_status.replace('_', ' ')}
+                </StatusBadge>
+              </VitalHeader>
+
+              <CompactMetrics>
+                <MetricBox>
+                  <MetricLabel>Completion</MetricLabel>
+                  <MetricValue>{week.completion_percentage}%</MetricValue>
+                </MetricBox>
+                <MetricBox>
+                  <MetricLabel>Projects</MetricLabel>
+                  <MetricValue>{week.vitals?.extracurricular?.projects_active || week.ec_details?.length || 0}</MetricValue>
+                </MetricBox>
+                <MetricBox>
+                  <MetricLabel>GPA</MetricLabel>
+                  <MetricValue>{week.academic_vitals?.gpa_weighted?.toFixed(2) || week.vitals?.academic?.gpa_weighted?.toFixed(2) || 'N/A'}</MetricValue>
+                </MetricBox>
+                <MetricBox>
+                  <MetricLabel>Awards</MetricLabel>
+                  <MetricValue>{week.vitals?.extracurricular?.awards_won || week.award_details?.length || 0}</MetricValue>
+                </MetricBox>
+              </CompactMetrics>
+
+              <div style={{ fontSize: '11px', color: '#666', marginTop: '8px' }}>
+                {week.focus_areas && week.focus_areas.length > 0 && (
+                  <div style={{ background: '#f8f9fa', padding: '8px', borderRadius: '6px', fontStyle: 'italic' }}>
+                    📌 {week.focus_areas[0].area}
+                  </div>
+                )}
               </div>
-            </VitalHeader>
 
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '14px' }}>
-                <span>Completion</span>
-                <span style={{ fontWeight: 600 }}>{week.completion_percentage}%</span>
-              </div>
-              <ProgressBar>
-                <ProgressFill $progress={week.completion_percentage} $status={week.progress_status} />
-              </ProgressBar>
-            </div>
+              <ActionPlanToggle
+                $isExpanded={isActionPlanExpanded(week.week_number)}
+                onClick={() => toggleActionPlan(week.week_number)}
+              >
+                <span>
+                  {isActionPlanExpanded(week.week_number) ? '📋 Hide Action Plan' : '📋 View Action Plan'}
+                  {actionPlans[week.week_number] && ` (${actionPlans[week.week_number]?.execution_items?.length || 0} items)`}
+                </span>
+                <ToggleIcon $isExpanded={isActionPlanExpanded(week.week_number)}>▼</ToggleIcon>
+              </ActionPlanToggle>
+            </VitalCard>
 
-            {/* Academic Profile - v3.0 with complete data */}
-            {week.academic_vitals && (
-              <CollapsibleSection>
-                <SectionHeader onClick={() => toggleSection(week.week_number, 'academic')} $isExpanded={isSectionExpanded(week.week_number, 'academic')}>
-                  <SectionTitle>
-                    <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'academic')}>▶</ExpandIcon>
-                    Academic Profile
-                  </SectionTitle>
-                </SectionHeader>
-                <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'academic')}>
-                  {/* GPA */}
-                  {week.academic_vitals.gpa_weighted && (
-                    <div style={{ marginBottom: '12px' }}>
-                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>GPA</div>
-                      <div style={{ fontSize: '16px', fontWeight: 600 }}>
-                        {week.academic_vitals.gpa_weighted.toFixed(2)} / {week.academic_vitals.gpa_scale || 4.0}
-                        {week.academic_vitals.gpa_unweighted && ` (UW: ${week.academic_vitals.gpa_unweighted.toFixed(2)})`}
-                      </div>
-                      {week.academic_vitals.class_rank && (
-                        <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                          Class Rank: {week.academic_vitals.class_rank === 'na' ? 'Unranked' : `${week.academic_vitals.class_rank} / ${week.academic_vitals.class_size}`}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* SAT */}
-                  {week.academic_vitals.sat && (
-                    <div style={{ marginBottom: '12px' }}>
-                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>SAT</div>
-                      <div style={{ fontSize: '16px', fontWeight: 600 }}>{week.academic_vitals.sat.total}</div>
-                      <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                        EBRW: {week.academic_vitals.sat.ebrw} | Math: {week.academic_vitals.sat.math}
-                        {week.academic_vitals.sat.attempts && week.academic_vitals.sat.attempts.length > 1 &&
-                          ` (${week.academic_vitals.sat.attempts.length} attempts)`
-                        }
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ACT */}
-                  {week.academic_vitals.act && (
-                    <div style={{ marginBottom: '12px' }}>
-                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '4px' }}>ACT</div>
-                      <div style={{ fontSize: '16px', fontWeight: 600 }}>{week.academic_vitals.act.composite}</div>
-                      <div style={{ fontSize: '12px', color: '#666', marginTop: '2px' }}>
-                        E: {week.academic_vitals.act.english} | M: {week.academic_vitals.act.math} |
-                        R: {week.academic_vitals.act.reading} | S: {week.academic_vitals.act.science}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* AP Exams */}
-                  {week.academic_vitals.ap_exams && week.academic_vitals.ap_exams.length > 0 && (
-                    <div style={{ marginBottom: '12px' }}>
-                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px' }}>
-                        AP Exams ({week.academic_vitals.ap_exams.length})
-                      </div>
-                      {week.academic_vitals.ap_exams.map((exam, idx) => (
-                        <div key={idx} style={{
-                          fontSize: '12px',
-                          padding: '4px 8px',
-                          background: '#f8f9fa',
-                          borderRadius: '4px',
-                          marginBottom: '4px',
-                          display: 'flex',
-                          justifyContent: 'space-between'
-                        }}>
-                          <span>{exam.subject}</span>
-                          <span style={{
-                            fontWeight: 600,
-                            color: exam.score === 5 ? '#28a745' : exam.score >= 4 ? '#FF5733' : '#6c757d'
-                          }}>
-                            {exam.score}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* IB Exams */}
-                  {week.academic_vitals.ib_exams && week.academic_vitals.ib_exams.length > 0 && (
-                    <div style={{ marginBottom: '12px' }}>
-                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px' }}>
-                        IB Exams ({week.academic_vitals.ib_exams.length})
-                      </div>
-                      {week.academic_vitals.ib_exams.map((exam, idx) => (
-                        <div key={idx} style={{
-                          fontSize: '12px',
-                          padding: '4px 8px',
-                          background: '#f8f9fa',
-                          borderRadius: '4px',
-                          marginBottom: '4px'
-                        }}>
-                          {exam.subject} ({exam.level}): {exam.final_score || exam.predicted_score}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Current Courses */}
-                  {week.academic_vitals.current_courses && week.academic_vitals.current_courses.length > 0 && (
-                    <div style={{ marginBottom: '12px' }}>
-                      <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px' }}>
-                        Current Courses (Grade {week.academic_vitals.current_courses[0].year})
-                      </div>
-                      {week.academic_vitals.current_courses.map((term, termIdx) => (
-                        <div key={termIdx} style={{ marginBottom: '8px' }}>
-                          <div style={{ fontSize: '11px', color: '#999', textTransform: 'uppercase', marginBottom: '4px' }}>
-                            {term.semester === 'fall' ? 'Fall Semester' : 'Spring Semester'}
-                          </div>
-                          {term.courses.map((course, courseIdx) => (
-                            <div key={courseIdx} style={{
-                              fontSize: '11px',
-                              padding: '3px 6px',
-                              background: course.level === 'AP' || course.level === 'IB' ? '#fff3cd' : '#f8f9fa',
-                              borderRadius: '3px',
-                              marginBottom: '2px',
-                              display: 'flex',
-                              justifyContent: 'space-between'
-                            }}>
-                              <span>{course.title}</span>
-                              <span style={{
-                                fontWeight: 600,
-                                color: course.level === 'AP' || course.level === 'IB' ? '#FF5733' : '#6c757d',
-                                fontSize: '10px'
-                              }}>
-                                {course.level}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Academic Rigor Summary */}
-                  {week.academic_vitals.total_ap_courses !== undefined && (
-                    <div style={{
-                      marginTop: '12px',
-                      padding: '8px',
-                      background: '#e7f3ff',
-                      borderRadius: '4px',
-                      fontSize: '12px'
-                    }}>
-                      <strong>Course Rigor:</strong> {week.academic_vitals.total_ap_courses} AP/IB courses
-                      {week.academic_vitals.total_honors_courses && ` + ${week.academic_vitals.total_honors_courses} Honors`}
-                    </div>
-                  )}
-                </SectionContent>
-              </CollapsibleSection>
-            )}
-
-            {/* Fallback to old vitals format for backwards compatibility */}
-            {!week.academic_vitals && week.vitals?.academic && (
-              <VitalsSection>
-                <strong style={{ fontSize: '14px', display: 'block', marginBottom: '8px' }}>Academic</strong>
-                {week.vitals.academic.gpa_weighted && (
-                  <VitalRow>
-                    <VitalLabel>GPA (Weighted)</VitalLabel>
-                    <VitalValue>{week.vitals.academic.gpa_weighted.toFixed(2)}</VitalValue>
-                  </VitalRow>
-                )}
-                {week.vitals.academic.sat_score && (
-                  <VitalRow>
-                    <VitalLabel>SAT Score</VitalLabel>
-                    <VitalValue>{week.vitals.academic.sat_score}</VitalValue>
-                  </VitalRow>
-                )}
-                {week.vitals.academic.ap_count !== undefined && (
-                  <VitalRow>
-                    <VitalLabel>AP Courses</VitalLabel>
-                    <VitalValue>{week.vitals.academic.ap_count}</VitalValue>
-                  </VitalRow>
-                )}
-              </VitalsSection>
-            )}
-
-            <VitalsSection>
-              <strong style={{ fontSize: '14px', display: 'block', marginBottom: '8px' }}>Extracurricular</strong>
-              {week.vitals.extracurricular.projects_active !== undefined && (
-                <VitalRow>
-                  <VitalLabel>Active Projects</VitalLabel>
-                  <VitalValue>{week.vitals.extracurricular.projects_active}</VitalValue>
-                </VitalRow>
-              )}
-              {week.vitals.extracurricular.leadership_roles !== undefined && (
-                <VitalRow>
-                  <VitalLabel>Leadership Roles</VitalLabel>
-                  <VitalValue>{week.vitals.extracurricular.leadership_roles}</VitalValue>
-                </VitalRow>
-              )}
-              {week.vitals.extracurricular.awards_won !== undefined && (
-                <VitalRow>
-                  <VitalLabel>Awards Won</VitalLabel>
-                  <VitalValue>{week.vitals.extracurricular.awards_won}</VitalValue>
-                </VitalRow>
-              )}
-            </VitalsSection>
-
-            {week.vitals.growth.hgti_score !== undefined && (
-              <VitalsSection>
-                <strong style={{ fontSize: '14px', display: 'block', marginBottom: '8px' }}>Growth</strong>
-                <VitalRow>
-                  <VitalLabel>HGTI Score</VitalLabel>
-                  <VitalValue>{week.vitals.growth.hgti_score?.toFixed(1)}</VitalValue>
-                </VitalRow>
-                {week.vitals.growth.breakthroughs !== undefined && (
-                  <VitalRow>
-                    <VitalLabel>Breakthroughs</VitalLabel>
-                    <VitalValue>{week.vitals.growth.breakthroughs}</VitalValue>
-                  </VitalRow>
-                )}
-              </VitalsSection>
-            )}
-
-            {week.focus_areas && week.focus_areas.length > 0 && (
-              <div style={{ marginTop: '16px' }}>
-                <strong style={{ fontSize: '14px', display: 'block', marginBottom: '8px' }}>Focus Areas</strong>
-                {week.focus_areas.slice(0, 2).map((area, index) => (
-                  <FocusArea key={index}>{area.area}</FocusArea>
-                ))}
-              </div>
-            )}
-
-            {/* Extracurriculars Section */}
-            {week.ec_details && week.ec_details.length > 0 && (
-              <CollapsibleSection>
-                <SectionHeader onClick={() => toggleSection(week.week_number, 'ecs')} $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>
-                  <SectionTitle>
-                    <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>▶</ExpandIcon>
-                    Extracurriculars ({week.ec_details.length})
-                  </SectionTitle>
-                </SectionHeader>
-                <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'ecs')}>
-                  {week.ec_details.map(renderEC)}
-                </SectionContent>
-              </CollapsibleSection>
-            )}
-
-            {/* Awards Section */}
-            {week.award_details && week.award_details.length > 0 && (
-              <CollapsibleSection>
-                <SectionHeader onClick={() => toggleSection(week.week_number, 'awards')} $isExpanded={isSectionExpanded(week.week_number, 'awards')}>
-                  <SectionTitle>
-                    <ExpandIcon $isExpanded={isSectionExpanded(week.week_number, 'awards')}>▶</ExpandIcon>
-                    Awards ({week.award_details.length})
-                  </SectionTitle>
-                </SectionHeader>
-                <SectionContent $isExpanded={isSectionExpanded(week.week_number, 'awards')}>
-                  {week.award_details.map(renderAward)}
-                </SectionContent>
-              </CollapsibleSection>
-            )}
-          </VitalCard>
-
-          {/* Weekly Action Plan Card - v10.9 */}
-          <WeeklyActionPlanCard
-            studentId={studentId}
-            weekNumber={week.week_number}
-            weekStart={week.week_start}
-            weekEnd={week.week_end}
-            actionPlan={actionPlans[week.week_number] || null}
-            onRefresh={() => loadActionPlans([week])}
-          />
-        </div>
+            {/* Expandable Action Plan Section - Seamlessly connected */}
+            <ExpandedActionPlanSection $isExpanded={isActionPlanExpanded(week.week_number)}>
+              <ActionPlanContent>
+                <WeeklyActionPlanCard
+                  studentId={studentId}
+                  weekNumber={week.week_number}
+                  weekStart={week.week_start}
+                  weekEnd={week.week_end}
+                  actionPlan={actionPlans[week.week_number] || null}
+                  onRefresh={() => loadActionPlans([week])}
+                />
+              </ActionPlanContent>
+            </ExpandedActionPlanSection>
+          </WeekCardContainer>
         ))}
       </VitalsGrid>
     </Container>
   );
 }
+

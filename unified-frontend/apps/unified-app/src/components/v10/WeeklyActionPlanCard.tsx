@@ -13,32 +13,70 @@ import {
 // ============================================================================
 
 const ActionPlanCard = styled.div`
-  background: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
   margin-top: 16px;
-  border-top: 3px solid #FF5733;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
 `;
 
 const CardHeader = styled.div`
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 1;
 `;
 
 const CardTitle = styled.h3`
   font-size: 18px;
   margin: 0 0 8px 0;
-  color: #333;
+  color: white;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 `;
 
 const WeekInfo = styled.div`
   font-size: 13px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
 `;
 
 const ProgressBar = styled.div`
@@ -119,9 +157,20 @@ const ExpandIcon = styled.span<{ $isExpanded?: boolean }>`
 `;
 
 const SectionContent = styled.div<{ $isExpanded?: boolean }>`
-  max-height: ${props => props.$isExpanded ? '8000px' : '0'};
-  overflow: hidden;
-  transition: max-height 0.3s ease;
+  display: ${props => props.$isExpanded ? 'block' : 'none'};
+  padding-top: ${props => props.$isExpanded ? '12px' : '0'};
+  animation: ${props => props.$isExpanded ? 'fadeIn 0.3s ease-in' : 'none'};
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `;
 
 const OutcomeItem = styled.div`
@@ -351,7 +400,12 @@ export function WeeklyActionPlanCard({
   actionPlan,
   onRefresh
 }: WeeklyActionPlanCardProps) {
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    execution: false, // Start collapsed
+    outcomes: false,
+    time: false,
+    frameworks: false
+  });
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
@@ -361,7 +415,7 @@ export function WeeklyActionPlanCard({
   };
 
   const isSectionExpanded = (section: string) => {
-    return expandedSections[section] || false;
+    return expandedSections[section] ?? false;
   };
 
   // Helper to get execution items for an outcome
