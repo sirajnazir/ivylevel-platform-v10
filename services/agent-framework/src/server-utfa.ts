@@ -32,6 +32,7 @@ import { v152Router } from './routes/v15.2.js';
 import { v153Router } from './routes/v15.3.js'; // v16.1 - Real EQ intelligence integrated
 import { v170Router } from './routes/v17.0.js'; // v17.0 - Full orchestration with StrategyOrchestrator
 import { v18Router } from './routes/v18.0.js'; // v18.0 - GamePlan dynamic adaptive features
+import { createV26MultiAgentsRouter } from './routes/v26-multiagents.js'; // v26.0 - MultiAgents orchestration
 import { assertIndexParity } from './retrieval/pinecone.js';
 import { CFG } from './config/env.js';
 import authRouter from './routes/auth.js';
@@ -87,6 +88,9 @@ app.use('/api/v17.0', v170Router); // v17.0 - Complete v15.2 orchestration pipel
 
 // Mount v18.0 routes (GamePlan Dynamic Adaptive Features)
 app.use('/api/v18', v18Router(pool)); // v18.0 - Revisions, quarterly reviews, events, parallel plans
+
+// Mount v26.0 routes (MultiAgents Orchestration)
+// Will be initialized after AgentRegistry in main() function below
 
 // Mount auth routes
 app.use('/api/auth', authRouter);
@@ -197,38 +201,32 @@ app.get('/students/:id/lifecycle', async (req, res) => {
   }
 });
 
-// v13.0: MULTI-DIMENSIONAL ENDPOINT - Uses v13.0 parallel execution pipeline
-// Replaces v11.3.2 with true multi-dimensional architecture (CAT-1/2/3 parallel)
-const v13Orchestrator = new UnifiedMultiDimensionalOrchestrator();
-
+// v18.0: AGENT REGISTRY ENDPOINT - Routes to specialized agents (GamePlan, Assessment, etc.)
 app.post('/agent/chat', async (req, res) => {
   try {
     const { message, student_id, studentId, session_id, sessionId } = req.body;
     // Support both snake_case and camelCase for compatibility
     const finalStudentId = student_id || studentId;
-    const rawSessionId = session_id || sessionId;
+    const rawSessionId = session_id || sessionId || `session-${Date.now()}`;
 
-    // v11.3.2: Validate session_id is UUID or set to null (let orchestrator generate one)
-    // Test scripts send string IDs like "test-cat3-rejection-stanford" which aren't UUIDs
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const finalSessionId = (rawSessionId && uuidRegex.test(rawSessionId)) ? rawSessionId : null;
+    console.log('[v18.0-AgentRegistry] Chat request:', { message: message?.slice(0, 80), student_id: finalStudentId });
 
-    console.log('[v13-Pipeline] Chat request:', { message: message?.slice(0, 80), student_id: finalStudentId });
-
-    // v13.0: Use multi-dimensional orchestrator
-    // 1. Context Hydration (student profile)
-    // 2. Multi-Dimensional Intent Analysis (CAT-1/2/3 detection)
-    // 3. Parallel Intelligence Execution (SQL + Pinecone + EQ in parallel)
-    // 4. Context Fusion Synthesis (LLM blending with quality verification)
-    const result = await v13Orchestrator.orchestrate({
-      message,
+    // v18.0: Route through Agent Registry
+    const agentRegistry = AgentRegistry.getInstance();
+    const result = await agentRegistry.routeQuery({
       student_id: finalStudentId,
-      session_id: finalSessionId
+      query: message,
+      session_id: rawSessionId
     });
 
-    res.json(result);
+    res.json({
+      answer: result.response,
+      session_id: rawSessionId,
+      agent_used: result.agent_used || 'agent-registry',
+      metadata: result.metadata
+    });
   } catch (error: any) {
-    console.error('[v13-Pipeline] Error:', error);
+    console.error('[v18.0-AgentRegistry] Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -447,6 +445,12 @@ const port = process.env.PORT || 8787;
     const agentRegistry = AgentRegistry.getInstance();
     await agentRegistry.initialize(pool);
     console.log('[BOOT] Agent Registry initialized successfully');
+
+    // Mount v26.0 MultiAgents routes (requires AgentRegistry)
+    console.log('[BOOT] Mounting v26.0 MultiAgents routes...');
+    const v26Router = createV26MultiAgentsRouter(pool, agentRegistry);
+    app.use('/api/v26', v26Router);
+    console.log('[BOOT] v26.0 MultiAgents routes mounted at /api/v26');
 
     // Schedule Quarterly Review Cron Job (v18.0)
     console.log('[BOOT] Scheduling Quarterly Review Cron Job...');

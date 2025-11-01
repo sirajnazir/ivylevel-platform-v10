@@ -158,7 +158,7 @@ export const Header = ({ activeTab = 'assessment', onTabChange }) => {
           <NavItem
             $active={activeTab === 'application'}
             onClick={() => handleTabClick('application')}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', display: 'none' }}
           >
             Application
           </NavItem>
@@ -179,16 +179,23 @@ export const Header = ({ activeTab = 'assessment', onTabChange }) => {
           <NavItem
             $active={activeTab === 'evidence'}
             onClick={() => handleTabClick('evidence')}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', display: 'none' }}
           >
             Evidence & Growth
           </NavItem>
           <NavItem
             $active={activeTab === 'aichat'}
             onClick={() => handleTabClick('aichat')}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', display: 'none' }}
           >
             AI Chat
+          </NavItem>
+          <NavItem
+            $active={activeTab === 'multiagents'}
+            onClick={() => handleTabClick('multiagents')}
+            style={{ cursor: 'pointer' }}
+          >
+            🤖 MultiAgents v2.0
           </NavItem>
         </Nav>
       </LeftSection>

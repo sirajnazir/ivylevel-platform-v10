@@ -23,6 +23,7 @@ import { ProjectsView } from "../v10/ProjectsView";
 import { WeeklyVitals } from "../v10/WeeklyVitals";
 import { GrowthTransformationsTab } from "../v10/GrowthTransformationsTab";
 import { v10Api, type AssessmentData } from "../../utils/v10ApiService";
+import { MultiAgentsTab } from "../v26/MultiAgentsTab";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -974,6 +975,13 @@ export function StudentDashboard() {
         return (
           <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
             <AIChat />
+          </div>
+        );
+
+      case 'multiagents':
+        return (
+          <div style={{ padding: '0', maxWidth: '100%', margin: '0' }}>
+            <MultiAgentsTab />
           </div>
         );
 
