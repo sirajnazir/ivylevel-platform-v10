@@ -1,9 +1,9 @@
 # IvyLevel Platform - Production Database Architecture
-# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v13.0 → v14.0 → v21.0 → v24.0 Complete Schema Documentation
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v13.0 → v14.0 → v21.0 → v24.0 → v25.0 Growth Journey Verified
 
-**Document Version:** v24.0
+**Document Version:** v25.0
 **Last Updated:** 2025-10-31
-**Status:** ✅ PRODUCTION READY - Complete Schema Documented + Data Integrity Verified + 89 Weeks Execution Data
+**Status:** ✅ PRODUCTION READY - Complete Schema Documented + Data Integrity Verified + 89 Weeks Execution Data + 93 Growth Timeline Events
 **Database:** PostgreSQL 14+
 **Connection:** Port 5432, Database: ivylevel
 **Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.0 Weekly Vitals Schema + v10.8 Universal Academic Schema + v11.0 Action Plans + v12.0 Game Plan JSONB + v13.0 Assessment Visualization + v14.0 Timeline Enrichment + v18.0 FactStore Integration + v18.1 kb_items Population + PostgresFactSource Implementation + v24.0 Complete Schema Documentation & Data Verification
@@ -42,7 +42,7 @@ This is the **single source of truth** for IvyLevel's production database schema
 
 ## Table of Contents
 
-1. [v24.0 Complete Database Schema](#v240-complete-database-schema)
+1. [v25.0 Complete Database Schema](#v250-complete-database-schema)
 2. [Schema Overview](#schema-overview)
 3. [v14 Schema (Preserved)](#v14-schema-preserved)
 4. [v1.0 Schema Extensions](#v10-schema-extensions)
@@ -344,32 +344,95 @@ CREATE INDEX idx_opportunities_status ON opportunities(status);
 
 ---
 
-#### **timeline_events** - Growth Journey Transformations
-**Purpose:** Track growth milestones and transformations over 2-4 years
-**Sample Count:** 30+ events for huda-2025
+#### **timeline_events** - Growth Journey Transformations (v25.0)
+**Purpose:** Unified timeline of growth transformations over 2-4 year college prep journey
+**Sample Count:** 93 events for huda-2025 (verified 2025-10-31)
+**Backend API:** `/students/:id/timeline` (v10.0.ts:1750)
+**Frontend Component:** `GrowthTransformationsTab.tsx`
 
 ```sql
 CREATE TABLE timeline_events (
-  id SERIAL PRIMARY KEY,
-  student_id VARCHAR(50) REFERENCES students(student_id),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id TEXT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
+  event_type TEXT NOT NULL CHECK (event_type IN (
+    'growth_event',      -- HGTI breakthroughs, transformations
+    'phase_transition',  -- Foundation → Build → Application → Decision
+    'academic',          -- SAT, GPA, course milestones
+    'application',       -- College submissions + decisions (accepted/waitlisted/rejected)
+    'project',           -- Major projects completed
+    'award',             -- Awards won
+    'program'            -- Summer programs attended
+  )),
+  subtype TEXT,          -- e.g., 'sat_score', 'acceptance', 'rejection', etc.
+  title TEXT NOT NULL,
   event_date DATE NOT NULL,
-  event_type VARCHAR(50),  -- 'breakthrough', 'milestone', 'achievement', 'transformation'
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  phase VARCHAR(50),  -- 'Foundation', 'Build', 'Decision'
-  impact_level VARCHAR(20),  -- 'low', 'medium', 'high', 'transformative'
-  metadata JSONB,  -- Additional context
-  created_at TIMESTAMP DEFAULT NOW()
+  description TEXT NOT NULL,
+  impact TEXT CHECK (impact IN ('minor', 'moderate', 'major')),
+  metadata JSONB DEFAULT '{}'::jsonb,  -- Additional context (college name, decision, etc.)
+  source_table TEXT,     -- Originating table (for traceability)
+  source_id UUID,        -- Originating record ID
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-CREATE INDEX idx_timeline_student_date ON timeline_events(student_id, event_date);
-CREATE INDEX idx_timeline_phase ON timeline_events(phase);
+-- Indexes for performance
+CREATE INDEX idx_timeline_events_student_date ON timeline_events(student_id, event_date DESC);
+CREATE INDEX idx_timeline_events_type ON timeline_events(event_type);
+CREATE INDEX idx_timeline_events_impact ON timeline_events(impact) WHERE impact = 'major';
+CREATE INDEX idx_timeline_events_source ON timeline_events(source_table, source_id) WHERE source_table IS NOT NULL;
+CREATE INDEX idx_timeline_events_metadata ON timeline_events USING gin(metadata);
+
+-- Row-level security
+ALTER TABLE timeline_events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY timeline_events_student_isolation ON timeline_events
+  USING (student_id = current_setting('app.student_id', true));
+
+-- Auto-update trigger
+CREATE TRIGGER timeline_events_updated_at_trigger
+  BEFORE UPDATE ON timeline_events
+  FOR EACH ROW EXECUTE FUNCTION update_timeline_events_updated_at();
 ```
 
-**Verified Data (huda-2025):**
-- 30+ transformation events
-- Balanced across 3 phases: Foundation (2023), Build (2024), Decision (2025)
-- Event types: academic milestones, EC breakthroughs, award wins
+**Verified Data (huda-2025) - 93 Total Events:**
+- **Applications:** 56 events (college submissions + decisions)
+  - Acceptances (major impact): SJSU
+  - Waitlisted (minor impact): Barnard, Cal Poly SLO, Georgia Tech
+  - Rejections (minor impact): Cornell, Yale, Columbia, Brown, etc.
+  - Date range: 2024-11-01 to 2025-04-01
+- **Growth Events:** 11 events (HGTI breakthroughs, transformations)
+  - Major: "🌟 Breakthrough: Self Image" (2025-05-15)
+  - Date range: 2023-06-21 to 2025-05-15
+- **Projects:** 8 events (major projects completed)
+  - Date range: 2023-01-01 to 2024-07-01
+- **Awards:** 6 events (awards won)
+  - Date range: 2024-03-15 to 2024-09-01
+- **Programs:** 5 events (summer programs attended)
+  - Date range: 2024-06-15 to 2024-07-08
+- **Phase Transitions:** 4 events (Foundation → Build → Application → Decision)
+  - Date range: 2023-09-01 to 2024-12-01
+- **Academic:** 3 events (SAT, GPA milestones)
+  - Date range: 2024-01-15 to 2024-04-20
+
+**Data Structure Example:**
+```json
+{
+  "id": "uuid",
+  "student_id": "huda-2025",
+  "event_type": "application",
+  "subtype": "decision",
+  "title": "Accepted to SJSU! 🎉",
+  "event_date": "2025-04-01",
+  "description": "Received acceptance letter from San Jose State University",
+  "impact": "moderate",
+  "metadata": {
+    "college": "San Jose State University",
+    "decision": "Accepted",
+    "decision_plan": "RD"
+  },
+  "source_table": "college_list",
+  "source_id": "uuid"
+}
+```
 
 ---
 
@@ -446,7 +509,7 @@ CREATE INDEX idx_tasks_due_date ON tasks(due_date);
 | **Preparation** | `weekly_vitals` (academic_vitals, action_plan) | `/students/huda-2025/vitals/weeks`<br>`/students/huda-2025/weeks/{week}/action-plan` | ✅ 89 weeks<br>✅ 1,151 items |
 | **Sessions** | Video files + metadata | N/A (file-based) | ✅ Video metadata |
 | **Application** | `opportunities`, application data | `/students/huda-2025/applications` | ✅ Projects, timeline |
-| **Growth Journey** | `timeline_events` | `/students/huda-2025/timeline` | ✅ 30+ events |
+| **Growth Journey** | `timeline_events` | `/students/huda-2025/timeline` | ✅ 93 events (56 applications, 11 growth, 8 projects, 6 awards, 5 programs, 4 phase transitions, 3 academic) |
 
 ---
 
