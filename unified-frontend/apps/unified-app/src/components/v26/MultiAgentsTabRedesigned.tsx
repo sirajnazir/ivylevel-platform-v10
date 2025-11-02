@@ -576,25 +576,7 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
       length: message.length,
     });
 
-    addIntelligenceLog('agent', `🔄 Processing query through ${agentConfig.name} Agent pipeline`, {
-      agent_id: agentId,
-      query_preview: message.slice(0, 50),
-    });
-
     try {
-      addIntelligenceLog('fact', '📚 STEP 1: Loading facts from database', {
-        student_id: session.student_id,
-        categories: ['STUDENT_PROFILE', 'ACTIVITY_DATA', 'ASSESSMENT_DATA'],
-      });
-
-      addIntelligenceLog('intelligence', '🧠 STEP 2: Running ALL intelligence types in parallel', {
-        agent: agentConfig.name,
-        total_types: agentId === 'execution-agent-v20' ? 16 :
-                     agentId === 'gameplan-agent-v18' ? 7 :
-                     agentId === 'assessment-agent-v18' ? 4 : 3,
-        execution_mode: 'parallel',
-      });
-
       const response = await fetch(`${API_URL}/api/v26/agents/${agentId}/message`, {
         method: 'POST',
         headers: {
@@ -614,22 +596,56 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
 
       const data = await response.json();
 
-      addIntelligenceLog('intelligence', '✅ STEP 3: Intelligence types activated', {
+      // Log v26 context with intent classification
+      if (data.v26_context) {
+        addIntelligenceLog('intelligence', `🎯 Intent Classification: ${data.v26_context.intent_classification}`, {
+          is_clone_student: data.v26_context.is_clone_student,
+          clone_student_id: data.v26_context.clone_student_id,
+          conversation_turns: data.v26_context.conversation_turns,
+        });
+
+        // Log processing steps from backend
+        if (data.v26_context.processing_steps) {
+          data.v26_context.processing_steps.forEach((step: string, index: number) => {
+            addIntelligenceLog('agent', `📍 STEP ${index + 1}: ${step}`);
+          });
+        }
+      }
+
+      addIntelligenceLog('fact', '📚 Loading facts for clone student (empty for new onboarding)', {
+        student_id: data.v26_context?.clone_student_id || session.student_id,
+        fact_count: data.facts_used?.length || 0,
+      });
+
+      addIntelligenceLog('intelligence', `🧠 Running ${agentConfig.name} Intelligence Types`, {
         triggered: data.intelligence_triggered || [],
         triggered_count: data.intelligence_triggered?.length || 0,
-        processing_time_ms: data.processing_time,
-        confidence: data.confidence,
+        available_types: agentId === 'execution-agent-v20' ? '15 types (TYPE-049 to TYPE-063)' :
+                        agentId === 'gameplan-agent-v18' ? '7 types (TYPE-001 to TYPE-007)' :
+                        agentId === 'assessment-agent-v18' ? '4 types (TYPE-080 to TYPE-083)' : '3 types',
       });
 
-      addIntelligenceLog('synthesis', '🔧 STEP 4: Synthesizing response from triggered intelligence', {
-        synthesis_strategy: `${agentConfig.name} Agent priority order`,
-        components_merged: data.intelligence_triggered?.length || 0,
+      if (data.intelligence_triggered && data.intelligence_triggered.length > 0) {
+        addIntelligenceLog('intelligence', `✅ Intelligence Activated: ${data.intelligence_triggered.join(', ')}`, {
+          triggered_count: data.intelligence_triggered.length,
+          processing_time_ms: data.processing_time,
+          confidence: data.confidence,
+        });
+      } else {
+        addIntelligenceLog('intelligence', '⚠️ No intelligence types triggered (check if agent received enough data)', {
+          confidence: data.confidence,
+        });
+      }
+
+      addIntelligenceLog('synthesis', '🔧 Synthesizing response from intelligence results', {
+        synthesis_strategy: `${agentConfig.name} Agent`,
+        intelligence_results_used: data.intelligence_triggered?.length || 0,
       });
 
-      addIntelligenceLog('agent', '📤 STEP 5: Response generated and validated', {
+      addIntelligenceLog('agent', '📤 Response generated and delivered', {
         response_length: data.agent_response.length,
         confidence: data.confidence,
-        validation_passed: true,
+        validation_score: data.validation_score,
       });
 
       // Add agent response to card
