@@ -86,12 +86,10 @@ export function createV26MultiAgentsRouter(pool: Pool, agentRegistry: AgentRegis
 
       const session = sessionResult.rows[0];
 
-      // Get student info for welcome message
-      const studentResult = await pool.query(
-        'SELECT full_name FROM students WHERE student_id = $1',
-        [student_id]
-      );
-      const studentName = studentResult.rows[0]?.full_name || 'there';
+      // Get student name from student_id (v26 siloed mode - no students table)
+      // Format: "huda-2025" → "Huda A."
+      const studentName = student_id.split('-')[0].charAt(0).toUpperCase() +
+                         student_id.split('-')[0].slice(1) + ' A.';
 
       // Generate welcome message based on session type
       let welcomeMessage = '';

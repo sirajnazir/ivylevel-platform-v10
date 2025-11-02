@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS multiagent_sessions (
   -- Primary key
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-  -- Student reference
-  student_id TEXT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
+  -- Student reference (v26.0 siloed mode - no foreign key)
+  student_id TEXT NOT NULL,
 
   -- Session metadata
   session_type TEXT NOT NULL CHECK (session_type IN ('onboarding', 'weekly_execution', 'ad_hoc')),
@@ -176,12 +176,12 @@ CREATE INDEX idx_intelligence_activations_timestamp ON intelligence_activations(
 -- Views for analytics
 -- ============================================================================
 
--- View: Recent multiagent sessions with key metrics
+-- View: Recent multiagent sessions with key metrics (v26 siloed - no students table)
 CREATE OR REPLACE VIEW v_multiagent_sessions_summary AS
 SELECT
   s.id,
   s.student_id,
-  st.full_name AS student_name,
+  s.student_id AS student_name, -- v26 siloed mode - use student_id as name
   s.session_type,
   s.status,
   s.current_phase,
@@ -198,10 +198,9 @@ SELECT
     ELSE EXTRACT(EPOCH FROM (NOW() - s.started_at)) * 1000
   END AS duration_ms
 FROM multiagent_sessions s
-LEFT JOIN students st ON s.student_id = st.student_id
 LEFT JOIN multiagent_messages m ON s.id = m.session_id
 LEFT JOIN intelligence_activations ia ON s.id = ia.session_id
-GROUP BY s.id, st.full_name
+GROUP BY s.id
 ORDER BY s.started_at DESC;
 
 -- View: Intelligence type usage statistics
