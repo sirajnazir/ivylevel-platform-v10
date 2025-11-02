@@ -23,7 +23,7 @@ import { ProjectsView } from "../v10/ProjectsView";
 import { WeeklyVitals } from "../v10/WeeklyVitals";
 import { GrowthTransformationsTab } from "../v10/GrowthTransformationsTab";
 import { v10Api, type AssessmentData } from "../../utils/v10ApiService";
-import { MultiAgentsTab } from "../v26/MultiAgentsTab";
+import { MultiAgentsTabRedesigned } from "../v26/MultiAgentsTabRedesigned";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -981,7 +981,7 @@ export function StudentDashboard() {
       case 'multiagents':
         return (
           <div style={{ padding: '0', maxWidth: '100%', margin: '0' }}>
-            <MultiAgentsTab />
+            <MultiAgentsTabRedesigned />
           </div>
         );
 
