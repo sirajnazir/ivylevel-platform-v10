@@ -27,7 +27,7 @@ import { Pool } from 'pg';
 import { AgentRegistry } from '../agents/registry.js';
 import { withApiKey, withRateLimit } from '../middleware/security.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
-import { V26AgentWrapper } from '../agents/V26AgentWrapper.js';
+import { V26AgentWrapperReal } from '../agents/V26AgentWrapperReal.js';
 
 const router = Router();
 const logger = createLogger('v26-multiagents');
@@ -36,14 +36,14 @@ const logger = createLogger('v26-multiagents');
  * Initialize router with dependencies
  */
 export function createV26MultiAgentsRouter(pool: Pool, agentRegistry: AgentRegistry): Router {
-  // Initialize V26AgentWrapper with intelligence-guided responses
-  const v26Wrapper = new V26AgentWrapper(agentRegistry);
+  // Initialize V26AgentWrapperReal with REAL agents for clone students
+  const v26Wrapper = new V26AgentWrapperReal(agentRegistry, pool);
 
   logger.event('v26.router.initialized', {
-    v26_wrapper: 'enabled',
-    mode: 'intelligence_guided_new_student',
-    real_intelligence_frameworks: true,
-    clean_slate_context: true,
+    v26_wrapper: 'real_agents',
+    mode: 'clone_student_with_empty_facts',
+    agents_used: ['AssessmentAgentV3', 'GamePlanAgent', 'ExecutionAgent', 'AwardsAgent', 'SummerProgramsAgent', 'ScholarshipsAgent'],
+    intelligence_types: 'all_real_types_TYPE-001_through_TYPE-083',
   });
   // ============================================================================
   // POST /api/v26/session/start
@@ -256,9 +256,13 @@ What would you like to focus on this week?`;
       logger.event('v26.agent.response_with_context', {
         agent_id: agentId,
         session_id,
-        is_new_student: agentResponse.v26_context.is_new_student,
-        facts_from_session: agentResponse.v26_context.facts_from_session,
-        facts_from_db: agentResponse.v26_context.facts_from_db,
+        is_clone_student: agentResponse.v26_context.is_clone_student,
+        clone_student_id: agentResponse.v26_context.clone_student_id,
+        real_student_id: agentResponse.v26_context.real_student_id,
+        conversation_turns: agentResponse.v26_context.conversation_turns,
+        intent_classification: agentResponse.v26_context.intent_classification,
+        processing_steps: agentResponse.v26_context.processing_steps,
+        intelligence_triggered_count: agentResponse.intelligence_triggered.length,
       });
 
       // Save agent response

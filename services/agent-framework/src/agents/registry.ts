@@ -14,6 +14,7 @@ import { Pool } from 'pg';
 import { EventBus } from '../events/EventBus.js';
 import { GamePlanAgent } from './v18/GamePlanAgentRefactored.js';
 import { AssessmentAgent } from './v18/AssessmentAgentRefactored.js';
+import { AssessmentAgentV3 } from './v18/AssessmentAgentV3.js';
 import { ExtracurricularsAgentRefactored } from './v18/ExtracurricularsAgentRefactored.js';
 import { AwardsAgentRefactored } from './v18/AwardsAgentRefactored.js';
 import { SummerProgramsAgentRefactored } from './v18/SummerProgramsAgentRefactored.js';
@@ -35,6 +36,7 @@ export class AgentRegistry {
 
   private gamePlanAgent: GamePlanAgent | null = null;
   private assessmentAgent: AssessmentAgent | null = null;
+  private assessmentAgentV3: AssessmentAgentV3 | null = null;
   private extracurricularsAgent: ExtracurricularsAgentRefactored | null = null;
   private awardsAgent: AwardsAgentRefactored | null = null;
   private summerProgramsAgent: SummerProgramsAgentRefactored | null = null;
@@ -90,12 +92,20 @@ export class AgentRegistry {
         (this.gamePlanAgent as any).initializeEventBus(this.eventBus, pool);
       }
 
-      // Initialize AssessmentAgent v18 with FactStore
+      // Initialize AssessmentAgent v18 with FactStore (legacy)
       this.assessmentAgent = new AssessmentAgent(this.factStore);
       // AssessmentAgent uses old BaseAgent pattern with EventBus
       if (typeof (this.assessmentAgent as any).initializeEventBus === 'function') {
         (this.assessmentAgent as any).initializeEventBus(this.eventBus, pool);
       }
+
+      // Initialize AssessmentAgentV3 (v23.0) with Intelligence Types
+      log.event('agent_registry.initialize_assessment_agent_v3', {});
+      this.assessmentAgentV3 = new AssessmentAgentV3(this.factStore);
+      // AssessmentAgentV3 uses BaseAgentWithIntelligence (no EventBus)
+      log.event('agent_registry.assessment_agent_v3_ready', {
+        intelligence_types_loaded: 4, // TYPE-080, TYPE-081, TYPE-082, TYPE-083
+      });
 
       // Initialize ExtracurricularsAgent v18 with FactStore
       this.extracurricularsAgent = new ExtracurricularsAgentRefactored(this.factStore);
@@ -170,13 +180,23 @@ export class AgentRegistry {
   }
 
   /**
-   * Get AssessmentAgent instance
+   * Get AssessmentAgent instance (legacy v18)
    */
   getAssessmentAgent(): AssessmentAgent {
     if (!this.assessmentAgent) {
       throw new Error('AssessmentAgent not initialized. Call initialize() first.');
     }
     return this.assessmentAgent;
+  }
+
+  /**
+   * Get AssessmentAgentV3 instance (v23.0 with Intelligence Types)
+   */
+  getAssessmentAgentV3(): AssessmentAgentV3 {
+    if (!this.assessmentAgentV3) {
+      throw new Error('AssessmentAgentV3 not initialized. Call initialize() first.');
+    }
+    return this.assessmentAgentV3;
   }
 
   /**
