@@ -381,6 +381,44 @@ What would you like to focus on this week?`;
         }
       }
 
+      // v28.0: Check for A2A handover in metadata
+      const a2a_handover_complete = agentResponse.metadata?.a2a_handover_complete || false;
+      const handover_id = agentResponse.metadata?.handover_id;
+      const new_agent_id = agentResponse.metadata?.agent_id;
+
+      // Phase mapping for agent transitions
+      const phaseMap: Record<string, string> = {
+        'assessment-agent-v18': 'assessment',
+        'gameplan-agent': 'gameplan',
+        'execution-agent': 'execution'
+      };
+
+      if (a2a_handover_complete && handover_id && new_agent_id) {
+        console.log('[V26_A2A] 🔄 A2A Handover detected!', {
+          handover_id,
+          from_agent: agentId,
+          to_agent: new_agent_id,
+          session_id
+        });
+
+        // Update session to reflect new active agent
+        const newPhase = phaseMap[new_agent_id] || sessionResult.rows[0].current_phase;
+
+        await pool.query(
+          `UPDATE multiagent_sessions
+           SET current_agent = $1,
+               current_phase = $2,
+               updated_at = NOW()
+           WHERE id = $3`,
+          [new_agent_id, newPhase, session_id]
+        );
+
+        console.log('[V26_A2A] ✅ Session updated:', {
+          new_agent: new_agent_id,
+          new_phase: newPhase
+        });
+      }
+
       // Update session analytics
       await pool.query(
         `UPDATE multiagent_sessions
@@ -398,6 +436,7 @@ What would you like to focus on this week?`;
         session_id,
         processing_time: processingTime,
         intelligence_triggered: (agentResponse as any).intelligence_triggered?.length || 0,
+        a2a_handover: a2a_handover_complete ? handover_id : null,
       });
 
       return res.status(200).json({
@@ -408,6 +447,14 @@ What would you like to focus on this week?`;
         confidence: agentResponse.validation_score,
         intelligence_triggered: (agentResponse as any).intelligence_triggered || [],
         metadata: agentResponse.metadata,
+        // v28.0: A2A Handover information
+        a2a_handover: a2a_handover_complete ? {
+          handover_complete: true,
+          handover_id,
+          from_agent: agentId,
+          to_agent: new_agent_id,
+          new_phase: phaseMap[new_agent_id] || sessionResult.rows[0].current_phase
+        } : null,
         // v26 Context: Real vs Clone Student IDs for intelligence tracing
         v26_context: {
           real_student_id: student_id,
