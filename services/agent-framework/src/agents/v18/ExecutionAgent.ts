@@ -23,7 +23,8 @@
 
 import { BaseAgentWithIntelligence } from './BaseAgentWithIntelligence.js';
 import { AgentQuery, AgentResponse } from '../types.js';
-import { FactStore, FactCategory, FactSet } from '../../facts/FactStore.js';
+import { FactStore, FactSet } from '../../facts/FactStore.js';
+import { FactCategory } from '../../facts/types.js';
 import { IntelligenceType, IntelligenceResult, IntelligenceRegistry } from '../../intelligence/IntelligenceRegistry.js';
 
 export class ExecutionAgent extends BaseAgentWithIntelligence {

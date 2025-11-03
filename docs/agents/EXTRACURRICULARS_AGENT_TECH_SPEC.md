@@ -1,10 +1,11 @@
 # Extracurriculars Agent - Technical Specification
 
-**Version:** v18.0
+**Version:** v3.0 (Intelligence Types Architecture)
 **Last Update:** 2025-10-29
 **Agent Domain:** Extracurricular Activities Strategy & Optimization
-**Parent Architecture:** [Foundation Agents Architecture](../FOUNDATION_AGENTS_ARCHITECTURE.md)
+**Parent Architecture:** [Foundation Agents Architecture v3.0](../FOUNDATION_AGENTS_ARCHITECTURE.md)
 **Fact-First Framework:** [v18.0 Architecture](../FACT_FIRST_ARCHITECTURE.md)
+**Intelligence Types:** Universal (7) + Domain-Specific (6)
 
 ---
 
@@ -125,6 +126,116 @@ The EC Agent is trained on 70+ frameworks extracted from:
 - Metric Ladder (hours → users → beneficiaries → $ → media)
 - Hours-Per-Week Reality Check (74.5h available after sleep/school)
 - Leadership Title Engineering (Founder > President > VP; National > Regional > School)
+
+---
+
+## 2.3 Intelligence Types Architecture (v3.0)
+
+**See:** `docs/agents/AWARDS_AGENT_TECH_SPEC.md` (Section 2) for complete Intelligence Types architecture
+**See:** `docs/FOUNDATION_AGENTS_ARCHITECTURE.md` (Section 3) for Intelligence Types foundation
+
+### Universal Intelligence Types (7 types - inherited from BaseAgent)
+
+ExtracurricularsAgent inherits ALL universal intelligence types:
+
+| Type ID | Name | Purpose | Example in EC Context |
+|---------|------|---------|----------------------|
+| TYPE-005 | 3R Rejection Protocol | Handle rejection/failure | "History Day didn't work out? Pivot to Science Fair in <2hrs" |
+| TYPE-018 | Strategic Pivot Protocol | Transform strategy within 48-72hrs | "Robotics team dissolved? Launch solo maker project + YouTube channel" |
+| TYPE-020 | Opportunity Pipeline | Generate 1.2 opportunities per interaction | "Starting coding club? Also consider: hackathons, open source, teaching" |
+| TYPE-011 | Celebration Science | Calibrated celebration | "Club launched = 'Great start!', 100 members = 'THIS IS INCREDIBLE!!!'" |
+| TYPE-012 | Rejection Alchemy | Transform rejection into fuel | "Rejected from leadership? Founded competing org → better Common App story" |
+| TYPE-021 | Parent Navigation | Balance parent/student messaging | Parent hears 'leadership development', student hears 'build cool stuff'" |
+| TYPE-010 | Permission Field | Vulnerability progression system | Build trust before delivering "Your ECs are cookie-cutter" |
+
+### Domain-Specific Intelligence Types (Extracurriculars-Specific)
+
+ExtracurricularsAgent declares its own EC portfolio optimization expertise:
+
+| Type ID | Name | Purpose | Components |
+|---------|------|---------|------------|
+| TYPE-013 | EC Portfolio Optimization | 10-slot Common App strategy | Flagship vs. Supporting vs. Validation Framework, Portfolio Operating Cadence |
+| TYPE-014 | Narrative Synthesis | Unify scattered activities under identity | Identity Fusion Framework, Cookie-Cutter Detection, Web Metaphor |
+| TYPE-015 | Impact Engineering | Escalate evidence ladder | Evidence Ladder (built → used → impact → media), Metric Hierarchy |
+| TYPE-016 | Time Mathematics | Validate realistic hour claims | 168-Hour Architecture, 74.5h Available Calculator, Task Multiplication 5X |
+| TYPE-017 | Task Multiplication | 5X impact formula (reused from Awards) | Same activity serves 5+ purposes simultaneously |
+| TYPE-019 | Formalization Ladder | Escalate from hobby to institution | 7-step legitimacy stack: idea → project → club → nonprofit → media → partnerships |
+
+### Implementation Pattern
+
+```typescript
+class ExtracurricularsAgentRefactored extends BaseAgent {
+  protected DOMAIN_INTELLIGENCE: IntelligenceType[] = [
+    IntelligenceRegistry.get('TYPE-013: EC_Portfolio_Optimization'),
+    IntelligenceRegistry.get('TYPE-014: Narrative_Synthesis'),
+    IntelligenceRegistry.get('TYPE-015: Impact_Engineering'),
+    IntelligenceRegistry.get('TYPE-016: Time_Mathematics'),
+    IntelligenceRegistry.get('TYPE-017: Task_Multiplication'),  // Shared with AwardsAgent
+    IntelligenceRegistry.get('TYPE-019: Formalization_Ladder')
+  ];
+
+  protected getRequiredFacts(): FactCategory[] {
+    return [
+      FactCategory.STUDENT_PROFILE,
+      FactCategory.ACTIVITY_DATA,
+      FactCategory.UNIQUE_NARRATIVE,
+      FactCategory.AVAILABLE_HOURS_WEEKLY,
+      FactCategory.TARGET_SCHOOLS
+    ];
+  }
+}
+```
+
+### Parallel Processing Example
+
+**Query:** "How can I make my coding club more impressive?"
+
+```
+Parallel Processing (13 intelligence types):
+  ├─ TYPE-013: Portfolio Optimization → "Position as flagship, add 2 supporting projects"
+  ├─ TYPE-014: Narrative Synthesis → "Frame as 'Democratizing CS Education' theme"
+  ├─ TYPE-015: Impact Engineering → "Get to 50 members, track learning outcomes, get media"
+  ├─ TYPE-016: Time Mathematics → "8 hrs/week realistic for founder role"
+  ├─ TYPE-017: Task Multiplication → "Use for: leadership, teaching, content, awards, essay"
+  ├─ TYPE-019: Formalization Ladder → "Step 3: Registered club → Step 5: Nonprofit 501(c)(3)"
+  ├─ TYPE-020: Opportunity Pipeline → "While building: apply NCWIT, blog on Medium, YouTube"
+  ├─ TYPE-011: Celebration Science → "50 members in 3 months = 'Amazing growth!'"
+  ├─ TYPE-005, TYPE-012, TYPE-018, TYPE-021, TYPE-010 → (monitoring for triggers)
+
+Synthesized Response:
+"Let's elevate your coding club from 'good' to 'standout.' Position it as your flagship activity under the 'Democratizing CS Education' theme. Three moves: (1) Scale to 50+ members with tracked learning outcomes—this proves impact. (2) Formalize: Register as 501(c)(3) nonprofit for credibility. (3) Multiply: Use this for NCWIT app, college essays, YouTube content, and teaching portfolio. With 8 hrs/week, you can hit legitimacy Step 5 by Q3. Meanwhile, apply to NCWIT and start blogging your teaching insights."
+```
+
+### Data Sources Mapped to Intelligence Types
+
+**TYPE-013 (Portfolio Optimization):**
+- 10 Activities Framework (STUDENT_INDEX.md)
+- Flagship vs. Supporting framework (W048)
+- Portfolio Operating Cadence (EXEC chips)
+
+**TYPE-014 (Narrative Synthesis):**
+- Web Metaphor (STUDENT_INDEX.md)
+- Identity Fusion patterns (Huda extractions)
+- Cookie-Cutter Detection framework
+
+**TYPE-015 (Impact Engineering):**
+- Evidence Ladder (W048 Formalization Ladder)
+- Metric Hierarchy (W076 Statistical Bridge)
+- Impact Scaling patterns
+
+**TYPE-016 (Time Mathematics):**
+- 168-Hour Architecture (EXEC chips Batch v2)
+- Hours Reality Check formulas
+- Task load validation
+
+**TYPE-017 (Task Multiplication):**
+- 5X Formula (Awards spec, reused here)
+- Multi-purpose project design
+
+**TYPE-019 (Formalization Ladder):**
+- 7-step legitimacy stack (W048)
+- Institutional escalation patterns
+- Synchronous Send timing
 
 ---
 

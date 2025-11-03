@@ -1,10 +1,10 @@
 # GamePlanAgent - Technical Architecture Specification
 
-**Document Version:** v2.0 (v18.0 Fact-First Architecture)
+**Document Version:** v3.0 (Intelligence Types Architecture)
 **Last Updated:** 2025-10-29
 **Status:** ✅ GOLD STANDARD SPECIFICATION
 **Agent Type:** Specialized Strategic Planning Agent
-**Parent Architecture:** Universal Agent Framework v1.0 + Fact-First Primitives v18.0
+**Parent Architecture:** Universal Agent Framework v1.0 + Fact-First Primitives v18.0 + Intelligence Types v3.0
 
 ---
 
@@ -46,6 +46,7 @@
 GamePlanAgent =
   Universal Agent Foundation (7 primitives)
   + Fact-First Architecture v18.0 (FactStore, BaseAgent, FactValidator)
+  + Intelligence Types v3.0 (7 Universal + Domain-Specific)
   + Strategic Planning Intelligence (DS6/DS7 game plan synthesis)
   + Jenny's Time Mathematician Logic (93-week framework)
   + Quarterly Adaptation Engine
@@ -654,131 +655,237 @@ test('should create game plan from facts', async () => {
 
 ## Intelligence Architecture
 
-### Two-Stream Intelligence Model
+### Intelligence Types Architecture (v3.0)
 
-The GamePlanAgent uses the same **dual-stream intelligence architecture** as AssessmentAgent:
+**Foundational Change:** GamePlanAgent now extends the **Intelligence Types Architecture**, aligning with AwardsAgent and all future agents. This replaces the two-stream intelligence model with a unified, parallel-processing intelligence framework.
 
-#### Stream 1: Game Plan Content Intelligence (WHAT)
+**See:** `docs/agents/AWARDS_AGENT_TECH_SPEC.md` (Section 2) for complete Intelligence Types architecture documentation
+**See:** `docs/FOUNDATION_AGENTS_ARCHITECTURE.md` (Section 3) for Intelligence Types foundation
 
-**Purpose:** Define strategic planning frameworks, quarterly decomposition logic, and time mathematician patterns
+### Universal Intelligence Types (7 types - inherited from BaseAgent)
 
-**Data Source:** 10 real GamePlan session transcripts (DS6/DS7 synthesis sessions)
+GamePlanAgent inherits ALL universal intelligence types that handle cross-cutting coaching concerns:
 
-**Location:** `/data/coaching_intelligence/extractions/huda_complete_game_plan_extraction.json`
+| Type ID | Name | Purpose | Example in GamePlan Context |
+|---------|------|---------|------------------------------|
+| TYPE-005 | 3R Rejection Protocol | Handle rejection/failure | "Missed NCWIT? Let's pivot to Congressional App in <2hrs" |
+| TYPE-018 | Strategic Pivot Protocol | Transform strategy within 48-72hrs | "SAT plateau? Shift focus to subject tests + portfolio this quarter" |
+| TYPE-020 | Opportunity Pipeline | Generate 1.2 opportunities per interaction | "Applying to Stanford program? Also consider: MIT WISE, JCamp, AI4All" |
+| TYPE-011 | Celebration Science | Calibrated celebration | "Q2 completion = 'Great progress!', Q4 ahead of schedule = 'THIS IS INCREDIBLE!!!'" |
+| TYPE-012 | Rejection Alchemy | Transform rejection into fuel | "NCWIT semifinalist validates your Digital Storyteller narrative for USC" |
+| TYPE-021 | Parent Navigation | Balance parent/student messaging | Parent hears 'rigorous 8-quarter plan', student hears 'we adapt quarterly'" |
+| TYPE-010 | Permission Field | Vulnerability progression system | Build trust before delivering "This quarter didn't go as planned" |
 
-**Structure:**
-```json
-{
-  "extraction_metadata": {
-    "student_id": "huda-2025",
-    "extraction_date": "2025-10-28",
-    "sessions_analyzed": 10,
-    "focus": "Strategic game plan creation + quarterly adaptation patterns"
-  },
-  "strategic_frameworks": [
-    {
-      "framework_name": "Target Profile Synthesis",
-      "description": "Synthesize assessment → target schools + narrative positioning",
-      "when_to_use": "Initial game plan creation after assessment",
-      "inputs": ["identity_fusion", "potential_spikes", "target_schools"],
-      "outputs": ["target_profile", "strategic_narrative"],
-      "effectiveness": 0.94
+### Domain-Specific Intelligence Types (GamePlan-Specific)
+
+GamePlanAgent declares its own strategic planning expertise:
+
+| Type ID | Name | Purpose | Components |
+|---------|------|---------|------------|
+| TYPE-001 | Game Plan Synthesis | Synthesize assessment → 2-year roadmap | Target Profile Synthesis Framework, Multi-Path Convergence Tactic |
+| TYPE-002 | Weak Spot Prioritization | Identify & sequence gap-closing actions | Rubric Gap Analysis Framework, P0/P1/P2 Prioritization Tactic |
+| TYPE-003 | Timeline Architecture | Map 93-week framework to student context | 93-Week Framework, Quarterly Decomposition Tactic, Milestone Mapping |
+| TYPE-004 | Multi-Path Convergence | Handle undecided students (CS vs Econ paths) | Parallel Planning Tactic, Convergence Milestone Technique |
+| TYPE-006 | Quarterly Adaptation | Respond to progress/setbacks with replanning | Milestone Achievement/Miss Tactics, Context Change Pivot |
+| TYPE-007 | Time Mathematician | Calculate realistic hour allocations | 168hr Weekly Planning, ROI-per-hour calculation |
+
+### Intelligence Type Implementation Example
+
+**TYPE-003: Timeline Architecture**
+
+```typescript
+export class TimelineArchitecture implements IntelligenceType {
+  type_id = 'TYPE-003';
+  name = 'Timeline Architecture';
+  category = 'DOMAIN_SPECIFIC' as const;
+
+  components = {
+    framework: {
+      name: '93-Week Framework',
+      description: 'Jenny\'s validated 2-year roadmap structure',
+      mental_model: 'Phase → Quarter → Milestone → Action hierarchy'
     },
-    {
-      "framework_name": "Quarterly Decomposition",
-      "description": "Break 2-year journey into 8 quarters with milestone mapping",
-      "when_to_use": "Initial game plan + quarterly reviews",
-      "inputs": ["time_remaining", "rubric_gap", "current_quarter"],
-      "outputs": ["quarterly_plan[]", "milestones[]"],
-      "effectiveness": 0.91
-    },
-    {
-      "framework_name": "Multi-Path Convergence",
-      "description": "Parallel planning for undecided students (e.g., CS vs Econ paths)",
-      "when_to_use": "Student has multiple viable paths",
-      "inputs": ["identity_fusion", "interests[]", "strength_areas[]"],
-      "outputs": ["path_a_plan", "path_b_plan", "convergence_milestones"],
-      "effectiveness": 0.89
-    }
-  ],
-  "time_mathematician_logic": {
-    "93_week_framework": {
-      "total_weeks": 93,
-      "phase_breakdown": {
-        "P1_FOUNDATION": { "weeks": "1-30", "focus": "Build foundation + spike creation" },
-        "P2_BUILD": { "weeks": "31-65", "focus": "Amplify spike + awards + portfolio" },
-        "P3_DECISION": { "weeks": "66-93", "focus": "Application strategy + final push" }
+    tactics: [
+      {
+        name: 'Quarterly Decomposition',
+        description: 'Break 93 weeks into 8 quarters with clear objectives',
+        steps: [
+          'Calculate weeks remaining from current week',
+          'Determine current phase (P1/P2/P3)',
+          'Assign priorities to each quarter (foundation → build → decision)',
+          'Map major milestones to quarters based on deadlines',
+          'Calculate required rubric Δ per quarter'
+        ]
       },
-      "critical_deadlines": [
-        { "week": 12, "deadline": "NCWIT Aspirations", "rubric_impact": 1.5 },
-        { "week": 24, "deadline": "Congressional App Challenge", "rubric_impact": 2.0 },
-        { "week": 52, "deadline": "Stanford Summer Session apps", "rubric_impact": 1.0 }
+      {
+        name: 'Milestone Mapping',
+        description: 'Sequence milestones across timeline with dependencies',
+        steps: [
+          'Extract all P0/P1 milestones from assessment',
+          'Map to specific weeks based on external deadlines',
+          'Identify dependencies (e.g., essay draft before submission)',
+          'Calculate rubric impact per milestone',
+          'Create critical path'
+        ]
+      }
+    ],
+    techniques: [
+      { name: 'Week Number Calculation', action: 'Calculate current week from program start date' },
+      { name: 'Phase Transition Detection', action: 'Detect when student enters new phase' },
+      { name: 'Deadline Prioritization', action: 'Sort milestones by urgency × rubric impact' }
+    ],
+    chips: [
+      { type: 'data', name: '93-Week Calendar', content: 'Phase boundaries, review triggers' },
+      { type: 'template', name: 'Quarterly Plan Template', content: 'Quarter structure with fields' },
+      { type: 'example', name: 'Huda 8-Quarter Plan', content: 'Real student timeline' }
+    ],
+    metrics: {
+      success_criteria: [
+        'All milestones have specific week numbers',
+        'No milestone conflicts (overlapping deadlines)',
+        'Critical path identified',
+        'Quarterly rubric Δ sums to total gap'
+      ],
+      validation: 'Verify timeline is achievable given student\'s available hours'
+    },
+    triggers: {
+      conditions: [
+        'assessment_completed event received',
+        'quarterly_review event received',
+        'student asks: "What\'s my timeline?"'
       ]
-    },
-    "quarterly_review_triggers": [1, 13, 25, 37, 49, 61, 73, 85]
-  },
-  "adaptation_patterns": {
-    "milestone_achieved": {
-      "trigger": "Student completes P0 milestone ahead of schedule",
-      "adaptation": "Accelerate next milestone, increase rubric projection"
-    },
-    "milestone_missed": {
-      "trigger": "Student misses P0 milestone deadline",
-      "adaptation": "Replan quarter, identify blockers, adjust expectations"
-    },
-    "context_change": {
-      "trigger": "Major life event (parent health, financial, etc.)",
-      "adaptation": "Pivot game plan, focus on achievable milestones"
     }
+  };
+
+  async process(query: AgentQuery, facts: FactSet): Promise<IntelligenceResult> {
+    const weekNumber = this.calculateCurrentWeek(facts);
+    const phase = this.determinePhase(weekNumber);
+    const weeksRemaining = 93 - weekNumber;
+
+    // Run Quarterly Decomposition tactic
+    const quarters = this.decomposeIntoQuarters(
+      weekNumber,
+      weeksRemaining,
+      facts.getValueByType('rubric_gap'),
+      facts.getFactsByType('milestone')
+    );
+
+    // Run Milestone Mapping tactic
+    const mappedMilestones = this.mapMilestonesToTimeline(
+      facts.getFactsByType('milestone'),
+      quarters
+    );
+
+    return {
+      type_id: this.type_id,
+      component: 'timeline',
+      data: {
+        current_week: weekNumber,
+        current_phase: phase,
+        weeks_remaining: weeksRemaining,
+        quarterly_plan: quarters,
+        milestones: mappedMilestones,
+        critical_path: this.calculateCriticalPath(mappedMilestones)
+      },
+      confidence: 0.95,
+      chips_used: ['93-Week Calendar', 'Quarterly Plan Template']
+    };
   }
 }
 ```
 
-**Loaded By:** `GamePlanIntelligenceLoader` → loads strategic planning patterns
+### Parallel Processing Pattern
 
-**Reference:** `services/agent-framework/src/intelligence/GamePlanIntelligenceLoader.ts` (to be implemented)
-
-#### Stream 2: 93-Week EQ Intelligence (HOW)
-
-**Purpose:** Apply Jenny's coaching style to strategic planning communications
-
-**Data Source:** Same 7 iMessage files + 87 session transcripts as AssessmentAgent
-
-**EQ Adaptations for GamePlan:**
-- **Future Pacing**: "In 3 months, you'll have..."
-- **Strategic Overwhelm Management**: "This feels like a lot, but let's break it down"
-- **Rejection Sandwich**: "This quarter didn't go as planned, but here's what we learned..."
-- **Celebration Calibration**: Amplify wins to build momentum
-
-**Reference:** `services/agent-framework/src/intelligence/EQProfileLoader.ts`
-
-### Intelligence Integration Pattern
+**Key Innovation:** ALL intelligence types (7 universal + 6 domain-specific) process EVERY query simultaneously.
 
 ```typescript
-// GamePlanAgent initialization
-async function createGamePlanAgent(config: GamePlanAgentConfig) {
-  // STREAM 1: Load game plan content intelligence (WHAT to plan)
-  const gamePlanIntelLoader = new GamePlanIntelligenceLoader();
-  const strategicIntelligence = await gamePlanIntelLoader.loadAllIntelligence();
-  // → Strategic frameworks, quarterly logic, adaptation patterns
+class GamePlanAgent extends BaseAgent {
+  protected DOMAIN_INTELLIGENCE: IntelligenceType[] = [
+    IntelligenceRegistry.get('TYPE-001: Game_Plan_Synthesis'),
+    IntelligenceRegistry.get('TYPE-002: Weak_Spot_Prioritization'),
+    IntelligenceRegistry.get('TYPE-003: Timeline_Architecture'),
+    IntelligenceRegistry.get('TYPE-004: Multi_Path_Convergence'),
+    IntelligenceRegistry.get('TYPE-006: Quarterly_Adaptation'),
+    IntelligenceRegistry.get('TYPE-007: Time_Mathematician')
+  ];
 
-  // STREAM 2: Load 93-week EQ intelligence (HOW Jenny coaches)
-  const eqLoader = new EQProfileLoader(config.db);
-  const eqProfile = await eqLoader.loadIntelligence('jenny_duan');
-  // → 94 conversations, 1,655 utterances, 745 markers, 482 examples
+  async handleQuery(query: AgentQuery): Promise<AgentResponse> {
+    // 1. Load facts
+    const facts = await this.factStore.getFacts(query.entity_id, this.getRequiredFacts());
 
-  // v18.0: Initialize FactStore
-  const factStore = initializeFactStore(config.pool);
+    // 2. Get all intelligence types (universal + domain)
+    const allIntelligence = [
+      ...BaseAgent.UNIVERSAL_INTELLIGENCE,  // 7 universal
+      ...this.DOMAIN_INTELLIGENCE            // 6 domain-specific
+    ];
 
-  // COMBINE: Create agent with both streams + fact-first enforcement
-  return new GamePlanAgent(factStore, {
-    strategicIntelligence,  // WHAT: frameworks, quarterly logic
-    eqProfile               // HOW: tone, style, warmth, patterns
-  });
+    // 3. PARALLEL processing (13 intelligence types fire simultaneously)
+    const intelligenceResults = await Promise.all(
+      allIntelligence.map(intel => intel.process(query, facts))
+    );
+
+    // 4. SYNTHESIZE response
+    return this.synthesizeResponse(intelligenceResults, query, facts);
+  }
 }
 ```
 
-**Reference:** `services/agent-framework/src/agents/v18/GamePlanAgentRefactored.ts:200-260`
+**Example Query:** "What should I focus on this quarter?"
+
+```
+Parallel Processing (13 intelligence types):
+  ├─ TYPE-001: Game Plan Synthesis → "Your Digital Storyteller narrative guides Q3 focus"
+  ├─ TYPE-002: Weak Spot Prioritization → "P0: Awards (none won yet), P1: Service hours"
+  ├─ TYPE-003: Timeline Architecture → "Q3 = weeks 25-36, P2-BUILD phase, 3 major milestones"
+  ├─ TYPE-004: Multi-Path Convergence → "CS path accelerating, film path on track for convergence"
+  ├─ TYPE-006: Quarterly Adaptation → "Q2 completed ahead of schedule, accelerate Q3 timeline"
+  ├─ TYPE-007: Time Mathematician → "18 hrs/week available, allocate: 8hr game dev, 6hr teaching, 4hr content"
+  ├─ TYPE-005: 3R Rejection → (not triggered)
+  ├─ TYPE-018: Strategic Pivot → (not triggered)
+  ├─ TYPE-020: Opportunity Pipeline → "Q3 opportunities: NCWIT (Oct 1), YoungArts (Dec), Scholastic (Dec)"
+  ├─ TYPE-011: Celebration Science → "Q2 completion ahead of schedule = 'Incredible progress!'"
+  ├─ TYPE-012: Rejection Alchemy → (not triggered)
+  ├─ TYPE-021: Parent Navigation → Parent: 'Q3 builds recognition', Student: 'awards you'll love'"
+  └─ TYPE-010: Permission Field → (sufficient trust established)
+
+Synthesized Response:
+"Incredible progress on Q2! Looking ahead, Q3 (weeks 25-36) is your P2-BUILD phase focused on recognition. Your top priority: winning awards (current P0 gap). With 18 hours/week, I recommend: 8hrs on Synthoria game polish, 6hrs teaching AI ethics for NCWIT, 4hrs content creation. Three major opportunities this quarter: NCWIT Aspirations (Oct 1 - perfect fit for Digital Storyteller), YoungArts Games (Dec), Scholastic Art & Writing (Dec). Your CS + film paths are converging nicely - each project serves both narratives."
+```
+
+### Data Sources
+
+**Intelligence Types leverage existing coaching data:**
+
+1. **Strategic Frameworks** (DS6/DS7 sessions):
+   - Location: `/data/coaching_intelligence/extractions/huda_complete_game_plan_extraction.json`
+   - Content: Target synthesis, quarterly decomposition, multi-path convergence
+   - Loaded into: TYPE-001, TYPE-003, TYPE-004
+
+2. **Time Mathematician Logic** (93-week framework):
+   - Location: Same file
+   - Content: Phase breakdown, deadline mapping, quarterly triggers
+   - Loaded into: TYPE-003, TYPE-007
+
+3. **Adaptation Patterns** (milestone tracking):
+   - Location: Same file
+   - Content: Achievement/miss responses, context change pivots
+   - Loaded into: TYPE-006
+
+4. **EQ Intelligence** (93-week coaching style):
+   - Location: `/data/eq/` (7 iMessage files + 87 sessions)
+   - Content: Future pacing, overwhelm management, celebration calibration
+   - Loaded into: Universal intelligence types (TYPE-005, TYPE-010, TYPE-011, TYPE-012, TYPE-018, TYPE-020, TYPE-021)
+
+### Benefits of Intelligence Types for GamePlan
+
+1. **Holistic Planning**: Single query triggers timeline + priorities + opportunities + celebration
+2. **Reusability**: Opportunity Pipeline (TYPE-020) shared with Awards, Scholarships, Programs
+3. **Adaptability**: Quarterly Adaptation (TYPE-006) can be tuned per student archetype
+4. **Extensibility**: Add TYPE-008: "College Essay Timeline" → auto-integrated
+5. **Testability**: Mock intelligence types to verify quarterly logic independently
+6. **Auditability**: Every game plan decision traceable to specific intelligence type
+
+**Reference:** `services/agent-framework/src/agents/v18/GamePlanAgentRefactored.ts:1-150`
 
 ---
 

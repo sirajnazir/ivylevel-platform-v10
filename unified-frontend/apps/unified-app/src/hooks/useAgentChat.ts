@@ -41,6 +41,10 @@ export function useAgentChat({
 
   const sendMessage = useCallback(
     async (message: string) => {
+      console.log('🚀 [useAgentChat] sendMessage called with:', message);
+      console.log('🚀 [useAgentChat] useV152:', useV152);
+      console.log('🚀 [useAgentChat] studentId:', studentId);
+
       if (!message.trim()) return;
 
       setLoading(true);
@@ -129,7 +133,9 @@ export function useAgentChat({
           return response;
         }
       } catch (error: any) {
-        console.error('Chat error:', error);
+        console.error('❌ [useAgentChat] Chat error:', error);
+        console.error('❌ [useAgentChat] Error message:', error.message);
+        console.error('❌ [useAgentChat] Error stack:', error.stack);
         if (onError) {
           onError(error);
         }
@@ -156,8 +162,10 @@ export function useAgentChat({
 
   return {
     messages,
+    setMessages, // Expose for direct message manipulation (e.g., v17.0 integration)
     sessionId,
     loading,
+    setLoading, // Expose for loading state control
     currentAgent,
     sendMessage,
     clearMessages,

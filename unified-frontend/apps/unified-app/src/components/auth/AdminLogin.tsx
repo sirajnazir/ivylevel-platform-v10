@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 import { cognitoAuthService } from '../../services/auth/cognitoAuthService';
 import { useNavigate } from 'react-router-dom';
 import { Shield } from 'lucide-react';

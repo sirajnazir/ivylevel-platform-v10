@@ -10,7 +10,8 @@
  * See: docs/BACKLOG_CRITICAL_ITEMS.md for expansion roadmap
  */
 
-import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet, FactCategory } from '../IntelligenceRegistry.js';
+import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet } from './BaseIntelligenceType.js';
+import { FactCategory } from '../../facts/types.js';
 
 /**
  * TYPE-051: Task Decomposition Intelligence (STUB)

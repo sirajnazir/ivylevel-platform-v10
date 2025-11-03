@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 
 const StyledLogoutButton = styled.button`
   display: flex;

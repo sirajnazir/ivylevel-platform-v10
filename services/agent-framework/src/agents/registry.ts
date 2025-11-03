@@ -15,6 +15,8 @@ import { EventBus } from '../events/EventBus.js';
 import { GamePlanAgent } from './v18/GamePlanAgentRefactored.js';
 import { AssessmentAgent } from './v18/AssessmentAgentRefactored.js';
 import { AssessmentAgentV3 } from './v18/AssessmentAgentV3.js';
+import { AssessmentAgentV3Conversational } from './v18/AssessmentAgentV3Conversational.js';
+import { AssessmentAgentV3ConversationalRealtime } from './v18/AssessmentAgentV3ConversationalRealtime.js';
 import { ExtracurricularsAgentRefactored } from './v18/ExtracurricularsAgentRefactored.js';
 import { AwardsAgentRefactored } from './v18/AwardsAgentRefactored.js';
 import { SummerProgramsAgentRefactored } from './v18/SummerProgramsAgentRefactored.js';
@@ -37,6 +39,8 @@ export class AgentRegistry {
   private gamePlanAgent: GamePlanAgent | null = null;
   private assessmentAgent: AssessmentAgent | null = null;
   private assessmentAgentV3: AssessmentAgentV3 | null = null;
+  private assessmentAgentV3Conversational: AssessmentAgentV3Conversational | null = null;
+  private assessmentAgentV3ConversationalRealtime: AssessmentAgentV3ConversationalRealtime | null = null;
   private extracurricularsAgent: ExtracurricularsAgentRefactored | null = null;
   private awardsAgent: AwardsAgentRefactored | null = null;
   private summerProgramsAgent: SummerProgramsAgentRefactored | null = null;
@@ -105,6 +109,23 @@ export class AgentRegistry {
       // AssessmentAgentV3 uses BaseAgentWithIntelligence (no EventBus)
       log.event('agent_registry.assessment_agent_v3_ready', {
         intelligence_types_loaded: 4, // TYPE-080, TYPE-081, TYPE-082, TYPE-083
+      });
+
+      // Initialize AssessmentAgentV3Conversational (v26.3) - LEGACY (with hardcoded questions)
+      log.event('agent_registry.initialize_assessment_agent_v3_conversational_legacy', {});
+      this.assessmentAgentV3Conversational = new AssessmentAgentV3Conversational(this.factStore, pool);
+
+      // Initialize AssessmentAgentV3ConversationalRealtime (v26.5) - PRODUCTION (intelligence-driven)
+      log.event('agent_registry.initialize_assessment_agent_v3_conversational_realtime', {});
+      this.assessmentAgentV3ConversationalRealtime = new AssessmentAgentV3ConversationalRealtime(this.factStore, pool);
+      // Uses TYPE-080 adaptive questions + 27 EQ layers from Jenny's real sessions
+      log.event('agent_registry.assessment_agent_v3_conversational_realtime_ready', {
+        intelligence_types_loaded: 4, // TYPE-080, TYPE-081, TYPE-082, TYPE-083
+        eq_layers: 27, // All 27 layers from W001 Huda session
+        personas: 7, // Jenny's 7 simultaneous personas
+        mode: 'intelligence_driven_conversational',
+        framework: 'Jenny_27_Layer_Assessment + TYPE-080_Adaptive',
+        hardcoded_questions: 0, // NO HARDCODED QUESTIONS
       });
 
       // Initialize ExtracurricularsAgent v18 with FactStore
@@ -247,6 +268,28 @@ export class AgentRegistry {
       throw new Error('ScholarshipsAgent not initialized. Call initialize() first.');
     }
     return this.scholarshipsAgent;
+  }
+
+  /**
+   * Get AssessmentAgentV3Conversational instance (v26.3) - LEGACY
+   * Uses hardcoded question arrays (DEPRECATED - use Realtime version)
+   */
+  getAssessmentAgentV3Conversational(): AssessmentAgentV3Conversational {
+    if (!this.assessmentAgentV3Conversational) {
+      throw new Error('AssessmentAgentV3Conversational not initialized. Call initialize() first.');
+    }
+    return this.assessmentAgentV3Conversational;
+  }
+
+  /**
+   * Get AssessmentAgentV3ConversationalRealtime instance (v26.5) - PRODUCTION
+   * Uses TYPE-080 adaptive questions + 27 EQ layers (NO HARDCODED QUESTIONS)
+   */
+  getAssessmentAgentV3ConversationalRealtime(): AssessmentAgentV3ConversationalRealtime {
+    if (!this.assessmentAgentV3ConversationalRealtime) {
+      throw new Error('AssessmentAgentV3ConversationalRealtime not initialized. Call initialize() first.');
+    }
+    return this.assessmentAgentV3ConversationalRealtime;
   }
 
   /**

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './hooks/useAuthMock';
-import useAuth from './hooks/useAuthMock';
+import { AuthProvider } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth';
 import { StudentDashboard } from './components/student/StudentDashboard';
 import { Login } from './components/auth/Login';
 import EntryPortal from './components/shared/EntryPortal';

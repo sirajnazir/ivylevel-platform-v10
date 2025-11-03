@@ -15,7 +15,8 @@
  * Pattern: Jenny's 93-week coaching progression with Huda
  */
 
-import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet, FactCategory } from '../IntelligenceRegistry.js';
+import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet } from './BaseIntelligenceType.js';
+import { FactCategory } from '../../facts/types.js';
 
 /**
  * 9 Rungs of Execution Ladder

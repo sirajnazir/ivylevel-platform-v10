@@ -1,0 +1,137 @@
+﻿{
+  "assessment_framework": {
+    "metadata": {
+      "type": "Pattern Library",
+      "purpose": "Reusable 20-point diagnostic framework from Jenny's approach"
+    },
+    
+    "the_20_point_diagnostic": {
+      "academic_dimension": {
+        "point_1": {
+          "extract": "GPA (weighted and unweighted)",
+          "question": "What's your GPA so far?",
+          "follow_up": "How does this compare to others in your school?"
+        },
+        "point_2": {
+          "extract": "Course rigor (AP/Honors count)",
+          "question": "What classes are you taking?",
+          "follow_up": "How many APs does your school offer?"
+        },
+        "point_3": {
+          "extract": "Test scores (current or planned)",
+          "question": "Have you taken SAT/ACT?",
+          "follow_up": "What's your target score?"
+        },
+        "point_4": {
+          "extract": "School competitive context",
+          "question": "Tell me about your school",
+          "follow_up": "How competitive would you say it is?"
+        },
+        "point_5": {
+          "extract": "Academic awards/distinctions",
+          "question": "Any academic recognition?",
+          "follow_up": "Honor roll, competitions, etc?"
+        }
+      },
+      
+      "activity_dimension": {
+        "point_6": {
+          "extract": "Complete activity list",
+          "question": "Tell me everything you do outside class",
+          "technique": "Let them talk, note everything"
+        },
+        "point_7": {
+          "extract": "Time allocation per activity",
+          "question": "How many hours per week on [activity]?",
+          "purpose": "Assess commitment level"
+        },
+        "point_8": {
+          "extract": "Leadership positions",
+          "question": "Do you lead or just participate?",
+          "follow_up": "Any officer positions?"
+        },
+        "point_9": {
+          "extract": "Achievement level",
+          "question": "Any awards or recognition?",
+          "critical": "Often reveals nothing - gap"
+        },
+        "point_10": {
+          "extract": "Depth indicators",
+          "question": "How long have you been involved?",
+          "assessment": "Years of commitment"
+        }
+      },
+      
+      "personality_dimension": {
+        "point_11": {
+          "extract": "Social style",
+          "question": "Are you more quiet or outgoing?",
+          "example": "Huda: quiet in class"
+        },
+        "point_12": {
+          "extract": "Collaboration preference",
+          "question": "Competitive or collaborative friend group?",
+          "insight": "Reveals comfort zone"
+        },
+        "point_13": {
+          "extract": "Communication style",
+          "question": "How do you express yourself best?",
+          "options": "Written, verbal, visual, etc"
+        },
+        "point_14": {
+          "extract": "Risk tolerance",
+          "question": "Comfortable putting yourself out there?",
+          "assessment": "Leadership potential"
+        },
+        "point_15": {
+          "extract": "Authentic interests",
+          "question": "What do you do for fun?",
+          "critical": "Often reveals true passions"
+        }
+      },
+      
+      "hidden_dimension": {
+        "point_16": {
+          "extract": "Random hobbies",
+          "question": "Any unusual interests?",
+          "value": "Differentiation opportunities"
+        },
+        "point_17": {
+          "extract": "Cultural identity",
+          "question": "Tell me about your family background",
+          "sensitivity": "Let them share comfort level"
+        },
+        "point_18": {
+          "extract": "Unique experiences",
+          "question": "Anything unique about your journey?",
+          "examples": "Moves, challenges, special circumstances"
+        },
+        "point_19": {
+          "extract": "Constraints/limitations",
+          "question": "What limits you?",
+          "types": "Time, resources, family, health"
+        },
+        "point_20": {
+          "extract": "True north passion",
+          "question": "Unlimited time and resources, what would you do?",
+          "reveals": "Authentic mission"
+        }
+      }
+    },
+    
+    "extraction_techniques": {
+      "opening_warmth": "Start with genuine curiosity",
+      "progressive_depth": "Surface → Specific → Deep",
+      "active_listening": "Note patterns while they talk",
+      "no_judgment": "Never say 'that's bad' or 'you're behind'",
+      "pattern_recognition": "Look for connections across dimensions"
+    },
+    
+    "timing_guidelines": {
+      "total": "20 points in 20 minutes",
+      "natural_flow": "Weave questions conversationally",
+      "not_checklist": "Should feel like chat not interview",
+      "flexibility": "Some points emerge naturally"
+    }
+  }
+}

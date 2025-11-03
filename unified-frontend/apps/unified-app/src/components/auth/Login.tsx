@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { cognitoAuthService } from '../../services/auth/cognitoAuthService';
 import { PasswordReset } from './PasswordReset';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 interface LoginProps {

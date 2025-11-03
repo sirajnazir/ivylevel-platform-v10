@@ -14,6 +14,8 @@
 import OpenAI from 'openai';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { getGroundingFacts as getGroundingFactsFromDB } from '../services/studentDataService.js';
+import { buildEQSystemPrompt } from '../compose/compose-eq.js';
+import { hybridSearch } from '../retrieval/hybrid.js';
 
 // Engineered context output
 export interface EngineeredContext {
@@ -94,10 +96,29 @@ export class ContextEngineeringPipeline {
 
     try {
       // Step 1: Retrieve few-shot examples via semantic search
-      const fewShotExamples = await this.retrieveFewShotExamples(
+      // v17.3: Add authentic Jenny examples from real sessions as fallback
+      let fewShotExamples = await this.retrieveFewShotExamples(
         studentContext.current_query,
         strategyNodeType
       );
+
+      // If Pinecone returns empty, use hardcoded authentic Jenny examples from real sessions
+      if (!fewShotExamples || fewShotExamples.length === 0) {
+        fewShotExamples = [
+          {
+            query: "I'm feeling really overwhelmed with all my college prep",
+            response: "I hear you—that's really tough. Let me break this down for you. First, what's the single thing causing you the most stress right now? We'll tackle that first, then we can work on the rest."
+          },
+          {
+            query: "I don't think I'm good enough for Stanford",
+            response: "Huda, I know that you are exceptional, and I know that you are great. I want you to believe it for yourself. Your GPA is stellar, your ECs show real leadership. The question isn't whether you're good enough—it's how we tell your story in a way that shows them who you really are."
+          },
+          {
+            query: "My parents want me to do more activities but I'm already so busy",
+            response: "I totally get it. Here's the thing—quality over quantity. Let's look at what you're already doing and see where you can go deeper instead of wider. What activity are you most passionate about right now?"
+          }
+        ];
+      }
 
       // Step 2: Extract SQL-grounded facts
       const groundingFacts = await this.extractGroundingFacts(
@@ -105,8 +126,19 @@ export class ContextEngineeringPipeline {
         studentContext.state
       );
 
-      // Step 3: Build system prompt
-      const systemPrompt = this.buildSystemPrompt(coachPersona, studentContext);
+      // Step 3: Build system prompt (v17.3: Use real Jenny EQ prompt)
+      // Get KB context via hybrid search for evidence-driven coaching
+      const hits = await hybridSearch(studentContext.current_query, studentContext.student_id);
+
+      // Build authentic Jenny EQ system prompt with vitals + KB context
+      const vitals = {
+        gpa: studentContext.state.gpa,
+        sat: studentContext.state.test_scores?.sat,
+        ec_count: studentContext.state.ec_count,
+        grade: studentContext.archetype,
+      };
+
+      const systemPrompt = buildEQSystemPrompt(vitals, hits);
 
       // Step 4: Check context length & compress if needed
       const totalTokens = this.estimateTokens(

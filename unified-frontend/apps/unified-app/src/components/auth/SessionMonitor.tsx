@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 import { cognitoAuthService } from '../../services/auth/cognitoAuthService';
 
 interface SessionMonitorProps {

@@ -1,0 +1,197 @@
+﻿{
+  "gameplan_architecture": {
+    "metadata": {
+      "type": "Pattern Library",
+      "purpose": "Framework for constructing strategic game plans from assessment to execution"
+    },
+    
+    "architecture_overview": {
+      "flow": "Rubric Analysis → Gap Identification → Priority Mapping → Roadmap Creation",
+      "timeframe": "2-year strategic plan with quarterly milestones",
+      "flexibility": "Built-in adaptation points every 8 weeks"
+    },
+    
+    "component_1_rubric_to_gaps": {
+      "rubric_dimensions": {
+        "academic": {
+          "max_points": 4,
+          "indicators": ["GPA", "Rigor", "Trajectory", "Intellectual Vitality"]
+        },
+        "extracurricular": {
+          "max_points": 4,
+          "indicators": ["Leadership", "Impact", "Commitment", "Recognition"]
+        },
+        "personal": {
+          "max_points": 4,
+          "indicators": ["Character", "Resilience", "Growth", "Self-Awareness"]
+        },
+        "institutional": {
+          "max_points": 4,
+          "indicators": ["Fit", "Contribution", "Differentiation", "Potential"]
+        },
+        "wildcard": {
+          "max_points": 4,
+          "indicators": ["X-Factor", "Uniqueness", "Compelling Story", "Memorability"]
+        }
+      },
+      
+      "gap_analysis_framework": {
+        "current_state": "Where student scores now",
+        "target_state": "Where they need to be for dream schools",
+        "gap_size": "Target - Current",
+        "feasibility": "Can this gap be closed in available time?",
+        "priority": "P0 (Critical), P1 (Important), P2 (Nice to have)"
+      }
+    },
+    
+    "component_2_strategic_priorities": {
+      "P0_critical_gaps": {
+        "definition": "Must fix or dream schools impossible",
+        "examples": [
+          "GPA below threshold",
+          "No leadership positions",
+          "No standout achievement",
+          "Weak narrative/synthesis"
+        ],
+        "time_allocation": "50% of effort"
+      },
+      
+      "P1_important_gaps": {
+        "definition": "Significantly improve competitiveness",
+        "examples": [
+          "Need external recognition",
+          "Build sustained impact",
+          "Develop spike in interest area",
+          "Create portfolio/evidence"
+        ],
+        "time_allocation": "35% of effort"
+      },
+      
+      "P2_enhancement": {
+        "definition": "Differentiation and polish",
+        "examples": [
+          "Additional certifications",
+          "Expanded network",
+          "Speaking opportunities",
+          "Published work"
+        ],
+        "time_allocation": "15% of effort"
+      }
+    },
+    
+    "component_3_roadmap_structure": {
+      "quarters": {
+        "Q1": {
+          "focus": "Foundation Building",
+          "typical_actions": [
+            "Establish core activities",
+            "Fix urgent gaps",
+            "Build initial portfolio"
+          ]
+        },
+        "Q2": {
+          "focus": "Momentum Building",
+          "typical_actions": [
+            "Launch signature project",
+            "Apply to first programs",
+            "Develop leadership role"
+          ]
+        },
+        "Q3": {
+          "focus": "Amplification",
+          "typical_actions": [
+            "Scale impact",
+            "Win recognition",
+            "Build external validation"
+          ]
+        },
+        "Q4-Q8": {
+          "focus": "Excellence & Execution",
+          "typical_actions": [
+            "Sustain achievements",
+            "Document journey",
+            "Prepare applications",
+            "Achieve measurable outcomes"
+          ]
+        }
+      },
+      
+      "monthly_checkpoints": {
+        "week_1": "Review progress on current initiatives",
+        "week_2": "Adjust tactics if needed",
+        "week_3": "Push forward on key projects",
+        "week_4": "Plan next month's priorities"
+      },
+      
+      "quarterly_reviews": {
+        "assess": "What worked? What didn't?",
+        "adjust": "Revise upcoming quarter based on learnings",
+        "accelerate": "Double down on what's working"
+      }
+    },
+    
+    "component_4_program_matching": {
+      "research_intensive": [
+        "RSI", "PROMYS", "SSP", "Garcia", "Simons"
+      ],
+      "leadership_focused": [
+        "HOBY", "RYLA", "Youth Leadership programs", "Student Government"
+      ],
+      "creative_technical": [
+        "NCWIT", "Congressional App", "Technovation", "MIT Launch"
+      ],
+      "summer_programs": {
+        "tier_1": ["MIT", "Stanford", "Carnegie Mellon camps"],
+        "tier_2": ["State programs", "University camps"],
+        "tier_3": ["Local opportunities", "Online programs"]
+      },
+      
+      "matching_criteria": {
+        "alignment": "Does it reinforce their narrative?",
+        "competitiveness": "Can they realistically get in?",
+        "impact": "Will it meaningfully strengthen profile?",
+        "timing": "Does it fit the roadmap?"
+      }
+    },
+    
+    "jenny_gameplan_principles": {
+      "principle_1": "Every action must serve the narrative",
+      "principle_2": "Quality over quantity always",
+      "principle_3": "Build evidence progressively",
+      "principle_4": "Leave room for organic opportunities",
+      "principle_5": "Parent buy-in is crucial for execution",
+      "principle_6": "Student ownership drives success",
+      "principle_7": "Celebrate small wins to maintain momentum",
+      "master_principle": "The plan is sacred but tactics are flexible"
+    },
+    
+    "execution_intelligence": {
+      "weekly_rhythms": {
+        "monday": "Week planning and priority setting",
+        "midweek": "Deep work on projects",
+        "friday": "Progress check and weekend planning"
+      },
+      
+      "monthly_cycles": {
+        "week_1": "Launch new initiatives",
+        "week_2-3": "Execute and iterate",
+        "week_4": "Complete and document"
+      },
+      
+      "success_indicators": {
+        "on_track": [
+          "Meeting monthly milestones",
+          "Student engaged and energized",
+          "Parents supportive",
+          "External validation emerging"
+        ],
+        "needs_adjustment": [
+          "Missing deadlines",
+          "Student overwhelmed or disengaged",
+          "No external recognition",
+          "Parents anxious or pushing back"
+        ]
+      }
+    }
+  }
+}

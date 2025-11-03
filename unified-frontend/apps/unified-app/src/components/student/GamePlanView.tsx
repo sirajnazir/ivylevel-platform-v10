@@ -8,7 +8,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Calendar, Target, CheckCircle, Clock, AlertCircle, TrendingUp, Award, BookOpen, Users } from 'lucide-react';
 import { v10Api } from '../../utils/v10ApiService';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 
 const Container = styled.div`
   padding: 24px;

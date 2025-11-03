@@ -6,7 +6,7 @@ import { EnhancedMediaPlayer } from '../shared/EnhancedMediaPlayer';
 import { videoPreloadService } from '../../services/videoPreloadService';
 import { metadataCacheService, hasCachedMetadata, getCachedMetadata } from '../../services/metadataCacheService';
 import API_ENDPOINTS from '../../config/api';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../contexts/ThemeContext';
 
 // Theme-aware styled components with glassmorphism

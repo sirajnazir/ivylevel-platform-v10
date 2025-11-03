@@ -18,6 +18,7 @@ import {
   getStudentContextInput as getStudentContextInputFromDB,
   getCoachPersona as getCoachPersonaFromDB,
 } from '../services/studentDataService.js';
+import { composeEQResponse } from '../compose/compose-eq.js';
 
 // Strategy execution input
 export interface StrategyExecutionInput {
@@ -75,6 +76,9 @@ export class StrategyOrchestrator {
     console.log(`[StrategyOrchestrator] Starting execution for query: "${input.student_query.substring(0, 100)}..."`);
 
     try {
+      // Generate session ID for cat-3 integration
+      const currentSessionId = `v17.3-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
       // Step 1: Classify Intent
       console.log('[StrategyOrchestrator] Step 1: Classifying intent...');
       const studentContext = await this.getStudentContext(input.student_id);
@@ -99,10 +103,16 @@ export class StrategyOrchestrator {
         coachPersona
       );
 
-      // Step 4: Execute Strategy (Generate Initial Response)
-      console.log('[StrategyOrchestrator] Step 4: Generating initial response...');
-      const prompt = this.assemblePrompt(context, input.student_query);
-      const initialResponse = await this.generateResponse(prompt);
+      // Step 4: Execute Strategy (v17.3: Use cat-3 composeEQResponse for authentic Jenny voice)
+      console.log('[StrategyOrchestrator] Step 4: Generating initial response with cat-3 EQ composer...');
+      const eqResult = await composeEQResponse({
+        message: input.student_query,
+        studentId: input.student_id,
+        sessionId: currentSessionId,
+        stream: false
+      });
+
+      const initialResponse = eqResult.answer;
 
       // Step 5: Reflection Loop (Quality Gate)
       console.log('[StrategyOrchestrator] Step 5: Reflection loop...');
@@ -214,16 +224,35 @@ export class StrategyOrchestrator {
   }
 
   /**
-   * Generate response using GPT-4
+   * Generate response using Jenny's fine-tuned model (v17.3)
+   * Uses ft:gpt-4o-mini with authentic Jenny EQ instead of generic GPT-4
    */
   private async generateResponse(prompt: string): Promise<string> {
+    // v17.3: Use Jenny's fine-tuned model with authentic EQ
+    const jennyModel = process.env.JENNY_V9_EQ_MODEL ||
+      'ft:gpt-4o-mini-2024-07-18:personal:jenny-v9-eq:CQMYIrRA';
+
     const completion = await this.llm.chat.completions.create({
-      model: 'gpt-4',
+      model: jennyModel,
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.7,
     });
 
-    return completion.choices[0].message.content || '';
+    let rawAnswer = completion.choices[0].message.content || '';
+
+    // Handle fine-tuned model returning JSON format
+    if (rawAnswer.startsWith('{') && rawAnswer.includes('"role"')) {
+      try {
+        const parsed = JSON.parse(rawAnswer);
+        if (parsed.content) {
+          rawAnswer = parsed.content;
+        }
+      } catch (e) {
+        // Use raw answer if JSON parse fails
+      }
+    }
+
+    return rawAnswer;
   }
 
   /**

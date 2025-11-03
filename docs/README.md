@@ -1,400 +1,216 @@
-# Documentation Index
+# IvyLevel Platform v10 - Documentation Index
 
-**IvyLevel Platform v10 - Jenny Agentic AI**
-**Last Updated:** 2025-10-03
-
----
-
-## 📚 Master Documentation (Source of Truth)
-
-These are the primary, actively maintained documents that represent the current state of the platform.
-
-### 🏗️ Architecture & Design
-
-#### [MASTER_TECHNICAL_SPEC.md](./MASTER_TECHNICAL_SPEC.md)
-**Primary technical specification** for the entire platform.
-- Complete end-to-end query flow (11 steps)
-- Architecture diagrams and component overview
-- Intent routing architecture (4-tier waterfall)
-- Fine-tuned Jenny model details
-- 27+ Intelligence layers documentation
-- Third-party integrations (PostgreSQL, Pinecone, OpenAI, Cohere)
-- Module reference with file paths
-- API contracts
-
-#### [DB_ARCHITECTURE_SPEC.md](./DB_ARCHITECTURE_SPEC.md)
-**Complete database architecture specification**.
-- Core schema (students, sources, vital_facts, kb_items, outcomes)
-- 30+ views for temporal resolution
-- Temporal query functions (first/latest/nth/as-of)
-- Enumeration tables (awards, ECs, programs, narratives, academics)
-- Migration history with timestamps
-- Indexes and performance optimization
-
-#### [FEATURES_AND_UPDATES.md](./FEATURES_AND_UPDATES.md)
-**Living tracker of all features and updates**.
-- Active features (v3.4)
-- Recent updates (last 30 days)
-- Planned features (backlog)
-- Migration history
-- Version history
-- Deprecation notices
-
-### 📋 Operations & Runbooks
-
-#### [OPERATOR_RUNBOOK.md](./OPERATOR_RUNBOOK.md)
-**Operational procedures for running the platform**.
-- Startup procedures
-- Service management
-- Common operations
-- Troubleshooting guides
-
-#### [INCIDENT_PLAYBOOK.md](./INCIDENT_PLAYBOOK.md)
-**Incident response procedures**.
-- Incident severity levels
-- Response workflows
-- Common issues and resolutions
-- Escalation paths
-
-#### [CHANGELOG.md](./CHANGELOG.md)
-**Chronological log of all changes**.
-- Feature additions
-- Bug fixes
-- Breaking changes
-- Performance improvements
+**Current Version:** v23.0 - AssessmentAgent Intelligence Types Complete  
+**Last Updated:** 2025-10-31  
+**Status:** ✅ Production Ready
 
 ---
 
-## 📦 Release Documentation
+## 🎯 START HERE
 
-Version-specific implementation details and release notes.
+### For Development
 
-### Current Releases (v3.x)
+1. **System Flow & API Reference** → [COMPLETE_SYSTEM_FLOW_SPECS.md](./COMPLETE_SYSTEM_FLOW_SPECS.md) ⭐ **PRIMARY REFERENCE**
+   - Complete system architecture
+   - All API endpoints with examples
+   - Frontend pages & components map
+   - Database schema & queries
+   - Authentication flow
+   - Data flow diagrams
+   - Troubleshooting guide
 
-- [V3.4_FUZZY_INTENT_TRAINING.md](./releases/V3.4_FUZZY_INTENT_TRAINING.md) - **Latest** (2025-10-03)
-  - 48 few-shot examples with synonym expansion
-  - Tiered confidence routing
-  - Fixes for natural language variations
+2. **Quick Reference Card** → [SYSTEM_QUICK_REFERENCE.md](./SYSTEM_QUICK_REFERENCE.md)
+   - Quick start (30 seconds)
+   - Critical ports & URLs
+   - Test account credentials
+   - Common commands
+   - One-line troubleshooting
 
-- [V3.3_ACADEMICS_ENHANCEMENT.md](./releases/V3.3_ACADEMICS_ENHANCEMENT.md) (2025-10-03)
-  - SAT timeline enumeration
-  - GPA tracking and timeline
-  - Transcript views (initial/final)
+### For Architecture
 
-- [V3.2_IMPLEMENTATION_STATUS.md](./releases/V3.2_IMPLEMENTATION_STATUS.md) (2025-10-03)
-  - GPT-5 intent router implementation status
-  - Testing results and validation
+3. **Master Technical Specification** → [MASTER_PROD_TECH_SPEC.md](./MASTER_PROD_TECH_SPEC.md)
+   - Overall architecture
+   - Component relationships
+   - Technology stack
 
-- [V3.2_GPT5_INTENT_ROUTER.md](./releases/V3.2_GPT5_INTENT_ROUTER.md) (2025-10-03)
-  - LLM-based intent classification
-  - 4-tier waterfall routing
-  - Intent schema standardization
+4. **Database Architecture** → [PROD_DB_ARCH.md](./PROD_DB_ARCH.md)
+   - Schema design (89 tables, 12 views)
+   - Relationships
+   - Indexes & optimization
+   - Migration history
 
-- [V3.1_IMPLEMENTATION_SUMMARY.md](./releases/V3.1_IMPLEMENTATION_SUMMARY.md) (2025-09-30)
-  - Universal enumerations
-  - Awards, ECs, programs, narratives
-
-### Legacy Releases (v1.x)
-
-- [ALPHA-1.0-RELEASE-NOTES.md](./releases/ALPHA-1.0-RELEASE-NOTES.md) (2025-09-23)
-  - Fine-tuned Jenny model (jenny-v1)
-  - 1,000 training examples
-  - 27+ intelligence layers
-
-- [v1.2.4_RELEASE_NOTES.md](./releases/v1.2.4_RELEASE_NOTES.md) (2025-09-24)
-- [v1.2.3_RELEASE_NOTES.md](./releases/v1.2.3_RELEASE_NOTES.md) (2025-09-23)
-- [v1.2_RELEASE_NOTES.md](./releases/v1.2_RELEASE_NOTES.md) (2025-09-23)
+5. **Feature Release History** → [PROD_FEATURE_RELEASE_DETAILS.md](./PROD_FEATURE_RELEASE_DETAILS.md)
+   - Version history (v1.0 → v23.0)
+   - Feature changelog
+   - Breaking changes
 
 ---
 
-## 📊 Reports & Status
-
-Implementation summaries, test results, and validation reports.
-
-### Implementation Reports
-
-- [UNIVERSAL_ENUMERATIONS_COMPLETE.md](./reports/UNIVERSAL_ENUMERATIONS_COMPLETE.md)
-  - Awards, ECs, programs, narratives enumerations
-  - Implementation validation
-
-- [GAMEPLAN_SEED_COMPLETE.md](./reports/GAMEPLAN_SEED_COMPLETE.md)
-  - GamePlan data loading status
-  - CSV seed validation
-
-- [FINAL_ECS_LOADED.md](./reports/FINAL_ECS_LOADED.md)
-  - Final ECs data validation
-  - CommonApp integration
-
-- [CORRECT_GAMEPLAN_DATA_LOADED.md](./reports/CORRECT_GAMEPLAN_DATA_LOADED.md)
-  - GamePlan data correction report
-  - Data quality fixes
-
-### Test & Validation Reports
-
-- [UI_TEST_STATUS.md](./reports/UI_TEST_STATUS.md)
-  - Test UI validation results
-  - Query testing status
-
-- [TRACE_TEST_RESULTS.md](./reports/TRACE_TEST_RESULTS.md)
-  - Query trace testing
-  - Trace viewer validation
-
-- [UI_TRACE_FIX_COMPLETE.md](./reports/UI_TRACE_FIX_COMPLETE.md)
-  - Trace panel fixes
-  - UI improvements
-
-- [VALIDATION_REPORT.md](./reports/VALIDATION_REPORT.md)
-  - System validation results
-  - Integration testing
-
-- [VALIDATION_RESULTS.md](./reports/VALIDATION_RESULTS.md)
-  - Additional validation metrics
-
-### Status Reports
-
-- [FINAL_STATUS.md](./reports/FINAL_STATUS.md)
-  - Overall platform status
-  - Feature completeness
-
-- [JENNY_V3_SETUP.md](./reports/JENNY_V3_SETUP.md)
-  - v3.0 setup guide
-  - Migration status
-
-- [UI_ACCESS_INSTRUCTIONS.md](./reports/UI_ACCESS_INSTRUCTIONS.md)
-  - Test UI access guide
-  - Local development setup
-
-- [IMPLEMENTATION_SUMMARY.md](./reports/IMPLEMENTATION_SUMMARY.md)
-  - High-level implementation summary
-
-- [PINECONE_V2_STATUS.md](./reports/PINECONE_V2_STATUS.md)
-  - Pinecone v2 migration status
-  - Vector database updates
-
-- [ENV_CONFIG.md](./reports/ENV_CONFIG.md)
-  - Environment configuration guide
-  - Required variables
-
-### Legacy Reports
-
-- [v1.2.4.1_release_acceptance.md](./reports/v1.2.4.1_release_acceptance.md)
-- [v1.2.4_hotfix_report.md](./reports/v1.2.4_hotfix_report.md)
-- [opportunity_report_huda.md](./reports/opportunity_report_huda.md)
-- [temporal_investigation.md](./reports/temporal_investigation.md)
-- [REMAINING_FIXES_NEEDED.md](./reports/REMAINING_FIXES_NEEDED.md)
-
-### Evaluation Reports
-
-- [eval/quick_scorecard_2025-09-24T00-28.md](./reports/eval/quick_scorecard_2025-09-24T00-28.md)
-  - Model evaluation metrics
-  - Performance scoring
-
----
-
-## 🗄️ Archived Documentation
-
-Historical documentation kept for reference. **Not actively maintained.**
-
-### Superseded Specifications
-
-- [archive/MASTER_SPEC_v1.0.md](./archive/MASTER_SPEC_v1.0.md)
-  - Original v1.0 master spec
-  - **Replaced by:** MASTER_TECHNICAL_SPEC.md
-  - **Reason:** Architecture evolved to UTFA + GPT-5 router
-
-- [archive/TECHNICAL_SPEC.md](./archive/TECHNICAL_SPEC.md)
-  - Early technical spec
-  - **Replaced by:** MASTER_TECHNICAL_SPEC.md
-
-- [archive/IMPLEMENTATION_TRACKER.md](./archive/IMPLEMENTATION_TRACKER.md)
-  - Old feature tracker
-  - **Replaced by:** FEATURES_AND_UPDATES.md
-
-### Historical Documentation
-
-- [archive/PENDING_BACKLOG.md](./archive/PENDING_BACKLOG.md) - Old backlog tracker
-- [archive/RUN_SNAPSHOT_2025-09-23.md](./archive/RUN_SNAPSHOT_2025-09-23.md) - Point-in-time snapshot
-- [archive/RUN_SNAPSHOT_2025-09-24.md](./archive/RUN_SNAPSHOT_2025-09-24.md) - Point-in-time snapshot
-- [archive/HANDOVER.md](./archive/HANDOVER.md) - Old handover doc
-- [archive/MANUAL_STEPS_CHECKLIST.md](./archive/MANUAL_STEPS_CHECKLIST.md) - Obsolete manual steps
-- [archive/VITALS_QUICK_START.md](./archive/VITALS_QUICK_START.md) - Old vitals guide
-- [archive/UI_CARD_SPEC.md](./archive/UI_CARD_SPEC.md) - Old UI spec
-
----
-
-## 🚀 Quick Start Guides
-
-### For Developers
-
-1. **Understanding the Architecture**
-   - Start with [MASTER_TECHNICAL_SPEC.md](./MASTER_TECHNICAL_SPEC.md) for overview
-   - Review [DB_ARCHITECTURE_SPEC.md](./DB_ARCHITECTURE_SPEC.md) for data model
-   - Check [FEATURES_AND_UPDATES.md](./FEATURES_AND_UPDATES.md) for current features
-
-2. **Making Changes**
-   - Review [OPERATOR_RUNBOOK.md](./OPERATOR_RUNBOOK.md) for operations
-   - Check [CHANGELOG.md](./CHANGELOG.md) for recent changes
-   - Update [FEATURES_AND_UPDATES.md](./FEATURES_AND_UPDATES.md) when adding features
-
-3. **Troubleshooting**
-   - Consult [INCIDENT_PLAYBOOK.md](./INCIDENT_PLAYBOOK.md) for common issues
-   - Check [reports/](./reports/) for recent status updates
-
-### For Product/Business
-
-1. **Current Capabilities**
-   - [FEATURES_AND_UPDATES.md](./FEATURES_AND_UPDATES.md) - Active features section
-   - [MASTER_TECHNICAL_SPEC.md](./MASTER_TECHNICAL_SPEC.md#fine-tuned-jenny-model) - Jenny model details
-
-2. **Roadmap**
-   - [FEATURES_AND_UPDATES.md](./FEATURES_AND_UPDATES.md#planned-features-backlog) - Planned features
-
-3. **Release History**
-   - [releases/](./releases/) - All release notes
-   - [CHANGELOG.md](./CHANGELOG.md) - Chronological changes
-
----
-
-## 📝 Documentation Standards
-
-### When to Update Each Doc
-
-#### MASTER_TECHNICAL_SPEC.md
-- Architecture changes
-- New system components
-- API contract changes
-- Integration updates
-
-#### DB_ARCHITECTURE_SPEC.md
-- New tables/views/functions
-- Schema changes
-- Migration additions
-- Index updates
-
-#### FEATURES_AND_UPDATES.md
-- New features (add to Active Features)
-- Feature updates (add to Recent Updates)
-- Deprecations (add to Deprecation Notices)
-- Version bumps (update Version History)
-
-#### CHANGELOG.md
-- Every commit to main
-- Bug fixes
-- Performance improvements
-- Breaking changes
-
-### Creating New Documentation
-
-#### For New Features
-1. Implement the feature
-2. Run migration (if DB changes)
-3. Add to `FEATURES_AND_UPDATES.md` (Active Features)
-4. Add to `FEATURES_AND_UPDATES.md` (Recent Updates)
-5. Update `DB_ARCHITECTURE_SPEC.md` (if DB changes)
-6. Update `MASTER_TECHNICAL_SPEC.md` (if architecture changes)
-7. Add entry to `CHANGELOG.md`
-
-#### For New Releases
-1. Create release doc in `releases/` (e.g., `V3.5_FEATURE_NAME.md`)
-2. Update `FEATURES_AND_UPDATES.md` version history
-3. Link from this README under Release Documentation
-
-#### For Bug Fixes/Hotfixes
-1. Fix the bug
-2. Add entry to `CHANGELOG.md`
-3. If significant, create report in `reports/`
-
----
-
-## 🔍 Finding Information
-
-### "How do I...?"
-
-| Task | Documentation |
-|------|---------------|
-| Understand the overall architecture | [MASTER_TECHNICAL_SPEC.md](./MASTER_TECHNICAL_SPEC.md) |
-| Find database schema details | [DB_ARCHITECTURE_SPEC.md](./DB_ARCHITECTURE_SPEC.md) |
-| Check what features are available | [FEATURES_AND_UPDATES.md](./FEATURES_AND_UPDATES.md#active-features-v34) |
-| See what changed recently | [CHANGELOG.md](./CHANGELOG.md) |
-| Troubleshoot an issue | [INCIDENT_PLAYBOOK.md](./INCIDENT_PLAYBOOK.md) |
-| Run the platform locally | [OPERATOR_RUNBOOK.md](./OPERATOR_RUNBOOK.md) |
-| Understand the intent router | [releases/V3.2_GPT5_INTENT_ROUTER.md](./releases/V3.2_GPT5_INTENT_ROUTER.md) |
-| Learn about the fine-tuned model | [MASTER_TECHNICAL_SPEC.md#fine-tuned-jenny-model](./MASTER_TECHNICAL_SPEC.md#fine-tuned-jenny-model) |
-| See migration history | [DB_ARCHITECTURE_SPEC.md#migration-history](./DB_ARCHITECTURE_SPEC.md#migration-history) |
-
-### "What's the status of...?"
-
-| Feature | Check |
-|---------|-------|
-| Universal enumerations | [reports/UNIVERSAL_ENUMERATIONS_COMPLETE.md](./reports/UNIVERSAL_ENUMERATIONS_COMPLETE.md) |
-| Academics (SAT/GPA) | [releases/V3.3_ACADEMICS_ENHANCEMENT.md](./releases/V3.3_ACADEMICS_ENHANCEMENT.md) |
-| Intent routing | [releases/V3.4_FUZZY_INTENT_TRAINING.md](./releases/V3.4_FUZZY_INTENT_TRAINING.md) |
-| Fine-tuned model | [releases/ALPHA-1.0-RELEASE-NOTES.md](./releases/ALPHA-1.0-RELEASE-NOTES.md) |
-| Test UI | [reports/UI_TEST_STATUS.md](./reports/UI_TEST_STATUS.md) |
-
----
-
-## 📂 Folder Structure
+## 📚 Documentation Structure
 
 ```
 docs/
-├── README.md                          # This file - documentation index
-├── MASTER_TECHNICAL_SPEC.md           # 🔴 Primary technical spec
-├── DB_ARCHITECTURE_SPEC.md            # 🔴 Database architecture
-├── FEATURES_AND_UPDATES.md            # 🔴 Feature tracker (living doc)
-├── CHANGELOG.md                       # Chronological change log
-├── OPERATOR_RUNBOOK.md                # Operations guide
-├── INCIDENT_PLAYBOOK.md               # Incident response
+├── COMPLETE_SYSTEM_FLOW_SPECS.md    ⭐ Complete system reference (v23.0)
+├── SYSTEM_QUICK_REFERENCE.md        Quick start & common tasks
+├── MASTER_PROD_TECH_SPEC.md         Architecture specification
+├── PROD_DB_ARCH.md                  Database architecture
+├── PROD_FEATURE_RELEASE_DETAILS.md  Release history
+├── README.md                        This file
 │
-├── releases/                          # Version-specific releases
-│   ├── V3.4_FUZZY_INTENT_TRAINING.md
-│   ├── V3.3_ACADEMICS_ENHANCEMENT.md
-│   ├── V3.2_GPT5_INTENT_ROUTER.md
-│   ├── V3.2_IMPLEMENTATION_STATUS.md
-│   ├── V3.1_IMPLEMENTATION_SUMMARY.md
-│   ├── ALPHA-1.0-RELEASE-NOTES.md
-│   ├── v1.2.4_RELEASE_NOTES.md
-│   ├── v1.2.3_RELEASE_NOTES.md
-│   └── v1.2_RELEASE_NOTES.md
+├── agents/                          Agent-specific specifications
+│   ├── GAMEPLAN_AGENT_TECH_SPEC.md
+│   ├── ASSESSMENT_AGENT_SPEC.md
+│   ├── AWARDS_AGENT_TECH_SPEC.md
+│   └── EXTRACURRICULARS_AGENT_TECH_SPEC.md
 │
-├── reports/                           # Status reports & test results
-│   ├── UNIVERSAL_ENUMERATIONS_COMPLETE.md
-│   ├── GAMEPLAN_SEED_COMPLETE.md
-│   ├── UI_TEST_STATUS.md
-│   ├── TRACE_TEST_RESULTS.md
-│   ├── VALIDATION_REPORT.md
-│   ├── FINAL_STATUS.md
-│   └── eval/
-│       └── quick_scorecard_2025-09-24T00-28.md
+├── guides/                          Implementation guides
+│   ├── PROJECT_STRUCTURE.md
+│   ├── DEEP_CLEANUP_SUMMARY.md
+│   └── V14_IMPLEMENTATION_GUIDE.md
 │
-└── archive/                           # Historical/superseded docs
-    ├── MASTER_SPEC_v1.0.md
-    ├── TECHNICAL_SPEC.md
-    ├── IMPLEMENTATION_TRACKER.md
-    ├── VITALS_QUICK_START.md
-    └── ...
+├── setup/                           Setup instructions
+│   └── (future setup docs)
+│
+└── archive/                         Archived/outdated docs
+    └── 2025-10-31-pre-v23.0/       Pre-v23.0 docs (DO NOT USE)
+        ├── README.md                Why archived
+        ├── UI_LAUNCH_STEP_BY_STEP.md
+        ├── JENNY_TEST_LAB_*.md
+        ├── HUDA_TEST_INTERFACE.md
+        ├── CAT1_COMPLETE_TECH_SPEC.md
+        ├── CAT3_COMPLETE_TECH_SPEC.md
+        └── V15.2_IMPLEMENTATION_PLAN.md
 ```
 
 ---
 
-## 🎯 Key Principles
+## 🚨 IMPORTANT NOTES
 
-1. **Single Source of Truth**: Master docs in `/docs` root are authoritative
-2. **Living Documentation**: Update with every significant change
-3. **Historical Context**: Archive superseded docs, don't delete
-4. **Clear Navigation**: This README is the entry point to all docs
-5. **Version Tracking**: All releases documented in `/releases`
+### What NOT to Use
+
+**Archived Documentation (2025-10-31):**
+- ❌ `docs/archive/2025-10-31-pre-v23.0/*` - Contains **outdated information**
+  - Wrong ports (3456, 3000, 4000 instead of 8787)
+  - Wrong API endpoints
+  - Wrong account details
+  - Outdated architecture
+
+**Why Archived:**
+- System upgraded to v23.0 with standardized ports & endpoints
+- Backend now uses `server-utfa.ts` on port 8787
+- Frontend uses Vite on port 5173
+- Student ID format unified: `huda-2025` (backend/DB), `huda_001` (login)
+
+### What TO Use
+
+✅ **COMPLETE_SYSTEM_FLOW_SPECS.md** - Single source of truth for:
+- Ports (8787, 5173)
+- API endpoints
+- Authentication
+- Data flows
+- File locations
+- Test accounts
 
 ---
 
-## 📞 Questions?
+## 🔄 Document Update Policy
 
-- **Technical Questions:** Check [MASTER_TECHNICAL_SPEC.md](./MASTER_TECHNICAL_SPEC.md)
-- **Database Questions:** Check [DB_ARCHITECTURE_SPEC.md](./DB_ARCHITECTURE_SPEC.md)
-- **Feature Questions:** Check [FEATURES_AND_UPDATES.md](./FEATURES_AND_UPDATES.md)
-- **Operational Issues:** Check [INCIDENT_PLAYBOOK.md](./INCIDENT_PLAYBOOK.md)
+**When to Update Documentation:**
+
+1. ✅ New API endpoint → Update `COMPLETE_SYSTEM_FLOW_SPECS.md` Section 6
+2. ✅ New frontend page → Update `COMPLETE_SYSTEM_FLOW_SPECS.md` Section 8
+3. ✅ Database change → Update `PROD_DB_ARCH.md` + `COMPLETE_SYSTEM_FLOW_SPECS.md` Section 5
+4. ✅ New feature → Update `PROD_FEATURE_RELEASE_DETAILS.md`
+5. ✅ Architecture change → Update `MASTER_PROD_TECH_SPEC.md`
+6. ✅ Version increment → Update all version stamps
+
+**Update Process:**
+```bash
+# 1. Make code changes
+# 2. Update relevant documentation
+# 3. Increment version numbers
+# 4. Commit together
+git add docs/ services/ unified-frontend/
+git commit -m "v24.0: Feature name + docs update"
+```
 
 ---
 
-**Last Updated:** 2025-10-03
-**Version:** v3.4 (Fuzzy Intent Training)
+## 📖 Common Tasks
+
+### Starting the System
+```bash
+# See: SYSTEM_QUICK_REFERENCE.md
+# Or: COMPLETE_SYSTEM_FLOW_SPECS.md Section "Quick Start Checklist"
+```
+
+### Adding a New API Endpoint
+```bash
+# 1. Implement in services/agent-framework/src/routes/
+# 2. Update COMPLETE_SYSTEM_FLOW_SPECS.md Section 6
+# 3. Add to v10ApiService.ts
+# 4. Update version
+```
+
+### Adding a New Frontend Page
+```bash
+# 1. Create component in unified-frontend/apps/unified-app/src/components/
+# 2. Add route in App.tsx
+# 3. Update COMPLETE_SYSTEM_FLOW_SPECS.md Section 8
+# 4. Update version
+```
+
+### Troubleshooting
+```bash
+# See: COMPLETE_SYSTEM_FLOW_SPECS.md Section "Troubleshooting"
+# Or: SYSTEM_QUICK_REFERENCE.md Section "Troubleshooting"
+```
+
+---
+
+## 🏗️ Architecture Overview
+
+```
+Frontend (React/Vite) :5173
+    ↓ HTTP/JSON
+Backend (Express/Node) :8787
+    ↓ SQL
+Database (PostgreSQL) :5432
+    ↓
+Pinecone (Vector Store)
+```
+
+**Key Technologies:**
+- Frontend: React 18.3.1, TypeScript, styled-components, Vite
+- Backend: Express.js, Node v22.16.0, TypeScript, tsx
+- Database: PostgreSQL 15+, 89 tables, 12 views
+- Vector: Pinecone (jenny-v3-3072-093025)
+- Intelligence: 36 Intelligence Types (v3.0 architecture)
+
+---
+
+## 📞 Getting Help
+
+1. **System Flow Questions** → `COMPLETE_SYSTEM_FLOW_SPECS.md`
+2. **Quick Commands** → `SYSTEM_QUICK_REFERENCE.md`
+3. **Architecture Questions** → `MASTER_PROD_TECH_SPEC.md`
+4. **Database Questions** → `PROD_DB_ARCH.md`
+5. **Version History** → `PROD_FEATURE_RELEASE_DETAILS.md`
+
+---
+
+## ✅ Document Status
+
+| Document | Version | Status | Last Updated |
+|----------|---------|--------|--------------|
+| COMPLETE_SYSTEM_FLOW_SPECS.md | v23.0 | ✅ Current | 2025-10-31 |
+| SYSTEM_QUICK_REFERENCE.md | v23.0 | ✅ Current | 2025-10-31 |
+| MASTER_PROD_TECH_SPEC.md | v10.1 | ✅ Current | 2025-10-09 |
+| PROD_DB_ARCH.md | v10.1 | ✅ Current | 2025-10-09 |
+| PROD_FEATURE_RELEASE_DETAILS.md | v10.1 | ✅ Current | 2025-10-09 |
+
+---
+
+**Last Updated:** 2025-10-31
+**Maintained By:** Development Team
+**Questions?** See `COMPLETE_SYSTEM_FLOW_SPECS.md` Section 11 (Version History)

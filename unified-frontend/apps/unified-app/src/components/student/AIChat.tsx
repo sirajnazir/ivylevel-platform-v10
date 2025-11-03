@@ -57,28 +57,28 @@ const V152Toggle = styled.button<{ $active: boolean }>`
   }
 `;
 
-// const AssessmentButton = styled.button` // Temporarily disabled - v15.3 routes not ready
-//   padding: 8px 16px;
-//   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-//   color: white;
-//   border: none;
-//   border-radius: 6px;
-//   font-size: 13px;
-//   font-weight: 600;
-//   cursor: pointer;
-//   transition: all 0.2s;
-//   margin-left: 8px;
-//
-//   &:hover:not(:disabled) {
-//     transform: translateY(-1px);
-//     box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-//   }
-//
-//   &:disabled {
-//     opacity: 0.5;
-//     cursor: not-allowed;
-//   }
-// `;
+const AssessmentButton = styled.button`
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 8px;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
 
 const QualityBadge = styled.div<{ $score: number }>`
   display: inline-flex;
@@ -302,15 +302,20 @@ export function AIChat() {
   const { user } = useAuth();
   const [input, setInput] = useState('');
   const [assessmentMode, setAssessmentMode] = useState<AssessmentMode>('normal');
-  const [useV152, setUseV152] = useState(true); // v15.2 enabled by default
-  // const [assessmentRunning, setAssessmentRunning] = useState(false); // Temporarily disabled - v15.3 routes not ready
+  const [useV152, setUseV152] = useState(false); // v15.2 disabled - using working v14 endpoint
+  const [assessmentRunning, setAssessmentRunning] = useState(false);
+  const [v170Metadata, setV170Metadata] = useState<{
+    quality_score?: number;
+    duration_ms?: number;
+    iterations?: number;
+  }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Use actual logged-in user's student ID from backend auth
   // Backend auth (/api/auth/login) returns student_id which is mapped to user.studentId
   const studentId = user?.studentId || user?.id || 'huda-2025';
 
-  const { messages, loading, currentAgent, sendMessage, v152Metadata } = useAgentChat({
+  const { messages, setMessages, loading, setLoading, currentAgent, sendMessage, v152Metadata } = useAgentChat({
     studentId,
     useV152,
     studentContext: {
@@ -331,10 +336,18 @@ export function AIChat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🎯 [AIChat] handleSubmit called, input:', input);
     if (!input.trim() || loading) return;
 
-    await sendMessage(input);
-    setInput('');
+    try {
+      console.log('🎯 [AIChat] Calling sendMessage...');
+      await sendMessage(input);
+      console.log('🎯 [AIChat] sendMessage completed successfully');
+      setInput('');
+    } catch (error) {
+      console.error('🎯 [AIChat] Error in handleSubmit:', error);
+      alert('Error details: ' + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    }
   };
 
   const handleModeClick = async (mode: 'interactive' | 'simulated') => {
@@ -348,39 +361,79 @@ export function AIChat() {
     await sendMessage(message);
   };
 
-  // const handleV153Assessment = async () => { // Temporarily disabled - v15.3 routes not ready
-  //   if (assessmentRunning) return;
-  //
-  //   setAssessmentRunning(true);
-  //
-  //   try {
-  //     console.log(`[v15.3] Starting assessment for student: ${studentId}`);
-  //
-  //     const response = await fetch('http://localhost:3004/api/v15.3/assessment', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         student_id: studentId,
-  //         assessment_trigger: 'manual',
-  //       }),
-  //     });
-  //
-  //     const result = await response.json();
-  //
-  //     if (result.success) {
-  //       console.log(`[v15.3] ✅ Assessment complete!`, result.data);
-  //       alert(`Assessment Complete!\n\nPhases: ${result.data.phase_results.length}/4\nLayers: ${result.data.total_layers_analyzed}\nDoc ID: ${result.data.assessment_doc_id}\n\nCheck console for full results.`);
-  //     } else {
-  //       console.error(`[v15.3] ❌ Assessment failed:`, result.error);
-  //       alert(`Assessment Failed: ${result.error}`);
-  //     }
-  //   } catch (error) {
-  //     console.error(`[v15.3] Request error:`, error);
-  //     alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  //   } finally {
-  //     setAssessmentRunning(false);
-  //   }
-  // };
+  const handleV153Assessment = async () => {
+    if (assessmentRunning || loading) return;
+
+    setAssessmentRunning(true);
+    setLoading(true);
+
+    // Add user message immediately
+    const userMessage = {
+      role: 'user' as const,
+      content: '🎯 Run comprehensive assessment with full orchestration',
+      timestamp: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+
+    try {
+      console.log(`[v17.0] Starting v17.0 orchestration for student: ${studentId}`);
+
+      const response = await fetch('http://localhost:8787/api/v17.0/assessment/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_id: studentId,
+          session_id: `session-${Date.now()}`,
+          query: 'Run comprehensive assessment with full orchestration',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log(`[v17.0] ✅ Assessment complete!`, result.data);
+
+        // Extract metadata for tracking
+        const metadata = result.data.metadata?.orchestration;
+        setV170Metadata({
+          quality_score: metadata?.quality_score,
+          duration_ms: metadata?.total_duration_ms,
+          iterations: metadata?.reflection_iterations,
+        });
+
+        // Add assistant response to chat
+        const assistantMessage = {
+          role: 'assistant' as const,
+          content: result.data.response,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        console.error(`[v17.0] ❌ Assessment failed:`, result.error);
+
+        // Add error message to chat
+        const errorMessage = {
+          role: 'assistant' as const,
+          content: `Assessment failed: ${result.error}`,
+          timestamp: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, errorMessage]);
+      }
+    } catch (error) {
+      console.error(`[v17.0] Request error:`, error);
+
+      // Add error message to chat
+      const errorMessage = {
+        role: 'assistant' as const,
+        content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setAssessmentRunning(false);
+      setLoading(false);
+    }
+  };
 
   return (
     <ChatContainer>
@@ -389,11 +442,11 @@ export function AIChat() {
           <span>{getAgentName(currentAgent)}</span>
           <div>
             <V152Toggle $active={useV152} onClick={() => setUseV152(!useV152)}>
-              {useV152 ? '⚡ v15.2 Active' : 'v14.0 Legacy'}
+              {useV152 ? '⚡ v15.2 Active' : '🎯 v18.0 GamePlan'}
             </V152Toggle>
-            {/* <AssessmentButton onClick={handleV153Assessment} disabled={assessmentRunning || loading}>
-              {assessmentRunning ? '🔄 Running...' : '✨ v15.3 Assessment'}
-            </AssessmentButton> */}
+            <AssessmentButton onClick={handleV153Assessment} disabled={assessmentRunning || loading}>
+              {assessmentRunning ? '🔄 Running...' : '🎯 Assessment'}
+            </AssessmentButton>
           </div>
         </HeaderTitle>
         <HeaderSubtitle>
@@ -411,6 +464,21 @@ export function AIChat() {
           {useV152 && v152Metadata.processing_time_ms && (
             <span style={{ marginLeft: '8px', opacity: 0.8 }}>
               • {(v152Metadata.processing_time_ms / 1000).toFixed(1)}s
+            </span>
+          )}
+          {v170Metadata.quality_score && (
+            <QualityBadge $score={v170Metadata.quality_score * 10}>
+              🎯 v17.0 Quality: {v170Metadata.quality_score.toFixed(2)}
+            </QualityBadge>
+          )}
+          {v170Metadata.duration_ms && (
+            <span style={{ marginLeft: '8px', opacity: 0.8 }}>
+              • {(v170Metadata.duration_ms / 1000).toFixed(1)}s
+            </span>
+          )}
+          {v170Metadata.iterations && (
+            <span style={{ marginLeft: '8px', opacity: 0.8 }}>
+              • {v170Metadata.iterations} iterations
             </span>
           )}
         </HeaderSubtitle>

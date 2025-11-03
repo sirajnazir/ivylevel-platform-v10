@@ -158,11 +158,11 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
     discovery: {
       phase: 'discovery',
       required_data: [
-        'grade_level', 'current_school', 'academic_interests', 'passion_areas',
-        'extracurricular_activities', 'personal_constraints', 'family_context',
+        'grade', 'high_school', 'interests', 'activities',
+        'target_major', 'target_colleges',
       ],
       optional_data: [
-        'dream_schools', 'career_aspirations', 'hobbies', 'favorite_subjects',
+        'personality_type', 'friend_group_size', 'career_goals',
       ],
       completion_threshold: 0.7, // 70% of required data
     },
@@ -288,19 +288,46 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
     const requirements = this.PHASE_REQUIREMENTS[phase];
     const allFacts = facts.getAllFacts();
 
+    console.log(`[TYPE-080] Calculating phase status for: ${phase}`);
+    console.log(`[TYPE-080] Total facts loaded: ${allFacts.length}`);
+    console.log(`[TYPE-080] Required data fields: ${requirements.required_data.join(', ')}`);
+
     // Check which required data exists
     const collectedData: string[] = [];
     const missingData: string[] = [];
 
     for (const dataKey of requirements.required_data) {
-      const hasData = allFacts.some(f =>
-        f.fact_type?.toLowerCase().includes(dataKey.toLowerCase()) ||
-        JSON.stringify(f.value).toLowerCase().includes(dataKey.toLowerCase())
-      );
+      // Check if field exists as actual property in fact.value (canonical schema)
+      const hasData = allFacts.some(f => {
+        if (typeof f.value === 'object' && f.value !== null) {
+          // Direct property check (e.g., value.grade, value.high_school)
+          const hasDirectProperty = dataKey in f.value;
+
+          // Also check if property has a non-empty value
+          if (hasDirectProperty) {
+            const val = (f.value as any)[dataKey];
+            // Consider data collected if: number (including 0), non-empty string, non-empty array, boolean
+            if (typeof val === 'number' || typeof val === 'boolean') {
+              console.log(`[TYPE-080] ✅ Found ${dataKey} = ${val} (${typeof val})`);
+              return true;
+            }
+            if (typeof val === 'string' && val.length > 0) {
+              console.log(`[TYPE-080] ✅ Found ${dataKey} = "${val}"`);
+              return true;
+            }
+            if (Array.isArray(val) && val.length > 0) {
+              console.log(`[TYPE-080] ✅ Found ${dataKey} = [${val.length} items]`);
+              return true;
+            }
+          }
+        }
+        return false;
+      });
 
       if (hasData) {
         collectedData.push(dataKey);
       } else {
+        console.log(`[TYPE-080] ❌ Missing: ${dataKey}`);
         missingData.push(dataKey);
       }
     }
@@ -308,6 +335,14 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
     const completionPercentage = (collectedData.length / requirements.required_data.length) * 100;
     const isComplete = completionPercentage >= (requirements.completion_threshold * 100);
     const readinessGatePassed = completionPercentage >= 70; // Min 70% to advance
+
+    console.log(`[TYPE-080] Phase ${phase} status:`, {
+      collected: collectedData.length,
+      missing: missingData.length,
+      completion: `${completionPercentage.toFixed(0)}%`,
+      collected_fields: collectedData.join(', '),
+      missing_fields: missingData.slice(0, 3).join(', ')
+    });
 
     return {
       phase,
@@ -371,7 +406,7 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
     return {
       from_phase: currentPhase,
       to_phase: nextPhase,
-      readiness_score,
+      readiness_score: readinessScore,
       can_transition: canTransition,
       blocking_factors: blockingFactors.length > 0 ? blockingFactors : undefined,
       recommendations,
@@ -414,23 +449,41 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
   private generateQuestionForDataKey(phase: AssessmentPhase, dataKey: string): AdaptiveQuestion | null {
     const questionMap: Record<string, Record<string, AdaptiveQuestion>> = {
       discovery: {
-        academic_interests: {
+        grade: {
+          question: 'What grade are you in right now?',
+          category: 'Academic Foundation',
+          priority: 'P0',
+          rationale: 'Essential baseline for timeline planning',
+        },
+        high_school: {
+          question: 'What school do you currently attend?',
+          category: 'Academic Foundation',
+          priority: 'P0',
+          rationale: 'Context for rigor and opportunities',
+        },
+        interests: {
           question: 'What subjects make you lose track of time? What topics do you find yourself researching outside of class?',
-          category: 'Academic Interests',
+          category: 'Interests',
           priority: 'P0',
-          rationale: 'Critical for understanding intellectual passions',
+          rationale: 'Critical for understanding intellectual passions and hobbies',
         },
-        passion_areas: {
-          question: 'What activities or causes energize you? What would you do even if no one was watching?',
-          category: 'Passion Areas',
-          priority: 'P0',
-          rationale: 'Core to identity formation',
-        },
-        extracurricular_activities: {
+        activities: {
           question: 'Walk me through your activities outside of school. What do you spend your time on and why?',
-          category: 'Extracurricular Activities',
+          category: 'Activities',
           priority: 'P0',
-          rationale: 'Reveals time allocation and priorities',
+          rationale: 'Reveals extracurriculars and time allocation',
+        },
+        target_major: {
+          question: 'What do you think you might want to study in college? Any major or field that excites you?',
+          category: 'Academic Goals',
+          priority: 'P1',
+          rationale: 'Helps frame narrative and school selection',
+        },
+        target_colleges: {
+          question: 'Do you have any dream schools or colleges you are thinking about?',
+          category: 'College Goals',
+          priority: 'P1',
+          rationale: 'Informs strategic planning and positioning',
         },
       },
       narrative: {
@@ -445,6 +498,24 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
           category: 'Core Values',
           priority: 'P0',
           rationale: 'Essential for narrative coherence',
+        },
+        challenges_overcome: {
+          question: 'What obstacles have you faced, and how did you navigate them?',
+          category: 'Narrative Depth',
+          priority: 'P0',
+          rationale: 'Reveals resilience and growth',
+        },
+        defining_moments: {
+          question: 'If you had to pick one or two moments that made you who you are today, what would they be?',
+          category: 'Narrative Depth',
+          priority: 'P0',
+          rationale: 'Core essay material',
+        },
+        identity_keywords: {
+          question: 'How would your closest friends describe you in 3-5 words?',
+          category: 'Identity Formation',
+          priority: 'P1',
+          rationale: 'External validation of self-perception',
         },
       },
       strategy: {

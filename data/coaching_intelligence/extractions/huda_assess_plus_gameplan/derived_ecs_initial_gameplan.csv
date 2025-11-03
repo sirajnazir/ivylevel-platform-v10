@@ -1,0 +1,11 @@
+item_id,student_id,item_type,title_name,subtype,tier1_state,event_date,status_detail,source_ref
+KB-HUDA-EC-GP-001,huda-2025,ec,Synthoria,Game Development,Planned,2023-01-01,"Student-developed narrative game project",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-002,huda-2025,ec,Empowering AI,AI/Tech,Planned,2023-01-01,"AI literacy and empowerment initiative",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-003,huda-2025,ec,Interactive Media Arts Club,Arts/Media,Planned,2023-09-01,"School club for interactive media and game design",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-004,huda-2025,ec,Folklift,Cultural/Tech,Planned,2023-01-01,"Cultural heritage preservation through technology",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-005,huda-2025,ec,YAC (Youth Advisory Council),Leadership,Planned,2023-09-01,"Youth advisory and advocacy council",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-006,huda-2025,ec,ASB Leadership,Leadership,Planned,2023-09-01,"Associated Student Body leadership role",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-007,huda-2025,ec,AI Ethics Advocacy,Advocacy,Planned,2023-01-01,"Ethical AI advocacy and education",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-008,huda-2025,ec,VFX Club,Media/Tech,Planned,2023-09-01,"Visual effects and digital media club",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-009,huda-2025,ec,News Anchor/Editor,Media/Journalism,Planned,2023-09-01,"School news production role",SRC-GP-2023-07-29
+KB-HUDA-EC-GP-010,huda-2025,ec,Filmmakers Club,Media/Film,Planned,2023-09-01,"Student filmmaking and production club",SRC-GP-2023-07-29

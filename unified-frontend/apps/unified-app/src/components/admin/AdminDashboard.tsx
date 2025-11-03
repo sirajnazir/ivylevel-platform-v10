@@ -7,7 +7,7 @@ import {
   LogOut, Bell
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 import { LogoutButton } from '../shared/LogoutButton';
 import { UserManagement } from './UserManagement';
 import { Analytics } from './Analytics';

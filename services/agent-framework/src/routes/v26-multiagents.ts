@@ -75,18 +75,66 @@ export function createV26MultiAgentsRouter(pool: Pool, agentRegistry: AgentRegis
 
       logger.event('v26.session.start', { student_id, session_type });
 
-      // Create new session in database
+      // Get clone student ID from mapping (MUST happen BEFORE creating session)
+      const V26_STUDENT_MAPPING: Record<string, string> = {
+        'huda-2025': 'huda-v26-2025',
+      };
+      const cloneStudentId = V26_STUDENT_MAPPING[student_id] || `${student_id}-v26-clone`;
+
+      console.log('[V26_SESSION_START] Student ID mapping:', {
+        real_student_id: student_id,
+        clone_student_id: cloneStudentId
+      });
+
+      // CRITICAL: Clean ALL old data for clone student before starting new session
+      // This ensures fresh baseline with no cached facts from previous test runs
+      console.log('[V26_SESSION_START] 🧹 Cleaning old clone student data...');
+      try {
+        // Delete intelligence activations (linked via session_id)
+        const r1 = await pool.query(`
+          DELETE FROM intelligence_activations
+          WHERE session_id IN (SELECT id FROM multiagent_sessions WHERE student_id = $1)
+        `, [cloneStudentId]);
+
+        // Delete multiagent messages
+        const r2 = await pool.query(`
+          DELETE FROM multiagent_messages
+          WHERE session_id IN (SELECT id FROM multiagent_sessions WHERE student_id = $1)
+        `, [cloneStudentId]);
+
+        // Delete multiagent sessions
+        const r3 = await pool.query(`
+          DELETE FROM multiagent_sessions WHERE student_id = $1
+        `, [cloneStudentId]);
+
+        // Delete kb_items (facts)
+        const r4 = await pool.query(`
+          DELETE FROM kb_items WHERE student_id = $1
+        `, [cloneStudentId]);
+
+        console.log('[V26_SESSION_START] ✅ Cleanup complete:', {
+          intelligence_activations: r1.rowCount,
+          messages: r2.rowCount,
+          sessions: r3.rowCount,
+          facts: r4.rowCount,
+        });
+      } catch (cleanupError) {
+        console.error('[V26_SESSION_START] ⚠️  Cleanup error (non-fatal):', cleanupError);
+        // Continue with session creation even if cleanup fails
+      }
+
+      // Create new session in database with CLONE student ID
       const sessionResult = await pool.query(
         `INSERT INTO multiagent_sessions (
           student_id, session_type, status, current_phase, current_agent
         ) VALUES ($1, $2, $3, $4, $5)
         RETURNING id, status, current_phase, current_agent, started_at`,
-        [student_id, session_type, 'in_progress', 'assessment', 'assessment-agent-v18']
+        [cloneStudentId, session_type, 'in_progress', 'assessment', 'assessment-agent-v18']
       );
 
       const session = sessionResult.rows[0];
 
-      // Get student name from student_id (v26 siloed mode - no students table)
+      // Get student name from real student_id (v26 siloed mode - no students table)
       // Format: "huda-2025" → "Huda A."
       const studentName = student_id.split('-')[0].charAt(0).toUpperCase() +
                          student_id.split('-')[0].slice(1) + ' A.';
@@ -124,7 +172,8 @@ What would you like to focus on this week?`;
 
       logger.event('v26.session.started', {
         session_id: session.id,
-        student_id,
+        real_student_id: student_id,
+        clone_student_id: cloneStudentId,
         session_type,
         current_phase: session.current_phase,
       });
@@ -136,6 +185,12 @@ What would you like to focus on this week?`;
         current_agent: session.current_agent,
         started_at: session.started_at,
         welcome_message: welcomeMessage,
+        // v26 Context: Real vs Clone Student IDs for intelligence tracing
+        v26_context: {
+          real_student_id: student_id,
+          clone_student_id: cloneStudentId,
+          is_clone_student: true,
+        },
       });
     } catch (error) {
       logger.error('v26.session.start.error', { error: String(error) });
@@ -230,6 +285,27 @@ What would you like to focus on this week?`;
 
       logger.event('v26.agent.message', { agent_id: agentId, session_id, student_id });
 
+      // Get session to retrieve clone student_id (session already stores clone ID)
+      const sessionResult = await pool.query(
+        `SELECT student_id, current_phase FROM multiagent_sessions WHERE id = $1`,
+        [session_id]
+      );
+
+      if (sessionResult.rows.length === 0) {
+        return res.status(404).json({
+          error: 'Session not found',
+          message: `No session found with id ${session_id}`,
+        });
+      }
+
+      const cloneStudentId = sessionResult.rows[0].student_id; // Already the clone ID!
+
+      console.log('[V26_MESSAGE] Using clone student ID from session:', {
+        session_id,
+        clone_student_id: cloneStudentId,
+        real_student_id_from_frontend: student_id
+      });
+
       // Save user message
       const userMessageResult = await pool.query(
         `INSERT INTO multiagent_messages (
@@ -245,7 +321,7 @@ What would you like to focus on this week?`;
 
       const agentResponse = await v26Wrapper.handleQuery({
         agent_id: agentId,
-        student_id,
+        student_id: cloneStudentId, // Use clone ID from session, not frontend student_id
         session_id,
         message,
       });
@@ -321,7 +397,7 @@ What would you like to focus on this week?`;
         agent_id: agentId,
         session_id,
         processing_time: processingTime,
-        intelligence_triggered: (agentResponse as any).triggered_intelligence?.length || 0,
+        intelligence_triggered: (agentResponse as any).intelligence_triggered?.length || 0,
       });
 
       return res.status(200).json({
@@ -330,8 +406,14 @@ What would you like to focus on this week?`;
         agent_response: agentResponse.response,
         processing_time: processingTime,
         confidence: agentResponse.validation_score,
-        intelligence_triggered: (agentResponse as any).triggered_intelligence || [],
+        intelligence_triggered: (agentResponse as any).intelligence_triggered || [],
         metadata: agentResponse.metadata,
+        // v26 Context: Real vs Clone Student IDs for intelligence tracing
+        v26_context: {
+          real_student_id: student_id,
+          clone_student_id: agentResponse.v26_context?.clone_student_id || `${student_id}-v26-clone`,
+          is_clone_student: true,
+        },
       });
     } catch (error) {
       logger.error('v26.agent.message.error', { error: String(error) });

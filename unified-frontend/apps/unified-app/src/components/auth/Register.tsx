@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { cognitoAuthService } from '../../services/auth/cognitoAuthService';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 
 interface RegisterProps {
   onSuccess?: () => void;

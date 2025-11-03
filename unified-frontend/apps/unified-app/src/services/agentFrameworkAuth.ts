@@ -5,7 +5,7 @@
  * Provides JWT authentication for all 9 agents
  */
 
-const API_BASE_URL = import.meta.env.VITE_AGENT_API_URL || 'http://localhost:4101/api';
+const API_BASE_URL = import.meta.env.VITE_AGENT_API_URL || 'http://localhost:8787';
 
 export interface AuthUser {
   user_id: string;
@@ -147,21 +147,29 @@ class AgentFrameworkAuthService {
    * Make authenticated fetch request
    */
   async authenticatedFetch(url: string, options: RequestInit = {}): Promise<Response> {
+    console.log('[AgentFrameworkAuth] Fetch to:', url);
+
     const token = this.getAccessToken();
     if (!token) {
+      console.error('[AgentFrameworkAuth] ❌ No authentication token found');
       throw new Error('Not authenticated');
     }
+
+    console.log('[AgentFrameworkAuth] ✅ Token found, making request');
 
     const headers = new Headers(options.headers);
     headers.set('Authorization', `Bearer ${token}`);
     headers.set('Content-Type', 'application/json');
 
     const response = await fetch(url, { ...options, headers });
+    console.log('[AgentFrameworkAuth] Response status:', response.status);
 
     // If 401, try refreshing token once
     if (response.status === 401) {
+      console.log('[AgentFrameworkAuth] Got 401, trying token refresh...');
       const newToken = await this.refreshAccessToken();
       if (newToken) {
+        console.log('[AgentFrameworkAuth] Token refreshed, retrying...');
         headers.set('Authorization', `Bearer ${newToken}`);
         return fetch(url, { ...options, headers });
       }

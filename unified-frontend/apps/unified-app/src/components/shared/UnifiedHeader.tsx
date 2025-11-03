@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, User, Home, BookOpen, Settings } from 'lucide-react';
-import useAuth from '../../hooks/useAuthMock';
+import { useAuth } from '../../hooks/useAuth';
 
 const UnifiedHeader: React.FC = () => {
   const { user, logout } = useAuth();

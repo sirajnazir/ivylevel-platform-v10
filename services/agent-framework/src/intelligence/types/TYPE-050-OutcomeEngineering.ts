@@ -13,7 +13,8 @@
  * Pattern: Outcome Correlation Map + Outcome Density Maximization
  */
 
-import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet, FactCategory } from '../IntelligenceRegistry.js';
+import { IntelligenceType, IntelligenceResult, AgentQuery, FactSet } from './BaseIntelligenceType.js';
+import { FactCategory } from '../../facts/types.js';
 
 type PriorityLevel = 'P0' | 'P1' | 'P2' | 'P3';
 type OutcomeDomain = 'academic' | 'test_preparation' | 'extracurricular' | 'application' | 'creative_project';

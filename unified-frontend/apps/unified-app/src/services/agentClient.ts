@@ -5,7 +5,7 @@
 
 import { agentFrameworkAuth } from './agentFrameworkAuth';
 
-const API_BASE_URL = import.meta.env.VITE_AGENT_API_URL || 'http://localhost:4101/api';
+const API_BASE_URL = import.meta.env.VITE_AGENT_API_URL || 'http://localhost:8787';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
@@ -53,20 +53,29 @@ class AgentClientService {
    * Send chat message to agents
    */
   async chat(request: ChatRequest): Promise<ChatResponse> {
-    const response = await agentFrameworkAuth.authenticatedFetch(
-      `${API_BASE_URL}/agents/chat`,
-      {
-        method: 'POST',
-        body: JSON.stringify(request),
-      }
-    );
+    console.log('[AgentClient] Sending request to:', `${API_BASE_URL}/agent/chat`);
+    console.log('[AgentClient] Request payload:', request);
+
+    // v18.0: Direct fetch without authentication (backend endpoint is public)
+    const response = await fetch(`${API_BASE_URL}/agent/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
+
+    console.log('[AgentClient] Response status:', response.status);
 
     if (!response.ok) {
       const error = await response.json();
+      console.error('[AgentClient] Error response:', error);
       throw new Error(error.message || 'Chat request failed');
     }
 
-    return response.json();
+    const data = await response.json();
+    console.log('[AgentClient] Success response:', data);
+    return data;
   }
 
   /**
@@ -74,7 +83,7 @@ class AgentClientService {
    */
   async listAgents(): Promise<AgentManifest[]> {
     const response = await agentFrameworkAuth.authenticatedFetch(
-      `${API_BASE_URL}/agents/list`
+      `${API_BASE_URL}/agent/list`
     );
 
     if (!response.ok) {
@@ -90,7 +99,7 @@ class AgentClientService {
    */
   async getSessions(studentId: string) {
     const response = await agentFrameworkAuth.authenticatedFetch(
-      `${API_BASE_URL}/agents/sessions/${studentId}`
+      `${API_BASE_URL}/agent/sessions/${studentId}`
     );
 
     if (!response.ok) {

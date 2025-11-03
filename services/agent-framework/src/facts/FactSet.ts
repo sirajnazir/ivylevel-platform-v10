@@ -7,6 +7,9 @@
 
 import { Fact, FactCategory, FactProvenance } from './types.js';
 
+// Re-export Fact for external use
+export { Fact, FactCategory, FactProvenance } from './types.js';
+
 export class FactSet {
   private facts: Map<string, Fact> = new Map();
 

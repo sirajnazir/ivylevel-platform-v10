@@ -464,7 +464,7 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
 
     setIsLoading(true);
     addIntelligenceLog('system', '🔵 SESSION START REQUESTED', {
-      student_id: user.student_id,
+      real_student_id: user.student_id,
       timestamp: new Date().toISOString(),
     });
 
@@ -498,6 +498,15 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
         current_agent: data.current_agent,
         current_phase: data.current_phase,
       });
+
+      // Log v26 context with clone student mapping
+      if (data.v26_context) {
+        addIntelligenceLog('system', '🔀 V26 Student Mapping Applied', {
+          real_student_id: data.v26_context.real_student_id,
+          clone_student_id: data.v26_context.clone_student_id,
+          is_clone_student: data.v26_context.is_clone_student,
+        });
+      }
 
       setSession({
         id: data.session_id,
@@ -577,6 +586,16 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
     });
 
     try {
+      // Capture current agent state BEFORE processing for comparison
+      const currentCard = agentCards.find(c => c.agent_id === agentId);
+      const previousDataFieldsCount = currentCard?.messages
+        .slice()
+        .reverse()
+        .find(m => m.role === 'agent' && (m as any).metadata?.data_collected_so_far)?.
+        metadata?.data_collected_so_far ?
+        Object.keys((currentCard.messages.slice().reverse().find(m => m.role === 'agent' && (m as any).metadata?.data_collected_so_far) as any).metadata.data_collected_so_far)
+          .filter(k => !['item_id', 'item_type', 'subtype', 'title', 'state', 'substate', 'status'].includes(k)).length : 0;
+
       const response = await fetch(`${API_URL}/api/v26/agents/${agentId}/message`, {
         method: 'POST',
         headers: {
@@ -612,10 +631,46 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
         }
       }
 
-      addIntelligenceLog('fact', '📚 Loading facts for clone student (empty for new onboarding)', {
-        student_id: data.v26_context?.clone_student_id || session.student_id,
-        fact_count: data.facts_used?.length || 0,
-      });
+      // Log collected data from metadata (not facts_used which is for intelligence processing)
+      const currentDataFieldsCount = data.metadata?.data_collected_so_far ?
+        Object.keys(data.metadata.data_collected_so_far).filter(k => !['item_id', 'item_type', 'subtype', 'title', 'state', 'substate', 'status'].includes(k)).length :
+        0;
+
+      const newFieldsExtracted = currentDataFieldsCount - previousDataFieldsCount;
+      const isFirstMessage = previousDataFieldsCount === 0 && currentDataFieldsCount > 0;
+
+      // Log with clear BEFORE → AFTER semantics
+      if (isFirstMessage) {
+        addIntelligenceLog('fact', '📚 Facts collected from conversation', {
+          clone_student_id: data.v26_context?.clone_student_id || session.student_id,
+          total_fields_collected: currentDataFieldsCount,
+          collected_data: data.metadata.data_collected_so_far,
+          extraction_status: 'First data extracted'
+        });
+      } else if (newFieldsExtracted > 0) {
+        addIntelligenceLog('fact', '📚 Facts updated - New data extracted', {
+          clone_student_id: data.v26_context?.clone_student_id || session.student_id,
+          previous_fields: previousDataFieldsCount,
+          current_fields: currentDataFieldsCount,
+          new_fields_added: newFieldsExtracted,
+          collected_data: data.metadata.data_collected_so_far,
+          extraction_status: `+${newFieldsExtracted} new field(s)`
+        });
+      } else if (currentDataFieldsCount > 0) {
+        addIntelligenceLog('fact', '📚 Facts loaded - No new data this message', {
+          clone_student_id: data.v26_context?.clone_student_id || session.student_id,
+          total_fields: currentDataFieldsCount,
+          collected_data: data.metadata.data_collected_so_far,
+          extraction_status: 'Existing data maintained'
+        });
+      } else {
+        addIntelligenceLog('fact', '📚 No facts collected yet', {
+          clone_student_id: data.v26_context?.clone_student_id || session.student_id,
+          total_fields: 0,
+          collected_data: 'Empty (new onboarding)',
+          extraction_status: 'Awaiting student data'
+        });
+      }
 
       addIntelligenceLog('intelligence', `🧠 Running ${agentConfig.name} Intelligence Types`, {
         triggered: data.intelligence_triggered || [],

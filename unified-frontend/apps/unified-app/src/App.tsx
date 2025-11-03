@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Auth Components
-import { AuthProvider } from './hooks/useAuthMock';
-import useAuth from './hooks/useAuthMock';
+import { AuthProvider } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';

@@ -84,12 +84,28 @@ export class V26AgentWrapperReal {
   }): Promise<V26AgentResponse> {
     const { agent_id, student_id, session_id, message } = params;
 
-    // Map real student to clone student
-    const cloneStudentId = V26_STUDENT_MAPPING[student_id] || `${student_id}-v26-clone`;
+    // Check if student_id is already a clone ID (ends with -v26-2025 or -v26-clone)
+    const isAlreadyCloneId = student_id.includes('-v26-') || student_id.endsWith('-v26-clone');
+
+    // Map real student to clone student (only if not already clone ID)
+    const cloneStudentId = isAlreadyCloneId
+      ? student_id
+      : (V26_STUDENT_MAPPING[student_id] || `${student_id}-v26-clone`);
+
+    const realStudentId = isAlreadyCloneId
+      ? Object.keys(V26_STUDENT_MAPPING).find(k => V26_STUDENT_MAPPING[k] === student_id) || student_id
+      : student_id;
+
+    console.log('[V26_WRAPPER] Student ID mapping:', {
+      input_student_id: student_id,
+      is_already_clone: isAlreadyCloneId,
+      real_student_id: realStudentId,
+      clone_student_id: cloneStudentId
+    });
 
     logger.event('v26_wrapper.handle_query_start', {
       agent_id,
-      real_student_id: student_id,
+      real_student_id: realStudentId,
       clone_student_id: cloneStudentId,
       session_id,
       message_preview: message.slice(0, 100),
@@ -181,7 +197,7 @@ export class V26AgentWrapperReal {
       v26_context: {
         is_clone_student: true,
         clone_student_id: cloneStudentId,
-        real_student_id: student_id,
+        real_student_id: realStudentId,
         conversation_turns: conversationHistory.length,
         intent_classification: intent,
         processing_steps: processingSteps,
@@ -272,7 +288,8 @@ export class V26AgentWrapperReal {
   }
 
   /**
-   * Call real AssessmentAgentV3 with intelligence types
+   * Call real AssessmentAgentV3ConversationalRealtime with intelligence types
+   * Uses TYPE-080 adaptive questions + 27 EQ layers (NO HARDCODED QUESTIONS)
    */
   private async callAssessmentAgentV3(
     studentId: string,
@@ -281,14 +298,24 @@ export class V26AgentWrapperReal {
     conversationHistory: ConversationMessage[],
     intent: string
   ): Promise<AgentResponse> {
-    const agent = this.agentRegistry.getAssessmentAgentV3();
+    console.log('\n[V26_WRAPPER] 🔧 callAssessmentAgentV3() ENTRY POINT');
+    console.log('[V26_WRAPPER] Getting agent from registry: getAssessmentAgentV3ConversationalRealtime()');
 
-    logger.event('v26_wrapper.calling_assessment_agent_v3', {
+    const agent = this.agentRegistry.getAssessmentAgentV3ConversationalRealtime();
+
+    console.log('[V26_WRAPPER] ✅ Agent retrieved:', agent.constructor.name);
+    console.log('[V26_WRAPPER] About to call agent.handleQuery()...');
+
+    logger.event('v26_wrapper.calling_assessment_agent_v3_conversational_realtime', {
       student_id: studentId,
       session_id: sessionId,
       intent,
       message_preview: message.slice(0, 50),
       conversation_turns: conversationHistory.length,
+      mode: 'intelligence_driven_conversational',
+      version: 'v26.5',
+      eq_layers: 27,
+      hardcoded_questions: 0,
     });
 
     // Build conversation context for agent
@@ -306,13 +333,19 @@ export class V26AgentWrapperReal {
       },
     };
 
+    console.log('[V26_WRAPPER] 📞 Calling agent.handleQuery() NOW...');
     const response = await agent.handleQuery(query) as IntelligenceAgentResponse;
+    console.log('[V26_WRAPPER] ✅ agent.handleQuery() returned!');
 
-    logger.event('v26_wrapper.assessment_agent_v3_response', {
+    logger.event('v26_wrapper.assessment_agent_v3_conversational_realtime_response', {
       triggered_intelligence: response.triggered_intelligence || [],
       intelligence_results_count: response.intelligence_results?.length || 0,
       facts_used_count: response.facts_used?.length || 0,
       confidence: response.validation_score,
+      mode: response.metadata?.mode || 'unknown',
+      current_phase: response.metadata?.current_phase,
+      eq_layer_active: response.metadata?.eq_layer_active,
+      confidence_level: response.metadata?.confidence_level,
     });
 
     return response;

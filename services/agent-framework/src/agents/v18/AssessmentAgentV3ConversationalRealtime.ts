@@ -841,15 +841,15 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
       // Gap Analysis & Opportunities (from TYPE-082)
       p0_gaps: ((gaps?.data as any)?.p0_gaps || []).map((g: any) => ({
         category: g.category || '',
-        gap_description: g.gap_description || '',
-        urgency: g.urgency || 'high',
-        recommended_action: g.recommended_action || '',
+        severity: 'p0' as 'p0',
+        description: g.gap_description || g.description || '',
+        recommendation: g.recommended_action || g.recommendation || '',
       })) as Gap[],
       p1_gaps: ((gaps?.data as any)?.p1_gaps || []).map((g: any) => ({
         category: g.category || '',
-        gap_description: g.gap_description || '',
-        urgency: g.urgency || 'medium',
-        recommended_action: g.recommended_action || '',
+        severity: 'p1' as 'p1',
+        description: g.gap_description || g.description || '',
+        recommendation: g.recommended_action || g.recommendation || '',
       })) as Gap[],
       quick_wins: ((gaps?.data as any)?.quick_wins || []).map((qw: any) => ({
         action: qw.action || '',

@@ -1142,8 +1142,8 @@ Every game plan you create is an object, not a document. It has methods, not jus
 
       const top3Gaps = payload.p0_gaps.slice(0, 3);
       top3Gaps.forEach((gap, idx) => {
-        message += `${idx + 1}. **${gap.category}**: ${gap.gap_description}\n`;
-        message += `   → *Strategy*: ${gap.recommended_action}\n\n`;
+        message += `${idx + 1}. **${gap.category}**: ${gap.description}\n`;
+        message += `   → *Strategy*: ${gap.recommendation}\n\n`;
       });
     }
 

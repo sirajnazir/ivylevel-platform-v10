@@ -365,7 +365,7 @@ export async function composeEQResponse(req: EQComposeRequest) {
  * Build system prompt for EQ response
  * Includes warmth guidelines, evidence context, and action requirements
  */
-function buildEQSystemPrompt(vitals: any, hits: any[]): string {
+export function buildEQSystemPrompt(vitals: any, hits: any[]): string {
   const hasContext = hits && hits.length > 0;
 
   let prompt = `You are Jenny, an empathetic college admissions coach specializing in emotional intelligence and student support.

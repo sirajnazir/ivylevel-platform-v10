@@ -31,14 +31,14 @@ export class PostgresFactSource implements FactSource {
   }
 
   /**
-   * Map fact categories to database tables
+   * Map fact categories to database tables/views
    */
   private initializeTableMapping(): void {
     this.tableMapping = new Map([
       [FactCategory.STUDENT_PROFILE, 'students'],
-      [FactCategory.ASSESSMENT_DATA, 'game_plans'],
-      [FactCategory.ACTIVITY_DATA, 'game_plans'],
-      [FactCategory.ACADEMIC_DATA, 'students'],
+      [FactCategory.ASSESSMENT_DATA, 'kb_items'],  // Assessment data from kb_items
+      [FactCategory.ACTIVITY_DATA, 'kb_items'],    // Activities from kb_items (Extracurricular type)
+      [FactCategory.ACADEMIC_DATA, 'kb_items'],    // Academic data from kb_items (Academic type)
     ]);
   }
 
@@ -85,117 +85,61 @@ export class PostgresFactSource implements FactSource {
   }
 
   /**
-   * Fetch assessment facts (game plan data)
+   * Fetch assessment facts from kb_items
+   * Assessment-related items: Goals, Plans, Assessments, etc.
+   * UPDATED: Now reads edges JSONB field for GPT-4o extracted data
    */
   private async fetchAssessmentFacts(studentId: string): Promise<Fact[]> {
     const result = await this.pool.query(
       `SELECT
-        game_plan_id,
-        profile_assessment,
-        target_profile,
-        target_schools,
-        updated_at
-      FROM game_plans
+        item_id,
+        item_type,
+        subtype,
+        title_name,
+        tier1_state,
+        tier2_substate,
+        status_detail,
+        edges,
+        created_ts,
+        updated_ts
+      FROM kb_items
       WHERE student_id = $1
-      ORDER BY created_at DESC
-      LIMIT 1`,
+        AND item_type IN ('Assessment', 'Goal', 'Plan')
+      ORDER BY created_ts DESC`,
       [studentId]
     );
 
-    if (result.rows.length === 0) return [];
-
-    const row = result.rows[0];
     const facts: Fact[] = [];
-    const baseProvenance = {
-      source_id: this.source_id,
-      timestamp: row.updated_at,
-      database_table: 'game_plans',
-      last_verified: row.updated_at,
-    };
 
-    // Extract unique narrative
-    if (row.target_profile?.narrative) {
+    result.rows.forEach((item: any) => {
+      // Merge edges JSONB data into value for GPT-4o extracted facts
+      const edgesData = item.edges || {};
+
       facts.push({
-        fact_id: `narrative_${studentId}`,
+        fact_id: `assessment_${item.item_id}`,
         category: FactCategory.ASSESSMENT_DATA,
         entity_id: studentId,
-        fact_type: 'unique_narrative',
-        value: row.target_profile.narrative,
+        fact_type: item.subtype || item.item_type.toLowerCase(), // Use subtype (academic_profile, social_profile, etc.)
+        value: {
+          item_id: item.item_id,
+          item_type: item.item_type,
+          subtype: item.subtype,
+          title: item.title_name,
+          state: item.tier1_state,
+          substate: item.tier2_substate,
+          status: item.status_detail,
+          ...edgesData, // Merge GPT-4o extracted data (grade, gpa, interests, etc.)
+        },
         provenance: {
-          ...baseProvenance,
-          query_used: "target_profile->'narrative'",
+          source_id: this.source_id,
+          timestamp: item.updated_ts,
+          database_table: 'kb_items',
+          query_used: 'SELECT FROM kb_items WHERE item_type IN (Assessment, Goal, Plan)',
+          last_verified: item.updated_ts,
         },
         confidence: 1.0,
       });
-    }
-
-    // Extract potential spikes
-    if (row.target_profile?.potential_spikes) {
-      facts.push({
-        fact_id: `spikes_${studentId}`,
-        category: FactCategory.ASSESSMENT_DATA,
-        entity_id: studentId,
-        fact_type: 'potential_spikes',
-        value: row.target_profile.potential_spikes,
-        provenance: {
-          ...baseProvenance,
-          query_used: "target_profile->'potential_spikes'",
-        },
-        confidence: 1.0,
-      });
-    }
-
-    // Extract weak spots
-    if (row.profile_assessment?.weak_spots) {
-      row.profile_assessment.weak_spots.forEach((ws: any) => {
-        facts.push({
-          fact_id: `weak_spot_${ws.weak_spot_id || ws.title}`,
-          category: FactCategory.ASSESSMENT_DATA,
-          entity_id: studentId,
-          fact_type: 'weak_spot',
-          value: ws,
-          provenance: {
-            ...baseProvenance,
-            query_used: "profile_assessment->'weak_spots'",
-          },
-          confidence: 1.0,
-        });
-      });
-    }
-
-    // Extract standout strengths
-    if (row.profile_assessment?.standout_strengths) {
-      row.profile_assessment.standout_strengths.forEach((strength: any) => {
-        facts.push({
-          fact_id: `strength_${strength.strength_id || strength.title}`,
-          category: FactCategory.ASSESSMENT_DATA,
-          entity_id: studentId,
-          fact_type: 'standout_strength',
-          value: strength,
-          provenance: {
-            ...baseProvenance,
-            query_used: "profile_assessment->'standout_strengths'",
-          },
-          confidence: 1.0,
-        });
-      });
-    }
-
-    // Extract target schools
-    if (row.target_schools) {
-      facts.push({
-        fact_id: `target_schools_${studentId}`,
-        category: FactCategory.ASSESSMENT_DATA,
-        entity_id: studentId,
-        fact_type: 'target_schools',
-        value: row.target_schools,
-        provenance: {
-          ...baseProvenance,
-          query_used: 'target_schools',
-        },
-        confidence: 1.0,
-      });
-    }
+    });
 
     log.event('postgres_fact_source.assessment_facts_extracted', {
       student_id: studentId,
@@ -206,44 +150,65 @@ export class PostgresFactSource implements FactSource {
   }
 
   /**
-   * Fetch activity facts (extracurricular activities)
+   * Fetch activity facts (extracurricular activities) from kb_items
    */
   private async fetchActivityFacts(studentId: string): Promise<Fact[]> {
     const result = await this.pool.query(
       `SELECT
-        profile_assessment,
-        updated_at
-      FROM game_plans
+        item_id,
+        item_type,
+        subtype,
+        title_name,
+        tier1_state,
+        tier2_substate,
+        status_detail,
+        key_metric_type,
+        key_metric_value,
+        key_metric_unit,
+        created_ts,
+        updated_ts
+      FROM kb_items
       WHERE student_id = $1
-      ORDER BY created_at DESC
-      LIMIT 1`,
+        AND item_type = 'Extracurricular'
+      ORDER BY created_ts DESC`,
       [studentId]
     );
 
-    if (result.rows.length === 0) return [];
-
-    const row = result.rows[0];
     const facts: Fact[] = [];
 
-    if (row.profile_assessment?.extracurricular_activities) {
-      row.profile_assessment.extracurricular_activities.forEach((activity: any) => {
-        facts.push({
-          fact_id: `activity_${activity.evidence_id || activity.title}`,
-          category: FactCategory.ACTIVITY_DATA,
-          entity_id: studentId,
-          fact_type: 'extracurricular_activity',
-          value: activity,
-          provenance: {
-            source_id: this.source_id,
-            timestamp: row.updated_at,
-            database_table: 'game_plans',
-            query_used: "profile_assessment->'extracurricular_activities'",
-            last_verified: row.updated_at,
-          },
-          confidence: 1.0,
-        });
+    result.rows.forEach((activity: any) => {
+      facts.push({
+        fact_id: `activity_${activity.item_id}`,
+        category: FactCategory.ACTIVITY_DATA,
+        entity_id: studentId,
+        fact_type: 'extracurricular_activity',
+        value: {
+          item_id: activity.item_id,
+          item_type: activity.item_type,
+          subtype: activity.subtype,
+          title: activity.title_name,
+          state: activity.tier1_state,
+          substate: activity.tier2_substate,
+          status: activity.status_detail,
+          metric_type: activity.key_metric_type,
+          metric_value: activity.key_metric_value,
+          metric_unit: activity.key_metric_unit,
+        },
+        provenance: {
+          source_id: this.source_id,
+          timestamp: activity.updated_ts,
+          database_table: 'kb_items',
+          query_used: 'SELECT FROM kb_items WHERE item_type = Extracurricular',
+          last_verified: activity.updated_ts,
+        },
+        confidence: 1.0,
       });
-    }
+    });
+
+    log.event('postgres_fact_source.activity_facts_extracted', {
+      student_id: studentId,
+      facts_count: facts.length,
+    });
 
     return facts;
   }
@@ -252,8 +217,58 @@ export class PostgresFactSource implements FactSource {
    * Fetch profile facts (student demographics, identity)
    */
   private async fetchProfileFacts(studentId: string): Promise<Fact[]> {
-    // TODO: Implement once students table has demographic data
-    return [];
+    const result = await this.pool.query(
+      `SELECT
+        student_id,
+        full_name,
+        email,
+        graduation_year,
+        high_school,
+        target_major,
+        created_at,
+        updated_at
+      FROM students
+      WHERE student_id = $1`,
+      [studentId]
+    );
+
+    if (result.rows.length === 0) return [];
+
+    const student = result.rows[0];
+    const facts: Fact[] = [];
+    const baseProvenance = {
+      source_id: this.source_id,
+      timestamp: student.updated_at,
+      database_table: 'students',
+      last_verified: student.updated_at,
+    };
+
+    // Basic profile fact
+    facts.push({
+      fact_id: `profile_${studentId}`,
+      category: FactCategory.STUDENT_PROFILE,
+      entity_id: studentId,
+      fact_type: 'student_profile',
+      value: {
+        full_name: student.full_name,
+        email: student.email,
+        graduation_year: student.graduation_year,
+        high_school: student.high_school,
+        target_major: student.target_major,
+      },
+      provenance: {
+        ...baseProvenance,
+        query_used: 'SELECT full_name, email, graduation_year, high_school, target_major FROM students',
+      },
+      confidence: 1.0,
+    });
+
+    log.event('postgres_fact_source.profile_facts_extracted', {
+      student_id: studentId,
+      facts_count: facts.length,
+    });
+
+    return facts;
   }
 
   /**
