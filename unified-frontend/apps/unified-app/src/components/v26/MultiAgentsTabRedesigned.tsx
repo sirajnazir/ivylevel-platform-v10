@@ -57,6 +57,12 @@ interface AgentCardData {
   color: string;
   messages: Message[];
   isActive: boolean;
+  status: 'ready' | 'active' | 'handed_off';  // v28.0: Track agent status
+  handoverInfo?: {  // v28.0: Store handover metadata
+    handedTo: string;
+    handoverId: string;
+    timestamp: Date;
+  };
 }
 
 // ============================================================================
@@ -208,18 +214,36 @@ const AgentCardsGrid = styled.div`
   }
 `;
 
-const AgentCard = styled.div<{ $color: string; $isActive: boolean }>`
-  background: white;
+const AgentCard = styled.div<{ $color: string; $isActive: boolean; $status: 'ready' | 'active' | 'handed_off' }>`
+  background: ${props => props.$status === 'handed_off' ? '#fafafa' : 'white'};
   border-radius: 12px;
-  border: 2px solid ${props => props.$isActive ? props.$color : '#e2e8f0'};
-  box-shadow: ${props => props.$isActive ? `0 4px 12px ${props.$color}33` : '0 2px 4px rgba(0,0,0,0.05)'};
+  border: ${props => {
+    if (props.$status === 'handed_off') return '1px dashed #cbd5e1';
+    return props.$isActive ? `2px solid ${props.$color}` : '2px solid #e2e8f0';
+  }};
+  box-shadow: ${props => {
+    if (props.$status === 'handed_off') return '0 2px 4px rgba(0,0,0,0.03)';
+    return props.$isActive ? `0 4px 12px ${props.$color}33` : '0 2px 4px rgba(0,0,0,0.05)';
+  }};
+  opacity: ${props => props.$status === 'handed_off' ? 0.6 : 1};
   display: flex;
   flex-direction: column;
   height: 400px;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 
   &:hover {
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    box-shadow: ${props => props.$status === 'handed_off' ? '0 2px 4px rgba(0,0,0,0.03)' : '0 6px 16px rgba(0,0,0,0.1)'};
+  }
+
+  /* v28.0: Transition animation when handover occurs */
+  &.agent-card-transition {
+    animation: agentTransition 2s ease;
+  }
+
+  @keyframes agentTransition {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); box-shadow: 0 8px 16px rgba(76, 175, 80, 0.4); }
+    100% { transform: scale(1); }
   }
 `;
 
@@ -245,13 +269,22 @@ const AgentEmoji = styled.span`
   font-size: 20px;
 `;
 
-const AgentStatus = styled.div<{ $color: string }>`
+const AgentStatus = styled.div<{ $color: string; $status?: 'ready' | 'active' | 'handed_off' }>`
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  color: ${props => props.$color};
+  color: ${props => {
+    if (props.$status === 'handed_off') return '#666';
+    return props.$color;
+  }};
   font-weight: 600;
+  background: ${props => {
+    if (props.$status === 'handed_off') return '#e0e0e0';
+    return 'transparent';
+  }};
+  padding: ${props => props.$status === 'handed_off' ? '4px 8px' : '0'};
+  border-radius: 4px;
 `;
 
 const StatusDot = styled.div<{ $color: string }>`
@@ -265,6 +298,24 @@ const StatusDot = styled.div<{ $color: string }>`
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
   }
+`;
+
+// v28.0: Handover indicator
+const HandoverIndicator = styled.div`
+  margin: 12px 16px;
+  padding: 10px 12px;
+  background: #fff3cd;
+  border-left: 3px solid #ffc107;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #856404;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const HandoverIcon = styled.span`
+  font-size: 16px;
 `;
 
 const AgentCardMessages = styled.div`
@@ -531,6 +582,7 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
           timestamp: new Date().toISOString(),
         }] : [],
         isActive: agent_id === data.current_agent,
+        status: agent_id === data.current_agent ? 'active' : 'ready',  // v28.0: Initial status
       }));
 
       setAgentCards(cards);
@@ -722,6 +774,64 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
           : card
       ));
 
+      // v28.0: Check for A2A handover
+      if (data.a2a_handover && data.a2a_handover.handover_complete) {
+        console.log('[FRONTEND_A2A] 🔄 Handover detected!', {
+          from: data.a2a_handover.from_agent,
+          to: data.a2a_handover.to_agent,
+          handover_id: data.a2a_handover.handover_id
+        });
+
+        // Log handover event
+        addIntelligenceLog('system', '🔄 A2A Agent Handover', {
+          from_agent: data.a2a_handover.from_agent,
+          to_agent: data.a2a_handover.to_agent,
+          handover_id: data.a2a_handover.handover_id,
+          new_phase: data.a2a_handover.new_phase
+        });
+
+        // Update agent cards: mark old agent as handed_off, new agent as active
+        setAgentCards(prev => prev.map(card => {
+          // Mark previous agent as handed off
+          if (card.agent_id === data.a2a_handover.from_agent) {
+            return {
+              ...card,
+              isActive: false,
+              status: 'handed_off',
+              handoverInfo: {
+                handedTo: data.a2a_handover.to_agent,
+                handoverId: data.a2a_handover.handover_id,
+                timestamp: new Date()
+              }
+            };
+          }
+
+          // Mark new agent as active
+          if (card.agent_id === data.a2a_handover.to_agent) {
+            return {
+              ...card,
+              isActive: true,
+              status: 'active'
+            };
+          }
+
+          return card;
+        }));
+
+        // Trigger transition animation on new active agent
+        setTimeout(() => {
+          const newAgentCard = document.querySelector(`[data-agent-id="${data.a2a_handover.to_agent}"]`);
+          if (newAgentCard) {
+            newAgentCard.classList.add('agent-card-transition');
+            newAgentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            setTimeout(() => {
+              newAgentCard.classList.remove('agent-card-transition');
+            }, 2000);
+          }
+        }, 100);
+      }
+
     } catch (error) {
       console.error('Error sending message:', error);
       addIntelligenceLog('system', '❌ ERROR processing message: ' + String(error));
@@ -780,17 +890,31 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
       <AgentCardsContainer>
         <AgentCardsGrid>
           {agentCards.map(card => (
-            <AgentCard key={card.agent_id} $color={card.color} $isActive={card.isActive}>
+            <AgentCard
+              key={card.agent_id}
+              $color={card.color}
+              $isActive={card.isActive}
+              $status={card.status}
+              data-agent-id={card.agent_id}
+            >
               <AgentCardHeader $color={card.color}>
                 <AgentCardTitle>
                   <AgentEmoji>{card.emoji}</AgentEmoji>
                   {card.name} Agent
                 </AgentCardTitle>
-                <AgentStatus $color={card.color}>
-                  {card.isActive && <StatusDot $color={card.color} />}
-                  {card.isActive ? 'ACTIVE' : 'READY'}
+                <AgentStatus $color={card.color} $status={card.status}>
+                  {card.status === 'active' && <StatusDot $color={card.color} />}
+                  {card.status === 'active' ? 'ACTIVE' : card.status === 'handed_off' ? 'HANDED OFF' : 'READY'}
                 </AgentStatus>
               </AgentCardHeader>
+
+              {/* v28.0: Show handover indicator if handed off */}
+              {card.status === 'handed_off' && card.handoverInfo && (
+                <HandoverIndicator>
+                  <HandoverIcon>↓</HandoverIcon>
+                  <span>Handed over to {AGENT_CONFIGS[card.handoverInfo.handedTo as keyof typeof AGENT_CONFIGS]?.name || 'next'} Agent</span>
+                </HandoverIndicator>
+              )}
 
               <AgentCardMessages>
                 {card.messages.length === 0 ? (
