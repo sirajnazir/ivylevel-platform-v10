@@ -1,12 +1,12 @@
 # IvyLevel Platform - Production Database Architecture
-# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v13.0 → v14.0 → v21.0 → v24.0 → v25.0 Growth Journey Verified
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v13.0 → v14.0 → v21.0 → v24.0 → v25.0 → v26.0 Growth Journey Verified
 
-**Document Version:** v25.0
-**Last Updated:** 2025-10-31
-**Status:** ✅ PRODUCTION READY - Complete Schema Documented + Data Integrity Verified + 89 Weeks Execution Data + 93 Growth Timeline Events
+**Document Version:** v27.0
+**Last Updated:** 2025-11-02
+**Status:** ✅ PRODUCTION READY - Complete Schema Documented + A2A Handover Architecture + Assessment Agent v3 Conversational Flow + Canonical Schema Alignment
 **Database:** PostgreSQL 14+
 **Connection:** Port 5432, Database: ivylevel
-**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.0 Weekly Vitals Schema + v10.8 Universal Academic Schema + v11.0 Action Plans + v12.0 Game Plan JSONB + v13.0 Assessment Visualization + v14.0 Timeline Enrichment + v18.0 FactStore Integration + v18.1 kb_items Population + PostgresFactSource Implementation + v24.0 Complete Schema Documentation & Data Verification
+**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.0 Weekly Vitals Schema + v10.8 Universal Academic Schema + v11.0 Action Plans + v12.0 Game Plan JSONB + v13.0 Assessment Visualization + v14.0 Timeline Enrichment + v18.0 FactStore Integration + v18.1 kb_items Population + PostgresFactSource Implementation + v24.0 Complete Schema Documentation & Data Verification + **v26.0 MultiAgent Platform v2.0 with Conversational Assessment + Canonical Schema**
 
 ---
 
@@ -31,34 +31,39 @@ This is the **single source of truth** for IvyLevel's production database schema
 15. **v19.0** - Summer Programs Agent Data Access (NO schema changes - uses existing kb_items table with item_type='Program')
 16. **v20.0** - ExecutionAgent Foundation with weekly_progress_snapshots table for ladder tracking (NO schema changes - uses existing v11.0 action plans + v10.0 weekly vitals)
 17. **v20.1** - ExecutionAgent Core Execution Primitives Expansion (NO schema changes - v20.1 uses existing tables; database migrations planned for v20.2)
-18. **Current Tables & Views** - What actually exists in production
-17. **Sample Data** - Real Jenny-Huda data with complete Common App submission + Game Plan + Enriched Timeline + kb_items (12 items including 2 summer programs)
-18. **Verified Data Integrity** - Comprehensive testing validates all queries + Awards Agent tests (4/4 passing) + Summer Programs Agent tests (4/4 passing) + ExecutionAgent tests (4/4 test cases)
-19. **Fact-First Data Access** - PostgresFactSource extracts facts from students + kb_items tables with complete provenance tracking for all agents (Awards, SummerPrograms, Execution)
+18. **v26.0** - MultiAgent Platform v2.0 with Conversational Assessment (NEW schema additions - multiagent_sessions, multiagent_messages, intelligence_activations tables + kb_items.edges JSONB enhancement for conversational data storage + Canonical Schema alignment)
+19. **v27.0** - A2A Handover Architecture + Assessment Agent v3 (PLANNED schema additions - a2a_handover_log table for agent-to-agent communication tracking + NO immediate schema changes for Assessment Agent v3 as it uses existing multiagent_messages for conversational flow + GamePlan handover data stored in multiagent_messages.metadata JSONB)
+20. **Current Tables & Views** - What actually exists in production
+21. **Sample Data** - Real Jenny-Huda data with complete Common App submission + Game Plan + Enriched Timeline + kb_items (12 items including 2 summer programs) + v26 clone student architecture (huda-v26-2025)
+21. **Verified Data Integrity** - Comprehensive testing validates all queries + Awards Agent tests (4/4 passing) + Summer Programs Agent tests (4/4 passing) + ExecutionAgent tests (4/4 test cases) + v26 Assessment Agent intelligence-driven conversational flow
+22. **Fact-First Data Access** - PostgresFactSource extracts facts from students + kb_items tables with complete provenance tracking for all agents (Awards, SummerPrograms, Execution, Assessment)
 
-**Key Principle:** All data references use REAL student data from Huda's actual UNC Chapel Hill Early Action submission (student_id: 'huda-2025'). Universal schema design enables support for any student type (STEM, Arts, Athletics, IB) while maintaining complete accuracy with final college applications. v14.0 enriches existing timeline_events table with 30 transformation milestones extracted from growth_events, vital_facts, kb_items, and weekly_vitals. v18.0 adds Fact-First data access layer (PostgresFactSource) that extracts structured facts from existing tables with complete provenance tracking - demonstrating zero-hallucination data access WITHOUT schema changes, just intelligent fact extraction and validation.
+**Key Principle:** All data references use REAL student data from Huda's actual UNC Chapel Hill Early Action submission (student_id: 'huda-2025'). Universal schema design enables support for any student type (STEM, Arts, Athletics, IB) while maintaining complete accuracy with final college applications. v14.0 enriches existing timeline_events table with 30 transformation milestones extracted from growth_events, vital_facts, kb_items, and weekly_vitals. v18.0 adds Fact-First data access layer (PostgresFactSource) that extracts structured facts from existing tables with complete provenance tracking - demonstrating zero-hallucination data access WITHOUT schema changes, just intelligent fact extraction and validation. **v26.0 extends kb_items with edges JSONB field for conversational assessment data and adds multiagent session management tables, all following Canonical Schema (see MULTIAGENT_V26_CANONICAL_SCHEMA.md) that aligns extraction, intelligence, and storage layers.**
 
 ---
 
 ## Table of Contents
 
-1. [v25.0 Complete Database Schema](#v250-complete-database-schema)
-2. [Schema Overview](#schema-overview)
-3. [v14 Schema (Preserved)](#v14-schema-preserved)
-4. [v1.0 Schema Extensions](#v10-schema-extensions)
-5. [Real Data Examples](#real-data-examples)
-6. [Database Views](#database-views)
+1. [v26.0 Complete Database Schema](#v260-complete-database-schema)
+2. [v26.0 MultiAgent Platform Tables](#v260-multiagent-platform-tables-new)
+3. [Schema Overview](#schema-overview)
+4. [v14 Schema (Preserved)](#v14-schema-preserved)
+5. [v1.0 Schema Extensions](#v10-schema-extensions)
+6. [Real Data Examples](#real-data-examples)
+7. [Database Views](#database-views)
+8. [Canonical Schema Reference](#canonical-schema-reference)
 7. [Migration History](#migration-history)
 8. [Gap Analysis](#gap-analysis)
 9. [Proposed Enhancements](#proposed-enhancements)
 
 ---
 
-## v24.0 Complete Database Schema
+## v26.0 Complete Database Schema
 
-**Last Verified:** 2025-10-31
-**Data Integrity Status:** ✅ VERIFIED - 89 weeks of execution data, 1,151 action items
+**Last Verified:** 2025-11-02
+**Data Integrity Status:** ✅ VERIFIED - 89 weeks of execution data, 1,151 action items + MultiAgent Platform v2.0 conversational assessment
 **Production Database:** PostgreSQL 14+, Port 5432, Database: ivylevel
+**Canonical Schema:** See [MULTIAGENT_V26_CANONICAL_SCHEMA.md](MULTIAGENT_V26_CANONICAL_SCHEMA.md) for field naming standards
 
 ### Core Production Tables (Verified with Real Data)
 
@@ -680,6 +685,7 @@ CREATE TABLE kb_items (
   confidence         TEXT DEFAULT 'medium',      -- 'high' | 'medium' | 'low'
   created_ts         TIMESTAMPTZ DEFAULT now(),
   updated_ts         TIMESTAMPTZ DEFAULT now(),
+  edges              JSONB DEFAULT '[]'::jsonb,  -- **v26.0 ADDITION** - Flexible data extensions (assessment data, relationships, etc.)
 
   -- Constraints
   CONSTRAINT kb_items_tier1_state_check
@@ -693,6 +699,7 @@ CREATE INDEX idx_kb_items_student ON kb_items(student_id);
 CREATE INDEX idx_kb_items_type_state ON kb_items(item_type, tier1_state, outcome_date, event_date, submit_date);
 CREATE INDEX idx_kb_items_source ON kb_items(source_ref);
 CREATE INDEX idx_kb_items_temporal ON kb_items(student_id, item_type, COALESCE(outcome_date, event_date, submit_date, deadline_date));
+CREATE INDEX idx_kb_items_edges ON kb_items USING GIN(edges);  -- v26.0: JSON querying for assessment data
 ```
 
 **Real Data Example (Huda - Awards):**
@@ -819,6 +826,174 @@ GROUP BY item_type;
 -- SummerProgram: 5 (3 completed: Stanford AI, MIT Launch, Girls Who Code SIP; 2 targeted: TASP, RSI)
 -- Test: 4 (SAT attempts: 1450, 1480, 1520, 1540)
 ```
+
+---
+
+### v26.0 MultiAgent Platform Tables (NEW)
+
+#### 1a. multiagent_sessions (Conversational Session Management)
+
+**Purpose:** Track multi-agent conversational sessions with state persistence across Assessment → GamePlan → Execution phases
+
+**Added:** v26.0 (2025-11-02)
+**Pattern:** Extends conversation tracking with JSONB packages for each phase
+
+**Schema:**
+```sql
+CREATE TABLE multiagent_sessions (
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  student_id         TEXT NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
+  session_type       TEXT NOT NULL CHECK (session_type IN ('onboarding', 'weekly_execution', 'ad_hoc')),
+  status             TEXT NOT NULL CHECK (status IN ('in_progress', 'completed', 'paused', 'error')),
+  current_phase      TEXT CHECK (current_phase IN ('assessment', 'gameplan', 'execution', 'complete')),
+  current_agent      TEXT,                       -- e.g., 'assessment-agent-v3', 'gameplan-agent-v18'
+
+  -- Phase-specific data packages (JSONB for flexibility)
+  assessment_package JSONB,                      -- Collected assessment data, questions asked, progress
+  gameplan_package   JSONB,                      -- Game plan state, recommendations, strategic insights
+  execution_package  JSONB,                      -- Weekly execution state, action items, progress tracking
+
+  -- Analytics
+  analytics          JSONB DEFAULT '{
+    "total_messages": 0,
+    "total_duration_ms": 0,
+    "total_tokens_input": 0,
+    "total_tokens_output": 0,
+    "total_cost": 0.0,
+    "agents_used": [],
+    "intelligence_types_triggered": [],
+    "total_intelligence_activations": 0
+  }'::jsonb,
+
+  -- Timestamps
+  started_at         TIMESTAMPTZ DEFAULT now(),
+  completed_at       TIMESTAMPTZ,
+  created_at         TIMESTAMPTZ DEFAULT now(),
+  updated_at         TIMESTAMPTZ DEFAULT now()
+);
+
+-- Indexes
+CREATE INDEX idx_multiagent_sessions_student_id ON multiagent_sessions(student_id);
+CREATE INDEX idx_multiagent_sessions_status ON multiagent_sessions(status);
+CREATE INDEX idx_multiagent_sessions_current_phase ON multiagent_sessions(current_phase);
+CREATE INDEX idx_multiagent_sessions_started_at ON multiagent_sessions(started_at DESC);
+
+-- Auto-update timestamp trigger
+CREATE OR REPLACE FUNCTION update_multiagent_sessions_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER multiagent_sessions_updated_at_trigger
+BEFORE UPDATE ON multiagent_sessions
+FOR EACH ROW EXECUTE FUNCTION update_multiagent_sessions_updated_at();
+```
+
+**assessment_package JSONB Structure (Canonical Schema):**
+```json
+{
+  "phase": "discovery",
+  "completion": 0.65,
+  "questions_asked": ["What grade are you in?", "What school do you attend?"],
+  "collected_data": {
+    "grade": 11,
+    "high_school": "Mountain House High",
+    "interests": ["AI", "Game Development"],
+    "activities": ["Teaching young girls"],
+    "target_major": "Computer Science",
+    "target_colleges": ["MIT", "Stanford"]
+  },
+  "intelligence_results": [
+    {"type_id": "TYPE-080", "triggered": true, "confidence": 1.0},
+    {"type_id": "TYPE-081", "triggered": true, "confidence": 0.95}
+  ]
+}
+```
+
+**Real Data Example (v26 Clone Student):**
+```sql
+-- Assessment session for huda-v26-2025 (clone of huda-2025 for testing)
+INSERT INTO multiagent_sessions (
+  student_id, session_type, status, current_phase, current_agent, assessment_package
+) VALUES (
+  'huda-v26-2025',
+  'onboarding',
+  'in_progress',
+  'assessment',
+  'assessment-agent-v3',
+  '{
+    "phase": "discovery",
+    "completion": 0.5,
+    "questions_asked": ["What grade are you in?", "What school do you attend?"],
+    "collected_data": {"grade": 11, "high_school": "Mountain House High"}
+  }'::jsonb
+);
+```
+
+---
+
+#### 1b. multiagent_messages (Conversation History)
+
+**Purpose:** Store all messages in multi-agent conversations with intelligence tracking
+
+**Added:** v26.0 (2025-11-02)
+**Pattern:** Message-level tracking with intelligence type attribution
+
+**Schema:**
+```sql
+CREATE TABLE multiagent_messages (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id        UUID NOT NULL REFERENCES multiagent_sessions(id) ON DELETE CASCADE,
+  agent_id          TEXT NOT NULL,              -- 'assessment-agent-v3', 'user', etc.
+  role              TEXT NOT NULL CHECK (role IN ('user', 'agent', 'system')),
+  content           TEXT NOT NULL,              -- Message text
+  intelligence_type TEXT,                       -- TYPE-080, TYPE-081, etc. (if applicable)
+  processing_time   INTEGER,                    -- Milliseconds
+  confidence        NUMERIC(5,2) CHECK (confidence BETWEEN 0 AND 100),
+  metadata          JSONB DEFAULT '{}'::jsonb,  -- Agent-specific metadata
+  timestamp         TIMESTAMPTZ DEFAULT now()
+);
+
+-- Indexes
+CREATE INDEX idx_multiagent_messages_session_id ON multiagent_messages(session_id);
+CREATE INDEX idx_multiagent_messages_agent_id ON multiagent_messages(agent_id);
+CREATE INDEX idx_multiagent_messages_intelligence_type ON multiagent_messages(intelligence_type) WHERE intelligence_type IS NOT NULL;
+CREATE INDEX idx_multiagent_messages_timestamp ON multiagent_messages(timestamp DESC);
+```
+
+---
+
+#### 1c. intelligence_activations (Intelligence Type Tracking)
+
+**Purpose:** Track when intelligence types are triggered and their results
+
+**Added:** v26.0 (2025-11-02)
+**Pattern:** Detailed intelligence provenance for debugging and analytics
+
+**Schema:**
+```sql
+CREATE TABLE intelligence_activations (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  session_id      UUID NOT NULL REFERENCES multiagent_sessions(id) ON DELETE CASCADE,
+  message_id      UUID REFERENCES multiagent_messages(id) ON DELETE CASCADE,
+  intelligence_id TEXT NOT NULL,              -- TYPE-080, TYPE-081, etc.
+  triggered       BOOLEAN NOT NULL DEFAULT false,
+  confidence      NUMERIC(5,2),
+  data            JSONB,                      -- Intelligence-specific output
+  processing_time INTEGER,                    -- Milliseconds
+  created_at      TIMESTAMPTZ DEFAULT now()
+);
+
+-- Indexes
+CREATE INDEX idx_intelligence_activations_session_id ON intelligence_activations(session_id);
+CREATE INDEX idx_intelligence_activations_intelligence_id ON intelligence_activations(intelligence_id);
+CREATE INDEX idx_intelligence_activations_triggered ON intelligence_activations(triggered) WHERE triggered = true;
+```
+
+---
 
 #### 2. vital_facts (Temporal Facts)
 
@@ -4134,6 +4309,57 @@ Response: "I need more information to answer this question. Missing data: studen
 **Migration Numbering:**
 - Migration 21: (Reserved for next agent data population)
 - Migration 22: (Reserved for additional kb_items types)
+- Migration 26: v26.0 MultiAgent Platform tables (multiagent_sessions, multiagent_messages, intelligence_activations)
+
+---
+
+## Canonical Schema Reference
+
+**Version:** v26.0
+**Document:** [MULTIAGENT_V26_CANONICAL_SCHEMA.md](MULTIAGENT_V26_CANONICAL_SCHEMA.md)
+**Purpose:** Single source of truth for all data field names across MultiAgent Platform v2.0
+
+### Key Principles
+
+1. **Unified Field Names:** All systems (extraction, intelligence, storage, API) use identical field names
+2. **Production Baseline:** Leverages existing `kb_items` table with additive JSONB extensions
+3. **Type Safety:** 30+ canonical fields with explicit types, examples, and usage notes
+4. **Validation:** Field name compliance enforced across all layers
+
+### Canonical Fields (Summary)
+
+**Academic Profile:**
+- `grade`, `high_school`, `gpa`, `gpa_type`
+- `sat_total`, `sat_math`, `sat_verbal`, `act_composite`
+- `ap_count`, `class_rank`, `class_rank_total`
+
+**Student Profile:**
+- `target_major`, `target_colleges`
+- `personality_type`, `friend_group_size`, `friend_group_dynamic`
+
+**Interests & Activities:**
+- `interests`, `activities`, `leadership_roles`
+
+**Goals & Aspirations:**
+- `career_goals`, `motivations`
+
+**Narrative (v26.1+):**
+- `unique_experiences`, `core_values`, `challenges_overcome`
+- `defining_moments`, `identity_keywords`
+
+### Field Name Migration Rules
+
+**❌ DO NOT USE (Legacy):**
+- `grade_level` → Use `grade`
+- `current_school` → Use `high_school`
+- `academic_interests` → Use `interests`
+- `extracurricular_activities` → Use `activities`
+
+**✅ ALWAYS USE (Canonical):**
+- All field names from `MULTIAGENT_V26_CANONICAL_SCHEMA.md`
+- Matches GPT-4o extraction schema exactly
+- Matches TYPE-080 intelligence requirements exactly
+- Stored in `kb_items.edges` and `multiagent_sessions.*_package` exactly
 
 ---
 
