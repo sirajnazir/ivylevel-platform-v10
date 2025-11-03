@@ -57,11 +57,23 @@ import { AssessmentAgentV3 } from './AssessmentAgentV3.js';
 import { FactStore } from '../../facts/FactStore.js';
 import { AgentQuery, FactCategory } from '../../facts/types.js';
 import { IntelligenceAgentResponse } from './BaseAgentWithIntelligence.js';
-import { FactSet } from '../../facts/FactSet.js';
+import { FactSet, Fact } from '../../facts/FactSet.js';
 import { createLogger } from '../../../../../packages/observability/dist/unified-logger.js';
 import { Pool } from 'pg';
 import { extractAssessmentDataGPT, validateAndNormalizeData, analyzeStudentEngagement, type ExtractedAssessmentData } from '../../nlp/assessmentExtract.js';
 import { IntelligenceResult } from '../../intelligence/types/BaseIntelligenceType.js';
+import { A2AOrchestrator } from '../../a2a/A2AOrchestrator.js';
+import type {
+  A2AHandoverPackage,
+  A2AHandoverType,
+  AssessmentToGamePlanPayload,
+  ExecutionContext,
+  A2AHandoverMetadata,
+  Gap,
+  QuickWin,
+  Indicator,
+  StudentDemographics,
+} from '../../a2a/types.js';
 
 const log = createLogger('assessment-agent-v3-conversational-realtime');
 
@@ -453,28 +465,55 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
     const hasMinimumDepth = this.checkMinimumAssessmentDepth(collectedData, state);
 
     if (state.synthesis_delivered && !hasNewSignificantData && hasMinimumDepth) {
-      // Synthesis delivered + no new data + sufficient depth = Handover to GamePlan
-      const handoverData = await this.prepareGamePlanHandover(facts, intelligenceResults, collectedData);
+      // Synthesis delivered + no new data + sufficient depth = A2A Handover to GamePlan
+      console.log('[ASSESSMENT_COMPLETE] ✅ Preparing A2A handover to GamePlan Agent');
 
-      const response = "Perfect! Now that we understand your unique story and positioning, I'm ready to create your strategic 2-year roadmap. " +
-                      "This will map out exactly how to build your profile for top colleges. Let me work on that for you.";
+      const handoverPackage = await this.prepareGamePlanHandover(facts, intelligenceResults, collectedData, state);
 
-      console.log('[ASSESSMENT_COMPLETE] Preparing handover to GamePlan Agent');
-      console.log('[HANDOVER_DATA]', JSON.stringify(handoverData, null, 2));
+      // Execute A2A synchronous handoff
+      console.log('[A2A_HANDOVER] Calling A2AOrchestrator.handleSynchronousHandoff()');
+      const handoverResult = await A2AOrchestrator.handleSynchronousHandoff(handoverPackage);
 
+      if (!handoverResult.success) {
+        console.error('[A2A_HANDOVER] ❌ Handover failed:', handoverResult.error);
+        // Fallback: Return error message
+        return {
+          response: "I'm ready to create your strategic roadmap, but I'm having trouble transitioning. Let me know if you'd like to continue!",
+          facts_used: facts.getAllFacts(),
+          validation_score: 0.5,
+          triggered_intelligence: intelligenceResults.filter(r => r.triggered).map(r => r.type_id),
+          provenance: facts.getProvenance(),
+          metadata: {
+            agent_id: this.agentId,
+            mode: 'handover_failed',
+            error: handoverResult.error,
+          },
+        };
+      }
+
+      console.log('[A2A_HANDOVER] ✅ Handover successful!');
+      console.log('[A2A_HANDOVER] GamePlan Agent initialized with:', {
+        handover_id: handoverResult.handover_id,
+        new_agent: handoverResult.new_agent,
+        facts_transferred: handoverResult.metadata?.facts_transferred,
+        processing_time_ms: handoverResult.metadata?.processing_time_ms,
+      });
+
+      // Return GamePlan Agent's initialization response
       return {
-        response,
+        response: handoverResult.response,
         facts_used: facts.getAllFacts(),
         validation_score: 1.0,
         triggered_intelligence: intelligenceResults.filter(r => r.triggered).map(r => r.type_id),
         provenance: facts.getProvenance(),
         metadata: {
-          agent_id: this.agentId,
-          mode: 'assessment_complete',
+          agent_id: 'gameplan-agent', // Now controlled by GamePlan Agent
+          mode: 'a2a_handover_complete',
           eq_layer: 10,
-          next_step: 'gameplan_creation',
-          data_collected_so_far: collectedData,
-          gameplan_handover: handoverData,
+          handover_id: handoverResult.handover_id,
+          previous_agent: this.agentId,
+          next_step: 'gameplan_strategy',
+          a2a_handover_complete: true,
         },
       };
     }
@@ -757,14 +796,15 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
   }
 
   /**
-   * v27.0: Prepare comprehensive handover data for GamePlan Agent
+   * v28.0: Prepare A2A handover package for GamePlan Agent
    * Assessment Agent discovers and synthesizes → GamePlan Agent strategizes roadmap
    */
   private async prepareGamePlanHandover(
     facts: FactSet,
     intelligenceResults: IntelligenceResult[],
-    collectedData: Record<string, any>
-  ): Promise<any> {
+    collectedData: Record<string, any>,
+    state: ConversationState
+  ): Promise<A2AHandoverPackage> {
 
     // Extract intelligence results
     const ivyScore = intelligenceResults.find(r => r.type_id === 'TYPE-081');
@@ -772,28 +812,59 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
     const potential = intelligenceResults.find(r => r.type_id === 'TYPE-083');
     const phaseFlow = intelligenceResults.find(r => r.type_id === 'TYPE-080');
 
-    // Build comprehensive handover structure
-    const handoverData = {
-      // Identity & Narrative (from assessment synthesis)
-      identity_synthesis: await this.generateIdentitySynthesis(collectedData, intelligenceResults),
-      unique_positioning: this.extractUniquePositioning(collectedData),
+    // Generate identity synthesis
+    const conversationHistory = this.extractConversationHistory(facts);
+    const identitySynthesis = await this.generateIdentitySynthesis(collectedData, intelligenceResults, conversationHistory);
+
+    // Build AssessmentToGamePlanPayload
+    const domainPayload: AssessmentToGamePlanPayload = {
+      domain: 'assessment_to_gameplan',
+      synthesis_delivered: state.synthesis_delivered,
+      identity_synthesis: identitySynthesis,
+      unique_positioning: this.extractUniquePositioning(collectedData).join(', '),
       narrative_thread: this.buildNarrativeThread(collectedData),
 
-      // Competitive Analysis
+      // Competitive Analysis (from TYPE-081)
       ivy_score: (ivyScore?.data as any)?.ivy_score || 0,
       competitiveness_tier: (ivyScore?.data as any)?.competitiveness_tier || 'unknown',
-      rubric_scores: (ivyScore?.data as any)?.rubric_scores || {},
+      rubric_scores: {
+        academics: (ivyScore?.data as any)?.rubric_scores?.academics || 0,
+        extracurriculars: (ivyScore?.data as any)?.rubric_scores?.extracurriculars || 0,
+        summer_programs: (ivyScore?.data as any)?.rubric_scores?.summer_programs || 0,
+        awards: (ivyScore?.data as any)?.rubric_scores?.awards || 0,
+        essays: (ivyScore?.data as any)?.rubric_scores?.essays || 0,
+        total: (ivyScore?.data as any)?.rubric_scores?.total || 0,
+      },
       top_strengths: (ivyScore?.data as any)?.top_strengths || [],
       critical_gaps: (ivyScore?.data as any)?.critical_gaps || [],
 
-      // Gap Analysis & Opportunities
-      p0_gaps: (gaps?.data as any)?.p0_gaps || [],
-      p1_gaps: (gaps?.data as any)?.p1_gaps || [],
-      quick_wins: (gaps?.data as any)?.quick_wins || [],
-      gap_score: (gaps?.data as any)?.overall_gap_score || 0,
+      // Gap Analysis & Opportunities (from TYPE-082)
+      p0_gaps: ((gaps?.data as any)?.p0_gaps || []).map((g: any) => ({
+        category: g.category || '',
+        gap_description: g.gap_description || '',
+        urgency: g.urgency || 'high',
+        recommended_action: g.recommended_action || '',
+      })) as Gap[],
+      p1_gaps: ((gaps?.data as any)?.p1_gaps || []).map((g: any) => ({
+        category: g.category || '',
+        gap_description: g.gap_description || '',
+        urgency: g.urgency || 'medium',
+        recommended_action: g.recommended_action || '',
+      })) as Gap[],
+      quick_wins: ((gaps?.data as any)?.quick_wins || []).map((qw: any) => ({
+        action: qw.action || '',
+        impact: qw.impact || '',
+        time_to_complete: qw.time_to_complete || '',
+        roi: qw.roi || 0,
+      })) as QuickWin[],
 
-      // Potential Indicators
-      potential_indicators: (potential?.data as any)?.highest_potential_activations || [],
+      // Potential Indicators (from TYPE-083)
+      potential_indicators: ((potential?.data as any)?.highest_potential_activations || []).map((ind: any) => ({
+        indicator_type: ind.indicator_type || '',
+        confidence: ind.confidence || 0,
+        evidence: ind.evidence || '',
+        recommendation: ind.recommendation || '',
+      })) as Indicator[],
       potential_boost: (potential?.data as any)?.potential_ivyscore_boost || 0,
 
       // Demographics & Context
@@ -804,21 +875,52 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
         intended_major: collectedData.target_major || '',
         gpa: collectedData.gpa || 0,
         gpa_type: collectedData.gpa_type || '',
-      },
+        sat_total: collectedData.sat_total,
+        act_composite: collectedData.act_composite,
+        ap_count: collectedData.ap_count,
+      } as StudentDemographics,
 
-      // Assessment Phase Completion
-      phase_statuses: (phaseFlow?.data as any)?.phase_statuses || [],
-      overall_completion: (phaseFlow?.data as any)?.overall_completion || 0,
-      current_phase: (phaseFlow?.data as any)?.current_phase || 'discovery',
-
-      // All Collected Data (raw)
-      all_collected_data: collectedData,
-
-      // Timestamp
+      // Assessment metadata
       assessment_completed_at: new Date().toISOString(),
     };
 
-    return handoverData;
+    // Build ExecutionContext
+    const executionContext: ExecutionContext = {
+      session_id: state.session_id,
+      student_id: state.student_id,
+      current_week: 0, // Will be calculated by GamePlan Agent
+      target_colleges: collectedData.target_colleges || [],
+      timeline_start: new Date().toISOString(),
+      timeline_end: '', // Will be set by GamePlan Agent
+    };
+
+    // Build A2A Handover Metadata
+    const metadata: A2AHandoverMetadata = {
+      handover_reason: 'assessment_complete',
+      user_visible_transition: true,
+      requires_user_confirmation: false,
+      priority: 'high',
+      assessment_message_count: state.message_count,
+      assessment_confidence_level: state.confidence_level,
+      intelligence_types_used: intelligenceResults.filter(r => r.triggered).map(r => r.type_id),
+    };
+
+    // Build complete A2A handover package
+    const handoverPackage: A2AHandoverPackage = {
+      handover_id: `a2a_${state.session_id}_${Date.now()}`,
+      handover_type: 'sync_handoff' as A2AHandoverType,
+      from_agent: this.agentId,
+      to_agent: 'gameplan-agent',
+      session_id: state.session_id,
+      student_id: state.student_id,
+      facts,
+      domain_payload: domainPayload,
+      execution_context: executionContext,
+      metadata,
+      created_at: new Date(),
+    };
+
+    return handoverPackage;
   }
 
   /**

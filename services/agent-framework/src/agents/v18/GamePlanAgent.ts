@@ -30,6 +30,11 @@ import type { LifecycleEvent, EventBus } from '../../events/EventBus.js';
 import { getToolsForAgent } from '../../tools/resolverTools.js';
 import type { Pool } from 'pg';
 import { createLogger } from '../../../../../packages/observability/dist/unified-logger.js';
+import type {
+  A2AHandoverPackage,
+  AssessmentToGamePlanPayload,
+} from '../../a2a/types.js';
+import { FactSet } from '../../facts/FactSet.js';
 
 const log = createLogger('gameplan-agent-v18');
 
@@ -215,6 +220,118 @@ export class GamePlanAgent extends BaseAgent {
     log.event('gameplan_agent.event_bus_initialized', {
       subscribed_events: ['assessment_completed', 'milestone_achieved'],
     });
+  }
+
+  /**
+   * Get current game plan from database (FACT-BASED)
+   * v18.0: Extracts ALL actual data fields, never returns mock/invented data
+   */
+  private async getCurrentGamePlan(student_id: string): Promise<any | null> {
+    if (!this.pool) {
+      throw new Error('GamePlanAgent not initialized with database pool');
+    }
+
+    const result = await this.pool.query(
+      `SELECT
+        game_plan_id,
+        student_id,
+
+        -- Core assessment data (facts)
+        profile_assessment,
+        target_profile,
+        target_schools,
+        tactical_horizon,
+
+        -- Metadata
+        plan_type,
+        convergence_status,
+        next_review_date,
+        created_at,
+        updated_at
+      FROM game_plans
+      WHERE student_id = $1
+      ORDER BY created_at DESC
+      LIMIT 1`,
+      [student_id]
+    );
+
+    return result.rows[0] || null;
+  }
+
+  /**
+   * Extract facts from game plan (TRUTH-FIRST)
+   * Returns only data that EXISTS in database, marks missing fields explicitly
+   */
+  private extractGamePlanFacts(gamePlan: any): {
+    has_data: boolean;
+    unique_narrative: string | null;
+    weak_spots_p0: any[];
+    weak_spots_other: any[];
+    standout_strengths: any[];
+    top_activities: any[];
+    target_schools: any[];
+    potential_spikes: string[];
+    next_tactical_actions: any[];
+  } {
+    const facts = {
+      has_data: false,
+      unique_narrative: null as string | null,
+      weak_spots_p0: [] as any[],
+      weak_spots_other: [] as any[],
+      standout_strengths: [] as any[],
+      top_activities: [] as any[],
+      target_schools: [] as any[],
+      potential_spikes: [] as string[],
+      next_tactical_actions: [] as any[],
+    };
+
+    // Extract unique narrative (from target_profile)
+    if (gamePlan.target_profile?.narrative) {
+      facts.unique_narrative = gamePlan.target_profile.narrative;
+      facts.has_data = true;
+    }
+
+    // Extract potential spikes
+    if (gamePlan.target_profile?.potential_spikes) {
+      facts.potential_spikes = gamePlan.target_profile.potential_spikes;
+      facts.has_data = true;
+    }
+
+    // Extract weak spots (P0 = highest priority)
+    if (gamePlan.profile_assessment?.weak_spots) {
+      const allWeakSpots = gamePlan.profile_assessment.weak_spots;
+      facts.weak_spots_p0 = allWeakSpots.filter((ws: any) => ws.priority === 'P0');
+      facts.weak_spots_other = allWeakSpots.filter((ws: any) => ws.priority !== 'P0');
+      facts.has_data = true;
+    }
+
+    // Extract standout strengths (top 3)
+    if (gamePlan.profile_assessment?.standout_strengths) {
+      facts.standout_strengths = gamePlan.profile_assessment.standout_strengths.slice(0, 3);
+      facts.has_data = true;
+    }
+
+    // Extract top activities (first 5 by display_order)
+    if (gamePlan.profile_assessment?.extracurricular_activities) {
+      facts.top_activities = gamePlan.profile_assessment.extracurricular_activities
+        .sort((a: any, b: any) => a.display_order - b.display_order)
+        .slice(0, 5);
+      facts.has_data = true;
+    }
+
+    // Extract target schools
+    if (gamePlan.target_schools && Array.isArray(gamePlan.target_schools)) {
+      facts.target_schools = gamePlan.target_schools;
+      facts.has_data = true;
+    }
+
+    // Extract next tactical actions (from tactical_horizon)
+    if (gamePlan.tactical_horizon?.upcoming_actions) {
+      facts.next_tactical_actions = gamePlan.tactical_horizon.upcoming_actions.slice(0, 5);
+      facts.has_data = true;
+    }
+
+    return facts;
   }
 
   /**
@@ -782,5 +899,364 @@ You are NOT a static document generator. You are a **LIVING STRATEGIC PLANNING S
 Every game plan you create is an object, not a document. It has methods, not just data. It evolves, not stays static.
 
 **Let's build roadmaps that adapt to reality.**`;
+  }
+
+  /**
+   * Public API: Handle game plan query from user
+   * v18.0: FACT-BASED - only returns data that exists in database
+   */
+  async handleGamePlanQuery(params: {
+    student_id: string;
+    query: string;
+    session_id: string;
+  }): Promise<{
+    response: string;
+    metadata?: any;
+  }> {
+    const { student_id, query, session_id } = params;
+
+    log.event('gameplan_agent.handle_query', {
+      student_id,
+      query: query.slice(0, 100),
+      session_id,
+    });
+
+    try {
+      // Step 1: Get current game plan from database (FACT-BASED)
+      const gamePlan = await this.getCurrentGamePlan(student_id);
+
+      if (!gamePlan) {
+        return {
+          response:
+            "You don't have a game plan yet. Complete your assessment first, and I'll create a strategic 2-year roadmap for you!",
+          metadata: {
+            has_game_plan: false,
+          },
+        };
+      }
+
+      // Step 2: Extract facts (TRUTH-FIRST - only return what exists)
+      const facts = this.extractGamePlanFacts(gamePlan);
+
+      if (!facts.has_data) {
+        return {
+          response:
+            "Your game plan exists but is still being built. Complete your assessment to populate it with your strategic roadmap!",
+          metadata: {
+            has_game_plan: true,
+            has_facts: false,
+            game_plan_id: gamePlan.game_plan_id,
+          },
+        };
+      }
+
+      // Step 3: Build fact-based response
+      const response = this.formatFactBasedResponse(facts, query);
+
+      return {
+        response,
+        metadata: {
+          has_game_plan: true,
+          has_facts: true,
+          game_plan_id: gamePlan.game_plan_id,
+          last_updated: gamePlan.updated_at,
+          facts_included: {
+            narrative: !!facts.unique_narrative,
+            p0_priorities: facts.weak_spots_p0.length,
+            strengths: facts.standout_strengths.length,
+            activities: facts.top_activities.length,
+            schools: facts.target_schools.length,
+            spikes: facts.potential_spikes.length,
+          },
+        },
+      };
+    } catch (error) {
+      log.error('gameplan_agent.handle_query_error', {
+        student_id,
+        error: String(error),
+      });
+
+      return {
+        response:
+          "I encountered an error retrieving your game plan. Let me know if you'd like to create a new one!",
+        metadata: {
+          error: String(error),
+        },
+      };
+    }
+  }
+
+  /**
+   * Format fact-based response (TRUTH-FIRST)
+   * Only displays facts that exist in database
+   */
+  private formatFactBasedResponse(
+    facts: {
+      unique_narrative: string | null;
+      weak_spots_p0: any[];
+      standout_strengths: any[];
+      top_activities: any[];
+      target_schools: any[];
+      potential_spikes: string[];
+    },
+    query: string
+  ): string {
+    let response = "**Your Strategic Game Plan**\n\n";
+
+    // 1. Unique Narrative (if exists)
+    if (facts.unique_narrative) {
+      response += `**Who You Are:**\n${facts.unique_narrative}\n\n`;
+    }
+
+    // 2. Potential Spikes (if exists)
+    if (facts.potential_spikes.length > 0) {
+      response += `**Your Potential Spikes:**\n`;
+      facts.potential_spikes.forEach((spike) => {
+        response += `• ${spike}\n`;
+      });
+      response += '\n';
+    }
+
+    // 3. P0 Priorities (highest priority items)
+    if (facts.weak_spots_p0.length > 0) {
+      response += `**🎯 Top Priorities (P0 - Must Address):**\n`;
+      facts.weak_spots_p0.forEach((ws) => {
+        response += `• **${ws.title}**: ${ws.status || ws.description}\n`;
+      });
+      response += '\n';
+    }
+
+    // 4. Key Strengths to Leverage
+    if (facts.standout_strengths.length > 0) {
+      response += `**💪 Your Standout Strengths:**\n`;
+      facts.standout_strengths.forEach((strength) => {
+        response += `• **${strength.title}**: ${strength.description}\n`;
+      });
+      response += '\n';
+    }
+
+    // 5. Top Activities
+    if (facts.top_activities.length > 0) {
+      response += `**📊 Your Key Activities:**\n`;
+      facts.top_activities.forEach((activity) => {
+        response += `• **${activity.title}** (${activity.role})`;
+        if (activity.impact) {
+          response += ` - ${activity.impact}`;
+        }
+        response += '\n';
+      });
+      response += '\n';
+    }
+
+    // 6. Target Schools (if exists)
+    if (facts.target_schools.length > 0) {
+      response += `**🎓 Target Schools:**\n`;
+      facts.target_schools.forEach((school: any) => {
+        response += `• ${school.name || school}`;
+        if (school.tier) {
+          response += ` (${school.tier})`;
+        }
+        response += '\n';
+      });
+      response += '\n';
+    }
+
+    response += '---\n';
+    response += '💡 *This game plan is grounded in your actual assessment data and adapts as you progress.*';
+
+    return response;
+  }
+
+  // ============================================================================
+  // A2A (Agent-to-Agent) HANDOVER SUPPORT - v28.0
+  // ============================================================================
+
+  /**
+   * v28.0: Initialize GamePlan Agent from Assessment Agent handover
+   *
+   * Receives A2AHandoverPackage with:
+   * - FactSet (all student facts)
+   * - AssessmentToGamePlanPayload (identity synthesis, gaps, IvyScore, potential)
+   * - ExecutionContext (session, student, timeline)
+   *
+   * Generates initial strategic response and creates game plan.
+   */
+  async initializeFromHandover(pkg: A2AHandoverPackage): Promise<string> {
+    log.event('gameplan_agent.a2a_handover_received', {
+      handover_id: pkg.handover_id,
+      from_agent: pkg.from_agent,
+      student_id: pkg.student_id,
+      facts_count: pkg.facts.count(),
+    });
+
+    // Extract domain payload
+    const payload = pkg.domain_payload as AssessmentToGamePlanPayload;
+
+    console.log('[GAMEPLAN_A2A] ✅ Handover received from Assessment Agent');
+    console.log('[GAMEPLAN_A2A] Identity Synthesis:', payload.identity_synthesis);
+    console.log('[GAMEPLAN_A2A] IvyScore:', payload.ivy_score);
+    console.log('[GAMEPLAN_A2A] P0 Gaps:', payload.p0_gaps.length);
+    console.log('[GAMEPLAN_A2A] Quick Wins:', payload.quick_wins.length);
+
+    // Create initial game plan in database
+    if (this.pool) {
+      try {
+        await this.createInitialGamePlanFromA2A(pkg.student_id, payload, pkg.facts);
+        console.log('[GAMEPLAN_A2A] ✅ Initial game plan created in database');
+      } catch (error) {
+        console.error('[GAMEPLAN_A2A] ❌ Error creating game plan:', error);
+        // Continue anyway - we can still provide strategic guidance
+      }
+    }
+
+    // Generate strategic GamePlan initialization message
+    return this.generateHandoverInitializationMessage(pkg.facts, payload);
+  }
+
+  /**
+   * v28.0: Generate initial GamePlan message after receiving Assessment handover
+   *
+   * Message structure (extracted from Huda transcript minute 15-17):
+   * 1. Acknowledge identity synthesis
+   * 2. Set strategic framing (2-year roadmap, not overwhelming)
+   * 3. Present top 3 P0 gaps as "opportunities"
+   * 4. Preview quick wins (this week/month actions)
+   * 5. Confidence anchor ("You're in a strong position")
+   */
+  private async generateHandoverInitializationMessage(
+    facts: FactSet,
+    payload: AssessmentToGamePlanPayload
+  ): Promise<string> {
+    let message = '';
+
+    // 1. Acknowledge identity synthesis (callback to assessment)
+    message += `${payload.identity_synthesis}\n\n`;
+
+    // 2. Strategic framing
+    message += `Now let's map out your strategic 2-year roadmap. This isn't about doing everything - `;
+    message += `it's about being extremely strategic with your time to maximize your college competitiveness.\n\n`;
+
+    // 3. Present P0 gaps as opportunities (cushioned critique - LAYER_6)
+    if (payload.p0_gaps.length > 0) {
+      message += `**🎯 Top Priority Areas (P0 - Critical for Competitiveness):**\n\n`;
+
+      const top3Gaps = payload.p0_gaps.slice(0, 3);
+      top3Gaps.forEach((gap, idx) => {
+        message += `${idx + 1}. **${gap.category}**: ${gap.gap_description}\n`;
+        message += `   → *Strategy*: ${gap.recommended_action}\n\n`;
+      });
+    }
+
+    // 4. Quick wins (immediate actions - LAYER_12)
+    if (payload.quick_wins.length > 0) {
+      message += `**⚡ Quick Wins (Start This Week):**\n\n`;
+
+      const top3Wins = payload.quick_wins.slice(0, 3);
+      top3Wins.forEach((win, idx) => {
+        message += `${idx + 1}. ${win.action}\n`;
+        message += `   • Impact: ${win.impact}\n`;
+        message += `   • Time: ${win.time_to_complete}\n\n`;
+      });
+    }
+
+    // 5. Competitive positioning (confidence anchor)
+    const tierMessages: Record<string, string> = {
+      'highly_competitive': "You're in a strong competitive position. With strategic execution over the next 2 years, you can target top-tier schools.",
+      'competitive': "You have solid fundamentals. Strategic improvements in your P0 areas will significantly boost your competitiveness.",
+      'developing': "We have clear opportunities to strengthen your profile. Focused execution on P0 priorities will transform your positioning.",
+    };
+
+    const tierMessage = tierMessages[payload.competitiveness_tier] ||
+                       "Let's build a strategic plan to maximize your college competitiveness.";
+
+    message += `**💪 Your Positioning:**\n`;
+    message += `${tierMessage}\n\n`;
+
+    // 6. Call to action (next step)
+    message += `**📋 Next Steps:**\n`;
+    message += `I'm going to create your detailed quarterly roadmap (Q1-Q8) with specific milestones and timelines. `;
+    message += `This will break down exactly what to work on each quarter to hit your college application goals.\n\n`;
+    message += `What questions do you have about the strategic direction?`;
+
+    return message;
+  }
+
+  /**
+   * v28.0: Create initial game plan from A2A handover data
+   */
+  private async createInitialGamePlanFromA2A(
+    studentId: string,
+    payload: AssessmentToGamePlanPayload,
+    facts: FactSet
+  ): Promise<void> {
+    if (!this.pool) {
+      throw new Error('GamePlanAgent not initialized with database pool');
+    }
+
+    // Build profile_assessment from payload
+    const profileAssessment = {
+      ivy_score: payload.ivy_score,
+      competitiveness_tier: payload.competitiveness_tier,
+      rubric_scores: payload.rubric_scores,
+      standout_strengths: payload.top_strengths,
+      weak_spots: [
+        ...payload.p0_gaps.map(g => ({ ...g, priority: 'P0' })),
+        ...payload.p1_gaps.map(g => ({ ...g, priority: 'P1' })),
+      ],
+    };
+
+    // Build target_profile from payload
+    const targetProfile = {
+      narrative: payload.narrative_thread,
+      unique_positioning: payload.unique_positioning,
+      potential_spikes: payload.potential_indicators.map(i => i.indicator_type),
+    };
+
+    // Build tactical_horizon (next 3 months)
+    const tacticalHorizon = {
+      upcoming_actions: payload.quick_wins.map((qw, idx) => ({
+        action_id: `quick_win_${idx + 1}`,
+        action_name: qw.action,
+        impact: qw.impact,
+        time_to_complete: qw.time_to_complete,
+        priority: 'P0',
+        status: 'pending',
+      })),
+    };
+
+    // Insert game plan
+    await this.pool.query(
+      `INSERT INTO game_plans (
+        game_plan_id,
+        student_id,
+        profile_assessment,
+        target_profile,
+        tactical_horizon,
+        plan_type,
+        convergence_status,
+        version,
+        next_review_date,
+        created_at,
+        updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
+      [
+        `gp_${studentId}_${Date.now()}`,
+        studentId,
+        JSON.stringify(profileAssessment),
+        JSON.stringify(targetProfile),
+        JSON.stringify(tacticalHorizon),
+        'converged', // Single major focus (from assessment)
+        'stable',
+        1,
+        new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days from now
+      ]
+    );
+
+    log.event('gameplan_agent.initial_plan_created_from_a2a', {
+      student_id: studentId,
+      ivy_score: payload.ivy_score,
+      p0_gaps_count: payload.p0_gaps.length,
+      quick_wins_count: payload.quick_wins.length,
+    });
   }
 }
