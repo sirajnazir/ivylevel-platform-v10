@@ -7,6 +7,9 @@
  * Version: v28.0
  */
 
+-- Enable migration mode to bypass DDL block (same as v26.0)
+SET app.migration = true;
+
 -- ============================================================================
 -- A2A Handover Log Table
 -- ============================================================================
