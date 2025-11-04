@@ -82,8 +82,9 @@ export class V26AgentWrapperReal {
     session_id: string;
     message: string;
     is_a2a_handover?: boolean; // v29.0.5: Skip insufficient data check for A2A handovers
+    handover_payload?: any; // v29.3: Pass handover payload for intelligence extraction
   }): Promise<V26AgentResponse> {
-    const { agent_id, student_id, session_id, message, is_a2a_handover } = params;
+    const { agent_id, student_id, session_id, message, is_a2a_handover, handover_payload } = params;
 
     // Check if student_id is already a clone ID (ends with -v26-2025 or -v26-clone)
     const isAlreadyCloneId = student_id.includes('-v26-') || student_id.endsWith('-v26-clone');
@@ -147,7 +148,8 @@ export class V26AgentWrapperReal {
         session_id,
         message,
         conversationHistory,
-        is_a2a_handover
+        is_a2a_handover,
+        handover_payload
       );
     } else if (agent_id.includes('execution')) {
       processingSteps.push('Routing to ExecutionAgent (TYPE-049 through TYPE-063)');
@@ -361,7 +363,8 @@ export class V26AgentWrapperReal {
     sessionId: string,
     message: string,
     conversationHistory: ConversationMessage[],
-    is_a2a_handover?: boolean // v29.0.5: Skip insufficient data check for A2A handovers
+    is_a2a_handover?: boolean, // v29.0.5: Skip insufficient data check for A2A handovers
+    handover_payload?: any // v29.3: Pass handover payload for intelligence extraction
   ): Promise<AgentResponse> {
     const agent = this.agentRegistry.getGamePlanAgent();
 
@@ -372,6 +375,7 @@ export class V26AgentWrapperReal {
       is_a2a_handover, // v29.0.5: Pass flag to bypass insufficient data check
       metadata: {
         conversation_history: this.buildConversationContext(conversationHistory),
+        handover_payload, // v29.3: Pass handover payload for intelligence extraction
       },
     };
 

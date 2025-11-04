@@ -30,6 +30,7 @@ import { createLogger } from '../../../../../packages/observability/dist/unified
 import { FactSet } from '../../facts/FactSet.js';
 import type { Pool } from 'pg';
 import { FactCategoryMapper } from '../../facts/FactCategoryMapper.js';
+import { HandoverPayloadExtractor, type AssessmentHandoverPayload } from '../../a2a/HandoverPayloadExtractor.js';
 
 const log = createLogger('gameplan-agent-v3');
 
@@ -98,6 +99,60 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
     } catch (error) {
       log.error('gameplan_agent.initialize_domain_intelligence_error', error);
     }
+  }
+
+  /**
+   * v29.3: Override handleQuery to inject handover intelligence results
+   *
+   * Problem: GamePlan was reloading facts from database, losing intelligence
+   * results (TYPE-085, TYPE-086) passed via handover payload.
+   *
+   * Solution: Check for handover payload first, extract intelligence results
+   * using HandoverPayloadExtractor, then call super.handleQuery with injected results.
+   *
+   * Universal Pattern: This approach can be replicated in Execution, Awards, etc.
+   */
+  async handleQuery(query: AgentQuery): Promise<any> {
+    // v29.3: Check for A2A handover payload in metadata
+    const handoverPayload = query.metadata?.handover_payload as AssessmentHandoverPayload | undefined;
+
+    console.log('[GP_v29.3_HANDOVER] 🔍 Checking for handover payload...', {
+      has_payload: !!handoverPayload,
+      payload_keys: handoverPayload ? Object.keys(handoverPayload) : [],
+    });
+
+    if (handoverPayload && HandoverPayloadExtractor.isPayloadSufficient(handoverPayload)) {
+      console.log('[GP_v29.3_HANDOVER] ✅ Handover payload found with sufficient data!', {
+        ivy_score: handoverPayload.ivy_score,
+        competitiveness_tier: handoverPayload.competitiveness_tier,
+        total_score: handoverPayload.rubric_scores.total,
+        p0_gaps: handoverPayload.p0_gaps.length,
+        p1_gaps: handoverPayload.p1_gaps.length,
+      });
+
+      // Extract intelligence results from handover payload (instead of reloading from DB)
+      const injectedIntelligence = HandoverPayloadExtractor.extractAllIntelligenceResults(handoverPayload);
+
+      console.log('[GP_v29.3_HANDOVER] 🎯 Injected intelligence results:', {
+        count: injectedIntelligence.length,
+        types: injectedIntelligence.map((r) => r.type_id),
+        triggered: injectedIntelligence.filter((r) => r.triggered).length,
+      });
+
+      // Store injected results in query metadata for base class to use
+      query.metadata = {
+        ...query.metadata,
+        injected_intelligence_results: injectedIntelligence,
+        handover_intelligence_used: true,
+      };
+
+      console.log('[GP_v29.3_HANDOVER] 🚀 Proceeding with handover intelligence (NO database reload)');
+    } else {
+      console.log('[GP_v29.3_HANDOVER] ℹ️ No sufficient handover payload, proceeding with normal fact loading from database');
+    }
+
+    // Call parent handleQuery (will use injected intelligence if available)
+    return super.handleQuery(query);
   }
 
   /**

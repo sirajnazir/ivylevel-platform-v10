@@ -16,6 +16,8 @@
  * - TYPE-081: IvyScore Calculation (hidden probability calculations)
  * - TYPE-082: Gap Analysis Engine (P0 critical gaps)
  * - TYPE-083: Potential Indicator Extraction (hidden strengths)
+ * - TYPE-085: Rubric Scoring Engine (Jenny's 5-dimension rubric from coaching) [v29.1]
+ * - TYPE-086: Gap Priority Analyzer (P0/P1/P2 gap prioritization) [v29.1]
  * - 27 EQ Layers from W001 Huda session analysis
  * - 11 Student structured extractions (Anoushka, Ananyaa, Aaryan, Hiba, Srinidhi, Arshiya, Aarnav, Iqra, Aarav, Zainab, Beya)
  * - Coaching Intelligence Chips: /data/kb_intel_chips/assess-gameplan-chips/
@@ -50,7 +52,8 @@
  * LAYER_27: Complete Formula (27sec credibility → 90min commitment locked)
  *
  * Created: 2025-11-02
- * Version: v26.5 - Production Intelligence-Driven NO HARDCODED QUESTIONS
+ * Version: v29.1 - Production Intelligence-Driven + Rubric Scoring Architecture
+ * Previous: v26.5 - NO HARDCODED QUESTIONS
  */
 
 import { FactStore } from '../../facts/FactStore.js';
@@ -79,6 +82,7 @@ import { FactDerivationEngine } from '../../facts/FactDerivationEngine.js';
 import { AdaptationContext } from '../../a2a/AgentFactRequirements.js';
 import { IntelligenceRegistry } from '../../intelligence/IntelligenceRegistry.js';
 import type { IntelligenceType } from '../../intelligence/types/BaseIntelligenceType.js';
+import { CanonicalFieldMapper } from '../../utils/CanonicalFieldMapper.js';
 
 const log = createLogger('assessment-agent-v3-conversational-realtime');
 
@@ -177,7 +181,7 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     super('assessment-agent-v18', factStore);
     this.pool = pool;
 
-    // Initialize Assessment intelligence types (TYPE-080, TYPE-081, TYPE-082, TYPE-083)
+    // Initialize Assessment intelligence types (TYPE-080, TYPE-081, TYPE-082, TYPE-083, TYPE-085, TYPE-086)
     this.initializeDomainIntelligence();
   }
 
@@ -191,6 +195,8 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
         'TYPE-081', // IvyScore Calculation
         'TYPE-082', // Gap Analysis Engine
         'TYPE-083', // Potential Indicator Extraction
+        'TYPE-085', // Rubric Scoring Engine (v29.1)
+        'TYPE-086', // Gap Priority Analyzer (v29.1)
       ];
 
       for (const typeId of typeIds) {
@@ -345,8 +351,8 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     console.log('[V26.5_REALTIME] Facts loaded:', facts.getAllFacts().length);
     console.log('[V26.5_REALTIME] Fact categories:', facts.getAllFacts().map(f => f.category));
 
-    // STEP 4: Process intelligence types (TYPE-080, 081, 082, 083)
-    console.log('[V26.5_REALTIME] 🧠 STEP 4: Processing intelligence types (TYPE-080, 081, 082, 083)...');
+    // STEP 4: Process intelligence types (TYPE-080, 081, 082, 083, 085, 086)
+    console.log('[V26.5_REALTIME] 🧠 STEP 4: Processing intelligence types (TYPE-080, 081, 082, 083, 085, 086)...');
     const intelligenceResults = await this.processIntelligenceTypes(query, facts);
     console.log('[V26.5_REALTIME] ✅ Intelligence results:', intelligenceResults.map(r => r.type_id));
     console.log('[V26.5_REALTIME] Intelligence triggered count:', intelligenceResults.filter(r => r.triggered).length);
@@ -825,6 +831,7 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
           previous_agent: this.agentId,
           next_step: 'gameplan_strategy',
           a2a_handover_complete: true,
+          handover_payload: handoverPackage.domain_payload, // v29.3: Pass domain_payload to route for GamePlan consumption
         },
       };
     }
@@ -1125,8 +1132,9 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
   ): Promise<A2AHandoverPackage> {
 
     // Extract intelligence results
-    const ivyScore = intelligenceResults.find(r => r.type_id === 'TYPE-081');
-    const gaps = intelligenceResults.find(r => r.type_id === 'TYPE-082');
+    // v29.1: Use TYPE-085 (Rubric Scoring) and TYPE-086 (Gap Priority) instead of old TYPE-081/082
+    const rubricScoring = intelligenceResults.find(r => r.type_id === 'TYPE-085');
+    const gapPriority = intelligenceResults.find(r => r.type_id === 'TYPE-086');
     const potential = intelligenceResults.find(r => r.type_id === 'TYPE-083');
     const phaseFlow = intelligenceResults.find(r => r.type_id === 'TYPE-080');
 
@@ -1142,38 +1150,32 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
       unique_positioning: this.extractUniquePositioning(collectedData).join(', '),
       narrative_thread: this.buildNarrativeThread(collectedData),
 
-      // Competitive Analysis (from TYPE-081)
-      ivy_score: (ivyScore?.data as any)?.ivy_score || 0,
-      competitiveness_tier: (ivyScore?.data as any)?.competitiveness_tier || 'unknown',
-      rubric_scores: {
-        academics: (ivyScore?.data as any)?.rubric_scores?.academics || 0,
-        extracurriculars: (ivyScore?.data as any)?.rubric_scores?.extracurriculars || 0,
-        summer_programs: (ivyScore?.data as any)?.rubric_scores?.summer_programs || 0,
-        awards: (ivyScore?.data as any)?.rubric_scores?.awards || 0,
-        essays: (ivyScore?.data as any)?.rubric_scores?.essays || 0,
-        total: (ivyScore?.data as any)?.rubric_scores?.total || 0,
-      },
-      top_strengths: (ivyScore?.data as any)?.top_strengths || [],
-      critical_gaps: (ivyScore?.data as any)?.critical_gaps || [],
+      // Competitive Analysis (from TYPE-085 rubric scoring v29.1)
+      // v29.2: Use CanonicalFieldMapper to prevent field mapping mismatches
+      ivy_score: CanonicalFieldMapper.extractIvyScore(intelligenceResults),
+      competitiveness_tier: this.deriveCompetitivenessTier(CanonicalFieldMapper.extractIvyScore(intelligenceResults)),
+      rubric_scores: CanonicalFieldMapper.extractRubricScores(intelligenceResults),
+      top_strengths: (rubricScoring?.data as any)?.dimension_scores?.filter((d: any) => d.raw_score >= 7).map((d: any) => d.dimension) || [],
+      critical_gaps: (rubricScoring?.data as any)?.dimension_scores?.filter((d: any) => d.raw_score <= 4).map((d: any) => d.dimension) || [],
 
-      // Gap Analysis & Opportunities (from TYPE-082)
-      p0_gaps: ((gaps?.data as any)?.p0_gaps || []).map((g: any) => ({
-        category: g.category || '',
+      // Gap Analysis & Opportunities (from TYPE-086 v29.1)
+      p0_gaps: ((gapPriority?.data as any)?.p0_gaps || []).map((g: any) => ({
+        category: g.dimension || g.category || '',
         severity: 'p0' as 'p0',
-        description: g.gap_description || g.description || '',
-        recommendation: g.recommended_action || g.recommendation || '',
+        description: g.gap_description || `${g.dimension} gap: ${g.current_score}/${g.target_score}` || '',
+        recommendation: g.recommended_action || `Focus on ${g.dimension}: Priority ${g.priority_score.toFixed(1)}` || '',
       })) as Gap[],
-      p1_gaps: ((gaps?.data as any)?.p1_gaps || []).map((g: any) => ({
-        category: g.category || '',
+      p1_gaps: ((gapPriority?.data as any)?.p1_gaps || []).map((g: any) => ({
+        category: g.dimension || g.category || '',
         severity: 'p1' as 'p1',
-        description: g.gap_description || g.description || '',
-        recommendation: g.recommended_action || g.recommendation || '',
+        description: g.gap_description || `${g.dimension} gap: ${g.current_score}/${g.target_score}` || '',
+        recommendation: g.recommended_action || `Improve ${g.dimension}: Priority ${g.priority_score.toFixed(1)}` || '',
       })) as Gap[],
-      quick_wins: ((gaps?.data as any)?.quick_wins || []).map((qw: any) => ({
-        action: qw.action || '',
-        impact: qw.impact || '',
-        time_to_complete: qw.time_to_complete || '',
-        roi: qw.roi || 0,
+      quick_wins: ((gapPriority?.data as any)?.quick_wins || []).map((qw: any) => ({
+        action: qw.action || qw.dimension || '',
+        impact: qw.impact || `+${qw.potential_gain || 0} points in ${qw.dimension}`,
+        time_to_complete: qw.time_to_complete || qw.urgency_level || '',
+        roi: qw.roi || qw.priority_score || 0,
       })) as QuickWin[],
 
       // Potential Indicators (from TYPE-083)
@@ -1239,6 +1241,22 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     };
 
     return handoverPackage;
+  }
+
+  /**
+   * Derive competitiveness tier from rubric score (v29.1)
+   * - Elite (40-50): Top-tier competitive
+   * - Strong (30-39): Highly competitive
+   * - Competitive (20-29): Competitive
+   * - Developing (10-19): Building profile
+   * - Emerging (0-9): Early stage
+   */
+  private deriveCompetitivenessTier(score: number): string {
+    if (score >= 40) return 'elite';
+    if (score >= 30) return 'strong';
+    if (score >= 20) return 'competitive';
+    if (score >= 10) return 'developing';
+    return 'emerging';
   }
 
   /**

@@ -1,10 +1,10 @@
 2# AssessmentAgent - Technical Architecture Specification
 
-**Document Version:** v3.6 (A2A Handover is_a2a_handover Flag Fix v29.0.5)
+**Document Version:** v3.8 (Field Mapping & Handover Payload Integration v29.3)
 **Last Updated:** 2025-11-04
-**Status:** ✅ PRODUCTION READY - Intelligence-Driven Conversational Assessment + v28.3 Infinite Loop Fix + v29 A2A Handover Integration + v29.0.5 Universal Handover Fix
+**Status:** ✅ PRODUCTION READY - Field Mapping Fixed + Handover Payload Working
 **Agent Type:** Specialized Conversational Assessment Agent
-**Parent Architecture:** Universal Agent Framework v1.0 + Intelligence Types v18.0 + Fact-First v2.0 + A2A HandoverValidator v29.0
+**Parent Architecture:** Universal Agent Framework v1.0 + Intelligence Types v18.0 + Fact-First v2.0 + A2A HandoverValidator v29.0 + CanonicalFieldMapper v29.2 + HandoverPayloadExtractor v29.3
 **Implementation:** AssessmentAgentV3ConversationalRealtime
 **Source File:** `services/agent-framework/src/agents/v18/AssessmentAgentV3ConversationalRealtime.ts`
 **Version History:**
@@ -15,6 +15,8 @@
 - **v3.4** (2025-11-04): v29.0.3 Database configuration fix - removed all `ivylevel_dev` references, unified to `ivylevel` database
 - **v3.5** (2025-11-04): v29.0.4 A2A Handover package complete - includes available_facts and handover_validation in response
 - **v3.6** (2025-11-04): v29.0.5 Universal handover fix - Added `is_a2a_handover` flag to AgentQuery interface to bypass insufficient data checks in target agent
+- **v3.7** (2025-11-04): v29.2 CanonicalFieldMapper integration - Fixed IvyScore normalization (0-50→0-100), semantic mapping (leadership→extracurriculars), correct field names (total_score not total_rubric_score)
+- **v3.8** (2025-11-04): v29.3 Handover payload attachment - Fixed missing handover_payload in metadata (line 834), enables GamePlan Agent to extract TYPE-085/TYPE-086 without database reload
 
 ---
 

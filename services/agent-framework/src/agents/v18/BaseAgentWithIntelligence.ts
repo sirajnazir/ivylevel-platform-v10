@@ -292,8 +292,12 @@ export abstract class BaseAgentWithIntelligence {
   }
 
   /**
-   * Process all intelligence types in parallel
+   * Process all intelligence types with dependency management
    * Returns ALL results (triggered and non-triggered)
+   *
+   * v29.1: Enhanced to support sequential processing for dependent types
+   * - TYPE-086 depends on TYPE-085 results
+   * - Dependent types receive previous results via query.context.intelligence_results
    */
   protected async processIntelligenceTypes(
     query: AgentQuery,
@@ -301,9 +305,22 @@ export abstract class BaseAgentWithIntelligence {
   ): Promise<IntelligenceResult[]> {
     const allIntelligenceTypes = this.getAllIntelligenceTypes();
 
-    // Run all intelligence types in parallel
-    const results = await Promise.all(
-      allIntelligenceTypes.map(async (intelligence) => {
+    // v29.1: Define dependencies (TYPE-086 needs TYPE-085)
+    const dependencies: Record<string, string[]> = {
+      'TYPE-086': ['TYPE-085'], // Gap analyzer needs rubric scores
+    };
+
+    // Separate independent and dependent types
+    const independentTypes = allIntelligenceTypes.filter(
+      intel => !dependencies[intel.type_id]
+    );
+    const dependentTypes = allIntelligenceTypes.filter(
+      intel => dependencies[intel.type_id]
+    );
+
+    // Phase 1: Run independent types in parallel
+    const independentResults = await Promise.all(
+      independentTypes.map(async (intelligence) => {
         const startTime = Date.now();
 
         try {
@@ -335,7 +352,54 @@ export abstract class BaseAgentWithIntelligence {
       })
     );
 
-    return results;
+    // Phase 2: Run dependent types sequentially with access to previous results
+    const dependentResults: IntelligenceResult[] = [];
+    for (const intelligence of dependentTypes) {
+      const startTime = Date.now();
+
+      try {
+        // Build combined results from independent + previous dependent
+        const previousResults = [...independentResults, ...dependentResults];
+
+        // Pass previous results via query.context
+        const enrichedQuery: AgentQuery = {
+          ...query,
+          context: {
+            ...query.context,
+            intelligence_results: previousResults, // v29.1: Previous intelligence results
+          },
+        };
+
+        const result = await intelligence.process(enrichedQuery, facts);
+
+        log.event(`${this.agentId}.intelligence_processed`, {
+          type_id: intelligence.type_id,
+          triggered: result.triggered,
+          confidence: result.confidence,
+          duration_ms: Date.now() - startTime,
+          dependencies: dependencies[intelligence.type_id],
+        });
+
+        dependentResults.push(result);
+      } catch (error) {
+        log.error(`${this.agentId}.intelligence_error`, {
+          type_id: intelligence.type_id,
+          error: String(error),
+        });
+
+        // Return error result
+        dependentResults.push({
+          type_id: intelligence.type_id,
+          component: 'error',
+          data: { error: String(error) },
+          confidence: 0,
+          triggered: false,
+        });
+      }
+    }
+
+    // Combine all results
+    return [...independentResults, ...dependentResults];
   }
 
   /**

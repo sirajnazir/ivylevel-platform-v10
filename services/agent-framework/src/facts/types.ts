@@ -87,6 +87,9 @@ export interface AgentQuery {
   // v29.0.5: Flag to indicate this query is from an A2A handover
   // When true, agents should bypass insufficient data checks
   is_a2a_handover?: boolean;
+  // v29.1: Context for intelligence type dependencies
+  // Allows dependent intelligence types to access previous results
+  context?: Record<string, any>;
 }
 
 /**
