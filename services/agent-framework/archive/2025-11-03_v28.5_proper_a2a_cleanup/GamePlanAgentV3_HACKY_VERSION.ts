@@ -204,7 +204,21 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
     log.event('gameplan_agent.synthesize_response_start', {
       intelligence_count: intelligenceResults.length,
       triggered_types: intelligenceResults.map((r) => r.type_id),
+      query: query.query,
     });
+
+    // v28.5: Detect A2A handover trigger message "continue"
+    if (query.query.toLowerCase() === 'continue' && intelligenceResults.length === 0) {
+      console.log('[GP_v28_HANDOVER] 🎯 A2A handover detected - returning welcome message');
+      const welcomeMessage = `Great! I've received your assessment profile. Now let's build your personalized game plan.
+
+I'm going to help you create a strategic 2-year roadmap to your dream schools. To do that effectively, I need to understand a few more things about your current situation.
+
+Let's start with **where you are right now academically**:
+
+What grade are you in, and what's your current GPA (if you know it)?`;
+      return welcomeMessage;
+    }
 
     if (intelligenceResults.length === 0) {
       return "I don't have enough information to create your strategic plan yet. Let's complete your assessment first!";

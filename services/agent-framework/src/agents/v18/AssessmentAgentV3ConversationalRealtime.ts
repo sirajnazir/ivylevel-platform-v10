@@ -53,10 +53,9 @@
  * Version: v26.5 - Production Intelligence-Driven NO HARDCODED QUESTIONS
  */
 
-import { AssessmentAgentV3 } from './AssessmentAgentV3.js';
 import { FactStore } from '../../facts/FactStore.js';
 import { AgentQuery, FactCategory } from '../../facts/types.js';
-import { IntelligenceAgentResponse } from './BaseAgentWithIntelligence.js';
+import { BaseAgentWithIntelligence, IntelligenceAgentResponse } from './BaseAgentWithIntelligence.js';
 import { FactSet, Fact } from '../../facts/FactSet.js';
 import { createLogger } from '../../../../../packages/observability/dist/unified-logger.js';
 import { Pool } from 'pg';
@@ -74,6 +73,12 @@ import type {
   Indicator,
   StudentDemographics,
 } from '../../a2a/types.js';
+import { FactCategoryMapper } from '../../facts/FactCategoryMapper.js';
+import { HandoverValidator } from '../../a2a/HandoverValidator.js';
+import { FactDerivationEngine } from '../../facts/FactDerivationEngine.js';
+import { AdaptationContext } from '../../a2a/AgentFactRequirements.js';
+import { IntelligenceRegistry } from '../../intelligence/IntelligenceRegistry.js';
+import type { IntelligenceType } from '../../intelligence/types/BaseIntelligenceType.js';
 
 const log = createLogger('assessment-agent-v3-conversational-realtime');
 
@@ -150,6 +155,7 @@ interface ConversationState {
   session_id: string;
   student_id: string;
   questions_asked: string[]; // Full text of every question asked
+  last_question?: string; // v28.2: Last question sent to student (for extraction context)
   confidence_level: number; // 0-100, tracks LAYER_20 progression
   parent_present: boolean;
   synthesis_delivered: boolean; // LAYER_9 synthesis moment happened
@@ -158,13 +164,144 @@ interface ConversationState {
   last_synthesized_data?: string; // v27.0: JSON snapshot of data at last synthesis (for change detection)
 }
 
-export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
+export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntelligence {
   private pool: Pool;
   private sessionStates: Map<string, ConversationState> = new Map();
 
+  /**
+   * Domain-specific intelligence types for Assessment Agent
+   */
+  protected DOMAIN_INTELLIGENCE: IntelligenceType[] = [];
+
   constructor(factStore: FactStore, pool: Pool) {
-    super(factStore);
+    super('assessment-agent-v18', factStore);
     this.pool = pool;
+
+    // Initialize Assessment intelligence types (TYPE-080, TYPE-081, TYPE-082, TYPE-083)
+    this.initializeDomainIntelligence();
+  }
+
+  /**
+   * Initialize Assessment-specific intelligence types
+   */
+  private initializeDomainIntelligence(): void {
+    try {
+      const typeIds = [
+        'TYPE-080', // 4-Phase Assessment Flow
+        'TYPE-081', // IvyScore Calculation
+        'TYPE-082', // Gap Analysis Engine
+        'TYPE-083', // Potential Indicator Extraction
+      ];
+
+      for (const typeId of typeIds) {
+        const intelligenceType = IntelligenceRegistry.get(typeId);
+        if (intelligenceType) {
+          this.DOMAIN_INTELLIGENCE.push(intelligenceType);
+        }
+      }
+    } catch (error) {
+      console.error('[AssessmentAgent] Failed to load intelligence types:', error);
+    }
+  }
+
+  /**
+   * Define required facts for Assessment Agent
+   */
+  protected getRequiredFacts(): FactCategory[] {
+    return [
+      FactCategory.STUDENT_PROFILE,
+      FactCategory.ASSESSMENT_DATA,
+    ];
+  }
+
+  /**
+   * Override loadFacts to use v28.1 multi-category storage
+   * UNIVERSAL FIX: Directly query kb_items with correct source_ref instead of FactStore
+   */
+  protected async loadFacts(entityId: string): Promise<FactSet> {
+    console.log('[v28.1_LOAD_FACTS] Loading facts from kb_items with source_ref=gpt4o_conversational_extraction_v28');
+
+    try {
+      // Query all v28.1 facts for this student
+      const result = await this.pool.query(
+        `SELECT item_type, subtype, edges, created_ts
+         FROM kb_items
+         WHERE student_id = $1 AND source_ref = 'gpt4o_conversational_extraction_v28'
+         ORDER BY created_ts DESC`,
+        [entityId]
+      );
+
+      console.log('[v28.1_LOAD_FACTS] Query result:', {
+        has_rows: !!result.rows,
+        rows_length: result.rows?.length,
+        rows_type: typeof result.rows,
+      });
+
+      if (!result.rows || !Array.isArray(result.rows)) {
+        console.error('[v28.1_LOAD_FACTS] ERROR: result.rows is not an array!', {
+          result_keys: Object.keys(result),
+          rows: result.rows,
+        });
+        return new FactSet([]);
+      }
+
+      console.log('[v28.1_LOAD_FACTS] Loaded', result.rows.length, 'kb_items');
+
+      // Convert kb_items to Fact[] array
+      const facts: Fact[] = [];
+
+      for (const row of result.rows) {
+        const category = row.item_type as FactCategory;
+
+        // Parse edges (PostgreSQL returns JSONB as string or object depending on driver)
+        const edges = typeof row.edges === 'string' ? JSON.parse(row.edges) : (row.edges || {});
+
+        console.log('[v28.1_LOAD_FACTS] Processing row:', {
+          category,
+          edges_type: typeof edges,
+          edges_keys: Object.keys(edges),
+        });
+
+        // Extract each fact from edges
+        // Create a single Fact with all fields from this kb_item
+        const allFields: Record<string, any> = {};
+        for (const [factType, factValue] of Object.entries(edges)) {
+          if (factType === 'v28_metadata') continue; // Skip metadata
+          allFields[factType] = factValue;
+        }
+
+        // Only create a Fact if we have actual data (not just metadata)
+        if (Object.keys(allFields).length > 0) {
+          facts.push({
+            fact_id: `${category}_combined_${Date.now()}_${Math.random()}`,
+            category,
+            fact_type: 'combined_fields', // Single fact containing all fields from this kb_item
+            value: allFields, // Now value is guaranteed to be an object with fact_type as keys
+            source: 'gpt4o_conversational_extraction_v28',
+            confidence: 0.9,
+            timestamp: row.created_ts,
+            provenance: {
+              source: 'gpt4o_conversational_extraction_v28',
+              extracted_at: row.created_ts,
+              extraction_method: 'v28.1_multi_category_mapping',
+            },
+          });
+
+          console.log('[v28.1_LOAD_FACTS] Added fact:', {
+            category,
+            fields_included: Object.keys(allFields),
+          });
+        }
+      }
+
+      console.log('[v28.1_LOAD_FACTS] Converted to Fact[]:', facts.length, 'facts');
+
+      // Create FactSet with proper Fact[] array
+      return new FactSet(facts);
+    } catch (error) {
+      console.error('[v28.1_LOAD_FACTS] Error loading facts:', error);
+      return new FactSet([]); // Return empty FactSet on error
+    }
   }
 
   /**
@@ -195,7 +332,8 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
     // STEP 2: Extract data from user message using GPT-4o (NO REGEX)
     console.log('[V26.5_REALTIME] 🤖 STEP 2: Extracting data using GPT-4o (NO REGEX)...');
     const conversationHistory = query.metadata?.conversation_history || '';
-    await this.extractAndStoreFacts(query.entity_id, query.query, conversationHistory);
+    const lastQuestion = state.last_question || ''; // v28.2: Pass last question for context
+    await this.extractAndStoreFacts(query.entity_id, query.query, conversationHistory, lastQuestion);
     console.log('[V26.5_REALTIME] ✅ GPT-4o extraction complete');
 
     // CRITICAL: Wait a moment to ensure database write is fully committed
@@ -236,7 +374,12 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
     // STEP 6: Update conversation state
     console.log('[V26.5_REALTIME] 💾 STEP 6: Saving conversation state...');
     state.message_count++;
-    state.questions_asked.push(response.response);
+    // v28.3: Track BOTH the original question and EQ-enhanced version to prevent infinite loops
+    // The filterAlreadyAskedQuestions() method checks against original questions from TYPE-080
+    // So we need to store the original question text, not just the EQ-enhanced version
+    const originalQuestion = response.metadata?.original_question || response.response;
+    state.questions_asked.push(originalQuestion);
+    console.log('[V28.3_LOOP_FIX] Saved original question to history:', originalQuestion.substring(0, 80));
     await this.saveConversationState(state);
     console.log('[V26.5_REALTIME] ✅ State saved. Total messages:', state.message_count);
 
@@ -275,7 +418,7 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
       console.log('[INTEL_GEN] TYPE-080 not triggered, using greeting fallback');
       // Fallback: Use simple greeting if TYPE-080 not triggered
       // Pass intelligence results so they show in UI even if not fully triggered
-      return this.generateGreeting(state, intelligenceResults);
+      return await this.generateGreeting(state, intelligenceResults);
     }
 
     const assessmentFlow = type080.data as any;
@@ -290,6 +433,7 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
     const collectedData = this.extractCollectedData(facts);
 
     // CRITICAL: Check if we've already asked this student these exact questions
+    // v28.1: TYPE-080 now intelligently skips questions when data exists, so we only need to check "already asked"
     const availableQuestions = await this.filterAlreadyAskedQuestions(
       assessmentFlow.adaptive_questions || [],
       state.questions_asked
@@ -297,7 +441,7 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
 
     if (availableQuestions.length === 0) {
       // All questions asked → Deliver synthesis (LAYER_9)
-      return await this.deliverSynthesisMoment(facts, intelligenceResults, state);
+      return await this.deliverSynthesisMoment(facts, intelligenceResults, state, query.entity_id);
     }
 
     // Select next question based on priority
@@ -311,6 +455,13 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
       query.query
     );
 
+    // v28.2: CRITICAL - Track the question we're sending so extraction knows context
+    state.last_question = nextQuestion.question;
+    console.log('[V28.2_QUESTION_TRACKING] Tracking question for next extraction:', nextQuestion.question.substring(0, 80));
+
+    // Update state in database
+    await this.saveConversationState(state);
+
     return {
       response: eqEnhancedResponse,
       facts_used: facts.getAllFacts(),
@@ -321,6 +472,7 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
       metadata: {
         agent_id: this.agentId,
         mode: 'intelligence_driven_conversational',
+        original_question: nextQuestion.question, // v28.3: Track original for loop detection
         current_phase: assessmentFlow.current_phase,
         overall_completion: assessmentFlow.overall_completion,
         eq_layer_active: state.current_eq_layer,
@@ -453,7 +605,8 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
   private async deliverSynthesisMoment(
     facts: FactSet,
     intelligenceResults: IntelligenceResult[],
-    state: ConversationState
+    state: ConversationState,
+    studentId: string
   ): Promise<IntelligenceAgentResponse> {
 
     const collectedData = this.extractCollectedData(facts);
@@ -468,7 +621,165 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
       // Synthesis delivered + no new data + sufficient depth = A2A Handover to GamePlan
       console.log('[ASSESSMENT_COMPLETE] ✅ Preparing A2A handover to GamePlan Agent');
 
+      // v28.1: Validate handover readiness BEFORE triggering
+      console.log('[v28.1_HANDOVER_VALIDATION] Step 1: Loading available facts from kb_items');
+
+      let available_facts: Map<any, any[]>;
+
+      try {
+        // Load all facts from kb_items for this student (using v28.1 multi-category storage)
+        const kb_result = await this.pool.query(
+          `SELECT item_type, edges, created_ts
+           FROM kb_items
+           WHERE student_id = $1 AND source_ref = 'gpt4o_conversational_extraction_v28'
+           ORDER BY created_ts DESC`,
+          [studentId]
+        );
+
+        console.log(`[v28.1_HANDOVER_VALIDATION] Query returned ${kb_result.rows.length} rows`);
+
+        available_facts = FactCategoryMapper.extractFactsFromKbItems(kb_result.rows);
+
+        console.log(`[v28.1_HANDOVER_VALIDATION] Loaded ${kb_result.rows.length} kb_items across ${available_facts.size} categories`);
+        for (const [category, facts_list] of available_facts) {
+          console.log(`  - ${category}: ${facts_list.length} facts`);
+        }
+      } catch (error) {
+        console.error('[v28.1_HANDOVER_VALIDATION] ❌ ERROR loading facts:', error);
+        console.error('[v28.1_HANDOVER_VALIDATION] Error stack:', (error as Error).stack);
+        throw error;
+      }
+
+      // Create adaptation context from available facts
+      const grade = this.getFactValue(available_facts, 'grade') || 10;
+      const personality = this.getFactValue(available_facts, 'personality_type');
+
+      const adaptation_context: AdaptationContext = {
+        class_year: grade as 9 | 10 | 11 | 12,
+        current_quarter: Math.ceil((new Date().getMonth() + 1) / 3) as 1 | 2 | 3 | 4,
+        student_capacity: 'medium', // Default, can be enhanced
+        personality_type: personality === 'shy' ? 'shy' : personality === 'confident' ? 'confident' : 'balanced',
+      };
+
+      console.log('[v28.1_HANDOVER_VALIDATION] Step 2: Running 20 quality gate validation');
+
+      const validation_result = await HandoverValidator.validateHandover(
+        'assessment-agent-v18',
+        'gameplan-agent-v3',
+        available_facts,
+        adaptation_context
+      );
+
+      console.log('[v28.1_HANDOVER_VALIDATION] Validation Results:', {
+        is_ready: validation_result.is_ready,
+        quality_score: validation_result.quality_score,
+        quality_gates_passed: `${validation_result.quality_gates_passed}/${validation_result.quality_gates_total}`,
+        pass_rate: `${(validation_result.quality_gates_pass_rate * 100).toFixed(0)}%`,
+        recommendation: validation_result.recommendation,
+        missing_mandatory: validation_result.missing_mandatory_facts.length,
+        can_derive: validation_result.can_derive,
+      });
+
+      // If not ready but can derive, attempt derivation
+      if (!validation_result.is_ready && validation_result.can_derive) {
+        console.log('[v28.1_FACT_DERIVATION] Attempting to derive missing facts');
+
+        const missing_fact_types = validation_result.missing_mandatory_facts.flatMap(req => req.fact_types);
+
+        const derived_results = FactDerivationEngine.deriveFacts(
+          available_facts,
+          missing_fact_types,
+          query.student_id,
+          'assessment-agent-v18',
+          'session_tbd', // Will be enhanced when session context is available
+          adaptation_context
+        );
+
+        console.log(`[v28.1_FACT_DERIVATION] Derived ${derived_results.length} facts`);
+
+        // Store derived facts to kb_items
+        for (const derived of derived_results) {
+          const category = derived.fact.category;
+          const item_id = `${query.student_id}_${category.toLowerCase()}_derived_v28`;
+
+          await this.pool.query(
+            `INSERT INTO kb_items (item_id, student_id, item_type, subtype, title_name, tier1_state, source_ref, confidence, edges, data)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+             ON CONFLICT (item_id) DO UPDATE SET
+               edges = kb_items.edges || EXCLUDED.edges,
+               data = COALESCE(kb_items.data, '{}'::jsonb) || EXCLUDED.data,
+               updated_ts = NOW()`,
+            [
+              item_id,
+              query.student_id,
+              category,
+              derived.fact.fact_type,
+              `Derived ${derived.fact.fact_type}`,
+              'Outcome',
+              `derived_v28_${derived.rule_used}`,
+              derived.confidence >= 0.8 ? 'high' : 'medium',
+              JSON.stringify({ [derived.fact.fact_type]: derived.fact.value }),
+              JSON.stringify({
+                derivation_rule: derived.rule_used,
+                confidence: derived.confidence,
+                derived_at: new Date().toISOString(),
+                personas_using: derived.fact.used_by_personas,
+              })
+            ]
+          );
+
+          console.log(`[v28.1_FACT_DERIVATION] ✅ Stored derived fact: ${derived.fact.fact_type} (confidence: ${derived.confidence.toFixed(2)})`);
+
+          // Add to available_facts for re-validation
+          if (!available_facts.has(category)) {
+            available_facts.set(category, []);
+          }
+          available_facts.get(category)!.push({
+            fact_type: derived.fact.fact_type,
+            value: derived.fact.value,
+            confidence: derived.confidence,
+            quality_score: derived.fact.quality_score,
+            metadata: {
+              derivation_rule: derived.rule_used,
+              is_derived: true,
+            },
+          });
+        }
+
+        // Re-validate after derivation
+        const revalidation_result = await HandoverValidator.validateHandover(
+          'assessment-agent-v18',
+          'gameplan-agent-v3',
+          available_facts,
+          adaptation_context
+        );
+
+        console.log('[v28.1_HANDOVER_VALIDATION] Re-validation after derivation:', {
+          is_ready: revalidation_result.is_ready,
+          quality_score: revalidation_result.quality_score,
+          quality_gates_passed: `${revalidation_result.quality_gates_passed}/${revalidation_result.quality_gates_total}`,
+        });
+      }
+
+      // Log validation summary
+      const validation_summary = HandoverValidator.getValidationSummary(validation_result);
+      console.log('[v28.1_HANDOVER_VALIDATION] Summary:\n' + validation_summary);
+
+      // Proceed with handover (even if not perfect - GamePlan can handle graceful degradation)
       const handoverPackage = await this.prepareGamePlanHandover(facts, intelligenceResults, collectedData, state);
+
+      // Enhance handover package with v28.1 validation metadata
+      (handoverPackage.metadata as any).v28_validation = {
+        quality_score: validation_result.quality_score,
+        quality_gates_passed: validation_result.quality_gates_passed,
+        quality_gates_total: validation_result.quality_gates_total,
+        pass_rate: validation_result.quality_gates_pass_rate,
+        is_ready: validation_result.is_ready,
+        recommendation: validation_result.recommendation,
+        rushed_handover_indicators: validation_result.rushed_handover_indicators,
+        student_specific_facts: validation_result.student_specific_count,
+        longitudinal_tracking_enabled: validation_result.has_longitudinal_tracking,
+      };
 
       // Execute A2A synchronous handoff
       console.log('[A2A_HANDOVER] Calling A2AOrchestrator.handleSynchronousHandoff()');
@@ -524,6 +835,13 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
 
       // Ask deeper questions about activities, leadership, service, awards
       const followUpQuestion = this.generatePostSynthesisFollowUp(collectedData);
+
+      // v28.2: Track the follow-up question for context-aware extraction
+      state.last_question = followUpQuestion;
+      console.log('[V28.2_QUESTION_TRACKING] (Post-synthesis) Tracking question:', followUpQuestion.substring(0, 80));
+
+      // Update state in database
+      await this.saveConversationState(state);
 
       return {
         response: followUpQuestion,
@@ -980,19 +1298,74 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
 
   /**
    * Filter out questions we've already asked this student
+   * OR questions where we already have the data
+   *
+   * v28.1: Universal fix for infinite loop - check collected data, not just questions asked
    */
   private async filterAlreadyAskedQuestions(
     adaptiveQuestions: any[],
-    questionsAsked: string[]
+    questionsAsked: string[],
+    collectedData?: Record<string, any>
   ): Promise<any[]> {
     return adaptiveQuestions.filter(aq => {
       const questionText = aq.question.toLowerCase();
-      return !questionsAsked.some(asked => {
+
+      // Check 1: Have we already asked this exact question?
+      const alreadyAsked = questionsAsked.some(asked => {
         const askedLower = asked.toLowerCase();
         // Check for semantic similarity (simple keyword matching)
         const keywords = questionText.split(' ').filter(w => w.length > 4);
         return keywords.some(keyword => askedLower.includes(keyword));
       });
+
+      if (alreadyAsked) {
+        console.log('[FILTER_QUESTIONS] Skipping already asked:', questionText.substring(0, 60));
+        return false;
+      }
+
+      // Check 2: Do we already have data for what this question is asking?
+      if (collectedData && Object.keys(collectedData).length > 0) {
+        // Map question keywords to likely data fields
+        // v28.1: Expanded keyword matching to catch variations
+        const dataFieldMappings: Record<string, string[]> = {
+          'activities': ['current_activities', 'activities', 'extracurriculars'],
+          'projects': ['current_activities', 'activities', 'projects'],
+          'built': ['current_activities', 'activities', 'projects'],  // "what have you built"
+          'done': ['current_activities', 'activities', 'projects'],   // "what have you done"
+          'working on': ['current_activities', 'activities', 'projects'], // "working on"
+          'school': ['high_school', 'school_name'],
+          'attend': ['high_school', 'school_name'],  // "what school do you attend"
+          'grade': ['grade', 'class_year'],
+          'interests': ['interests', 'passions'],
+          'subjects': ['interests', 'passions'],  // "what subjects"
+          'major': ['target_major', 'intended_major'],
+          'study': ['target_major', 'intended_major'],  // "what do you want to study"
+          'gpa': ['gpa', 'unweighted_gpa', 'weighted_gpa'],
+          'sat': ['sat_total', 'sat_score'],
+          'awards': ['awards', 'recognitions'],
+          'leadership': ['leadership_roles', 'leadership'],
+        };
+
+        for (const [keyword, dataFields] of Object.entries(dataFieldMappings)) {
+          if (questionText.includes(keyword)) {
+            const hasData = dataFields.some(field => {
+              const value = collectedData[field];
+              const hasValue = value !== undefined && value !== null &&
+                              (Array.isArray(value) ? value.length > 0 : true);
+              if (hasValue) {
+                console.log(`[FILTER_QUESTIONS] Skipping question about "${keyword}" - already have data in "${field}":`, value);
+              }
+              return hasValue;
+            });
+
+            if (hasData) {
+              return false; // Filter out this question
+            }
+          }
+        }
+      }
+
+      return true; // Keep this question
     });
   }
 
@@ -1053,13 +1426,19 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
    * Based on Jenny's typical 15-25 minute assessments (10-20 exchanges)
    */
   private checkMinimumAssessmentDepth(data: Record<string, any>, state: ConversationState): boolean {
+    // v28.2: Check all semantic variants of activities
+    const hasActivitiesData = (data.activities?.length || 0) > 0 ||
+                              (data.current_activities?.length || 0) > 0 ||
+                              (data.extracurriculars?.length || 0) > 0 ||
+                              (data.projects?.length || 0) > 0;
+
     console.log('[DEPTH_CHECK] Checking assessment depth:', {
       message_count: state.message_count,
       has_grade: !!data.grade,
       has_school: !!data.high_school,
       has_interests: (data.interests?.length || 0) > 0,
       has_major: !!data.target_major,
-      has_activities: (data.activities?.length || 0) > 0,
+      has_activities: hasActivitiesData,
       has_leadership: (data.leadership_roles?.length || 0) > 0,
     });
 
@@ -1079,7 +1458,7 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
     }
 
     // Should have at least some activities/leadership/awards context
-    const hasDepth = (data.activities?.length || 0) > 0 ||
+    const hasDepth = hasActivitiesData ||
                      (data.leadership_roles?.length || 0) > 0 ||
                      (data.career_goals?.length || 0) > 0;
 
@@ -1094,15 +1473,24 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
 
   /**
    * v27.0: Generate follow-up questions after synthesis to gather more depth
+   * v28.1: Use semantic field checking to handle field name variations
    */
   private generatePostSynthesisFollowUp(data: Record<string, any>): string {
+    // v28.1: Helper to check if we have activities data (any semantic variant)
+    const hasActivities = data.activities?.length > 0 ||
+                         data.current_activities?.length > 0 ||
+                         data.extracurriculars?.length > 0 ||
+                         data.projects?.length > 0;
+
+    const hasLeadership = data.leadership_roles?.length > 0;
+
     // Priority: Ask about what's missing
-    if (!data.activities || data.activities.length === 0) {
+    if (!hasActivities) {
       return "Great! Now tell me - what activities or projects have you been working on related to " +
              `${data.interests?.[0] || data.target_major || 'your interests'}? What have you actually built or done?`;
     }
 
-    if (!data.leadership_roles || data.leadership_roles.length === 0) {
+    if (!hasLeadership) {
       return "Perfect! Have you taken on any leadership roles in your activities? " +
              "Like leading a team, starting something, or mentoring others?";
     }
@@ -1187,10 +1575,21 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
   /**
    * Generate initial greeting (LAYER_1)
    */
-  private generateGreeting(state: ConversationState, intelligenceResults?: IntelligenceResult[]): IntelligenceAgentResponse {
+  private async generateGreeting(state: ConversationState, intelligenceResults?: IntelligenceResult[]): Promise<IntelligenceAgentResponse> {
     const greeting = state.message_count === 0
       ? "Hi! It's really nice to meet you. I'm here to help you build your path to top colleges, and I'd love to learn more about you.\n\nCan you tell me what your GPA is so far?"
       : "Tell me more about yourself - your interests, activities, and goals.";
+
+    // v28.2: Track the question for context-aware extraction
+    const question = state.message_count === 0
+      ? "Can you tell me what your GPA is so far?"
+      : "Tell me more about yourself - your interests, activities, and goals.";
+
+    state.last_question = question;
+    console.log('[V28.2_QUESTION_TRACKING] (Greeting) Tracking question:', question);
+
+    // Update state in database
+    await this.saveConversationState(state);
 
     return {
       response: greeting,
@@ -1270,15 +1669,17 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
 
   /**
    * Extract and store facts using GPT-4o (reuse from parent)
+   * v28.2: Now accepts last_question for context-aware extraction
    */
   async extractAndStoreFacts(
     studentId: string,
     userMessage: string,
-    conversationHistory: string
+    conversationHistory: string,
+    lastQuestion: string = ''
   ): Promise<void> {
     console.log('[EXTRACT_GPT4O] Starting extraction...');
 
-    const rawExtractedData = await extractAssessmentDataGPT(userMessage, conversationHistory);
+    const rawExtractedData = await extractAssessmentDataGPT(userMessage, conversationHistory, lastQuestion);
     const extractedData = validateAndNormalizeData(rawExtractedData);
 
     if (Object.keys(extractedData).length > 0) {
@@ -1288,117 +1689,128 @@ export class AssessmentAgentV3ConversationalRealtime extends AssessmentAgentV3 {
   }
 
   /**
-   * Store extracted facts in kb_items.edges (universal storage)
+   * Store extracted facts in kb_items using FactCategoryMapper (v28.1 multi-category storage)
+   *
+   * Enhancement: Uses FactCategoryMapper to intelligently map facts to multiple categories:
+   * - STUDENT_PROFILE: grade, high_school, target_major, personality_type
+   * - ASSESSMENT_DATA: rubric scores, gaps, unique_narrative
+   * - ACTIVITY_DATA: current activities, leadership_roles, time_commitments
+   * - GOAL_DATA: target_schools, target_colleges
+   * - ACADEMIC_DATA: GPA, test scores, AP count
    */
   private async storeExtractedFacts(
     studentId: string,
     extractedData: ExtractedAssessmentData
   ): Promise<void> {
     try {
-      // Academic Profile
-      if (extractedData.grade || extractedData.high_school || extractedData.gpa || extractedData.gpa_type || extractedData.sat_total || extractedData.act_composite || extractedData.ap_count) {
-        const academicData: any = {};
-        if (extractedData.grade) academicData.grade = extractedData.grade;
-        if (extractedData.high_school) academicData.high_school = extractedData.high_school;
-        if (extractedData.gpa) academicData.gpa = extractedData.gpa;
-        if (extractedData.gpa_type) academicData.gpa_type = extractedData.gpa_type;
-        if (extractedData.sat_total) academicData.sat_total = extractedData.sat_total;
-        if (extractedData.act_composite) academicData.act_composite = extractedData.act_composite;
-        if (extractedData.ap_count) academicData.ap_count = extractedData.ap_count;
+      console.log('[v28.1] Using FactCategoryMapper for multi-category storage');
+
+      // Flatten extractedData into simple key-value pairs
+      const flatData: Record<string, any> = {};
+
+      // Student Profile facts
+      if (extractedData.grade) flatData.grade = extractedData.grade;
+      if (extractedData.high_school) flatData.high_school = extractedData.high_school;
+      if (extractedData.target_major) flatData.target_major = extractedData.target_major;
+      if (extractedData.personality_type) flatData.personality_type = extractedData.personality_type;
+      if (extractedData.interests) flatData.interests = extractedData.interests;
+
+      // Academic Data facts
+      if (extractedData.gpa) flatData.gpa = extractedData.gpa;
+      if (extractedData.gpa_type) flatData.gpa_type = extractedData.gpa_type;
+      if (extractedData.sat_total) flatData.sat_total = extractedData.sat_total;
+      if (extractedData.act_composite) flatData.act_composite = extractedData.act_composite;
+      if (extractedData.ap_count) flatData.ap_count = extractedData.ap_count;
+
+      // Activity Data facts
+      if (extractedData.activities) flatData.current_activities = extractedData.activities;
+      if (extractedData.leadership_roles) flatData.leadership_roles = extractedData.leadership_roles;
+
+      // Goal Data facts
+      if (extractedData.target_colleges) flatData.target_schools = extractedData.target_colleges;
+
+      // Social/Confidence facts (mapped to STUDENT_PROFILE)
+      if (extractedData.friend_group_size) flatData.friend_group_size = extractedData.friend_group_size;
+      if (extractedData.friend_group_dynamic) flatData.friend_group_dynamic = extractedData.friend_group_dynamic;
+
+      if (Object.keys(flatData).length === 0) {
+        console.log('[v28.1] No extractable facts found');
+        return;
+      }
+
+      // Use FactCategoryMapper to map to categories
+      const categorizedFacts = FactCategoryMapper.mapToCategories(
+        flatData,
+        studentId,
+        'assessment-agent-v18',
+        'session_tbd' // Will be enhanced when session context is available
+      );
+
+      console.log(`[v28.1] Mapped ${Object.keys(flatData).length} facts to ${categorizedFacts.size} categories`);
+
+      // Store to each category
+      for (const [category, enhancedFacts] of categorizedFacts) {
+        const factsByType = new Map<string, any>();
+
+        // Group facts by fact_type for storage
+        for (const fact of enhancedFacts) {
+          factsByType.set(fact.fact_type, fact.value);
+        }
+
+        // Store as single kb_item per category with all facts in edges
+        const item_id = `${studentId}_${category.toLowerCase()}_v28`;
+
+        // Combine facts and metadata into edges JSON
+        const edgesData = {
+          ...Object.fromEntries(factsByType),
+          v28_metadata: {
+            fact_count: enhancedFacts.length,
+            personas_used: [...new Set(enhancedFacts.flatMap(f => f.used_by_personas))],
+            student_specific_count: enhancedFacts.filter(f => f.is_student_specific).length,
+            longitudinal_count: enhancedFacts.filter(f => f.track_over_time).length,
+            avg_quality_score: enhancedFacts.reduce((sum, f) => sum + f.quality_score, 0) / enhancedFacts.length,
+            extraction_timestamp: new Date().toISOString(),
+          }
+        };
 
         await this.pool.query(
           `INSERT INTO kb_items (item_id, student_id, item_type, subtype, title_name, tier1_state, source_ref, confidence, edges)
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-           ON CONFLICT (item_id) DO UPDATE SET edges = kb_items.edges || EXCLUDED.edges, updated_ts = NOW()`,
+           ON CONFLICT (item_id) DO UPDATE SET
+             edges = kb_items.edges || EXCLUDED.edges,
+             updated_ts = NOW()`,
           [
-            `${studentId}_academic_profile`,
+            item_id,
             studentId,
-            'Assessment',
-            'academic_profile',
-            `Academic Profile`,
+            category, // Use FactCategory enum value (e.g., 'student_profile')
+            'extracted_facts',
+            `${category} Facts`,
             'Outcome',
-            'gpt4o_conversational_extraction',
+            'gpt4o_conversational_extraction_v28',
             'high',
-            JSON.stringify(academicData)
+            JSON.stringify(edgesData),
           ]
         );
+
+        console.log(`[v28.1] ✅ Stored ${enhancedFacts.length} facts to ${category} category`);
       }
 
-      // Interests & Goals
-      if (extractedData.interests || extractedData.target_major || extractedData.target_colleges) {
-        const interestsData: any = {};
-        if (extractedData.interests) interestsData.interests = extractedData.interests;
-        if (extractedData.target_major) interestsData.target_major = extractedData.target_major;
-        if (extractedData.target_colleges) interestsData.target_colleges = extractedData.target_colleges;
-
-        await this.pool.query(
-          `INSERT INTO kb_items (item_id, student_id, item_type, subtype, title_name, tier1_state, source_ref, confidence, edges)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-           ON CONFLICT (item_id) DO UPDATE SET edges = kb_items.edges || EXCLUDED.edges, updated_ts = NOW()`,
-          [
-            `${studentId}_interests_goals`,
-            studentId,
-            'Assessment',
-            'interests_goals',
-            `Interests & Goals`,
-            'Outcome',
-            'gpt4o_conversational_extraction',
-            'high',
-            JSON.stringify(interestsData)
-          ]
-        );
-      }
-
-      // Social Profile
-      if (extractedData.personality_type || extractedData.friend_group_size || extractedData.friend_group_dynamic) {
-        const socialData: any = {};
-        if (extractedData.personality_type) socialData.personality_type = extractedData.personality_type;
-        if (extractedData.friend_group_size) socialData.friend_group_size = extractedData.friend_group_size;
-        if (extractedData.friend_group_dynamic) socialData.friend_group_dynamic = extractedData.friend_group_dynamic;
-
-        await this.pool.query(
-          `INSERT INTO kb_items (item_id, student_id, item_type, subtype, title_name, tier1_state, source_ref, confidence, edges)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-           ON CONFLICT (item_id) DO UPDATE SET edges = kb_items.edges || EXCLUDED.edges, updated_ts = NOW()`,
-          [
-            `${studentId}_social_profile`,
-            studentId,
-            'Assessment',
-            'social_profile',
-            `Social Profile`,
-            'Outcome',
-            'gpt4o_conversational_extraction',
-            'high',
-            JSON.stringify(socialData)
-          ]
-        );
-      }
-
-      // Activities & Leadership
-      if (extractedData.activities || extractedData.leadership_roles) {
-        const activitiesData: any = {};
-        if (extractedData.activities) activitiesData.activities = extractedData.activities;
-        if (extractedData.leadership_roles) activitiesData.leadership_roles = extractedData.leadership_roles;
-
-        await this.pool.query(
-          `INSERT INTO kb_items (item_id, student_id, item_type, subtype, title_name, tier1_state, source_ref, confidence, edges)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-           ON CONFLICT (item_id) DO UPDATE SET edges = kb_items.edges || EXCLUDED.edges, updated_ts = NOW()`,
-          [
-            `${studentId}_activities_leadership`,
-            studentId,
-            'Assessment',
-            'activities_leadership',
-            `Activities & Leadership`,
-            'Outcome',
-            'gpt4o_conversational_extraction',
-            'high',
-            JSON.stringify(activitiesData)
-          ]
-        );
-      }
+      console.log('[v28.1] Multi-category storage complete');
     } catch (error) {
-      log.error('store_extracted_facts_error', error);
+      log.error('store_extracted_facts_error_v28', error);
     }
+  }
+
+  /**
+   * Helper: Get fact value from categorized facts
+   */
+  private getFactValue(available_facts: Map<FactCategory, any[]>, fact_type: string): any {
+    for (const [_, facts] of available_facts) {
+      const fact = facts.find((f: any) => f.fact_type === fact_type || f.subtype === fact_type);
+      if (fact) {
+        return fact.value || fact.data?.value || fact.data;
+      }
+    }
+    return null;
   }
 }

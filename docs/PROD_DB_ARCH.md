@@ -1,12 +1,12 @@
 # IvyLevel Platform - Production Database Architecture
-# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v13.0 → v14.0 → v21.0 → v24.0 → v25.0 → v26.0 Growth Journey Verified
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v13.0 → v14.0 → v21.0 → v24.0 → v25.0 → v26.0 → v27.0 → v29.0 HandoverValidator
 
-**Document Version:** v27.0
-**Last Updated:** 2025-11-02
-**Status:** ✅ PRODUCTION READY - Complete Schema Documented + A2A Handover Architecture + Assessment Agent v3 Conversational Flow + Canonical Schema Alignment
+**Document Version:** v29.0
+**Last Updated:** 2025-11-04
+**Status:** ✅ PRODUCTION READY - Proper A2A Architecture + HandoverValidator + 20 Quality Gates + Multi-Category Fact Storage + Canonical Schema Alignment
 **Database:** PostgreSQL 14+
 **Connection:** Port 5432, Database: ivylevel
-**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.0 Weekly Vitals Schema + v10.8 Universal Academic Schema + v11.0 Action Plans + v12.0 Game Plan JSONB + v13.0 Assessment Visualization + v14.0 Timeline Enrichment + v18.0 FactStore Integration + v18.1 kb_items Population + PostgresFactSource Implementation + v24.0 Complete Schema Documentation & Data Verification + **v26.0 MultiAgent Platform v2.0 with Conversational Assessment + Canonical Schema**
+**Architecture:** v14 Zero-Hallucination + v1.0 Multi-Coach + v2.0 Data Quality + v2.1 Final Precedence + v3.2 Production Infrastructure + v10.0 Weekly Vitals Schema + v10.8 Universal Academic Schema + v11.0 Action Plans + v12.0 Game Plan JSONB + v13.0 Assessment Visualization + v14.0 Timeline Enrichment + v18.0 FactStore Integration + v18.1 kb_items Population + PostgresFactSource Implementation + v24.0 Complete Schema Documentation & Data Verification + v26.0 MultiAgent Platform v2.0 with Conversational Assessment + Canonical Schema + **v28.1 Multi-Category Fact Storage in kb_items + v29.0 HandoverValidator Integration (NO schema changes - uses existing multiagent_messages.metadata for validation metrics)**
 
 ---
 
@@ -33,10 +33,13 @@ This is the **single source of truth** for IvyLevel's production database schema
 17. **v20.1** - ExecutionAgent Core Execution Primitives Expansion (NO schema changes - v20.1 uses existing tables; database migrations planned for v20.2)
 18. **v26.0** - MultiAgent Platform v2.0 with Conversational Assessment (NEW schema additions - multiagent_sessions, multiagent_messages, intelligence_activations tables + kb_items.edges JSONB enhancement for conversational data storage + Canonical Schema alignment)
 19. **v27.0** - A2A Handover Architecture + Assessment Agent v3 (PLANNED schema additions - a2a_handover_log table for agent-to-agent communication tracking + NO immediate schema changes for Assessment Agent v3 as it uses existing multiagent_messages for conversational flow + GamePlan handover data stored in multiagent_messages.metadata JSONB)
-20. **Current Tables & Views** - What actually exists in production
-21. **Sample Data** - Real Jenny-Huda data with complete Common App submission + Game Plan + Enriched Timeline + kb_items (12 items including 2 summer programs) + v26 clone student architecture (huda-v26-2025)
-21. **Verified Data Integrity** - Comprehensive testing validates all queries + Awards Agent tests (4/4 passing) + Summer Programs Agent tests (4/4 passing) + ExecutionAgent tests (4/4 test cases) + v26 Assessment Agent intelligence-driven conversational flow
-22. **Fact-First Data Access** - PostgresFactSource extracts facts from students + kb_items tables with complete provenance tracking for all agents (Awards, SummerPrograms, Execution, Assessment)
+20. **v28.1** - Multi-Category Fact Storage (NO schema changes - kb_items table already supports category JSONB array + source_ref field + Enhanced extraction with gpt4o_conversational_extraction_v28 source tracking)
+21. **v28.3** - Assessment Agent Infinite Loop Fix (NO schema changes - uses existing multiagent_messages.metadata JSONB to track original_question alongside eq_enhanced_question for loop prevention)
+22. **v29.0** - HandoverValidator Integration (NO schema changes - uses existing multiagent_messages.metadata JSONB to store handover_validation metrics including quality_score, quality_gates_passed, quality_gates_total, is_ready, recommendation + Fact loading from kb_items grouped by FactCategory + 20 quality gate validation stored in audit trail)
+23. **Current Tables & Views** - What actually exists in production
+24. **Sample Data** - Real Jenny-Huda data with complete Common App submission + Game Plan + Enriched Timeline + kb_items with multi-category facts + v26 clone student architecture (huda-v26-2025) + v28 gpt4o conversational extraction
+25. **Verified Data Integrity** - Comprehensive testing validates all queries + Awards Agent tests (4/4 passing) + Summer Programs Agent tests (4/4 passing) + ExecutionAgent tests (4/4 test cases) + v26 Assessment Agent intelligence-driven conversational flow + v29 HandoverValidator 20 quality gate validation
+26. **Fact-First Data Access** - PostgresFactSource extracts facts from students + kb_items tables with complete provenance tracking for all agents (Awards, SummerPrograms, Execution, Assessment, GamePlan) + Multi-category fact storage with FactCategory grouping + HandoverValidator quality-gated handovers
 
 **Key Principle:** All data references use REAL student data from Huda's actual UNC Chapel Hill Early Action submission (student_id: 'huda-2025'). Universal schema design enables support for any student type (STEM, Arts, Athletics, IB) while maintaining complete accuracy with final college applications. v14.0 enriches existing timeline_events table with 30 transformation milestones extracted from growth_events, vital_facts, kb_items, and weekly_vitals. v18.0 adds Fact-First data access layer (PostgresFactSource) that extracts structured facts from existing tables with complete provenance tracking - demonstrating zero-hallucination data access WITHOUT schema changes, just intelligent fact extraction and validation. **v26.0 extends kb_items with edges JSONB field for conversational assessment data and adds multiagent session management tables, all following Canonical Schema (see MULTIAGENT_V26_CANONICAL_SCHEMA.md) that aligns extraction, intelligence, and storage layers.**
 

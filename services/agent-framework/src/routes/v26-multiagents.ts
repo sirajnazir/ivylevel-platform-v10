@@ -28,6 +28,8 @@ import { AgentRegistry } from '../agents/registry.js';
 import { withApiKey, withRateLimit } from '../middleware/security.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
 import { V26AgentWrapperReal } from '../agents/V26AgentWrapperReal.js';
+import { HandoverValidator } from '../a2a/HandoverValidator.js';
+import { FactCategory } from '../facts/types.js';
 
 const router = Router();
 const logger = createLogger('v26-multiagents');
@@ -357,7 +359,7 @@ What would you like to focus on this week?`;
         ]
       );
 
-      const agentMessage = agentMessageResult.rows[0];
+      let agentMessage = agentMessageResult.rows[0];
 
       // Save intelligence activations if available
       if ((agentResponse as any).intelligence_results) {
@@ -401,6 +403,53 @@ What would you like to focus on this week?`;
           session_id
         });
 
+        // v28.5: Load available facts from kb_items for handover validation
+        console.log('[V28.5_HANDOVER] 📊 Loading facts for handover validation...');
+        const factsResult = await pool.query(
+          `SELECT category, fact_type, fact_value, fact_text, confidence, metadata
+           FROM kb_items
+           WHERE student_id = $1
+             AND source_ref = $2
+           ORDER BY created_at DESC`,
+          [cloneStudentId, 'gpt4o_conversational_extraction_v28']
+        );
+
+        // Group facts by category
+        const available_facts = new Map<FactCategory, any[]>();
+        for (const row of factsResult.rows) {
+          const category = row.category as FactCategory;
+          if (!available_facts.has(category)) {
+            available_facts.set(category, []);
+          }
+          available_facts.get(category)!.push(row);
+        }
+
+        console.log('[V28.5_HANDOVER] 📋 Facts loaded by category:', {
+          categories: Array.from(available_facts.keys()),
+          total_facts: factsResult.rows.length,
+          breakdown: Array.from(available_facts.entries()).map(([cat, facts]) => ({
+            category: cat,
+            count: facts.length
+          }))
+        });
+
+        // v28.5: Validate handover readiness with HandoverValidator
+        console.log('[V28.5_HANDOVER] 🔍 Validating handover with 20 quality gates...');
+        const handoverValidation = await HandoverValidator.validateHandover(
+          agentId,
+          new_agent_id,
+          available_facts
+        );
+
+        console.log('[V28.5_HANDOVER] 📊 Validation Result:', {
+          is_ready: handoverValidation.is_ready,
+          quality_score: handoverValidation.quality_score,
+          quality_gates_passed: `${handoverValidation.quality_gates_passed}/${handoverValidation.quality_gates_total}`,
+          recommendation: handoverValidation.recommendation,
+          missing_mandatory: handoverValidation.missing_mandatory_facts.length,
+          rushed_indicators: handoverValidation.rushed_handover_indicators.length
+        });
+
         // Update session to reflect new active agent
         const newPhase = phaseMap[new_agent_id] || sessionResult.rows[0].current_phase;
 
@@ -417,6 +466,74 @@ What would you like to focus on this week?`;
           new_agent: new_agent_id,
           new_phase: newPhase
         });
+
+        // v28.5: Call new agent based on validation result
+        console.log('[V28.5_HANDOVER] 🚀 Proceeding with handover...');
+
+        try {
+          // v28.5: Always call the new agent (it will handle insufficient data internally)
+          // The agent's generateInsufficientDataResponse() will ask natural questions if needed
+          const handoverResponse = await v26Wrapper.handleQuery({
+            agent_id: new_agent_id,
+            student_id: cloneStudentId,
+            session_id,
+            message: 'continue', // Trigger agent initialization
+          });
+
+          console.log('[V28.5_HANDOVER] ✅ New agent response generated:', {
+            response_length: handoverResponse.response?.length || 0,
+            validation_score: handoverResponse.validation_score,
+            handover_quality: handoverValidation.quality_score
+          });
+
+          // Replace the placeholder response with the actual new agent response
+          agentResponse.response = handoverResponse.response;
+          agentResponse.metadata = {
+            ...agentResponse.metadata,
+            ...handoverResponse.metadata,
+            handover_validation: {
+              quality_score: handoverValidation.quality_score,
+              quality_gates_passed: handoverValidation.quality_gates_passed,
+              quality_gates_total: handoverValidation.quality_gates_total,
+              is_ready: handoverValidation.is_ready,
+              recommendation: handoverValidation.recommendation,
+            }
+          };
+
+          // Store the new agent's message
+          const newAgentMessageResult = await pool.query(
+            `INSERT INTO multiagent_messages
+             (session_id, agent_id, role, content, processing_time, confidence, metadata)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id, timestamp`,
+            [
+              session_id,
+              new_agent_id,
+              'agent',
+              handoverResponse.response,
+              processingTime,
+              handoverResponse.validation_score || 1,
+              JSON.stringify({
+                agent_id: handoverResponse.agent_id,
+                intelligence_triggered: handoverResponse.intelligence_triggered,
+                handover_received: true,
+                handover_validation: {
+                  quality_score: handoverValidation.quality_score,
+                  quality_gates_passed: handoverValidation.quality_gates_passed,
+                  is_ready: handoverValidation.is_ready,
+                }
+              }),
+            ]
+          );
+
+          // Update agentMessage reference to the new agent's message
+          agentMessage = newAgentMessageResult.rows[0];
+
+          console.log('[V28.5_HANDOVER] 💾 New agent message stored:', agentMessage.id);
+        } catch (handoverError) {
+          console.error('[V28.5_HANDOVER] ❌ Failed to call new agent:', handoverError);
+          // Keep the placeholder response if agent call fails
+        }
       }
 
       // Update session analytics
