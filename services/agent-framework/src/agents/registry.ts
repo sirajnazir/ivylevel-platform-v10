@@ -7,15 +7,12 @@
  * - Provide singleton access to agents
  * - Initialize IntelligenceRegistry with all intelligence types
  *
- * Updated: 2025-10-29 (v18.1 - Intelligence Types Architecture)
+ * Updated: 2025-11-02 (v28.0 - GamePlanAgentV3 with Intelligence Types Architecture)
  */
 
 import { Pool } from 'pg';
 import { EventBus } from '../events/EventBus.js';
-import { GamePlanAgent } from './v18/GamePlanAgentRefactored.js';
-import { AssessmentAgent } from './v18/AssessmentAgentRefactored.js';
-import { AssessmentAgentV3 } from './v18/AssessmentAgentV3.js';
-import { AssessmentAgentV3Conversational } from './v18/AssessmentAgentV3Conversational.js';
+import { GamePlanAgentV3 } from './v18/GamePlanAgentV3.js';
 import { AssessmentAgentV3ConversationalRealtime } from './v18/AssessmentAgentV3ConversationalRealtime.js';
 import { ExtracurricularsAgentRefactored } from './v18/ExtracurricularsAgentRefactored.js';
 import { AwardsAgentRefactored } from './v18/AwardsAgentRefactored.js';
@@ -36,10 +33,7 @@ const log = createLogger('agent-registry');
 export class AgentRegistry {
   private static instance: AgentRegistry | null = null;
 
-  private gamePlanAgent: GamePlanAgent | null = null;
-  private assessmentAgent: AssessmentAgent | null = null;
-  private assessmentAgentV3: AssessmentAgentV3 | null = null;
-  private assessmentAgentV3Conversational: AssessmentAgentV3Conversational | null = null;
+  private gamePlanAgent: GamePlanAgentV3 | null = null;
   private assessmentAgentV3ConversationalRealtime: AssessmentAgentV3ConversationalRealtime | null = null;
   private extracurricularsAgent: ExtracurricularsAgentRefactored | null = null;
   private awardsAgent: AwardsAgentRefactored | null = null;
@@ -89,33 +83,15 @@ export class AgentRegistry {
         domain_types: IntelligenceRegistry.getByCategory('DOMAIN_SPECIFIC').length,
       });
 
-      // Initialize GamePlanAgent v18 with FactStore
-      this.gamePlanAgent = new GamePlanAgent(this.factStore);
-      // GamePlanAgent uses old BaseAgent pattern with EventBus
-      if (typeof (this.gamePlanAgent as any).initializeEventBus === 'function') {
-        (this.gamePlanAgent as any).initializeEventBus(this.eventBus, pool);
-      }
-
-      // Initialize AssessmentAgent v18 with FactStore (legacy)
-      this.assessmentAgent = new AssessmentAgent(this.factStore);
-      // AssessmentAgent uses old BaseAgent pattern with EventBus
-      if (typeof (this.assessmentAgent as any).initializeEventBus === 'function') {
-        (this.assessmentAgent as any).initializeEventBus(this.eventBus, pool);
-      }
-
-      // Initialize AssessmentAgentV3 (v23.0) with Intelligence Types
-      log.event('agent_registry.initialize_assessment_agent_v3', {});
-      this.assessmentAgentV3 = new AssessmentAgentV3(this.factStore);
-      // AssessmentAgentV3 uses BaseAgentWithIntelligence (no EventBus)
-      log.event('agent_registry.assessment_agent_v3_ready', {
-        intelligence_types_loaded: 4, // TYPE-080, TYPE-081, TYPE-082, TYPE-083
+      // Initialize GamePlanAgentV3 (v18.0 Intelligence Types Architecture v3.0)
+      log.event('agent_registry.initialize_gameplan_agent_v3', {});
+      this.gamePlanAgent = new GamePlanAgentV3(this.factStore, this.pool);
+      // GamePlanAgentV3 uses BaseAgentWithIntelligence (Intelligence Types architecture)
+      log.event('agent_registry.gameplan_agent_v3_ready', {
+        intelligence_types_loaded: 6, // TYPE-001, TYPE-002, TYPE-003, TYPE-004, TYPE-006, TYPE-007
       });
 
-      // Initialize AssessmentAgentV3Conversational (v26.3) - LEGACY (with hardcoded questions)
-      log.event('agent_registry.initialize_assessment_agent_v3_conversational_legacy', {});
-      this.assessmentAgentV3Conversational = new AssessmentAgentV3Conversational(this.factStore, pool);
-
-      // Initialize AssessmentAgentV3ConversationalRealtime (v26.5) - PRODUCTION (intelligence-driven)
+      // Initialize AssessmentAgentV3ConversationalRealtime (v26.5 + v28.1) - PRODUCTION (multi-category storage)
       log.event('agent_registry.initialize_assessment_agent_v3_conversational_realtime', {});
       this.assessmentAgentV3ConversationalRealtime = new AssessmentAgentV3ConversationalRealtime(this.factStore, pool);
       // Uses TYPE-080 adaptive questions + 27 EQ layers from Jenny's real sessions
@@ -169,7 +145,7 @@ export class AgentRegistry {
       log.event('agent_registry.initialize_complete', {
         agents_initialized: [
           'GamePlanAgent-v18',
-          'AssessmentAgent-v18',
+          'AssessmentAgentV3ConversationalRealtime-v26.5-v28.1',
           'ExtracurricularsAgent-v18',
           'AwardsAgent-v18.1',
           'SummerProgramsAgent-v19.0',
@@ -201,23 +177,13 @@ export class AgentRegistry {
   }
 
   /**
-   * Get AssessmentAgent instance (legacy v18)
+   * Get AssessmentAgentV3ConversationalRealtime instance (v26.5 + v28.1)
    */
-  getAssessmentAgent(): AssessmentAgent {
-    if (!this.assessmentAgent) {
-      throw new Error('AssessmentAgent not initialized. Call initialize() first.');
+  getAssessmentAgentV3ConversationalRealtime(): AssessmentAgentV3ConversationalRealtime {
+    if (!this.assessmentAgentV3ConversationalRealtime) {
+      throw new Error('AssessmentAgentV3ConversationalRealtime not initialized. Call initialize() first.');
     }
-    return this.assessmentAgent;
-  }
-
-  /**
-   * Get AssessmentAgentV3 instance (v23.0 with Intelligence Types)
-   */
-  getAssessmentAgentV3(): AssessmentAgentV3 {
-    if (!this.assessmentAgentV3) {
-      throw new Error('AssessmentAgentV3 not initialized. Call initialize() first.');
-    }
-    return this.assessmentAgentV3;
+    return this.assessmentAgentV3ConversationalRealtime;
   }
 
   /**
@@ -545,8 +511,8 @@ export class AgentRegistry {
 
     if (isAssessmentQuery) {
 
-      // Route to AssessmentAgent
-      const assessmentAgent = this.getAssessmentAgent();
+      // Route to AssessmentAgentV3ConversationalRealtime (v26.5 + v28.1)
+      const assessmentAgent = this.getAssessmentAgentV3ConversationalRealtime();
       const result = await assessmentAgent.handleQuery({
         entity_id: student_id,
         query,
@@ -555,10 +521,10 @@ export class AgentRegistry {
 
       return {
         response: result.response,
-        agent_used: 'AssessmentAgent-v18',
+        agent_used: 'AssessmentAgentV3ConversationalRealtime-v26.5-v28.1',
         metadata: {
           ...result.metadata,
-          facts_used_count: result.facts_used.length,
+          facts_used_count: result.facts_used?.length || 0,
           validation_score: result.validation_score,
         },
       };
@@ -599,7 +565,7 @@ export class AgentRegistry {
           'ExecutionAgent-v20.0',
           'ScholarshipsAgent-v21.0',
           'GamePlanAgent-v18',
-          'AssessmentAgent-v18',
+          'AssessmentAgentV3ConversationalRealtime-v26.5-v28.1',
           'ExtracurricularsAgent-v18',
           'AwardsAgent-v18.1',
           'SummerProgramsAgent-v19.0',

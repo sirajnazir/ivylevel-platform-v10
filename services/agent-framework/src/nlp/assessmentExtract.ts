@@ -174,7 +174,12 @@ Key extraction rules:
 1. COMPREHENSIVE: Extract every data point mentioned, even if multiple facts in one message
 2. ACCURATE: Only extract explicitly stated information - don't infer or assume
 3. CONTEXT-AWARE: Use conversation history to understand references (e.g., "I'm in 10th" → grade: 10)
-4. FLEXIBLE: Handle various phrasings:
+4. QUESTION-AWARE: Use the last question asked to correctly interpret the student's response
+   - If asked about activities/projects → extract to 'activities' field
+   - If asked about interests/passions → extract to 'interests' field
+   - If asked about leadership → extract to 'leadership_roles' field
+   - The student's answer is ALWAYS in response to the last question asked
+5. FLEXIBLE: Handle various phrasings:
    - "4.3 weighted GPA" or "GPA is 4.3" or "I have a 4.3"
    - "10th grade" or "sophomore" or "I'm in 10th"
    - "SAT 1450" or "scored 1450" or "got a 1450 on my SAT"
@@ -187,22 +192,34 @@ Input: "I'm interested in computer science and film"
 Output: { interests: ["computer science", "film"] }
 
 Input: "I scored 1450 on my SAT - 720 math and 730 verbal. I've also taken 5 AP classes."
-Output: { sat_total: 1450, sat_math: 720, sat_verbal: 730, ap_count: 5 }`;
+Output: { sat_total: 1450, sat_math: 720, sat_verbal: 730, ap_count: 5 }
+
+CRITICAL QUESTION-AWARE EXAMPLES:
+Last Question: "What activities or projects have you been working on?"
+Student Response: "Empowering young girls to become coders through educational games"
+Output: { activities: ["Educational game to empower young girls in coding"] }  ← NOT interests!
+
+Last Question: "What are you passionate about?"
+Student Response: "Empowering young girls to become coders through educational games"
+Output: { interests: ["empowering young girls in tech", "educational games"] }  ← This time it IS interests!`;
 
 /**
  * Extract structured assessment data from student's message using GPT-4o
  *
  * @param studentMessage - The student's response/message
  * @param conversationHistory - Previous conversation context (optional)
+ * @param lastQuestion - The last question asked by the agent (v28.2: for context-aware extraction)
  * @returns Extracted structured data, or empty object if nothing extracted
  */
 export async function extractAssessmentDataGPT(
   studentMessage: string,
-  conversationHistory?: string
+  conversationHistory?: string,
+  lastQuestion: string = ''
 ): Promise<ExtractedAssessmentData> {
   try {
     console.log('\n========== GPT-4o ASSESSMENT EXTRACTION START ==========');
     console.log('[GPT4o_EXTRACT] Student message:', studentMessage);
+    console.log('[GPT4o_EXTRACT] Last question asked:', lastQuestion || '(none)');
 
     const messages: ChatCompletionMessageParam[] = [
       { role: "system", content: SYSTEM_PROMPT }
@@ -216,9 +233,17 @@ export async function extractAssessmentDataGPT(
       });
     }
 
+    // v28.2: CRITICAL - Include last question for context-aware extraction
+    // This prevents misinterpretation (e.g., activities answer being extracted as interests)
+    let extractionPrompt = `Extract all assessment data from this student response:\n\n"${studentMessage}"`;
+
+    if (lastQuestion) {
+      extractionPrompt = `The agent just asked: "${lastQuestion}"\n\nThe student's response is: "${studentMessage}"\n\nExtract all assessment data from the student's response IN THE CONTEXT of what was asked. If asked about activities/projects, extract to 'activities'. If asked about interests/passions, extract to 'interests'.`;
+    }
+
     messages.push({
       role: "user",
-      content: `Extract all assessment data from this student response:\n\n"${studentMessage}"`
+      content: extractionPrompt
     });
 
     const response = await openai.chat.completions.create({

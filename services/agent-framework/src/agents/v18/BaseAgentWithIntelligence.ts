@@ -383,8 +383,18 @@ export abstract class BaseAgentWithIntelligence {
       missing_categories: missing,
     });
 
+    // v28.2: More natural error message
+    const prettifyCategory = (cat: string) => {
+      return cat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    };
+
+    const missingPretty = missing.slice(0, 2).map(prettifyCategory);
+    const naturalMessage = missingPretty.length > 0
+      ? `I'm still learning about you! Let me know a bit more about ${missingPretty.join(' and ')} so I can help you better.`
+      : `I'm still learning about you! Let's continue building your profile.`;
+
     return {
-      response: `I need more information to answer this question. Missing data: ${missing.join(', ')}`,
+      response: naturalMessage,
       facts_used: [],
       validation_score: 1.0, // Valid response (explicitly states missing data)
       provenance: [],

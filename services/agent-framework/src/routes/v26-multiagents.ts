@@ -403,28 +403,24 @@ What would you like to focus on this week?`;
           session_id
         });
 
-        // v28.5: Load available facts from kb_items for handover validation
-        console.log('[V28.5_HANDOVER] 📊 Loading facts for handover validation...');
+        // v29.0: Load available facts from kb_items for handover validation
+        // Note: kb_items stores category in item_type field, facts in edges JSONB
+        console.log('[V29.0_HANDOVER] 📊 Loading facts for handover validation...');
         const factsResult = await pool.query(
-          `SELECT category, fact_type, fact_value, fact_text, confidence, metadata
+          `SELECT item_type, subtype, edges, confidence, created_ts
            FROM kb_items
            WHERE student_id = $1
              AND source_ref = $2
-           ORDER BY created_at DESC`,
+           ORDER BY created_ts DESC`,
           [cloneStudentId, 'gpt4o_conversational_extraction_v28']
         );
 
-        // Group facts by category
-        const available_facts = new Map<FactCategory, any[]>();
-        for (const row of factsResult.rows) {
-          const category = row.category as FactCategory;
-          if (!available_facts.has(category)) {
-            available_facts.set(category, []);
-          }
-          available_facts.get(category)!.push(row);
-        }
+        // Group facts by category (item_type = FactCategory)
+        // v28.1: Facts stored in edges JSONB, extract using FactCategoryMapper
+        const { FactCategoryMapper } = await import('../facts/FactCategoryMapper.js');
+        const available_facts = FactCategoryMapper.extractFactsFromKbItems(factsResult.rows);
 
-        console.log('[V28.5_HANDOVER] 📋 Facts loaded by category:', {
+        console.log('[V29.0_HANDOVER] 📋 Facts loaded by category:', {
           categories: Array.from(available_facts.keys()),
           total_facts: factsResult.rows.length,
           breakdown: Array.from(available_facts.entries()).map(([cat, facts]) => ({

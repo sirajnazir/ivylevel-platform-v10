@@ -19,7 +19,7 @@
  * @date 2025-10-29
  */
 
-import { BaseAgent } from '../BaseAgent';
+import { BaseAgentWithIntelligence } from './BaseAgentWithIntelligence.js';
 import { AgentQuery, AgentResponse } from '../types';
 import { FactCategory, FactSet, Fact } from '../../facts/types';
 import { FactStore } from '../../facts/FactStore';
@@ -134,11 +134,11 @@ interface StudentDemographic {
 // ExtracurricularsAgentRefactored Class
 // ============================================================================
 
-export class ExtracurricularsAgentRefactored extends BaseAgent {
+export class ExtracurricularsAgentRefactored extends BaseAgentWithIntelligence {
   protected agentDomain = 'extracurriculars' as const;
 
   constructor(factStore: FactStore) {
-    super(factStore);
+    super('extracurriculars-agent', factStore);
   }
 
   /**

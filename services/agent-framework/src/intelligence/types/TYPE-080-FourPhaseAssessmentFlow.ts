@@ -297,27 +297,32 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
     const missingData: string[] = [];
 
     for (const dataKey of requirements.required_data) {
+      // v28.1: Get semantically equivalent field names
+      const acceptableFieldNames = this.getSemanticFieldNames(dataKey);
+      console.log(`[TYPE-080] Checking for "${dataKey}" (also accepts: ${acceptableFieldNames.filter(n => n !== dataKey).join(', ') || 'none'})`);
+
       // Check if field exists as actual property in fact.value (canonical schema)
       const hasData = allFacts.some(f => {
         if (typeof f.value === 'object' && f.value !== null) {
-          // Direct property check (e.g., value.grade, value.high_school)
-          const hasDirectProperty = dataKey in f.value;
+          // Check all semantically equivalent field names
+          for (const fieldName of acceptableFieldNames) {
+            const hasProperty = fieldName in f.value;
 
-          // Also check if property has a non-empty value
-          if (hasDirectProperty) {
-            const val = (f.value as any)[dataKey];
-            // Consider data collected if: number (including 0), non-empty string, non-empty array, boolean
-            if (typeof val === 'number' || typeof val === 'boolean') {
-              console.log(`[TYPE-080] ✅ Found ${dataKey} = ${val} (${typeof val})`);
-              return true;
-            }
-            if (typeof val === 'string' && val.length > 0) {
-              console.log(`[TYPE-080] ✅ Found ${dataKey} = "${val}"`);
-              return true;
-            }
-            if (Array.isArray(val) && val.length > 0) {
-              console.log(`[TYPE-080] ✅ Found ${dataKey} = [${val.length} items]`);
-              return true;
+            if (hasProperty) {
+              const val = (f.value as any)[fieldName];
+              // Consider data collected if: number (including 0), non-empty string, non-empty array, boolean
+              if (typeof val === 'number' || typeof val === 'boolean') {
+                console.log(`[TYPE-080] ✅ Found ${dataKey} via "${fieldName}" = ${val} (${typeof val})`);
+                return true;
+              }
+              if (typeof val === 'string' && val.length > 0) {
+                console.log(`[TYPE-080] ✅ Found ${dataKey} via "${fieldName}" = "${val}"`);
+                return true;
+              }
+              if (Array.isArray(val) && val.length > 0) {
+                console.log(`[TYPE-080] ✅ Found ${dataKey} via "${fieldName}" = [${val.length} items]`);
+                return true;
+              }
             }
           }
         }
@@ -419,6 +424,8 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
 
   /**
    * Generate adaptive questions for current phase
+   *
+   * v28.1: Universal fix - intelligently skip questions when we have related data
    */
   private generateAdaptiveQuestions(
     currentPhase: AssessmentPhase,
@@ -430,17 +437,69 @@ export class FourPhaseAssessmentFlow implements IntelligenceType {
 
     const questions: AdaptiveQuestion[] = [];
 
+    // v28.1: Get all collected data to check for semantic matches
+    const collectedFields = new Set(currentStatus.collected_data);
+    console.log('[TYPE-080] Collected fields:', Array.from(collectedFields));
+
     // Generate questions for missing data (prioritized)
     const priorityMissing = currentStatus.missing_data.slice(0, 5); // Top 5
 
     for (const dataKey of priorityMissing) {
+      // v28.1: Check if we have semantically related data before generating question
+      if (this.hasSemanticMatch(dataKey, collectedFields)) {
+        console.log(`[TYPE-080] Skipping question for "${dataKey}" - have related data:`, Array.from(collectedFields));
+        continue;
+      }
+
       const question = this.generateQuestionForDataKey(currentPhase, dataKey);
       if (question) {
         questions.push(question);
       }
     }
 
+    console.log(`[TYPE-080] Generated ${questions.length} adaptive questions for ${currentPhase} phase`);
     return questions;
+  }
+
+  /**
+   * v28.1: Get all acceptable field names for a given required field
+   * Returns array of field names that can satisfy the requirement
+   */
+  private getSemanticFieldNames(requiredField: string): string[] {
+    const semanticMappings: Record<string, string[]> = {
+      'activities': ['current_activities', 'activities', 'extracurriculars', 'projects'],
+      'interests': ['interests', 'passions', 'subjects'],
+      'target_major': ['target_major', 'intended_major', 'major'],
+      'high_school': ['high_school', 'school_name', 'school'],
+      'grade': ['grade', 'class_year'],
+      'target_colleges': ['target_colleges', 'dream_schools', 'college_list'],
+    };
+
+    return semanticMappings[requiredField] || [requiredField];
+  }
+
+  /**
+   * v28.1: Check if we have semantically related data for a field
+   * This allows "current_activities" to satisfy "activities", etc.
+   */
+  private hasSemanticMatch(requiredField: string, collectedFields: Set<string>): boolean {
+    // Direct match
+    if (collectedFields.has(requiredField)) {
+      return true;
+    }
+
+    // Semantic mappings: required_field -> [acceptable_collected_fields]
+    const semanticMappings: Record<string, string[]> = {
+      'activities': ['current_activities', 'activities', 'extracurriculars', 'projects'],
+      'interests': ['interests', 'passions', 'subjects'],
+      'target_major': ['target_major', 'intended_major', 'major'],
+      'high_school': ['high_school', 'school_name', 'school'],
+      'grade': ['grade', 'class_year'],
+      'target_colleges': ['target_colleges', 'dream_schools', 'college_list'],
+    };
+
+    const acceptableFields = semanticMappings[requiredField] || [];
+    return acceptableFields.some(field => collectedFields.has(field));
   }
 
   /**
