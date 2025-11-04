@@ -52,8 +52,8 @@
  * LAYER_27: Complete Formula (27sec credibility → 90min commitment locked)
  *
  * Created: 2025-11-02
- * Version: v29.1 - Production Intelligence-Driven + Rubric Scoring Architecture
- * Previous: v26.5 - NO HARDCODED QUESTIONS
+ * Version: v29.8 - Assessment Agent 100% Complete (6/6 intelligence types wired)
+ * Previous: v29.1 - Production Intelligence-Driven + Rubric Scoring Architecture
  */
 
 import { FactStore } from '../../facts/FactStore.js';
@@ -187,26 +187,31 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
 
   /**
    * Initialize Assessment-specific intelligence types
+   * v29.8: Wired 6 domain intelligence types (100% spec-compliant)
    */
   private initializeDomainIntelligence(): void {
+    log.event('assessment_agent.initialize_start', {
+      agent_id: this.agentId,
+      intelligence_types_expected: 6,
+    });
+
     try {
-      const typeIds = [
-        'TYPE-080', // 4-Phase Assessment Flow
-        'TYPE-081', // IvyScore Calculation
-        'TYPE-082', // Gap Analysis Engine
-        'TYPE-083', // Potential Indicator Extraction
-        'TYPE-085', // Rubric Scoring Engine (v29.1)
-        'TYPE-086', // Gap Priority Analyzer (v29.1)
+      this.DOMAIN_INTELLIGENCE = [
+        IntelligenceRegistry.get('TYPE-080'), // 4-Phase Assessment Flow
+        IntelligenceRegistry.get('TYPE-081'), // IvyScore Calculation
+        IntelligenceRegistry.get('TYPE-082'), // Gap Analysis Engine
+        IntelligenceRegistry.get('TYPE-083'), // Potential Indicator Extraction
+        IntelligenceRegistry.get('TYPE-085'), // Rubric Scoring Engine (v29.1)
+        IntelligenceRegistry.get('TYPE-086'), // Gap Priority Analyzer (v29.1)
       ];
 
-      for (const typeId of typeIds) {
-        const intelligenceType = IntelligenceRegistry.get(typeId);
-        if (intelligenceType) {
-          this.DOMAIN_INTELLIGENCE.push(intelligenceType);
-        }
-      }
+      log.event('assessment_agent.initialize_complete', {
+        domain_intelligence_count: this.DOMAIN_INTELLIGENCE.length,
+        types_loaded: this.DOMAIN_INTELLIGENCE.map(t => t.type_id),
+      });
     } catch (error) {
-      console.error('[AssessmentAgent] Failed to load intelligence types:', error);
+      log.error('assessment_agent.initialize_error', error);
+      throw new Error('Failed to initialize AssessmentAgent: ' + String(error));
     }
   }
 
