@@ -56,6 +56,11 @@ import { GapPriorityAnalyzer } from './types/TYPE-086-GapPriorityAnalyzer.js';
 import { ScholarshipSelectionMatrix } from './types/TYPE-031-ScholarshipSelectionMatrix.js';
 import { ApplicationTimelineStrategy } from './types/TYPE-032-ApplicationTimelineStrategy.js';
 import { FinancialAidIntelligence } from './types/TYPE-033-FinancialAidIntelligence.js';
+import { TaskMultiplication } from './types/TYPE-017-TaskMultiplication.js';
+import { AwardStrategyOrchestration } from './types/TYPE-022-AwardStrategyOrchestration.js';
+import { AwardTierClassification } from './types/TYPE-024-AwardTierClassification.js';
+import { ContentRecyclingMatrix } from './types/TYPE-025-ContentRecyclingMatrix.js';
+import { SeventyTwentyTenRule } from './types/TYPE-026-SeventyTwentyTenRule.js';
 
 /**
  * Global registry for intelligence type instances
@@ -146,9 +151,14 @@ export class IntelligenceRegistry {
     this.register(new QuarterlyAdaptation());           // TYPE-006 ✅ Complete (v18.0)
     this.register(new TimeMathematician());             // TYPE-007 ✅ Complete (v18.0)
 
-    // Register DOMAIN-SPECIFIC intelligence types (Awards Agent)
-    this.register(new AwardArbitrageSystem()); // TYPE-023
-    this.register(new QuickWinsStrategy());    // TYPE-027
+    // Register DOMAIN-SPECIFIC intelligence types (Awards Agent) - v29.6
+    this.register(new TaskMultiplication());         // TYPE-017 (shared: Awards, ECs, Execution)
+    this.register(new AwardStrategyOrchestration()); // TYPE-022 ✅ Complete (v29.6)
+    this.register(new AwardArbitrageSystem());       // TYPE-023
+    this.register(new AwardTierClassification());    // TYPE-024 ✅ Complete (v29.6)
+    this.register(new ContentRecyclingMatrix());     // TYPE-025 ✅ Complete (v29.6)
+    this.register(new SeventyTwentyTenRule());       // TYPE-026 ✅ Complete (v29.6)
+    this.register(new QuickWinsStrategy());          // TYPE-027
 
     // Register DOMAIN-SPECIFIC intelligence types (Summer Programs Agent) - v19.0
     this.register(new ProgramSelectionMatrix());    // TYPE-028

@@ -68,7 +68,12 @@ export class AwardsAgentRefactored extends BaseAgentWithIntelligence {
     // Load domain-specific intelligence types from registry
     try {
       this.DOMAIN_INTELLIGENCE = [
+        IntelligenceRegistry.get('TYPE-017'), // Task Multiplication (5X Formula)
+        IntelligenceRegistry.get('TYPE-022'), // Award Strategy Orchestration
         IntelligenceRegistry.get('TYPE-023'), // Award Arbitrage System
+        IntelligenceRegistry.get('TYPE-024'), // Award Tier Classification
+        IntelligenceRegistry.get('TYPE-025'), // Content Recycling Matrix
+        IntelligenceRegistry.get('TYPE-026'), // 70/20/10 Portfolio Rule
         IntelligenceRegistry.get('TYPE-027'), // Quick Wins Strategy
         // TYPE-020 (Opportunity Pipeline) is inherited as UNIVERSAL
       ];
