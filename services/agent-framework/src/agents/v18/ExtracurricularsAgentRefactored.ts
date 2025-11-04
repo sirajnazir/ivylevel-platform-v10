@@ -1,5 +1,5 @@
 /**
- * ExtracurricularsAgentRefactored - v18.0 Fact-First Architecture
+ * ExtracurricularsAgentRefactored - v29.7 Intelligence Types Architecture
  *
  * Portfolio Architect + Narrative Synthesizer for EC optimization
  *
@@ -7,22 +7,25 @@
  * Intelligence: 70+ coaching frameworks from 93 weeks of real coaching data
  * Spec: /docs/agents/EXTRACURRICULARS_AGENT_TECH_SPEC.md
  *
- * Core Capabilities:
- * - EC Portfolio Audit (Tier Classification T1-T4, Cookie-Cutter Detection)
- * - Narrative Synthesis (Coherent identity from scattered activities)
- * - Strategic Activity Selection (Exploration → Selection → Depth)
- * - Impact Engineering (M0 → M1 → M2 → M3 → M4 escalation)
- * - Time Architecture (168-Hour reality check)
- * - Crisis Management (Strategic Pivot Protocol 48-72h)
+ * Core Capabilities (v29.7 - 6 Domain Intelligence Types):
+ * - TYPE-013: EC Portfolio Optimization (10-slot Common App strategy, tier classification T1-T4)
+ * - TYPE-014: Narrative Synthesis (Web Metaphor, Identity Fusion, cookie-cutter detection)
+ * - TYPE-015: Impact Engineering (Evidence Ladder M0→M4 escalation)
+ * - TYPE-016: Time Mathematics (168-Hour Architecture reality check)
+ * - TYPE-017: Task Multiplication (5X Formula, shared with Awards Agent)
+ * - TYPE-019: Formalization Ladder (5-step legitimacy stack)
  *
- * @version 18.0
- * @date 2025-10-29
+ * @version 29.7
+ * @date 2025-11-04
  */
 
 import { BaseAgentWithIntelligence } from './BaseAgentWithIntelligence.js';
 import { AgentQuery, AgentResponse } from '../types';
 import { FactCategory, FactSet, Fact } from '../../facts/types';
 import { FactStore } from '../../facts/FactStore';
+import { IntelligenceType } from '../../intelligence/types/BaseIntelligenceType.js';
+import { IntelligenceRegistry } from '../../intelligence/IntelligenceRegistry.js';
+import { log } from '../../utils/logger.js';
 
 // ============================================================================
 // Types & Interfaces
@@ -137,8 +140,37 @@ interface StudentDemographic {
 export class ExtracurricularsAgentRefactored extends BaseAgentWithIntelligence {
   protected agentDomain = 'extracurriculars' as const;
 
+  /**
+   * Domain-specific intelligence types for EC Agent
+   * v29.7: Loaded from IntelligenceRegistry (6 domain types)
+   */
+  protected DOMAIN_INTELLIGENCE: IntelligenceType[] = [];
+
   constructor(factStore: FactStore) {
     super('extracurriculars-agent', factStore);
+
+    log.event('extracurriculars_agent.initialize_start');
+
+    // Load domain-specific intelligence types from registry (v29.7)
+    try {
+      this.DOMAIN_INTELLIGENCE = [
+        IntelligenceRegistry.get('TYPE-013'), // EC Portfolio Optimization (10-slot strategy)
+        IntelligenceRegistry.get('TYPE-014'), // Narrative Synthesis (Identity Fusion)
+        IntelligenceRegistry.get('TYPE-015'), // Impact Engineering (Evidence Ladder M0→M4)
+        IntelligenceRegistry.get('TYPE-016'), // Time Mathematics (168-Hour Architecture)
+        IntelligenceRegistry.get('TYPE-017'), // Task Multiplication (5X Formula, shared with Awards)
+        IntelligenceRegistry.get('TYPE-019'), // Formalization Ladder (5-step legitimacy)
+        // TYPE-020 (Opportunity Pipeline) is inherited as UNIVERSAL
+      ];
+
+      log.event('extracurriculars_agent.initialize_complete', {
+        domain_intelligence_count: this.DOMAIN_INTELLIGENCE.length,
+        total_intelligence_count: this.getAllIntelligenceTypes().length,
+      });
+    } catch (error) {
+      log.error('extracurriculars_agent.initialize_error', error);
+      throw new Error('Failed to initialize ExtracurricularsAgent: ' + String(error));
+    }
   }
 
   /**
