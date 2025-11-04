@@ -61,6 +61,11 @@ import { AwardStrategyOrchestration } from './types/TYPE-022-AwardStrategyOrches
 import { AwardTierClassification } from './types/TYPE-024-AwardTierClassification.js';
 import { ContentRecyclingMatrix } from './types/TYPE-025-ContentRecyclingMatrix.js';
 import { SeventyTwentyTenRule } from './types/TYPE-026-SeventyTwentyTenRule.js';
+import { ECPortfolioOptimization } from './types/TYPE-013-ECPortfolioOptimization.js';
+import { NarrativeSynthesis } from './types/TYPE-014-NarrativeSynthesis.js';
+import { ImpactEngineering } from './types/TYPE-015-ImpactEngineering.js';
+import { TimeMathematics } from './types/TYPE-016-TimeMathematics.js';
+import { FormalizationLadder } from './types/TYPE-019-FormalizationLadder.js';
 
 /**
  * Global registry for intelligence type instances
@@ -159,6 +164,13 @@ export class IntelligenceRegistry {
     this.register(new ContentRecyclingMatrix());     // TYPE-025 ✅ Complete (v29.6)
     this.register(new SeventyTwentyTenRule());       // TYPE-026 ✅ Complete (v29.6)
     this.register(new QuickWinsStrategy());          // TYPE-027
+
+    // Register DOMAIN-SPECIFIC intelligence types (Extracurriculars Agent) - v29.7
+    this.register(new ECPortfolioOptimization());    // TYPE-013 ✅ Complete (v29.7)
+    this.register(new NarrativeSynthesis());         // TYPE-014 ✅ Complete (v29.7)
+    this.register(new ImpactEngineering());          // TYPE-015 ✅ Complete (v29.7)
+    this.register(new TimeMathematics());            // TYPE-016 ✅ Complete (v29.7)
+    this.register(new FormalizationLadder());        // TYPE-019 ✅ Complete (v29.7)
 
     // Register DOMAIN-SPECIFIC intelligence types (Summer Programs Agent) - v19.0
     this.register(new ProgramSelectionMatrix());    // TYPE-028
