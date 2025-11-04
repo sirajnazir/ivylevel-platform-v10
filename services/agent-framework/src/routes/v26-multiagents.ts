@@ -383,6 +383,96 @@ What would you like to focus on this week?`;
         }
       }
 
+      // v29.0.2: Save collected facts to kb_items (Assessment Agent conversational extraction)
+      console.log('[V29.0.2_DEBUG] Checking fact-saving conditions:', {
+        agentId,
+        is_assessment: agentId === 'assessment-agent-v18',
+        has_metadata: !!agentResponse.metadata,
+        metadata_keys: agentResponse.metadata ? Object.keys(agentResponse.metadata) : [],
+        has_data_collected: !!agentResponse.metadata?.data_collected_so_far,
+      });
+
+      if (agentId === 'assessment-agent-v18' && agentResponse.metadata?.data_collected_so_far) {
+        const collectedData = agentResponse.metadata.data_collected_so_far;
+
+        console.log('[V29.0.2_FACT_SAVE] 💾 Saving conversational facts to kb_items...', {
+          clone_student_id: cloneStudentId,
+          fact_count: Object.keys(collectedData).length,
+          fact_keys: Object.keys(collectedData)
+        });
+
+        // Import FactCategoryMapper to categorize facts
+        const { FactCategoryMapper } = await import('../facts/FactCategoryMapper.js');
+
+        // Map collected data to categories using FactCategoryMapper
+        const categorizedFacts = FactCategoryMapper.mapToCategories(
+          collectedData,
+          cloneStudentId,
+          'assessment-agent-v18',
+          session_id
+        );
+
+        // Save each categorized fact to kb_items with v28.1 multi-category storage
+        for (const [category, facts] of categorizedFacts.entries()) {
+          for (const fact of facts) {
+            const item_id = `${cloneStudentId}_${category.toLowerCase()}_conversational_v28`;
+
+            // Build edges JSONB with fact data
+            const edges: any = {};
+            edges[fact.fact_type] = fact.value;
+            edges.v28_metadata = {
+              confidence: fact.confidence,
+              quality_score: fact.quality_score,
+              is_student_specific: fact.is_student_specific,
+              extraction_method: fact.extraction_method,
+              source_agent: fact.source_agent,
+              source_session: fact.source_session,
+              created_at: fact.created_at
+            };
+
+            try {
+              const result = await pool.query(
+                `INSERT INTO kb_items (item_id, student_id, item_type, subtype, title_name, tier1_state, source_ref, confidence, edges)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                 ON CONFLICT (item_id) DO UPDATE SET
+                   edges = kb_items.edges || EXCLUDED.edges,
+                   updated_ts = NOW()`,
+                [
+                  item_id,
+                  cloneStudentId,
+                  category, // item_type = FactCategory
+                  fact.fact_type,
+                  `Conversational Assessment - ${category}`,
+                  'In Transit',
+                  'gpt4o_conversational_extraction_v28',
+                  'medium',
+                  JSON.stringify(edges)
+                ]
+              );
+              console.log('[V29.0.2_FACT_SAVE] ✅ INSERT successful:', {
+                item_id,
+                category,
+                fact_type: fact.fact_type,
+                rows_affected: result.rowCount
+              });
+            } catch (error: any) {
+              console.error('[V29.0.2_FACT_SAVE] ❌ INSERT FAILED:', {
+                item_id,
+                category,
+                fact_type: fact.fact_type,
+                error: error.message,
+                code: error.code
+              });
+            }
+          }
+        }
+
+        console.log('[V29.0.2_FACT_SAVE] ✅ Facts saved to kb_items:', {
+          categories_saved: categorizedFacts.size,
+          total_facts: Array.from(categorizedFacts.values()).reduce((sum, facts) => sum + facts.length, 0)
+        });
+      }
+
       // v28.0: Check for A2A handover in metadata
       const a2a_handover_complete = agentResponse.metadata?.a2a_handover_complete || false;
       const handover_id = agentResponse.metadata?.handover_id;
@@ -394,6 +484,10 @@ What would you like to focus on this week?`;
         'gameplan-agent': 'gameplan',
         'execution-agent': 'execution'
       };
+
+      // v29.0.4: Declare handover variables outside block scope for response
+      let available_facts: Map<any, any[]> = new Map();
+      let handoverValidation: any = null;
 
       if (a2a_handover_complete && handover_id && new_agent_id) {
         console.log('[V26_A2A] 🔄 A2A Handover detected!', {
@@ -418,7 +512,7 @@ What would you like to focus on this week?`;
         // Group facts by category (item_type = FactCategory)
         // v28.1: Facts stored in edges JSONB, extract using FactCategoryMapper
         const { FactCategoryMapper } = await import('../facts/FactCategoryMapper.js');
-        const available_facts = FactCategoryMapper.extractFactsFromKbItems(factsResult.rows);
+        available_facts = FactCategoryMapper.extractFactsFromKbItems(factsResult.rows);
 
         console.log('[V29.0_HANDOVER] 📋 Facts loaded by category:', {
           categories: Array.from(available_facts.keys()),
@@ -431,7 +525,7 @@ What would you like to focus on this week?`;
 
         // v28.5: Validate handover readiness with HandoverValidator
         console.log('[V28.5_HANDOVER] 🔍 Validating handover with 20 quality gates...');
-        const handoverValidation = await HandoverValidator.validateHandover(
+        handoverValidation = await HandoverValidator.validateHandover(
           agentId,
           new_agent_id,
           available_facts
@@ -560,13 +654,36 @@ What would you like to focus on this week?`;
         confidence: agentResponse.validation_score,
         intelligence_triggered: (agentResponse as any).intelligence_triggered || [],
         metadata: agentResponse.metadata,
-        // v28.0: A2A Handover information
+        // v28.0: A2A Handover information (v29.0.4: Include available_facts and validation)
         a2a_handover: a2a_handover_complete ? {
           handover_complete: true,
           handover_id,
           from_agent: agentId,
           to_agent: new_agent_id,
-          new_phase: phaseMap[new_agent_id] || sessionResult.rows[0].current_phase
+          new_phase: phaseMap[new_agent_id] || sessionResult.rows[0].current_phase,
+          // v29.0.4: Include available facts loaded from database
+          available_facts: Array.from(available_facts.entries()).map(([category, facts]) => ({
+            category,
+            facts: facts.map(f => ({
+              fact_type: f.fact_type,
+              value: f.value,
+              confidence: f.confidence,
+              quality_score: f.quality_score
+            }))
+          })),
+          // v29.0.4: Include validation results from HandoverValidator
+          handover_validation: handoverValidation ? {
+            is_ready: handoverValidation.is_ready,
+            quality_score: handoverValidation.quality_score,
+            quality_gates_passed: handoverValidation.quality_gates_passed,
+            quality_gates_total: handoverValidation.quality_gates_total,
+            quality_gates_pass_rate: handoverValidation.quality_gates_pass_rate,
+            missing_mandatory_facts: handoverValidation.missing_mandatory_facts,
+            recommendation: handoverValidation.recommendation,
+            rushed_handover_indicators: handoverValidation.rushed_handover_indicators,
+            student_specific_count: handoverValidation.student_specific_count,
+            longitudinal_fact_count: handoverValidation.longitudinal_fact_count
+          } : null
         } : null,
         // v26 Context: Real vs Clone Student IDs for intelligence tracing
         v26_context: {
