@@ -84,6 +84,9 @@ export interface AgentQuery {
   query: string;
   session_id: string;
   metadata?: Record<string, any>;
+  // v29.0.5: Flag to indicate this query is from an A2A handover
+  // When true, agents should bypass insufficient data checks
+  is_a2a_handover?: boolean;
 }
 
 /**

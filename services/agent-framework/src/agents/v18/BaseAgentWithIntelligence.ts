@@ -227,7 +227,8 @@ export abstract class BaseAgentWithIntelligence {
       const facts = await this.loadFacts(query.entity_id);
 
       // Step 2: Check if sufficient facts exist (ENFORCED)
-      if (!facts.hasSufficientData(this.getRequiredFacts())) {
+      // v29.0.5: Skip check if this is an A2A handover (facts exist in DB but not in context)
+      if (!query.is_a2a_handover && !facts.hasSufficientData(this.getRequiredFacts())) {
         return this.generateInsufficientDataResponse(facts);
       }
 

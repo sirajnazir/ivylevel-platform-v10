@@ -81,8 +81,9 @@ export class V26AgentWrapperReal {
     student_id: string;
     session_id: string;
     message: string;
+    is_a2a_handover?: boolean; // v29.0.5: Skip insufficient data check for A2A handovers
   }): Promise<V26AgentResponse> {
-    const { agent_id, student_id, session_id, message } = params;
+    const { agent_id, student_id, session_id, message, is_a2a_handover } = params;
 
     // Check if student_id is already a clone ID (ends with -v26-2025 or -v26-clone)
     const isAlreadyCloneId = student_id.includes('-v26-') || student_id.endsWith('-v26-clone');
@@ -145,7 +146,8 @@ export class V26AgentWrapperReal {
         cloneStudentId,
         session_id,
         message,
-        conversationHistory
+        conversationHistory,
+        is_a2a_handover
       );
     } else if (agent_id.includes('execution')) {
       processingSteps.push('Routing to ExecutionAgent (TYPE-049 through TYPE-063)');
@@ -358,7 +360,8 @@ export class V26AgentWrapperReal {
     studentId: string,
     sessionId: string,
     message: string,
-    conversationHistory: ConversationMessage[]
+    conversationHistory: ConversationMessage[],
+    is_a2a_handover?: boolean // v29.0.5: Skip insufficient data check for A2A handovers
   ): Promise<AgentResponse> {
     const agent = this.agentRegistry.getGamePlanAgent();
 
@@ -366,6 +369,7 @@ export class V26AgentWrapperReal {
       entity_id: studentId,
       query: message,
       session_id: sessionId,
+      is_a2a_handover, // v29.0.5: Pass flag to bypass insufficient data check
       metadata: {
         conversation_history: this.buildConversationContext(conversationHistory),
       },

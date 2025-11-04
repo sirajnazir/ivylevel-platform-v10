@@ -563,11 +563,13 @@ What would you like to focus on this week?`;
         try {
           // v28.5: Always call the new agent (it will handle insufficient data internally)
           // The agent's generateInsufficientDataResponse() will ask natural questions if needed
+          // v29.0.5: Pass is_a2a_handover flag to bypass insufficient data check
           const handoverResponse = await v26Wrapper.handleQuery({
             agent_id: new_agent_id,
             student_id: cloneStudentId,
             session_id,
             message: 'continue', // Trigger agent initialization
+            is_a2a_handover: true, // Skip insufficient data check
           });
 
           console.log('[V28.5_HANDOVER] ✅ New agent response generated:', {
