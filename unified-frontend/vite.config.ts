@@ -19,6 +19,11 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      '/api/v26': {
+        target: process.env.VITE_AGENT_API_URL || 'http://localhost:8787',
+        changeOrigin: true,
+        rewrite: (path) => path,
+      },
       '/api': {
         target: process.env.VITE_API_BASE_URL || 'http://localhost:8000',
         changeOrigin: true,

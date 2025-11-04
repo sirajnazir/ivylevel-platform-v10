@@ -544,7 +544,8 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
-  const API_URL = import.meta.env.VITE_AGENT_API_URL || 'http://localhost:8787';
+  // Use relative URLs - Vite proxy will forward /api/v26 to agent-framework backend
+  const API_URL = '';
 
   // Agent configurations
   const AGENT_CONFIGS = {
