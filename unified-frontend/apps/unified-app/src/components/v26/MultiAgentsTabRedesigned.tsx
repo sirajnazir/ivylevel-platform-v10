@@ -58,7 +58,7 @@ interface AgentCardData {
   color: string;
   messages: Message[];
   isActive: boolean;
-  status: 'ready' | 'active' | 'handed_off';  // v28.0: Track agent status
+  status: 'ready' | 'active' | 'handed_off' | 'delegating';  // v30.1.2: Added delegating status
   handoverInfo?: {  // v28.0: Store handover metadata
     handedTo: string;
     handoverId: string;
@@ -215,7 +215,7 @@ const AgentCardsGrid = styled.div`
   }
 `;
 
-const AgentCard = styled.div<{ $color: string; $isActive: boolean; $status: 'ready' | 'active' | 'handed_off' }>`
+const AgentCard = styled.div<{ $color: string; $isActive: boolean; $status: 'ready' | 'active' | 'handed_off' | 'delegating' }>`
   background: ${props => props.$status === 'handed_off' ? '#fafafa' : 'white'};
   border-radius: 12px;
   border: ${props => {
@@ -232,8 +232,20 @@ const AgentCard = styled.div<{ $color: string; $isActive: boolean; $status: 'rea
   height: 400px;
   transition: all 0.3s ease;
 
+  /* v30.1.2: Greyscale filter for inactive agents */
+  filter: ${props => {
+    if (props.$status === 'handed_off') return 'grayscale(80%)';
+    if (props.$status === 'ready' && !props.$isActive) return 'grayscale(60%)';
+    return 'none';
+  }};
+
+  /* v30.1.2: Transform for active agents */
+  transform: ${props => props.$isActive ? 'scale(1.02)' : 'scale(1)'};
+
   &:hover {
     box-shadow: ${props => props.$status === 'handed_off' ? '0 2px 4px rgba(0,0,0,0.03)' : '0 6px 16px rgba(0,0,0,0.1)'};
+    /* Remove greyscale on hover for better interaction feedback */
+    filter: ${props => props.$status === 'handed_off' ? 'grayscale(60%)' : 'none'};
   }
 
   /* v28.0: Transition animation when handover occurs */
@@ -241,10 +253,26 @@ const AgentCard = styled.div<{ $color: string; $isActive: boolean; $status: 'rea
     animation: agentTransition 2s ease;
   }
 
+  /* v30.1.2: Delegation animation (pulsing effect) */
+  &.agent-card-delegating {
+    animation: agentDelegating 1.5s ease-in-out infinite;
+  }
+
   @keyframes agentTransition {
     0% { transform: scale(1); }
-    50% { transform: scale(1.02); box-shadow: 0 8px 16px rgba(76, 175, 80, 0.4); }
-    100% { transform: scale(1); }
+    50% { transform: scale(1.05); box-shadow: 0 8px 16px rgba(76, 175, 80, 0.4); }
+    100% { transform: scale(1.02); }
+  }
+
+  @keyframes agentDelegating {
+    0%, 100% {
+      border-color: ${props => props.$color};
+      box-shadow: 0 4px 12px ${props => props.$color}33;
+    }
+    50% {
+      border-color: #fbbf24;
+      box-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
+    }
   }
 `;
 
@@ -270,21 +298,23 @@ const AgentEmoji = styled.span`
   font-size: 20px;
 `;
 
-const AgentStatus = styled.div<{ $color: string; $status?: 'ready' | 'active' | 'handed_off' }>`
+const AgentStatus = styled.div<{ $color: string; $status?: 'ready' | 'active' | 'handed_off' | 'delegating' }>`
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 11px;
   color: ${props => {
     if (props.$status === 'handed_off') return '#666';
+    if (props.$status === 'delegating') return '#f59e0b';  // v30.1.2: Orange for delegating
     return props.$color;
   }};
   font-weight: 600;
   background: ${props => {
     if (props.$status === 'handed_off') return '#e0e0e0';
+    if (props.$status === 'delegating') return '#fef3c7';  // v30.1.2: Yellow background for delegating
     return 'transparent';
   }};
-  padding: ${props => props.$status === 'handed_off' ? '4px 8px' : '0'};
+  padding: ${props => (props.$status === 'handed_off' || props.$status === 'delegating') ? '4px 8px' : '0'};
   border-radius: 4px;
 `;
 
@@ -938,8 +968,10 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
                   {card.name} Agent
                 </AgentCardTitle>
                 <AgentStatus $color={card.color} $status={card.status}>
-                  {card.status === 'active' && <StatusDot $color={card.color} />}
-                  {card.status === 'active' ? 'ACTIVE' : card.status === 'handed_off' ? 'HANDED OFF' : 'READY'}
+                  {(card.status === 'active' || card.status === 'delegating') && <StatusDot $color={card.status === 'delegating' ? '#f59e0b' : card.color} />}
+                  {card.status === 'active' ? 'ACTIVE' :
+                   card.status === 'delegating' ? 'DELEGATING' :
+                   card.status === 'handed_off' ? 'HANDED OFF' : 'READY'}
                 </AgentStatus>
               </AgentCardHeader>
 
