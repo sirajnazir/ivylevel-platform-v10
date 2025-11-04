@@ -40,6 +40,7 @@ interface Message {
   confidence?: number;
   timestamp: string;
   metadata?: any;
+  suggested_responses?: string[]; // v29.5: Quick reply bubbles
 }
 
 interface IntelligenceLog {
@@ -359,6 +360,39 @@ const MessageMeta = styled.div`
   margin-top: 4px;
   display: flex;
   gap: 12px;
+`;
+
+// v29.5: Quick Reply Bubbles Styles
+const QuickRepliesContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+`;
+
+const QuickReplyBubble = styled.button`
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid #cbd5e1;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+    border-color: #4F46E5;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0px);
+  }
 `;
 
 const AgentCardInput = styled.div`
@@ -766,6 +800,7 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
         processing_time: data.processing_time,
         confidence: data.confidence,
         timestamp: new Date().toISOString(),
+        suggested_responses: data.metadata?.suggested_responses, // v29.5: Quick reply bubbles
       };
 
       setAgentCards(prev => prev.map(card =>
@@ -935,6 +970,22 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
                             <span>🧠 {msg.intelligence_triggered.length} types</span>
                           )}
                         </MessageMeta>
+                      )}
+
+                      {/* v29.5: Quick Reply Bubbles */}
+                      {msg.role === 'agent' && msg.suggested_responses && msg.suggested_responses.length > 0 && (
+                        <QuickRepliesContainer>
+                          {msg.suggested_responses.map((suggestion, idx) => (
+                            <QuickReplyBubble
+                              key={idx}
+                              onClick={() => {
+                                setInputValues(prev => ({ ...prev, [card.agent_id]: suggestion }));
+                              }}
+                            >
+                              {suggestion}
+                            </QuickReplyBubble>
+                          ))}
+                        </QuickRepliesContainer>
                       )}
                     </div>
                   ))

@@ -1,11 +1,101 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v29.0
+**Document Version:** v29.5
 **Last Updated:** 2025-11-04
-**Current Version:** v29.0 - Proper A2A Architecture + HandoverValidator + 20 Quality Gates
-**Status:** ✅ PRODUCTION READY - PROPER A2A ARCHITECTURE + HANDOVER VALIDATOR + 20 QUALITY GATES + 7 AGENTS OPERATIONAL + 34 INTELLIGENCE TYPES
+**Current Version:** v29.5 - A2A Handover GamePlan Fix + Quick Reply Bubbles
+**Status:** ✅ PRODUCTION READY - A2A HANDOVER COMPLETE + GAMEPLAN REPORTS WORKING + QUICK REPLY UX ENHANCEMENT
 **Strategic Focus:** 7 Core Student Development Agents (9th-11th Grade, 3+ Years Value)
 **See:** PRIORITY_ROADMAP_REFOCUSED.md for strategic rationale (deprioritized college apps agents)
+
+---
+
+## v29.5 - A2A Handover GamePlan Fix + Quick Reply Bubbles UX (2025-11-04)
+
+**Focus:** Fixed empty GamePlan Priority Focus Areas by normalizing Assessment→GamePlan handover payload format, and added context-aware quick reply bubbles to speed up Assessment Agent testing/UX.
+
+### Summary
+
+v29.5 fixes critical A2A handover issue where GamePlan Priority Focus Areas and Quarterly Roadmap appeared but were empty despite intelligence types triggering correctly. Also adds quick reply bubble UX enhancement to Assessment Agent for faster testing and better user experience.
+
+**Key Accomplishments:**
+
+- **Fixed Empty GamePlan Sections** - Normalized Assessment payload format to match GamePlan expectations
+- **Payload Format Mismatch Resolution** - Added HandoverPayloadExtractor normalization for TYPE-086 gap data
+- **Quick Reply Bubbles UX** - Context-aware suggested responses appear below Assessment questions
+- **Frontend Component Cleanup** - Archived deprecated MultiAgentsTab.tsx, using MultiAgentsTabRedesigned.tsx only
+
+### Root Cause Analysis
+
+**Problem:** GamePlan Priority Focus Areas and Quarterly Roadmap sections appeared but were completely empty, despite TYPE-085 (Rubric Scoring) and TYPE-086 (Gap Priority Analyzer) triggering correctly during A2A handover.
+
+**Diagnosis:**
+- Assessment Agent generated gap data in format: `{ category, severity: 'p0', description, recommendation }`
+- GamePlan Agent expected format: `{ dimension, priority: 'P0', gap_size, recommended_actions: [] }`
+- Format mismatch caused GamePlan synthesis logic to skip all gaps
+
+**Solution:**
+Added normalization in `HandoverPayloadExtractor.extractGapPriorityResult()`:
+- Map `category` → `dimension`
+- Convert `severity: 'p0'` → `priority: 'P0'` (uppercase)
+- Parse `gap_size` from description string (e.g., "recognition gap: 0/7" → gap_size = 7)
+- Wrap single `recommendation` into `recommended_actions[]` array
+
+### Files Modified
+
+**Backend:**
+- `services/agent-framework/src/a2a/HandoverPayloadExtractor.ts` (lines 172-224)
+  - Added `extractGapPriorityResult()` normalization for TYPE-086 payload
+- `services/agent-framework/src/agents/v18/GamePlanAgentV3.ts` (lines 358-430)
+  - Updated Priority Focus Areas to use TYPE-086 from handover
+- `services/agent-framework/src/agents/v18/AssessmentAgentV3ConversationalRealtime.ts` (lines 1421-1497)
+  - Added `generateSuggestedResponses()` method for context-aware quick replies
+  - Integrated suggested_responses into metadata
+
+**Frontend:**
+- `unified-frontend/apps/unified-app/src/components/v26/MultiAgentsTabRedesigned.tsx`
+  - Added `suggested_responses` field to Message interface (line 43)
+  - Extract suggested_responses from API metadata (line 770)
+  - Added QuickRepliesContainer and QuickReplyBubble styled components (lines 365-396)
+  - Render quick reply bubbles below agent messages (lines 942-956)
+
+**Archived:**
+- `unified-frontend/apps/unified-app/src/components/v26/MultiAgentsTab.tsx`
+  - Moved to `/archive/2025-11-04/` (was incorrectly being edited instead of MultiAgentsTabRedesigned)
+
+### Impact
+
+**GamePlan Reports:**
+- ✅ Priority Focus Areas now populate with proper gap analysis and scores
+- ✅ Quarterly Roadmap integrates TYPE-086 recommendations correctly
+- ✅ Example output: "Focus on recognition: Priority 14.7 (recognition, Gap: 7.0)"
+
+**Quick Reply Bubbles:**
+- ✅ Speeds up Assessment Agent testing (click instead of typing)
+- ✅ Context-aware suggestions based on question type:
+  - Grade questions → ["9th grade", "10th grade", "11th grade", "12th grade"]
+  - School questions → ["Mountain House High School", "Mission San Jose High School", etc.]
+  - Interest questions → ["Computer Science", "Biology/Pre-Med", etc.]
+- ✅ Improves production UX by showing common response patterns
+- ⚠️ Note: Suggestions may not always be perfectly relevant (acceptable trade-off for speed)
+
+### Testing Verified
+
+**GamePlan Report:**
+- Session ID: `504e3364-aea3-438b-bed2-731457732cc1`
+- Student: huda-v26-2025
+- Confirmed Priority Focus Areas showing:
+  - "Focus on recognition: Priority 14.7 (recognition, Gap: 7.0)"
+  - "Focus on leadership: Priority 13.6 (leadership, Gap: 7.0)"
+  - "Focus on academics: Priority 13.5 (academics, Gap: 6.0)"
+
+**Quick Reply Bubbles:**
+- Confirmed appearing below Assessment Agent questions
+- Confirmed clickable and populate input field
+- Confirmed context-awareness working for common question types
+
+### Migration Notes
+
+None - backward compatible changes.
 
 ---
 

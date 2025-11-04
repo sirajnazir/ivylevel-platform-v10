@@ -468,6 +468,15 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     // Update state in database
     await this.saveConversationState(state);
 
+    // v29.5: Generate suggested quick replies based on question context
+    const suggestedResponses = this.generateSuggestedResponses(nextQuestion, collectedData);
+
+    console.log('[v29.5_QUICK_REPLIES] Generated suggested responses:', {
+      question_text: nextQuestion.question.substring(0, 80),
+      suggested_responses: suggestedResponses,
+      count: suggestedResponses.length,
+    });
+
     return {
       response: eqEnhancedResponse,
       facts_used: facts.getAllFacts(),
@@ -484,6 +493,7 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
         eq_layer_active: state.current_eq_layer,
         confidence_level: state.confidence_level,
         data_collected_so_far: collectedData,
+        suggested_responses: suggestedResponses, // v29.5: Quick reply bubbles for frontend
       },
     };
   }
@@ -1412,6 +1422,63 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     console.log('[EXTRACT_COLLECTED_DATA] Final collected data:', JSON.stringify(collectedData, null, 2));
 
     return collectedData;
+  }
+
+  /**
+   * v29.5: Generate suggested quick reply responses based on question context
+   * Provides clickable response bubbles to speed up testing and improve UX
+   */
+  private generateSuggestedResponses(question: any, collectedData: Record<string, any>): string[] {
+    const questionText = question.question.toLowerCase();
+    const suggestions: string[] = [];
+
+    // Grade detection
+    if (questionText.includes('grade') || questionText.includes('year')) {
+      return ['9th grade', '10th grade', '11th grade', '12th grade'];
+    }
+
+    // School detection
+    if (questionText.includes('school')) {
+      return ['Mountain House High School', 'Mission San Jose High School', 'American High School'];
+    }
+
+    // Interests/Activities detection
+    if (questionText.includes('interest') || questionText.includes('passionate') || questionText.includes('excites you')) {
+      return ['Computer Science', 'Biology/Pre-Med', 'Business/Entrepreneurship', 'Environmental Science'];
+    }
+
+    // Major detection
+    if (questionText.includes('major') || questionText.includes('study')) {
+      return ['Computer Science', 'Pre-Med/Biology', 'Business', 'Engineering', 'Psychology'];
+    }
+
+    // Dream schools detection
+    if (questionText.includes('dream') || questionText.includes('target') || questionText.includes('college')) {
+      return ['Stanford, MIT, CMU', 'UC Berkeley, UCLA, UCSD', 'Harvard, Yale, Princeton', 'Not sure yet'];
+    }
+
+    // Projects/Activities detection
+    if (questionText.includes('project') || questionText.includes('activity') || questionText.includes('built') || questionText.includes('created')) {
+      return ['Built an app/website', 'Research project', 'Started a club', 'Volunteering work'];
+    }
+
+    // Impact detection
+    if (questionText.includes('impact') || questionText.includes('help') || questionText.includes('difference')) {
+      return ['Help my community', 'Empower others', 'Solve real problems', 'Create opportunities'];
+    }
+
+    // Challenges detection
+    if (questionText.includes('challenge') || questionText.includes('obstacle') || questionText.includes('difficult')) {
+      return ['Time management', 'Lack of resources', 'Self-doubt', 'Finding opportunities'];
+    }
+
+    // Goals detection
+    if (questionText.includes('goal') || questionText.includes('achieve') || questionText.includes('accomplish')) {
+      return ['Get into top college', 'Win awards/competitions', 'Launch my project', 'Make a difference'];
+    }
+
+    // Default suggestions for open-ended questions
+    return ['Tell me more', 'I need help with this', 'Let me think about it', 'What do you recommend?'];
   }
 
   /**

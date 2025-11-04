@@ -170,7 +170,38 @@ export class HandoverPayloadExtractor {
    * @returns Synthetic TYPE-086 intelligence result (as if it ran in GamePlan)
    */
   static extractGapPriorityResult(payload: AssessmentHandoverPayload): IntelligenceResult {
-    const prioritized_gaps = [...payload.p0_gaps, ...payload.p1_gaps];
+    // v29.4.1: Normalize Assessment payload format to GamePlan expected format
+    // Assessment format: { category, severity: 'p0'/'p1', description, recommendation }
+    // GamePlan format: { dimension, priority: 'P0'/'P1', recommended_actions: [], gap_size, ... }
+
+    const normalizeGap = (gap: any) => {
+      // Parse gap_size from description (e.g., "recognition gap: 0/7" → gap_size = 7)
+      const gapMatch = gap.description.match(/(\d+)\/(\d+)/);
+      const current_score = gapMatch ? parseInt(gapMatch[1]) : 0;
+      const target_score = gapMatch ? parseInt(gapMatch[2]) : 10;
+      const gap_size = target_score - current_score;
+
+      return {
+        dimension: gap.category,  // 'recognition', 'leadership', etc.
+        current_score,
+        target_score,
+        gap_size,
+        priority: gap.severity.toUpperCase() as 'P0' | 'P1',  // 'p0' → 'P0'
+        urgency: gap.severity === 'p0' ? 'Critical' : 'High',
+        recommended_actions: [gap.recommendation],  // Convert single recommendation to array
+      };
+    };
+
+    const normalizedP0 = payload.p0_gaps.map(normalizeGap);
+    const normalizedP1 = payload.p1_gaps.map(normalizeGap);
+    const prioritized_gaps = [...normalizedP0, ...normalizedP1];
+
+    console.log('[EXTRACTOR_v29.4.1] Normalized gaps:', {
+      original_p0_count: payload.p0_gaps.length,
+      original_p1_count: payload.p1_gaps.length,
+      normalized_count: prioritized_gaps.length,
+      sample_normalized: prioritized_gaps[0],
+    });
 
     return {
       type_id: 'TYPE-086',
@@ -179,14 +210,14 @@ export class HandoverPayloadExtractor {
       confidence: 0.8,
       data: {
         prioritized_gaps,
-        quick_wins: payload.p0_gaps
-          .filter((g) => g.gap_size <= 2)
+        quick_wins: normalizedP0
+          .filter((g) => g.gap_size <= 3)  // Quick wins are small gaps
           .map((g) => ({
-            action: g.recommended_actions[0] || 'Address gap in ' + g.dimension,
+            action: g.recommended_actions[0],
             timeline: '2-4 weeks',
             impact: 'High',
           })),
-        source: 'handover_payload_extraction_v29.3',
+        source: 'handover_payload_extraction_v29.4.1',
         timestamp: payload.timestamp,
       },
     };

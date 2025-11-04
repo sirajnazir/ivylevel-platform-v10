@@ -650,7 +650,7 @@ What would you like to focus on this week?`;
         a2a_handover: a2a_handover_complete ? handover_id : null,
       });
 
-      return res.status(200).json({
+      const responsePayload = {
         user_message_id: userMessage.id,
         agent_message_id: agentMessage.id,
         agent_response: agentResponse.response,
@@ -695,7 +695,9 @@ What would you like to focus on this week?`;
           clone_student_id: agentResponse.v26_context?.clone_student_id || `${student_id}-v26-clone`,
           is_clone_student: true,
         },
-      });
+      };
+
+      return res.status(200).json(responsePayload);
     } catch (error) {
       logger.error('v26.agent.message.error', { error: String(error) });
       return res.status(500).json({

@@ -303,6 +303,16 @@ export abstract class BaseAgentWithIntelligence {
     query: AgentQuery,
     facts: FactSet
   ): Promise<IntelligenceResult[]> {
+    // v29.3.5: Check for injected intelligence results from A2A handover
+    const injectedResults = (query.metadata?.injected_intelligence_results as IntelligenceResult[]) || [];
+
+    if (injectedResults.length > 0) {
+      console.log('[BASE_v29.3.5] 🎯 Found injected intelligence results from handover!', {
+        count: injectedResults.length,
+        types: injectedResults.map((r) => r.type_id),
+      });
+    }
+
     const allIntelligenceTypes = this.getAllIntelligenceTypes();
 
     // v29.1: Define dependencies (TYPE-086 needs TYPE-085)
@@ -398,8 +408,8 @@ export abstract class BaseAgentWithIntelligence {
       }
     }
 
-    // Combine all results
-    return [...independentResults, ...dependentResults];
+    // Combine all results (v29.3.5: include injected results from A2A handover)
+    return [...injectedResults, ...independentResults, ...dependentResults];
   }
 
   /**

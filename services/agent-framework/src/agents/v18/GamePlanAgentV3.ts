@@ -17,8 +17,15 @@
  * - Synthesis from intelligence results (not monolithic prompt)
  * - Automatic validation + provenance tracking
  *
+ * v29.4 Changes (A2A Handover Synthesis Fix):
+ * - Priority Focus Areas: Now PRIORITIZES TYPE-086 (from A2A handover) over TYPE-002
+ * - Quarterly Roadmap: Integrates TYPE-086 action recommendations with TYPE-003 timeline
+ * - Rationale: Assessment's rubric-based gap analysis (TYPE-085/086) is more accurate
+ *   than GamePlan's own weak spot detection, following real game plan report structure
+ *
  * Created: 2025-10-29
  * Architecture: v3.0 Intelligence Types
+ * Last Updated: 2025-11-04 (v29.4)
  */
 
 import { BaseAgentWithIntelligence } from './BaseAgentWithIntelligence.js';
@@ -331,8 +338,15 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
 
   /**
    * Synthesize overview response (full strategic plan)
+   * v29.3.2: Added TYPE-085/TYPE-086 support for A2A handover payloads
    */
   private synthesizeOverviewResponse(results: IntelligenceResult[], facts: FactSet): string {
+    console.log('[GP_v29.3.4_ENTRY] 🚀 synthesizeOverviewResponse CALLED!', {
+      results_count: results.length,
+      results_types: results.map((r) => r.type_id),
+      triggered_count: results.filter((r) => r.triggered).length,
+    });
+
     const sections: string[] = [];
 
     // Header
@@ -348,9 +362,69 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
       sections.push(`**Positioning:** ${data.target_profile?.unique_positioning?.join(', ') || 'Developing'}\n`);
     }
 
-    // TYPE-002: Weak Spots + Priority Actions
+    // v29.4: Priority Focus Areas - ALWAYS prefer TYPE-086 (A2A handover) over TYPE-002
+    // Rationale: TYPE-086 comes from Assessment's rubric-based gap analysis which is more accurate
+    // than GamePlan's own TYPE-002 weak spot detection. TYPE-002 is only a fallback.
+    const gapAnalyzer = results.find((r) => r.type_id === 'TYPE-086');
     const weakSpots = results.find((r) => r.type_id === 'TYPE-002');
-    if (weakSpots && weakSpots.data) {
+
+    console.log('[GP_v29.4_PRIORITY] 🎯 Priority Focus Areas data sources:', {
+      has_TYPE_086: !!gapAnalyzer,
+      has_TYPE_002: !!weakSpots,
+      will_use: gapAnalyzer ? 'TYPE-086 (A2A handover)' : (weakSpots ? 'TYPE-002 (fallback)' : 'none'),
+    });
+
+    if (gapAnalyzer && gapAnalyzer.data) {
+      // TYPE-086: Gap Priority Analyzer (from A2A handover - PREFERRED)
+      const data = gapAnalyzer.data as any;
+      const prioritized_gaps = data.prioritized_gaps || [];
+
+      console.log('[GP_v29.4_086] TYPE-086 gap data:', {
+        prioritized_gaps_count: prioritized_gaps.length,
+        data_keys: Object.keys(data),
+        first_gap: prioritized_gaps[0],
+      });
+
+      sections.push(`\n## Priority Focus Areas\n`);
+
+      // Show P0 gaps (highest priority weak spots)
+      const p0Gaps = prioritized_gaps.filter((g: any) => g.priority === 'P0');
+      console.log('[GP_v29.4_086] P0 gaps:', { count: p0Gaps.length, sample: p0Gaps[0] });
+
+      if (p0Gaps.length > 0) {
+        sections.push('**Critical Gaps (P0) - Must Address:**');
+        p0Gaps.slice(0, 3).forEach((gap: any) => {
+          const actions = gap.recommended_actions || [];
+          const action = actions[0] || `Address ${gap.dimension} gap`;
+          sections.push(`- ${action} (${gap.dimension}, Gap: ${gap.gap_size.toFixed(1)})`);
+        });
+      }
+
+      // Show P1 gaps if no P0 (or as secondary priorities)
+      const p1Gaps = prioritized_gaps.filter((g: any) => g.priority === 'P1');
+      console.log('[GP_v29.4_086] P1 gaps:', { count: p1Gaps.length });
+
+      if (p1Gaps.length > 0 && p0Gaps.length === 0) {
+        sections.push('**High Priority (P1):**');
+        p1Gaps.slice(0, 3).forEach((gap: any) => {
+          const actions = gap.recommended_actions || [];
+          const action = actions[0] || `Address ${gap.dimension} gap`;
+          sections.push(`- ${action} (${gap.dimension}, Gap: ${gap.gap_size.toFixed(1)})`);
+        });
+      }
+
+      // Show Quick Wins
+      const quickWins = data.quick_wins || [];
+      console.log('[GP_v29.4_086] Quick wins:', { count: quickWins.length, wins: quickWins });
+
+      if (quickWins.length > 0) {
+        sections.push('\n**Quick Wins (2-4 weeks):**');
+        quickWins.slice(0, 2).forEach((win: any) => {
+          sections.push(`- ${win.action} (Impact: ${win.impact})`);
+        });
+      }
+    } else if (weakSpots && weakSpots.data) {
+      // TYPE-002: Weak Spots + Priority Actions (fallback when no A2A handover)
       const data = weakSpots.data as any;
       sections.push(`\n## Priority Focus Areas\n`);
       const p0Actions = data.prioritized_actions?.filter((a: any) => a.priority === 'P0') || [];
@@ -362,11 +436,66 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
       }
     }
 
-    // TYPE-003: Quarterly Timeline
+    // v29.4: Quarterly Roadmap - Integrate TYPE-086 action recommendations with TYPE-003 timeline
+    // Rationale: Roadmap should map tactical "boosters" (actions) to prioritized gaps from TYPE-086
     const timeline = results.find((r) => r.type_id === 'TYPE-003');
-    if (timeline && timeline.data) {
+
+    sections.push(`\n## Quarterly Roadmap\n`);
+
+    if (gapAnalyzer && gapAnalyzer.data && timeline && timeline.data) {
+      // BEST CASE: Both TYPE-086 gaps and TYPE-003 timeline available
+      const gapData = gapAnalyzer.data as any;
+      const timelineData = timeline.data as any;
+      const plans = timelineData.quarterly_plans || [];
+      const prioritized_gaps = gapData.prioritized_gaps || [];
+
+      console.log('[GP_v29.4_ROADMAP] Building integrated roadmap:', {
+        has_gaps: prioritized_gaps.length > 0,
+        has_timeline: plans.length > 0,
+      });
+
+      // Map P0 gaps to quarterly actions
+      const p0Gaps = prioritized_gaps.filter((g: any) => g.priority === 'P0');
+      if (p0Gaps.length > 0 && plans.length > 0) {
+        plans.slice(0, 3).forEach((plan: any, idx: number) => {
+          sections.push(`\n**Q${plan.quarter}: ${plan.goal}**`);
+
+          // Show timeline milestones
+          const topMilestones = plan.key_milestones?.slice(0, 2) || [];
+          topMilestones.forEach((m: any) => {
+            sections.push(`- ${m.title || m}`);
+          });
+
+          // Add relevant P0 gap actions for this quarter
+          const relevantGap = p0Gaps[idx];
+          if (relevantGap && relevantGap.recommended_actions) {
+            const action = relevantGap.recommended_actions[0];
+            sections.push(`- **Focus:** ${action} (${relevantGap.dimension})`);
+          }
+        });
+      }
+    } else if (gapAnalyzer && gapAnalyzer.data) {
+      // FALLBACK 1: Only TYPE-086 available (no timeline) - create action-based roadmap
+      const gapData = gapAnalyzer.data as any;
+      const prioritized_gaps = gapData.prioritized_gaps || [];
+      const p0Gaps = prioritized_gaps.filter((g: any) => g.priority === 'P0');
+
+      console.log('[GP_v29.4_ROADMAP] Building gap-based roadmap (no timeline):', {
+        p0_gaps: p0Gaps.length,
+      });
+
+      if (p0Gaps.length > 0) {
+        sections.push('**Immediate Actions (Next 3 Months):**');
+        p0Gaps.slice(0, 3).forEach((gap: any) => {
+          const actions = gap.recommended_actions || [];
+          actions.slice(0, 2).forEach((action: string) => {
+            sections.push(`- ${action} (${gap.dimension})`);
+          });
+        });
+      }
+    } else if (timeline && timeline.data) {
+      // FALLBACK 2: Only TYPE-003 available (no gaps) - standard timeline
       const data = timeline.data as any;
-      sections.push(`\n## Quarterly Roadmap\n`);
       const plans = data.quarterly_plans || [];
       plans.slice(0, 3).forEach((plan: any) => {
         sections.push(`\n**Q${plan.quarter}: ${plan.goal}**`);
@@ -375,6 +504,9 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
           sections.push(`- ${m.title || m}`);
         });
       });
+    } else {
+      // NO DATA: Show placeholder
+      sections.push('*Roadmap will be generated after initial assessment*');
     }
 
     // TYPE-007: Time Allocation
