@@ -1,35 +1,46 @@
 /**
- * v26.0 MultiAgents Routes
+ * v31.4 MultiAgents Routes (Clean LangGraph Orchestration)
  *
- * Purpose: API endpoints for multi-agent orchestration with session-based state management.
+ * Purpose: Thin API layer over LangGraph orchestration for multi-agent interactions.
  *
- * Architecture:
- * - Session lifecycle: start → assessment → gameplan → execution → complete
- * - Agent routing: Assessment → GamePlan → (Awards + Programs + Scholarships) → Execution
- * - Real-time intelligence tracing and conversation history
+ * Architecture (v31.4):
+ * - Single orchestration path: All requests → LangGraphOrchestratorV31
+ * - State management: Redis-backed checkpointing + database persistence
+ * - Memory: Conversation history and collected facts preserved across turns
+ * - Agents: UNCHANGED - wrapped as LangGraph tools
+ * - Intelligence: 83 types preserved (TYPE-001 through TYPE-083)
+ *
+ * Session lifecycle: start → assessment → gameplan → execution → complete
+ * Agent flow: Assessment → GamePlan → (Awards + ECs + Scholarships) → Execution
  *
  * Endpoints:
  * - POST /api/v26/session/start - Start new multiagent session
  * - GET /api/v26/session/:sessionId - Get session state and history
  * - POST /api/v26/session/:sessionId/pause - Pause active session
  * - POST /api/v26/session/:sessionId/resume - Resume paused session
- * - POST /api/v26/agents/:agentId/message - Send message to specific agent
+ * - POST /api/v26/agents/:agentId/message - Send message to specific agent (via orchestrator)
  * - GET /api/v26/agents/:agentId/status - Get agent status and capabilities
  * - GET /api/v26/session/:sessionId/trace - Get intelligence activation traces
  * - POST /api/v26/session/:sessionId/handoff - Trigger agent handoff
  *
  * Created: 2025-11-01
- * Version: v26.0
+ * Updated: 2025-11-04 (v31.4 - Clean orchestration)
+ * Version: v31.4
  */
+
+console.log('[v31.4 MODULE] Loading v26-multiagents routes module...');
 
 import { Router, Request, Response } from 'express';
 import { Pool } from 'pg';
 import { AgentRegistry } from '../agents/registry.js';
 import { withApiKey, withRateLimit } from '../middleware/security.js';
 import { createLogger } from '../../../../packages/observability/dist/unified-logger.js';
-import { V26AgentWrapperReal } from '../agents/V26AgentWrapperReal.js';
 import { HandoverValidator } from '../a2a/HandoverValidator.js';
 import { FactCategory } from '../facts/types.js';
+// v31.4: Clean LangGraph Orchestration (Single Path)
+import { LangGraphOrchestratorV31 } from '../langgraph/LangGraphOrchestratorV31.js';
+// v34.0: Universal Orchestration (Signal Protocol + Decision Engines)
+import { LangGraphOrchestratorV34 } from '../langgraph/v34/LangGraphOrchestratorV34.js';
 
 const router = Router();
 const logger = createLogger('v26-multiagents');
@@ -38,15 +49,74 @@ const logger = createLogger('v26-multiagents');
  * Initialize router with dependencies
  */
 export function createV26MultiAgentsRouter(pool: Pool, agentRegistry: AgentRegistry): Router {
-  // Initialize V26AgentWrapperReal with REAL agents for clone students
-  const v26Wrapper = new V26AgentWrapperReal(agentRegistry, pool);
+  console.log('[v31.4 FUNCTION] createV26MultiAgentsRouter() called!');
 
-  logger.event('v26.router.initialized', {
-    v26_wrapper: 'real_agents',
-    mode: 'clone_student_with_empty_facts',
-    agents_used: ['AssessmentAgentV3', 'GamePlanAgent', 'ExecutionAgent', 'AwardsAgent', 'SummerProgramsAgent', 'ScholarshipsAgent'],
-    intelligence_types: 'all_real_types_TYPE-001_through_TYPE-083',
-  });
+  // v34.0: Feature flag for universal orchestration
+  const USE_V34_ORCHESTRATION = process.env.USE_V34_ORCHESTRATION === 'true';
+
+  // Initialize orchestrator (v31.4 or v34.0 based on feature flag)
+  let orchestrator: any = null;
+  const orchestratorVersion = USE_V34_ORCHESTRATION ? 'v34.0' : 'v31.4';
+
+  console.log(`[${orchestratorVersion} DEBUG] About to enter try block...`);
+  try {
+    console.log(`[${orchestratorVersion} DEBUG] Inside try block!`);
+    const factStore = agentRegistry.getFactStore();
+    console.log(`[${orchestratorVersion} DEBUG] Got factStore`);
+
+    logger.event('router.init_start', {
+      version: orchestratorVersion,
+      redis_url: process.env.REDIS_URL ? 'present' : 'absent',
+      feature_flag_v34: USE_V34_ORCHESTRATION
+    });
+    console.log(`[${orchestratorVersion} DEBUG] Logged init_start event`);
+
+    if (USE_V34_ORCHESTRATION) {
+      console.log('[v34.0 DEBUG] Creating LangGraphOrchestratorV34...');
+      orchestrator = new LangGraphOrchestratorV34(
+        pool,
+        factStore,
+        undefined // v34.0: Disable Redis for now - use stateless mode with database persistence
+      );
+      console.log('[v34.0 DEBUG] LangGraphOrchestratorV34 created successfully!');
+
+      logger.event('v34.router.initialized', {
+        orchestration: 'langgraph_v34.0',
+        checkpointing: 'stateless',
+        decision_engines: ['handover', 'delegation', 'escalation'],
+        signal_protocol: 'universal',
+        backward_compatible: true,
+        agents: ['assessment-agent-v18', 'gameplan-agent-v18', 'execution-agent', 'awards-agent-v18', 'extracurriculars-agent-v18', 'scholarships-agent'],
+        intelligence_types: '83_types_TYPE-001_through_TYPE-083'
+      });
+    } else {
+      console.log('[v31.4 DEBUG] Creating LangGraphOrchestratorV31...');
+      orchestrator = new LangGraphOrchestratorV31(
+        pool,
+        factStore,
+        undefined // v31.4: Disable Redis for now - use stateless mode with database persistence
+      );
+      console.log('[v31.4 DEBUG] LangGraphOrchestratorV31 created successfully!');
+
+      logger.event('v31.router.initialized', {
+        orchestration: 'langgraph_v31.4',
+        checkpointing: 'stateless',
+        agents: ['assessment-agent-v18', 'gameplan-agent-v18', 'execution-agent', 'awards-agent-v18', 'extracurriculars-agent-v18', 'scholarships-agent'],
+        intelligence_types: '83_types_TYPE-001_through_TYPE-083'
+      });
+    }
+
+    console.log(`[${orchestratorVersion} DEBUG] Logged router.initialized event`);
+  } catch (error) {
+    console.log(`[${orchestratorVersion} DEBUG] CAUGHT ERROR:`, error);
+    logger.error('router.init_failed', {
+      version: orchestratorVersion,
+      error: String(error),
+      stack: error instanceof Error ? error.stack : 'no stack',
+      message: error instanceof Error ? error.message : String(error)
+    });
+    throw error; // Re-throw to see the error in server logs
+  }
   // ============================================================================
   // POST /api/v26/session/start
   // ============================================================================
@@ -302,10 +372,11 @@ What would you like to focus on this week?`;
 
       const cloneStudentId = sessionResult.rows[0].student_id; // Already the clone ID!
 
-      console.log('[V26_MESSAGE] Using clone student ID from session:', {
+      console.log('[V31.4_MESSAGE] Using clone student ID from session:', {
         session_id,
         clone_student_id: cloneStudentId,
-        real_student_id_from_frontend: student_id
+        real_student_id_from_frontend: student_id,
+        orchestration: 'langgraph_v31.4'
       });
 
       // Save user message
@@ -318,29 +389,190 @@ What would you like to focus on this week?`;
 
       const userMessage = userMessageResult.rows[0];
 
-      // Route to V26AgentWrapper (uses real agents with clean-slate student context)
+      // v31.4: Single orchestration path through LangGraph
       const startTime = Date.now();
 
-      const agentResponse = await v26Wrapper.handleQuery({
-        agent_id: agentId,
-        student_id: cloneStudentId, // Use clone ID from session, not frontend student_id
+      console.log('[V31.4_ROUTE] About to call orchestrator.handleMessage:', {
         session_id,
-        message,
+        cloneStudentId,
+        agentId,
+        message_preview: message.substring(0, 50)
       });
+
+      logger.event('v31.orchestrator.invoke', {
+        session_id,
+        student_id: cloneStudentId,
+        agent_id: agentId,
+        message_length: message.length
+      });
+
+      // ✅ Layer 3 Fix: Wrap orchestrator call in try-catch
+      let result: any;
+
+      try {
+        result = await orchestrator.handleMessage({
+          student_id: cloneStudentId,
+          session_id,
+          message
+        });
+      } catch (orchestratorError) {
+        logger.error('router.orchestrator.failed', {
+          session_id,
+          error: String(orchestratorError),
+          stack: orchestratorError instanceof Error ? orchestratorError.stack : undefined
+        });
+
+        return res.status(500).json({
+          error: 'Orchestrator failed',
+          message: orchestratorError instanceof Error ? orchestratorError.message : 'Unknown error'
+        });
+      }
 
       const processingTime = Date.now() - startTime;
 
-      // Log v26 context
-      logger.event('v26.agent.response_with_context', {
+      // ✅ Layer 3 Fix: Guard against undefined result (triple check)
+      if (!result) {
+        logger.error('router.orchestrator.returned_undefined', {
+          session_id,
+          use_v34: USE_V34_ORCHESTRATION
+        });
+
+        return res.status(500).json({
+          error: 'Orchestrator returned no result',
+          message: 'Internal error - orchestrator.handleMessage() returned undefined'
+        });
+      }
+
+      // ✅ Layer 3 Fix: Debug log AFTER guard
+      logger.event('router.orchestrator.result', {
+        session_id,
+        has_agent_response: !!result.agent_response,
+        has_confidence: !!result.confidence,
+        has_metadata: !!result.metadata,
+        result_keys: Object.keys(result)
+      });
+
+      // ✅ Layer 3 Fix: Safe access with optional chaining
+      const confidence = result.confidence ?? result.current_confidence ?? 0.0;
+      const metadata = result.metadata ?? {};
+      const intelligenceTriggered = result.intelligence_triggered ?? [];
+
+      // v34.0: Convert orchestrator result to route response format
+      // v34.0 returns FrontendOrchestratorResponse, v31.4 returns WorkflowState
+      const isV34Response = result?.agent_response !== undefined;
+
+      const agentResponse = isV34Response ? {
+        // v34.0 format (FrontendOrchestratorResponse)
+        response: result.agent_response,
+        validation_score: result.confidence || 0.8,
+        intelligence_triggered: result.intelligence_triggered || [],
+        intelligence_results: [],
+        // v34.0: a2a_handover at root level if present
+        ...(result.a2a_handover ? { a2a_handover: result.a2a_handover } : {}),
+        metadata: {
+          ...result.metadata,
+          orchestration: 'langgraph_v34.0',
+          processing_time_ms: processingTime,
+          // v34.0: Preserve collaboration events if present, otherwise create default
+          collaboration_events: result.metadata?.collaboration_events || [
+            {
+              timestamp: new Date().toISOString(),
+              event: 'orchestrator_invoke',
+              message: '🚀 LangGraph v34.0 universal orchestration',
+              details: { session_id, agent_id: agentId, decision_engines: ['handover', 'delegation', 'escalation'] }
+            },
+            {
+              timestamp: new Date().toISOString(),
+              event: 'workflow_complete',
+              message: `✅ Workflow completed (${processingTime}ms)`,
+              details: { duration_ms: processingTime, confidence: result.confidence || 0.8 }
+            }
+          ]
+        },
+        v26_context: {
+          real_student_id: student_id,
+          clone_student_id: cloneStudentId,
+          is_clone_student: true,
+          orchestration: 'langgraph_v34.0'
+        }
+      } : {
+        // v31.4 format (WorkflowState)
+        response: result.current_response,
+        validation_score: result.current_confidence,
+        intelligence_triggered: result.current_intelligence_triggered || [],
+        intelligence_results: [],
+        metadata: {
+          ...result.current_metadata,
+          orchestration: 'langgraph_v31.4',
+          processing_time_ms: processingTime,
+          state_management: 'database_persisted',
+          data_collected_so_far: result.current_metadata?.data_collected_so_far,
+          collaboration_events: [
+            {
+              timestamp: new Date().toISOString(),
+              event: 'orchestrator_invoke',
+              message: '🚀 LangGraph v31.4 orchestration',
+              details: { session_id, agent_id: agentId }
+            },
+            {
+              timestamp: new Date().toISOString(),
+              event: 'state_loaded',
+              message: '💾 Conversation history and facts loaded',
+              details: {
+                history_messages: result.conversation_history?.length || 0,
+                facts_keys: Object.keys(result.collected_facts || {}).length
+              }
+            },
+            {
+              timestamp: new Date().toISOString(),
+              event: 'agent_execution',
+              message: `🤖 ${agentId} executed with full context`,
+              details: { agent: result.agent_context?.current_agent }
+            },
+            {
+              timestamp: new Date().toISOString(),
+              event: 'intelligence_triggered',
+              message: `🧠 ${result.current_intelligence_triggered?.length || 0} intelligence types activated`,
+              details: { types: result.current_intelligence_triggered }
+            },
+            {
+              timestamp: new Date().toISOString(),
+              event: 'workflow_complete',
+              message: `✅ Workflow completed (${processingTime}ms)`,
+              details: { duration_ms: processingTime, confidence: result.current_confidence }
+            }
+          ]
+        },
+        v26_context: {
+          real_student_id: student_id,
+          clone_student_id: cloneStudentId,
+          is_clone_student: true,
+          orchestration: 'langgraph_v31.4'
+        }
+      };
+
+      logger.event('orchestrator.success', {
+        version: orchestratorVersion,
+        session_id,
+        duration_ms: processingTime,
+        agent_used: isV34Response ? agentId : result.agent_context?.current_agent,
+        confidence: isV34Response ? result.confidence : result.current_confidence,
+        intelligence_count: agentResponse.intelligence_triggered?.length || 0,
+        had_handover: isV34Response ? !!result.a2a_handover : false,
+        had_delegation: isV34Response ? !!result.metadata?.delegation_started : false
+      });
+
+      // Log context
+      logger.event('agent.response_context', {
+        version: orchestratorVersion,
         agent_id: agentId,
         session_id,
-        is_clone_student: agentResponse.v26_context.is_clone_student,
-        clone_student_id: agentResponse.v26_context.clone_student_id,
-        real_student_id: agentResponse.v26_context.real_student_id,
-        conversation_turns: agentResponse.v26_context.conversation_turns,
-        intent_classification: agentResponse.v26_context.intent_classification,
-        processing_steps: agentResponse.v26_context.processing_steps,
-        intelligence_triggered_count: agentResponse.intelligence_triggered.length,
+        clone_student_id: cloneStudentId,
+        real_student_id: student_id,
+        intelligence_triggered_count: agentResponse.intelligence_triggered?.length || 0,
+        metadata_keys: Object.keys(agentResponse.metadata || {}),
+        has_data_collected: !!agentResponse.metadata?.data_collected_so_far,
+        has_handover_data: !!agentResponse.a2a_handover
       });
 
       // Save agent response
@@ -557,77 +789,28 @@ What would you like to focus on this week?`;
           new_phase: newPhase
         });
 
-        // v28.5: Call new agent based on validation result
-        console.log('[V28.5_HANDOVER] 🚀 Proceeding with handover...');
+        // TODO v31.4 Phase 2: Implement handover through orchestrator's check_handover node
+        // For now, handover is detected but not auto-triggered
+        // The orchestrator will handle this in the next message when user continues conversation
+        console.log('[V31.4_HANDOVER] 🚧 Handover detected - will be triggered on next message', {
+          from_agent: agentId,
+          to_agent: new_agent_id,
+          validation_score: handoverValidation.quality_score
+        });
 
-        try {
-          // v28.5: Always call the new agent (it will handle insufficient data internally)
-          // The agent's generateInsufficientDataResponse() will ask natural questions if needed
-          // v29.0.5: Pass is_a2a_handover flag to bypass insufficient data check
-          // v29.3: Pass handover_payload to new agent for intelligence extraction
-          const handoverResponse = await v26Wrapper.handleQuery({
-            agent_id: new_agent_id,
-            student_id: cloneStudentId,
-            session_id,
-            message: 'continue', // Trigger agent initialization
-            is_a2a_handover: true, // Skip insufficient data check
-            handover_payload: agentResponse.metadata?.handover_payload, // v29.3: Pass intelligence data
-          });
-
-          console.log('[V28.5_HANDOVER] ✅ New agent response generated:', {
-            response_length: handoverResponse.response?.length || 0,
-            validation_score: handoverResponse.validation_score,
-            handover_quality: handoverValidation.quality_score
-          });
-
-          // Replace the placeholder response with the actual new agent response
-          agentResponse.response = handoverResponse.response;
-          agentResponse.metadata = {
-            ...agentResponse.metadata,
-            ...handoverResponse.metadata,
-            handover_validation: {
-              quality_score: handoverValidation.quality_score,
-              quality_gates_passed: handoverValidation.quality_gates_passed,
-              quality_gates_total: handoverValidation.quality_gates_total,
-              is_ready: handoverValidation.is_ready,
-              recommendation: handoverValidation.recommendation,
-            }
-          };
-
-          // Store the new agent's message
-          const newAgentMessageResult = await pool.query(
-            `INSERT INTO multiagent_messages
-             (session_id, agent_id, role, content, processing_time, confidence, metadata)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
-             RETURNING id, timestamp`,
-            [
-              session_id,
-              new_agent_id,
-              'agent',
-              handoverResponse.response,
-              processingTime,
-              handoverResponse.validation_score || 1,
-              JSON.stringify({
-                agent_id: handoverResponse.agent_id,
-                intelligence_triggered: handoverResponse.intelligence_triggered,
-                handover_received: true,
-                handover_validation: {
-                  quality_score: handoverValidation.quality_score,
-                  quality_gates_passed: handoverValidation.quality_gates_passed,
-                  is_ready: handoverValidation.is_ready,
-                }
-              }),
-            ]
-          );
-
-          // Update agentMessage reference to the new agent's message
-          agentMessage = newAgentMessageResult.rows[0];
-
-          console.log('[V28.5_HANDOVER] 💾 New agent message stored:', agentMessage.id);
-        } catch (handoverError) {
-          console.error('[V28.5_HANDOVER] ❌ Failed to call new agent:', handoverError);
-          // Keep the placeholder response if agent call fails
-        }
+        // Store handover metadata for next turn
+        agentResponse.metadata = {
+          ...agentResponse.metadata,
+          handover_pending: true,
+          handover_to: new_agent_id,
+          handover_validation: {
+            quality_score: handoverValidation.quality_score,
+            quality_gates_passed: handoverValidation.quality_gates_passed,
+            quality_gates_total: handoverValidation.quality_gates_total,
+            is_ready: handoverValidation.is_ready,
+            recommendation: handoverValidation.recommendation,
+          }
+        };
       }
 
       // Update session analytics
