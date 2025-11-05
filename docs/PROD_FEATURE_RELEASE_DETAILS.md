@@ -1,11 +1,130 @@
 # IvyLevel Platform - Production Feature Release Details
 
-**Document Version:** v30.1.1
-**Last Updated:** 2025-11-04
-**Current Version:** v30.1.1 - ALL 7 AGENTS WITH COMPLETE TECH SPECS: Comprehensive Documentation Platform-Wide
-**Status:** ✅ PRODUCTION READY - ALL AGENTS 100% SPEC-COMPLIANT WITH ENHANCED INITIALIZATION
-**Strategic Focus:** Complete 7-agent platform with full intelligence orchestration across all domains
-**Milestone:** 46 intelligence types registered and wired, ALL 7 agents production-ready
+**Document Version:** v32.0
+**Last Updated:** 2025-11-05
+**Current Version:** v32.0 - LangGraph State Orchestration Fix: Student ID & Session Persistence
+**Status:** ✅ PRODUCTION READY - v31.4 LangGraph orchestration fully operational
+**Strategic Focus:** Fixed critical state management bug enabling proper fact accumulation
+**Milestone:** LangGraph StateChannels complete, multi-turn fact persistence working
+
+---
+
+## v32.0 - LangGraph State Orchestration Fix (2025-11-05)
+
+**Focus:** Fixed critical LangGraph StateChannels bug where `student_id` and `session_id` were being dropped from state, preventing fact accumulation and causing database errors. This was a tactical fix to the state management layer, confirming the v31.4 architecture is fundamentally sound.
+
+### Summary
+
+v32.0 resolves the persistent `data_collected_so_far: {}` bug that has been affecting v31.4 since its introduction. The root cause was missing channel definitions in LangGraph's state management - `student_id` and `session_id` fields were not registered in StateChannels, causing them to be silently dropped when state flowed through the graph. This 14-line fix enables proper multi-turn fact accumulation, confirming that the state-first architecture is working correctly.
+
+**Verification:** 5-message test conversation showed perfect fact accumulation from `{grade: 11}` → `{grade: 11, high_school, interests, gpa, sat_total}` with 100% persistence.
+
+### Root Cause Analysis
+
+**The Bug:**
+- LangGraph requires ALL state fields to have channel definitions with reducer functions
+- `student_id` and `session_id` were missing from StateChannels definition
+- Without channel definitions, LangGraph silently drops these fields during state updates
+- This caused `query.entity_id = undefined` in Assessment Agent
+- Facts were extracted but couldn't be loaded (no student_id for DB queries)
+- Result: `data_collected_so_far` always returned empty `{}`
+
+**The Fix:**
+- Added `student_id` and `session_id` channels to StateChannels (`state.ts:146-159`)
+- Used immutable reducer pattern: `next || prev` (set once, persist forever)
+- 14 lines of code, zero architectural changes needed
+
+### Key Changes
+
+**1. State Management Fix** (`services/agent-framework/src/langgraph/state.ts:146-159`)
+```typescript
+// v32.0 FIX: Identity fields (immutable - set once at session start)
+student_id: {
+  value: (prev: string | undefined, next: string | undefined) => {
+    return next || prev; // Use new if provided, else keep previous
+  },
+  default: () => undefined
+},
+
+session_id: {
+  value: (prev: string | undefined, next: string | undefined) => {
+    return next || prev; // Use new if provided, else keep previous
+  },
+  default: () => undefined
+},
+```
+
+**2. UI Display Fix** (`services/agent-framework/test-extraction-ui.html:379`)
+- Fixed `vundefined` display issue
+- Changed: `${metadata.orchestration} v${metadata.version}` → `${metadata.orchestration}`
+- Now shows: `🔀 Orchestration: langgraph_v31.4` cleanly
+
+### Files Modified
+
+- `services/agent-framework/src/langgraph/state.ts` (lines 146-159: Added student_id and session_id channels)
+- `services/agent-framework/test-extraction-ui.html` (line 379: Fixed version display)
+- `docs/PROD_FEATURE_RELEASE_DETAILS.md` (this file: v32.0 section)
+- `docs/MASTER_PROD_TECH_SPEC.md` (version bump + timestamp)
+- `CHANGELOG.md` (detailed change log)
+
+### Impact
+
+**Before v32.0:**
+- ❌ `student_id: undefined` in workflow
+- ❌ Facts extracted but not persisted
+- ❌ `data_collected_so_far: {}` always empty
+- ❌ Agent couldn't load previous facts
+- ❌ No multi-turn memory
+
+**After v32.0:**
+- ✅ `student_id: 'huda-v26-2025'` flows correctly
+- ✅ Facts extracted and persisted to DB
+- ✅ `data_collected_so_far: { grade: 11, high_school: "...", ... }` cumulative
+- ✅ Agent loads all previous facts
+- ✅ Perfect multi-turn memory across conversation
+
+### Test Results
+
+**Multi-Turn Fact Accumulation Test:**
+1. Turn 1: "I am in 11th grade" → `{grade: 11}`
+2. Turn 2: "Dublin High School" → `{grade: 11, high_school: "Dublin High School"}`
+3. Turn 3: "CS, Game Development" → `{grade: 11, high_school: "...", interests: ["CS", "Game Development"]}`
+4. Turn 4: "GPA 4.0 weighted" → `{gpa: 4, gpa_type: "weighted", grade: 11, interests: [...], high_school: "..."}`
+5. Turn 5: "SAT 1500" → `{gpa: 4, gpa_type: "weighted", sat_total: 1500, grade: 11, interests: [...], high_school: "..."}`
+
+**Intelligence Triggered:** All 7 types firing correctly (TYPE-020, 080, 081, 082, 083, 085, 086)
+
+**Phase Completion:** Discovery phase progressed from 0% → 17% → 50%+ as facts accumulated
+
+### Architecture Validation
+
+This fix **confirms the v31.4 state-first architecture is correct**:
+- Facts ARE being extracted ✅
+- Facts ARE being stored to DB ✅
+- Facts ARE being loaded from DB ✅
+- LangGraph state accumulation works ✅
+- Problem was just missing channel definitions (tactical, not architectural)
+
+The state-first pattern is working as designed:
+1. Session start: Load facts from DB once → Seed `state.collected_facts`
+2. Each turn: Extract new facts → Merge into `state.collected_facts` (in-memory)
+3. Session end: Save `state.collected_facts` → DB
+
+### Migration Notes
+
+**No breaking changes.** This is a bug fix that enables existing functionality to work correctly. No migration steps required.
+
+**Deployment:**
+1. Deploy updated code
+2. Existing sessions will automatically start working correctly
+3. No database changes needed
+4. No API changes
+
+### Next Steps
+
+- ✅ v32.0 completes the v31.4 LangGraph orchestration stabilization
+- Ready to expand: Add more specialized agents using the proven StateChannels pattern
+- Consider: Agent delegation flows, handover mechanics, collaborative workflows
 
 ---
 

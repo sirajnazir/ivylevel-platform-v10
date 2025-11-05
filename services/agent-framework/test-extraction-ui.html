@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Extraction Debug Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .test-panel, .results-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .test-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .test-btn {
+            background: white;
+            border: 2px solid #667eea;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .test-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .test-btn .expected {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .test-btn:hover .expected {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .status-box {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .status-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #718096;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .log-container {
+            background: #1a202c;
+            color: #68d391;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 600px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-left: 3px solid #4299e1;
+            padding-left: 12px;
+        }
+
+        .log-error {
+            border-left-color: #f56565;
+            color: #fc8181;
+        }
+
+        .log-success {
+            border-left-color: #48bb78;
+            color: #68d391;
+        }
+
+        .log-warning {
+            border-left-color: #ed8936;
+            color: #f6ad55;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .badge-error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .badge-pending {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 Assessment Extraction Debug Tool</h1>
+            <p class="subtitle">Step-by-step extraction testing to identify where facts collection fails</p>
+        </header>
+
+        <div class="main-content">
+            <div class="test-panel">
+                <h2>🧪 Test Messages</h2>
+
+                <div class="status-box">
+                    <div class="status-label">Session ID</div>
+                    <div class="status-value" id="session-id">Not created</div>
+                </div>
+
+                <div class="status-box">
+                    <div class="status-label">Student ID (Clone)</div>
+                    <div class="status-value">huda-v26-2025</div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-primary" onclick="createSession()">🆕 Create New Session</button>
+                    <button class="btn-secondary" onclick="clearLogs()">🗑️ Clear Logs</button>
+                </div>
+
+                <h3 style="margin: 20px 0 10px 0; color: #4a5568;">Quick Tests:</h3>
+                <div class="test-messages">
+                    <button class="test-btn" onclick="testMessage('I am in 11th grade')">
+                        <span>Test 1: "I am in 11th grade"</span>
+                        <span class="expected">→ Expect: grade=11</span>
+                    </button>
+                    <button class="test-btn" onclick="testMessage('Dublin High School')">
+                        <span>Test 2: "Dublin High School"</span>
+                        <span class="expected">→ Expect: high_school</span>
+                    </button>
+                    <button class="test-btn" onclick="testMessage('CS, Game Development')">
+                        <span>Test 3: "CS, Game Development"</span>
+                        <span class="expected">→ Expect: interests</span>
+                    </button>
+                    <button class="test-btn" onclick="testMessage('GPA 4.0 weighted')">
+                        <span>Test 4: "GPA 4.0 weighted"</span>
+                        <span class="expected">→ Expect: gpa, gpa_type</span>
+                    </button>
+                    <button class="test-btn" onclick="testMessage('SAT 1500')">
+                        <span>Test 5: "SAT 1500"</span>
+                        <span class="expected">→ Expect: sat_total</span>
+                    </button>
+                </div>
+
+                <h3 style="margin: 20px 0 10px 0; color: #4a5568;">Advanced:</h3>
+                <button class="btn-primary" style="width: 100%;" onclick="runFullSequence()">
+                    🚀 Run Full Test Sequence (5 messages)
+                </button>
+            </div>
+
+            <div class="results-panel">
+                <h2>📊 Extraction Results & Logs</h2>
+                <div class="log-container" id="log-container">
+                    <div class="log-entry log-warning">
+                        ⏳ Waiting for session creation...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8787/api/v26';
+        const API_KEY = 'test-key';
+        let sessionId = null;
+
+        function log(message, type = 'info') {
+            const container = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+
+            const timestamp = new Date().toLocaleTimeString();
+            entry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('log-container').innerHTML = '<div class="log-entry log-warning">⏳ Logs cleared. Ready for new tests...</div>';
+        }
+
+        async function createSession() {
+            log('🔄 Creating new session for huda-2025...', 'info');
+
+            try {
+                const response = await fetch(`${API_URL}/session/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        student_id: 'huda-2025',
+                        session_type: 'onboarding'
+                    })
+                });
+
+                const data = await response.json();
+                sessionId = data.session_id;
+
+                document.getElementById('session-id').textContent = sessionId.substring(0, 20) + '...';
+
+                log(`✅ Session created: ${sessionId}`, 'success');
+                log(`🔀 Mapped to clone student: ${data.v26_context.clone_student_id}`, 'info');
+
+            } catch (error) {
+                log(`❌ ERROR creating session: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMessage(message) {
+            if (!sessionId) {
+                log('❌ ERROR: No session created! Click "Create New Session" first.', 'error');
+                return;
+            }
+
+            log(`📤 Sending message: "${message}"`, 'info');
+
+            try {
+                const response = await fetch(`${API_URL}/agents/assessment-agent-v18/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        student_id: 'huda-2025',
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                log(`📥 Response received (${data.processing_time}ms)`, 'info');
+                log(`💬 Agent: "${data.agent_response.substring(0, 100)}${data.agent_response.length > 100 ? '...' : ''}"`, 'info');
+
+                // Check for data collection in metadata
+                const metadata = data.metadata;
+                const hasDataCollected = metadata && metadata.data_collected_so_far;
+
+                if (hasDataCollected && Object.keys(metadata.data_collected_so_far).length > 0) {
+                    const collected = metadata.data_collected_so_far;
+                    log(`✅ EXTRACTION SUCCESS! Collected: ${JSON.stringify(collected)}`, 'success');
+                } else {
+                    log(`⚠️ NO DATA COLLECTED - Extraction may have failed or not been called`, 'warning');
+                }
+
+                // Check intelligence types
+                if (data.intelligence_triggered && data.intelligence_triggered.length > 0) {
+                    log(`🧠 Intelligence types: ${data.intelligence_triggered.join(', ')}`, 'info');
+                }
+
+                // Show collaboration events
+                if (metadata && metadata.collaboration_events) {
+                    const events = metadata.collaboration_events;
+                    log(`🔀 Orchestration: ${metadata.orchestration}`, 'info');
+                    log(`📊 ${events.length} collaboration events logged`, 'info');
+                }
+
+            } catch (error) {
+                log(`❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function runFullSequence() {
+            if (!sessionId) {
+                await createSession();
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            const messages = [
+                'I am in 11th grade',
+                'Dublin High School',
+                'CS and Game Development',
+                'GPA 4.0 weighted',
+                'SAT 1500'
+            ];
+
+            log('🚀 Starting full test sequence...', 'info');
+
+            for (let i = 0; i < messages.length; i++) {
+                log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'info');
+                log(`TEST ${i + 1} OF ${messages.length}`, 'info');
+                log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`, 'info');
+
+                await testMessage(messages[i]);
+
+                // Wait 2 seconds between messages
+                if (i < messages.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+
+            log('\n🏁 Full sequence complete!', 'success');
+        }
+    </script>
+</body>
+</html>

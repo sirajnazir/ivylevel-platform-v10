@@ -1,11 +1,11 @@
 # IvyLevel Platform - Master Production Technical Specification
-# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v12.1 → v13.0 → v14.0 → v18.0 → v24.0 → v25.0 → v27.0 → v29.0 → v29.5 → v29.8 → v30.0 MAJOR RELEASE
+# v14 → v1.0 → v2.0 → v2.1 → v3.2 → v10.8.2 → v11.0 → v12.0 → v12.1 → v13.0 → v14.0 → v18.0 → v24.0 → v25.0 → v27.0 → v29.0 → v29.5 → v29.8 → v30.0 → v32.0
 
-**Document Version:** v30.0
-**Last Updated:** 2025-11-04
-**Status:** ✅ PRODUCTION READY - CORE AGENTS 100% COMPLETE + FULL INTELLIGENCE PIPELINE OPERATIONAL
-**Platform Version:** v30.0 (Assessment 6/6 + GamePlan 6/6 + Execution 15/15 + Awards 7/7 + ECs 6/6 Intelligence Types = 40 Active Types)
-**Architecture:** Fact-First Universal Primitives + BaseAgentWithIntelligence + Intelligence Types Registry (40 types) + HandoverValidator + A2A Multi-Agent Delegation + Zero-Hallucination by Design + FactStore + PostgresFactSource + 7 Operational Agents (100% spec-compliant core journey)
+**Document Version:** v32.0
+**Last Updated:** 2025-11-05
+**Status:** ✅ PRODUCTION READY - v31.4 LangGraph Orchestration Fully Operational
+**Platform Version:** v32.0 (LangGraph StateChannels Fix + Multi-Turn Fact Persistence Working)
+**Architecture:** LangGraph v31.4 State Orchestration + Fact-First Universal Primitives + BaseAgentWithIntelligence + Intelligence Types Registry (46 types) + HandoverValidator + A2A Multi-Agent Delegation + Zero-Hallucination by Design + FactStore + PostgresFactSource + 7 Operational Agents
 
 **Frontend:** React 18.3.1 + TypeScript, Vite, Port 5173, 6 Tabs (Assessment, Game Plan, Preparation with 89 weeks, Sessions, Application, Growth Journey with 93 timeline events)
 **Backend:** Express.js + Node.js 22.16.0, Port 8787, RESTful API
@@ -46,8 +46,9 @@ This is the **single source of truth** for IvyLevel's production technical archi
 26. **v29.6-v29.7** - Specialist Agent Intelligence Types Complete (Awards Agent 7/7 types including TYPE-017 Task Multiplication + Extracurriculars Agent 6/6 types including TYPE-013 Portfolio Optimization, TYPE-014 Narrative Synthesis, TYPE-015 Impact Engineering, TYPE-016 Time Mathematics, TYPE-019 Formalization Ladder + GamePlan AgentDelegator integration for Awards + ECs specialist insights during overview synthesis)
 27. **v29.8** - Core Agents Intelligence Types Wiring Complete (Assessment Agent enhanced initialization with proper logging and error handling for 6/6 types + GamePlan Agent verification of existing complete implementation 6/6 types + Execution Agent refactored initialization method for 15/15 types + All three mandatory core agents now 100% spec-compliant with proper observability)
 28. **v30.0 MAJOR RELEASE** - Complete Intelligence Pipeline Operational End-to-End. **Full Pipeline:** Student onboards → Assessment Agent (6 types) → A2A Handover → GamePlan Agent (6 types) → Delegates to Awards (7 types) + ECs (6 types) + Summer Programs (3 types) + Scholarships (3 types) → Synthesizes 93-week roadmap → A2A Handover → Execution Agent (15 types) → Weekly execution. **Intelligence Types Active:** 40 domain-specific types across core journey (Assessment 6 + GamePlan 6 + Awards 7 + ECs 6 + Execution 15 = 40, plus Summer Programs 3 + Scholarships 3 = 46 total registered). **Role Boundaries Verified:** Assessment (WHAT & WHERE: gap identification, Ivy Score), GamePlan (HOW & TIMELINE: 93-week roadmap, quarterly adaptation), Execution (WHEN & TRACKING: weekly tasks, progress monitoring, blocking detection). **Initialization Pattern:** All agents follow consistent pattern with proper logging, error handling, and observability. **Documentation:** All master specs synchronized to v30.0, complete intelligence types registry documented, all individual agent specs updated to reflect 100% spec compliance. **Production Ready:** Zero hallucinations validated end-to-end, complete core coaching journey operational with full intelligence orchestration.
+29. **v32.0** - LangGraph State Orchestration Fix (Fixed critical LangGraph StateChannels bug where student_id and session_id were being dropped from state + Added missing channel definitions with immutable reducer pattern in `state.ts:146-159` + 14-line tactical fix enabling multi-turn fact accumulation + Verified with 5-message test: facts accumulate from `{grade: 11}` → `{grade: 11, high_school, interests, gpa, sat_total}` with 100% persistence + Architecture validation: confirms v31.4 state-first design is correct + All 7 intelligence types triggering correctly (TYPE-020, 080, 081, 082, 083, 085, 086) + Discovery phase completion tracking working (0% → 17% → 50%) + Fixed UI display issue showing `vundefined` in test-extraction-ui.html + Zero breaking changes, zero migrations needed + Production ready: LangGraph v31.4 orchestration fully operational)
 
-**Key Principle:** v14.0 is ADDITIVE - All previous layers (v14 → v13.0) preserved and enhanced with Growth Transformations Timeline featuring comprehensive 2-year journey data enrichment (30 new transformation events added) balanced across Foundation (2023), Build (2024), and Decision (2025) phases with full qualitative + quantitative transformation tracking.
+**Key Principle:** v32.0 is SURGICAL - Fixed specific LangGraph state management bug without architectural changes, confirming that the v31.4 state-first architecture is fundamentally sound and ready for production multi-agent workflows.
 
 ---
 

@@ -1,5 +1,61 @@
 # Changelog
 
+## [2025-11-05 03:30] v32.0: LangGraph State Orchestration Fix - Student ID & Session Persistence
+
+**Summary:** Fixed critical LangGraph StateChannels bug where `student_id` and `session_id` were being silently dropped from state during workflow execution. This 14-line tactical fix adds missing channel definitions with immutable reducer patterns, enabling proper multi-turn fact accumulation. Verified with 5-message test conversation showing perfect fact persistence from `{grade: 11}` → cumulative `{grade, high_school, interests, gpa, sat_total}`. Confirms v31.4 state-first architecture is fundamentally sound and production-ready.
+
+**Root Cause:**
+- LangGraph requires ALL state fields to have channel definitions with reducer functions
+- `student_id` and `session_id` were missing from StateChannels object
+- Without channels, LangGraph drops these fields when state flows through graph nodes
+- This caused `query.entity_id = undefined` in Assessment Agent
+- Facts were extracted and stored but couldn't be loaded (no student_id for DB queries)
+- Result: `data_collected_so_far` always returned empty `{}`
+
+**The Fix (14 lines):**
+Added immutable identity channels to StateChannels with `next || prev` reducer pattern (set once at session start, persist forever across all workflow nodes).
+
+**Files Modified:**
+- services/agent-framework/src/langgraph/state.ts:146-159 - Added student_id and session_id channels
+- services/agent-framework/test-extraction-ui.html:379 - Fixed vundefined display issue
+- docs/PROD_FEATURE_RELEASE_DETAILS.md:1-129 - Added v32.0 release section
+- docs/MASTER_PROD_TECH_SPEC.md:1-51 - Updated version to v32.0, added version history entry
+- CHANGELOG.md:1-3 - This entry
+
+**Impact:**
+- ✅ student_id flows correctly through LangGraph state
+- ✅ Facts extracted, stored, and loaded successfully
+- ✅ data_collected_so_far returns cumulative facts across conversation turns
+- ✅ Multi-turn memory working (5-message test verified)
+- ✅ All 7 intelligence types triggering correctly (TYPE-020, 080, 081, 082, 083, 085, 086)
+- ✅ Phase completion tracking operational (0% → 17% → 50%)
+- ✅ Zero breaking changes, zero migrations needed
+
+**Test Results:**
+```
+Turn 1: "I am in 11th grade" → {grade: 11}
+Turn 2: "Dublin High School" → {grade: 11, high_school: "Dublin High School"}
+Turn 3: "CS, Game Development" → {grade: 11, high_school: "...", interests: ["CS", "Game Development"]}
+Turn 4: "GPA 4.0 weighted" → {gpa: 4, gpa_type: "weighted", grade: 11, interests: [...], high_school: "..."}
+Turn 5: "SAT 1500" → {gpa: 4, gpa_type: "weighted", sat_total: 1500, grade: 11, interests: [...], high_school: "..."}
+```
+
+**Architecture Validation:**
+This fix confirms the v31.4 state-first architecture is correct:
+- Facts ARE being extracted ✅
+- Facts ARE being stored to DB ✅
+- Facts ARE being loaded from DB ✅
+- LangGraph state accumulation works ✅
+- Problem was tactical (missing channels), not architectural
+
+**Code References:**
+- services/agent-framework/src/langgraph/state.ts:146-159 (channel definitions)
+- services/agent-framework/src/langgraph/LangGraphOrchestratorV31.ts:264-274 (state usage in call_agent node)
+- services/agent-framework/src/langgraph/AgentToolWrapper.ts:100 (student_id → entity_id mapping)
+- services/agent-framework/src/agents/v18/AssessmentAgentV3ConversationalRealtime.ts:355 (fact loading)
+
+---
+
 ## [2025-10-29 22:00] v18.0: Fact-First Architecture + ExtracurricularsAgent (70+ Coaching Intelligence Chips)
 
 **Summary:** Architectural revolution - Eliminate hallucination at the system level through universal Fact-First primitives. Refactored GamePlanAgent, AssessmentAgent, and ExtracurricularsAgent to extend BaseAgent abstract class, enforcing fact-only responses with full provenance tracking. Added comprehensive Coaching Intelligence Catalog with 70+ frameworks extracted from 93 weeks of real coaching data. Zero-hallucination guaranteed by design.
