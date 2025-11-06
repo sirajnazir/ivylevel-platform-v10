@@ -62,6 +62,9 @@ import { BaseAgentWithIntelligence, IntelligenceAgentResponse } from './BaseAgen
 import { FactSet, Fact } from '../../facts/FactSet.js';
 import { createLogger } from '../../../../../packages/observability/dist/unified-logger.js';
 import { Pool } from 'pg';
+import { UniversalFact, FactCategory as UFFactCategory, ProductionTable } from '../../facts/UniversalFact.js';
+import { SchemaCoverage } from '../../facts/SchemaCoverage.js';
+import { StudentIsolation } from '../../facts/StudentIsolation.js';
 import { extractAssessmentDataGPT, validateAndNormalizeData, analyzeStudentEngagement, type ExtractedAssessmentData } from '../../nlp/assessmentExtract.js';
 import { IntelligenceResult } from '../../intelligence/types/BaseIntelligenceType.js';
 import { A2AOrchestrator } from '../../a2a/A2AOrchestrator.js';
@@ -83,6 +86,8 @@ import { AdaptationContext } from '../../a2a/AgentFactRequirements.js';
 import { IntelligenceRegistry } from '../../intelligence/IntelligenceRegistry.js';
 import type { IntelligenceType } from '../../intelligence/types/BaseIntelligenceType.js';
 import { CanonicalFieldMapper } from '../../utils/CanonicalFieldMapper.js';
+import { AssessmentFactTracker, AssessmentProgress } from './AssessmentFactTracker.js';
+import { AssessmentQuestionGenerator } from './AssessmentQuestionGenerator.js';
 
 const log = createLogger('assessment-agent-v3-conversational-realtime');
 
@@ -171,6 +176,11 @@ interface ConversationState {
 export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntelligence {
   private pool: Pool;
   private sessionStates: Map<string, ConversationState> = new Map();
+
+  /**
+   * v34.1: Track handover execution per session (prevents infinite loop)
+   */
+  private sessionHandovers: Map<string, boolean> = new Map();
 
   /**
    * Domain-specific intelligence types for Assessment Agent
@@ -317,9 +327,21 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
 
   /**
    * MAIN ENTRY POINT: Handle user message with full intelligence-driven flow
+   * LAYER 4: Comprehensive debug logging for v34.1 handover flow
    */
   async handleQuery(query: AgentQuery): Promise<IntelligenceAgentResponse> {
     const sessionId = query.session_id || 'no-session';
+
+    // v34.2 UNIVERSAL FACTS + SCHEMA COVERAGE - Architecture redesign
+    console.log('🚀 [v34.2 UNIVERSAL FACTS] Assessment Agent with schema-based coverage (NOT fact counting)!');
+
+    // LAYER 4: Debug entry point
+    log.event('assessment.handle_query.start', {
+      session_id: sessionId,
+      student_id: query.entity_id,
+      message_length: query.query?.length || 0,
+      has_context: !!query.context
+    });
 
     console.log('\n========== INTELLIGENCE-DRIVEN ASSESSMENT V26.5 REALTIME START ==========');
     console.log('[V26.5_REALTIME] 🚀 AssessmentAgentV3ConversationalRealtime.handleQuery() CALLED');
@@ -355,6 +377,182 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     const facts = await this.loadFacts(query.entity_id);
     console.log('[V26.5_REALTIME] Facts loaded:', facts.getAllFacts().length);
     console.log('[V26.5_REALTIME] Fact categories:', facts.getAllFacts().map(f => f.category));
+
+    // v34.2 UNIVERSAL FACTS: Load Universal Facts and calculate schema coverage
+    console.log('🔧 [v34.2 UNIVERSAL FACTS] Loading Universal Facts and checking schema coverage...');
+
+    try {
+      // Load existing Universal Facts
+      const existingUniversalFacts = await this.loadUniversalFacts(query.entity_id);
+
+      // Convert latest extraction to Universal Facts
+      const newUniversalFacts = this.toUniversalFacts(
+        query.entity_id,
+        await this.getLatestExtractedData(query.entity_id), // Get from last extraction
+        sessionId
+      );
+
+      // Combine all facts
+      const allUniversalFacts = [...existingUniversalFacts, ...newUniversalFacts];
+
+      // Calculate schema coverage (NOT fact count!)
+      const coverage = SchemaCoverage.fromFacts(allUniversalFacts);
+
+      log.event('assessment.schema_coverage', {
+        session_id: sessionId,
+        student_id: query.entity_id,
+        coverage: coverage.toJSON()
+      });
+
+      console.log('[v34.2] Schema coverage check:', {
+        is_complete: coverage.isMinimumCoverageAchieved(),
+        completion_pct: coverage.completion_percentage,
+        required: coverage.toJSON().required,
+        optional: coverage.toJSON().optional,
+        missing: coverage.getMissingRequiredFields()
+      });
+
+      // v34.3 ENHANCED ASSESSMENT: Check using AssessmentFactTracker
+      // Convert UniversalFact[] to Map<string, any> for AssessmentFactTracker
+      const factsMap = new Map<string, any>();
+      for (const fact of allUniversalFacts) {
+        if (fact.data.metadata?.field_name) {
+          factsMap.set(fact.data.metadata.field_name, fact.data.fields);
+        }
+      }
+
+      // Calculate comprehensive assessment progress
+      const conversationTurns = state.message_count || 0;
+      const assessmentProgress: AssessmentProgress = AssessmentFactTracker.calculateProgress(
+        factsMap,
+        conversationTurns
+      );
+
+      console.log('[v34.3 ENHANCED ASSESSMENT] Progress:', {
+        total_facts_collected: assessmentProgress.total_facts_collected,
+        total_facts_required: assessmentProgress.total_facts_required,
+        overall_completion: assessmentProgress.overall_completion,
+        quality_score: assessmentProgress.quality_score,
+        is_complete: assessmentProgress.is_complete,
+        conversation_turns: conversationTurns,
+        next_priority_tier: assessmentProgress.next_priority_tier,
+      });
+
+      // Check if minimum coverage achieved (OLD logic for backward compatibility)
+      const handoverExecuted = this.sessionHandovers.get(sessionId) || false;
+
+      // v34.3 RAISED BAR: Use AssessmentFactTracker completion criteria
+      const shouldHandover = assessmentProgress.is_complete &&
+                            assessmentProgress.quality_score >= 8.5 &&
+                            conversationTurns >= 45 &&
+                            assessmentProgress.total_facts_collected >= 90 &&
+                            !handoverExecuted;
+
+      if (shouldHandover) {
+        console.log('[v34.3] ✅ Enhanced assessment complete! Triggering handover to GamePlan...');
+        console.log('[v34.3]   - Facts collected:', assessmentProgress.total_facts_collected, '(target: 90+)');
+        console.log('[v34.3]   - Quality score:', assessmentProgress.quality_score.toFixed(2), '(target: 8.5+)');
+        console.log('[v34.3]   - Conversation turns:', conversationTurns, '(target: 45+)');
+
+        // Mark handover as executed for this session
+        this.sessionHandovers.set(sessionId, true);
+
+        log.event('assessment.handover_triggered', {
+          session_id: sessionId,
+          student_id: query.entity_id,
+          schema_coverage: coverage.toJSON()
+        });
+
+        // Generate handover response
+        const handoverResponse = this.generateHandoverResponseV2(coverage);
+
+        console.log('[v34.2 HANDOVER] 🎯 Schema complete! Returning handover with signals:');
+        console.log('[v34.2 HANDOVER]   - phase_complete: true');
+        console.log('[v34.2 HANDOVER]   - completion_percentage:', coverage.completion_percentage);
+        console.log('[v34.2 HANDOVER]   - suggested_next_phase: gameplan');
+
+        // Return with handover signal
+        return {
+          response: handoverResponse,
+          facts_used: facts.getAllFacts(),
+          validation_score: 1.0,
+          provenance: [],
+          confidence: 1.0,
+          intelligence_triggered: ['TYPE-085', 'TYPE-086'],
+          triggered_intelligence: ['TYPE-085', 'TYPE-086'],
+
+          metadata: {
+            assessment_complete: true,
+            schema_coverage: coverage.toJSON(),
+            universal_facts: allUniversalFacts,
+            data_collected_so_far: facts.getAllFacts(),
+            mode: 'handover',
+            eq_layer_active: 'LAYER_9: Synthesis Moment',
+
+            // v34.3 ENHANCED ASSESSMENT: Include progress metrics
+            assessment_progress: {
+              total_facts_collected: assessmentProgress.total_facts_collected,
+              total_facts_required: assessmentProgress.total_facts_required,
+              overall_completion: assessmentProgress.overall_completion,
+              quality_score: assessmentProgress.quality_score,
+              conversation_turns: conversationTurns,
+              tier_progress: assessmentProgress.tier_progress,
+              is_complete: assessmentProgress.is_complete,
+            },
+
+            // ✅ CRITICAL: Handover signals for v34 orchestrator
+            signals: {
+              phase_complete: true,
+              // FIX: Return 100 to signal "assessment phase is complete" (not data completeness %)
+              // coverage.completion_percentage would be 38% (3/8 fields), but we mean "phase done"
+              completion_percentage: 100,
+              confidence: 1.0,
+              suggested_next_phase: 'gameplan',
+
+              requires_handover: [{
+                from_agent: 'assessment-agent-v18',
+                to_agent: 'gameplan-agent-v18',
+                reason: 'Minimum schema coverage achieved (grade, high_school, interests)',
+                confidence: 1.0,
+                schema_coverage: coverage.toJSON(),
+                collected_facts: facts.getAllFacts()
+              }]
+            },
+
+            // v26 compat: Also set direct handover flag
+            requires_handover: [{
+              from_agent: 'assessment-agent-v18',
+              to_agent: 'gameplan-agent-v18',
+              reason: 'Assessment complete - all required data collected',
+              confidence: 1.0
+            }]
+          }
+        };
+      }
+
+      console.log('[v34.2] Schema coverage not yet complete, continuing with normal flow...');
+      console.log('[v34.2] Missing fields:', coverage.getMissingFieldsDescription());
+
+      log.event('assessment.schema_coverage.continue', {
+        session_id: sessionId,
+        student_id: query.entity_id,
+        reason: 'minimum_coverage_not_achieved',
+        missing: coverage.getMissingRequiredFields()
+      });
+
+    } catch (error) {
+      // CATCH: Any error in schema coverage check should not block normal assessment flow
+      console.error('[v34.2] ❌ Schema coverage error:', error);
+      console.error('[v34.2] Stack trace:', error instanceof Error ? error.stack : 'No stack');
+      log.error('assessment.schema_coverage.error', {
+        session_id: sessionId,
+        student_id: query.entity_id,
+        error: String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      console.log('[v34.2] ⚠️ Schema coverage check error, continuing with normal assessment flow...');
+      // Continue to normal flow below
+    }
 
     // STEP 4: Process intelligence types (TYPE-080, 081, 082, 083, 085, 086)
     console.log('[V26.5_REALTIME] 🧠 STEP 4: Processing intelligence types (TYPE-080, 081, 082, 083, 085, 086)...');
@@ -445,9 +643,11 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
 
     // CRITICAL: Check if we've already asked this student these exact questions
     // v28.1: TYPE-080 now intelligently skips questions when data exists, so we only need to check "already asked"
+    // v31.2: BUGFIX - Pass collectedData to prevent asking questions about data we already have
     const availableQuestions = await this.filterAlreadyAskedQuestions(
       assessmentFlow.adaptive_questions || [],
-      state.questions_asked
+      state.questions_asked,
+      collectedData  // v31.2: CRITICAL FIX - was missing, causing synthesis loop
     );
 
     if (availableQuestions.length === 0) {
@@ -455,29 +655,79 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
       return await this.deliverSynthesisMoment(facts, intelligenceResults, state, query.entity_id);
     }
 
-    // Select next question based on priority
-    const nextQuestion = this.selectNextQuestion(availableQuestions, collectedData, state);
+    // v34.3 ENHANCED ASSESSMENT: Calculate assessment progress and try enhanced question generation
+    let nextQuestionText: string;
+    let nextQuestionCategory: string = 'General';
+    let nextQuestionPriority: string = 'P2';
+
+    try {
+      // Load universal facts to calculate progress
+      const universalFacts = await this.loadUniversalFacts(query.entity_id);
+      const factsMap = new Map<string, any>();
+      for (const fact of universalFacts) {
+        if (fact.data.metadata?.field_name) {
+          factsMap.set(fact.data.metadata.field_name, fact.data.fields);
+        }
+      }
+
+      const assessmentProgress = AssessmentFactTracker.calculateProgress(
+        factsMap,
+        state.message_count || 0
+      );
+
+      // Try to generate enhanced question using AssessmentQuestionGenerator
+      const conversationHistory = query.metadata?.conversation_history || [];
+      const enhancedQuestion = this.generateEnhancedQuestion(
+        assessmentProgress,
+        query.query || '',
+        conversationHistory
+      );
+
+      if (enhancedQuestion) {
+        // Use enhanced question from AssessmentQuestionGenerator
+        nextQuestionText = enhancedQuestion;
+        // Derive category from next priority tier
+        nextQuestionCategory = assessmentProgress.next_priority_tier || 'General';
+        nextQuestionPriority = 'P0'; // Enhanced questions are high priority
+        console.log('[v34.3 ENHANCED] Using AssessmentQuestionGenerator question');
+      } else {
+        // Fallback to TYPE-080 question selection
+        const nextQuestion = this.selectNextQuestion(availableQuestions, collectedData, state);
+        nextQuestionText = nextQuestion.question;
+        nextQuestionCategory = nextQuestion.category;
+        nextQuestionPriority = nextQuestion.priority;
+        console.log('[v34.3 ENHANCED] Using TYPE-080 fallback question');
+      }
+    } catch (error) {
+      console.error('[v34.3 ENHANCED] Error in enhanced question generation, falling back to TYPE-080:', error);
+      // Fallback to original TYPE-080 logic
+      const nextQuestion = this.selectNextQuestion(availableQuestions, collectedData, state);
+      nextQuestionText = nextQuestion.question;
+      nextQuestionCategory = nextQuestion.category;
+      nextQuestionPriority = nextQuestion.priority;
+    }
 
     // Apply EQ Layer transformation
     const eqEnhancedResponse = this.applyEQLayer(
-      nextQuestion.question,
+      nextQuestionText,
       state,
       collectedData,
       query.query
     );
 
     // v28.2: CRITICAL - Track the question we're sending so extraction knows context
-    state.last_question = nextQuestion.question;
-    console.log('[V28.2_QUESTION_TRACKING] Tracking question for next extraction:', nextQuestion.question.substring(0, 80));
+    state.last_question = nextQuestionText;
+    console.log('[V28.2_QUESTION_TRACKING] Tracking question for next extraction:', nextQuestionText.substring(0, 80));
 
     // Update state in database
     await this.saveConversationState(state);
 
     // v29.5: Generate suggested quick replies based on question context
-    const suggestedResponses = this.generateSuggestedResponses(nextQuestion, collectedData);
+    const nextQuestionObj = { question: nextQuestionText, category: nextQuestionCategory, priority: nextQuestionPriority };
+    const suggestedResponses = this.generateSuggestedResponses(nextQuestionObj, collectedData);
 
     console.log('[v29.5_QUICK_REPLIES] Generated suggested responses:', {
-      question_text: nextQuestion.question.substring(0, 80),
+      question_text: nextQuestionText.substring(0, 80),
       suggested_responses: suggestedResponses,
       count: suggestedResponses.length,
     });
@@ -492,7 +742,7 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
       metadata: {
         agent_id: this.agentId,
         mode: 'intelligence_driven_conversational',
-        original_question: nextQuestion.question, // v28.3: Track original for loop detection
+        original_question: nextQuestionText, // v28.3: Track original for loop detection
         current_phase: assessmentFlow.current_phase,
         overall_completion: assessmentFlow.overall_completion,
         eq_layer_active: state.current_eq_layer,
@@ -802,51 +1052,32 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
         longitudinal_tracking_enabled: validation_result.has_longitudinal_tracking,
       };
 
-      // Execute A2A synchronous handoff
-      console.log('[A2A_HANDOVER] Calling A2AOrchestrator.handleSynchronousHandoff()');
-      const handoverResult = await A2AOrchestrator.handleSynchronousHandoff(handoverPackage);
+      // ARCHIVED 2025-11-05: A2A handoff removed - LangGraph orchestrator handles handover via requires_handover signal
+      // The orchestrator detects requires_handover in metadata and routes to gameplan-agent automatically
+      console.log('[v34.2] 🎯 Handover signal set in metadata - LangGraph will route to GamePlan Agent');
 
-      if (!handoverResult.success) {
-        console.error('[A2A_HANDOVER] ❌ Handover failed:', handoverResult.error);
-        // Fallback: Return error message
-        return {
-          response: "I'm ready to create your strategic roadmap, but I'm having trouble transitioning. Let me know if you'd like to continue!",
-          facts_used: facts.getAllFacts(),
-          validation_score: 0.5,
-          triggered_intelligence: intelligenceResults.filter(r => r.triggered).map(r => r.type_id),
-          provenance: facts.getProvenance(),
-          metadata: {
-            agent_id: this.agentId,
-            mode: 'handover_failed',
-            error: handoverResult.error,
-          },
-        };
-      }
-
-      console.log('[A2A_HANDOVER] ✅ Handover successful!');
-      console.log('[A2A_HANDOVER] GamePlan Agent initialized with:', {
-        handover_id: handoverResult.handover_id,
-        new_agent: handoverResult.new_agent,
-        facts_transferred: handoverResult.metadata?.facts_transferred,
-        processing_time_ms: handoverResult.metadata?.processing_time_ms,
-      });
-
-      // Return GamePlan Agent's initialization response
+      // Return with handover signal - orchestrator will handle the actual handover
       return {
-        response: handoverResult.response,
+        response: "Perfect! I've gathered the core information needed. Let me connect you with our Game Plan strategist who will create your personalized roadmap.",
         facts_used: facts.getAllFacts(),
         validation_score: 1.0,
         triggered_intelligence: intelligenceResults.filter(r => r.triggered).map(r => r.type_id),
         provenance: facts.getProvenance(),
         metadata: {
-          agent_id: 'gameplan-agent', // Now controlled by GamePlan Agent
-          mode: 'a2a_handover_complete',
+          agent_id: this.agentId, // Still Assessment Agent until orchestrator switches
+          mode: 'handover_ready',
           eq_layer: 10,
-          handover_id: handoverResult.handover_id,
           previous_agent: this.agentId,
           next_step: 'gameplan_strategy',
-          a2a_handover_complete: true,
-          handover_payload: handoverPackage.domain_payload, // v29.3: Pass domain_payload to route for GamePlan consumption
+
+          // v34.2: Handover signal for LangGraph orchestrator
+          requires_handover: [{
+            from_agent: this.agentId,
+            to_agent: 'gameplan-agent-v18',
+            reason: 'Assessment complete - minimum schema coverage achieved',
+            confidence: 1.0,
+            payload: handoverPackage.domain_payload
+          }]
         },
       };
     }
@@ -1330,6 +1561,42 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
   }
 
   /**
+   * v34.3 ENHANCED ASSESSMENT: Use AssessmentQuestionGenerator for smarter question selection
+   * Integrates with existing TYPE-080 intelligence layer
+   */
+  private generateEnhancedQuestion(
+    assessmentProgress: AssessmentProgress,
+    lastStudentResponse: string,
+    conversationHistory: any[]
+  ): string | null {
+    try {
+      // Convert conversation history to Message[] format
+      const messages = conversationHistory.map((msg: any) => ({
+        role: msg.role || 'user',
+        content: msg.content || msg.message || ''
+      }));
+
+      // Generate next question using AssessmentQuestionGenerator
+      const nextQuestion = AssessmentQuestionGenerator.generateNextQuestion(
+        assessmentProgress,
+        lastStudentResponse,
+        messages
+      );
+
+      console.log('[v34.3 ENHANCED ASSESSMENT] Generated question from AssessmentQuestionGenerator:', {
+        question_preview: nextQuestion.substring(0, 80),
+        next_priority_tier: assessmentProgress.next_priority_tier,
+        estimated_remaining: assessmentProgress.estimated_remaining_questions
+      });
+
+      return nextQuestion;
+    } catch (error) {
+      console.error('[v34.3 ENHANCED ASSESSMENT] Error generating enhanced question:', error);
+      return null; // Fallback to TYPE-080 questions
+    }
+  }
+
+  /**
    * Filter out questions we've already asked this student
    * OR questions where we already have the data
    *
@@ -1767,14 +2034,32 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     conversationHistory: string,
     lastQuestion: string = ''
   ): Promise<void> {
+    // v31.3: Deep trace logging temporarily disabled due to module path issues
+    // Will use console.log for now to test OpenAI API key fix
+
     console.log('[EXTRACT_GPT4O] Starting extraction...');
+    console.log('[EXTRACT_GPT4O] Student ID:', studentId);
+    console.log('[EXTRACT_GPT4O] User message:', userMessage);
+    console.log('[EXTRACT_GPT4O] Last question:', lastQuestion);
 
-    const rawExtractedData = await extractAssessmentDataGPT(userMessage, conversationHistory, lastQuestion);
-    const extractedData = validateAndNormalizeData(rawExtractedData);
+    try {
+      const rawExtractedData = await extractAssessmentDataGPT(userMessage, conversationHistory, lastQuestion);
 
-    if (Object.keys(extractedData).length > 0) {
-      await this.storeExtractedFacts(studentId, extractedData);
-      console.log(`[EXTRACT_GPT4O] ✅ Stored ${Object.keys(extractedData).length} data points`);
+      console.log('[EXTRACT_GPT4O] Raw extracted data:', JSON.stringify(rawExtractedData, null, 2));
+
+      const extractedData = validateAndNormalizeData(rawExtractedData);
+
+      console.log('[EXTRACT_GPT4O] Validated data:', JSON.stringify(extractedData, null, 2));
+
+      if (Object.keys(extractedData).length > 0) {
+        await this.storeExtractedFacts(studentId, extractedData);
+        console.log(`[EXTRACT_GPT4O] ✅ Stored ${Object.keys(extractedData).length} data points`);
+      } else {
+        console.log('[EXTRACT_GPT4O] ⚠️ No data extracted from user message');
+      }
+    } catch (error) {
+      console.error('[EXTRACT_GPT4O] ❌ ERROR:', error);
+      throw error;
     }
   }
 
@@ -1898,9 +2183,661 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     for (const [_, facts] of available_facts) {
       const fact = facts.find((f: any) => f.fact_type === fact_type || f.subtype === fact_type);
       if (fact) {
-        return fact.value || fact.data?.value || fact.data;
+        return fact.value;
       }
     }
     return null;
+  }
+
+  /**
+   * v34.1: DEFENSIVE - Check if assessment has enough data for handover
+   *
+   * Safe handling:
+   * - Empty facts array
+   * - Missing fields
+   * - Undefined values
+   * - Type mismatches
+   */
+  private checkAssessmentCompletion(facts: FactSet): boolean {
+    try {
+      // Get all facts safely
+      const allFacts = facts?.getAllFacts?.() || [];
+
+      // GUARD: Handle empty facts
+      if (!allFacts || allFacts.length === 0) {
+        log.event('assessment.completion_check.no_facts', {
+          facts_count: 0
+        });
+        return false;
+      }
+
+      // Convert to map with safe defaults
+      const factMap: Record<string, any> = {};
+
+      for (const fact of allFacts) {
+        try {
+          // Handle both .fact_type and .category
+          const key = fact?.fact_type || fact?.category;
+          const value = fact?.value;
+
+          if (key && value !== undefined && value !== null) {
+            factMap[key] = value;
+          }
+        } catch (err) {
+          // Skip malformed facts
+          log.event('assessment.completion_check.skip_fact', {
+            error: String(err)
+          });
+          continue;
+        }
+      }
+
+      // GUARD: Check if we have any meaningful facts
+      if (Object.keys(factMap).length === 0) {
+        log.event('assessment.completion_check.no_meaningful_facts', {
+          raw_facts: allFacts.length,
+          parsed_facts: 0
+        });
+        return false;
+      }
+
+      // Core required fields for assessment completion
+      const coreFields = ['grade', 'high_school', 'interests'];
+
+      // SAFE: Check each field exists with truthy value
+      const hasCoreFields = coreFields.every(field => {
+        const value = factMap[field];
+        return value !== undefined &&
+               value !== null &&
+               value !== '' &&
+               value !== 'unknown';
+      });
+
+      if (!hasCoreFields) {
+        const missingFields = coreFields.filter(f => !factMap[f]);
+        log.event('assessment.completion_check.missing_core_fields', {
+          missing: missingFields,
+          present: Object.keys(factMap)
+        });
+        return false;
+      }
+
+      // Count meaningful facts (filter out empty/trivial values)
+      const meaningfulFacts = Object.entries(factMap).filter(([key, value]) => {
+        // SAFE: Check value is meaningful
+        if (value === undefined || value === null || value === '') {
+          return false;
+        }
+
+        if (value === 'unknown' || value === 'n/a') {
+          return false;
+        }
+
+        // Check arrays
+        if (Array.isArray(value)) {
+          return value.length > 0;
+        }
+
+        // Check objects
+        if (typeof value === 'object') {
+          return Object.keys(value).length > 0;
+        }
+
+        return true;
+      });
+
+      // Assessment complete if:
+      // 1. Has core fields (grade, school, interests)
+      // 2. Has at least 5 meaningful facts total
+      const isComplete = meaningfulFacts.length >= 5;
+
+      log.event('assessment.completion_check.result', {
+        has_core_fields: hasCoreFields,
+        meaningful_facts_count: meaningfulFacts.length,
+        is_complete: isComplete,
+        facts_present: Object.keys(factMap)
+      });
+
+      return isComplete;
+
+    } catch (error) {
+      // CATCH: Any unexpected errors
+      log.error('assessment.completion_check.error', {
+        error: String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+
+      // Safe fallback: not complete
+      return false;
+    }
+  }
+
+  /**
+   * v34.1: Calculate how many assessment phases are complete
+   *
+   * @param facts - All facts collected for the student
+   * @returns Number of phases complete (0-4)
+   */
+  /**
+   * v34.1: Calculate number of assessment phases complete
+   * LAYER 3: Defensive implementation - never throws
+   *
+   * @param facts - All facts collected for the student
+   * @returns Number of phases complete (0-4), or 0 on error
+   */
+  private calculatePhasesComplete(facts: FactSet): number {
+    try {
+      // GUARD: Handle null/undefined facts
+      const allFacts = facts?.getAllFacts?.() || [];
+
+      if (!allFacts || allFacts.length === 0) {
+        return 0;
+      }
+
+      const factMap: Record<string, any> = {};
+
+      // SAFE: Build fact map with defensive access
+      for (const fact of allFacts) {
+        try {
+          const key = fact?.fact_type || fact?.category;
+          const value = fact?.value;
+
+          if (key && value !== undefined && value !== null) {
+            factMap[key] = value;
+          }
+        } catch (err) {
+          // Skip malformed facts
+          continue;
+        }
+      }
+
+      let phases = 0;
+
+      // Phase 1: Basic Academic Info
+      if (factMap.grade && factMap.high_school) {
+        phases++;
+      }
+
+      // Phase 2: Interests & Passion
+      if (factMap.interests || factMap.target_major || factMap.passions) {
+        phases++;
+      }
+
+      // Phase 3: Activities & Projects
+      if (factMap.current_activities || factMap.projects || factMap.activities) {
+        phases++;
+      }
+
+      // Phase 4: Character & Values
+      if (factMap.values || factMap.challenges || factMap.defining_moments || factMap.character) {
+        phases++;
+      }
+
+      log.event('assessment.phases_complete', {
+        phases_complete: phases,
+        has_basic: phases >= 1,
+        has_interests: phases >= 2,
+        has_activities: phases >= 3,
+        has_character: phases >= 4
+      });
+
+      return phases;
+
+    } catch (error) {
+      // CATCH: Any error in phase calculation
+      log.error('assessment.phases_complete.error', {
+        error: String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      return 0; // Safe fallback
+    }
+  }
+
+  /**
+   * v34.1: Generate handover response when assessment is complete
+   * LAYER 3: Defensive implementation - never throws
+   *
+   * @param facts - All facts collected for the student
+   * @returns Handover message to send to user
+   */
+  private generateHandoverResponse(facts: FactSet): string {
+    try {
+      // SAFE: Calculate phases (returns 0 on error)
+      const phasesComplete = this.calculatePhasesComplete(facts);
+
+      // GUARD: Handle unexpected phase count
+      if (phasesComplete < 0 || phasesComplete > 4) {
+        log.event('assessment.handover_response.invalid_phases', {
+          phases_complete: phasesComplete
+        });
+      }
+
+      return `Perfect! I've gathered everything I need to understand your profile and goals.
+
+Based on our conversation, I can see your authentic passion and potential. Let me hand you over to our Game Plan strategist who will create your personalized roadmap to success.
+
+Ready to see your strategic plan?`;
+
+    } catch (error) {
+      // CATCH: Any error in generating handover response
+      log.error('assessment.handover_response.error', {
+        error: String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
+
+      // Safe fallback message
+      return `Great! I've gathered what I need. Let me connect you with our Game Plan strategist who will help create your personalized roadmap.`;
+    }
+  }
+
+  /**
+   * v34.1: Clear handover tracking for a session
+   *
+   * @param sessionId - Session ID to clear
+   */
+  public clearSessionHandover(sessionId: string): void {
+    this.sessionHandovers.delete(sessionId);
+    log.event('assessment.handover_cleared', { session_id: sessionId });
+  }
+
+  /**
+   * v34.2 UNIVERSAL FACTS: Convert extracted data → Universal Facts
+   *
+   * Each fact declares its schema_target (which production table to populate)
+   */
+  private toUniversalFacts(
+    studentId: string,
+    extractedData: any,
+    sessionId: string
+  ): UniversalFact[] {
+    const facts: UniversalFact[] = [];
+    const timestamp = Date.now();
+
+    // Grade fact → students table
+    if (extractedData.grade !== undefined) {
+      facts.push({
+        fact_id: `fact_${studentId}_grade_${timestamp}`,
+        student_id: studentId,
+        category: UFFactCategory.PROFILE,
+        subcategory: 'grade',
+
+        schema_target: {
+          primary_table: ProductionTable.STUDENTS,
+          related_tables: [ProductionTable.WEEKLY_VITALS],
+          update_strategy: 'upsert'
+        },
+
+        data: {
+          fields: {
+            current_grade: extractedData.grade,
+            graduation_year: this.calculateGradYear(extractedData.grade)
+          },
+          metadata: {
+            field_name: 'grade',  // ← For coverage tracking
+            data_type: 'integer',
+            schema_requirement: 'required'
+          }
+        },
+
+        source: {
+          agent_id: 'assessment-agent-v18',
+          extraction_method: 'gpt4o_conversational_v28',
+          source_type: 'conversation',
+          session_id: sessionId
+        },
+        confidence: 0.95,
+        extracted_at: new Date().toISOString(),
+        verified: true
+      });
+    }
+
+    // High school fact → students table
+    if (extractedData.high_school) {
+      facts.push({
+        fact_id: `fact_${studentId}_high_school_${timestamp}`,
+        student_id: studentId,
+        category: UFFactCategory.PROFILE,
+        subcategory: 'high_school',
+
+        schema_target: {
+          primary_table: ProductionTable.STUDENTS,
+          update_strategy: 'upsert'
+        },
+
+        data: {
+          fields: {
+            high_school_name: extractedData.high_school
+          },
+          metadata: {
+            field_name: 'high_school',
+            data_type: 'string',
+            schema_requirement: 'required'
+          }
+        },
+
+        source: {
+          agent_id: 'assessment-agent-v18',
+          extraction_method: 'gpt4o_conversational_v28',
+          source_type: 'conversation',
+          session_id: sessionId
+        },
+        confidence: 0.98,
+        extracted_at: new Date().toISOString(),
+        verified: true
+      });
+    }
+
+    // Interests fact → kb_items table
+    if (extractedData.interests && extractedData.interests.length > 0) {
+      facts.push({
+        fact_id: `fact_${studentId}_interests_${timestamp}`,
+        student_id: studentId,
+        category: UFFactCategory.PROFILE,
+        subcategory: 'interests',
+
+        schema_target: {
+          primary_table: ProductionTable.KB_ITEMS,
+          update_strategy: 'upsert'
+        },
+
+        data: {
+          fields: {
+            interests: extractedData.interests
+          },
+          metadata: {
+            field_name: 'interests',
+            data_type: 'array',
+            schema_requirement: 'required'
+          }
+        },
+
+        source: {
+          agent_id: 'assessment-agent-v18',
+          extraction_method: 'gpt4o_conversational_v28',
+          source_type: 'conversation',
+          session_id: sessionId
+        },
+        confidence: 0.90,
+        extracted_at: new Date().toISOString(),
+        verified: true
+      });
+    }
+
+    // Target major fact → kb_items table (optional)
+    if (extractedData.target_major) {
+      facts.push({
+        fact_id: `fact_${studentId}_target_major_${timestamp}`,
+        student_id: studentId,
+        category: UFFactCategory.PROFILE,
+        subcategory: 'target_major',
+
+        schema_target: {
+          primary_table: ProductionTable.KB_ITEMS,
+          update_strategy: 'upsert'
+        },
+
+        data: {
+          fields: {
+            target_major: extractedData.target_major
+          },
+          metadata: {
+            field_name: 'target_major',
+            data_type: 'string',
+            schema_requirement: 'optional'
+          }
+        },
+
+        source: {
+          agent_id: 'assessment-agent-v18',
+          extraction_method: 'gpt4o_conversational_v28',
+          source_type: 'conversation',
+          session_id: sessionId
+        },
+        confidence: 0.85,
+        extracted_at: new Date().toISOString(),
+        verified: true
+      });
+    }
+
+    // GPA fact → weekly_vitals table (optional)
+    if (extractedData.gpa !== undefined) {
+      facts.push({
+        fact_id: `fact_${studentId}_gpa_${timestamp}`,
+        student_id: studentId,
+        category: UFFactCategory.ACADEMIC,
+        subcategory: 'gpa',
+
+        schema_target: {
+          primary_table: ProductionTable.WEEKLY_VITALS,
+          update_strategy: 'upsert'
+        },
+
+        data: {
+          fields: {
+            gpa_weighted: extractedData.gpa,
+            gpa_scale: extractedData.gpa_scale || 4.0
+          },
+          metadata: {
+            field_name: 'gpa',
+            data_type: 'decimal',
+            schema_requirement: 'optional'
+          }
+        },
+
+        source: {
+          agent_id: 'assessment-agent-v18',
+          extraction_method: 'gpt4o_conversational_v28',
+          source_type: 'conversation',
+          session_id: sessionId
+        },
+        confidence: 0.90,
+        extracted_at: new Date().toISOString(),
+        verified: true
+      });
+    }
+
+    return facts;
+  }
+
+  /**
+   * v34.2: Load Universal Facts for student
+   * Reconstructs from kb_items for now (Phase 1 implementation)
+   */
+  private async loadUniversalFacts(studentId: string): Promise<UniversalFact[]> {
+    const result = await this.pool.query(`
+      SELECT item_id as id, edges as data, created_ts
+      FROM kb_items
+      WHERE student_id = $1
+      AND source_ref = 'gpt4o_conversational_extraction_v28'
+      ORDER BY created_ts ASC
+    `, [studentId]);
+
+    const facts: UniversalFact[] = [];
+
+    for (const row of result.rows) {
+      const data = row.data;
+      const timestamp = row.created_ts.getTime();
+
+      // Reconstruct Universal Facts from JSON data
+      if (data.grade !== undefined) {
+        facts.push({
+          fact_id: `fact_${studentId}_grade_${timestamp}`,
+          student_id: studentId,
+          category: UFFactCategory.PROFILE,
+          subcategory: 'grade',
+          schema_target: {
+            primary_table: ProductionTable.STUDENTS,
+            update_strategy: 'upsert'
+          },
+          data: {
+            fields: { current_grade: data.grade },
+            metadata: { field_name: 'grade', schema_requirement: 'required' }
+          },
+          source: {
+            agent_id: 'assessment-agent-v18',
+            extraction_method: 'gpt4o_conversational_v28',
+            source_type: 'conversation'
+          },
+          confidence: 0.95,
+          extracted_at: row.created_ts.toISOString(),
+          verified: true
+        });
+      }
+
+      if (data.high_school) {
+        facts.push({
+          fact_id: `fact_${studentId}_high_school_${timestamp}`,
+          student_id: studentId,
+          category: UFFactCategory.PROFILE,
+          subcategory: 'high_school',
+          schema_target: {
+            primary_table: ProductionTable.STUDENTS,
+            update_strategy: 'upsert'
+          },
+          data: {
+            fields: { high_school_name: data.high_school },
+            metadata: { field_name: 'high_school', schema_requirement: 'required' }
+          },
+          source: {
+            agent_id: 'assessment-agent-v18',
+            extraction_method: 'gpt4o_conversational_v28',
+            source_type: 'conversation'
+          },
+          confidence: 0.98,
+          extracted_at: row.created_ts.toISOString(),
+          verified: true
+        });
+      }
+
+      if (data.interests && data.interests.length > 0) {
+        facts.push({
+          fact_id: `fact_${studentId}_interests_${timestamp}`,
+          student_id: studentId,
+          category: UFFactCategory.PROFILE,
+          subcategory: 'interests',
+          schema_target: {
+            primary_table: ProductionTable.KB_ITEMS,
+            update_strategy: 'upsert'
+          },
+          data: {
+            fields: { interests: data.interests },
+            metadata: { field_name: 'interests', schema_requirement: 'required' }
+          },
+          source: {
+            agent_id: 'assessment-agent-v18',
+            extraction_method: 'gpt4o_conversational_v28',
+            source_type: 'conversation'
+          },
+          confidence: 0.90,
+          extracted_at: row.created_ts.toISOString(),
+          verified: true
+        });
+      }
+
+      if (data.target_major) {
+        facts.push({
+          fact_id: `fact_${studentId}_target_major_${timestamp}`,
+          student_id: studentId,
+          category: UFFactCategory.PROFILE,
+          subcategory: 'target_major',
+          schema_target: {
+            primary_table: ProductionTable.KB_ITEMS,
+            update_strategy: 'upsert'
+          },
+          data: {
+            fields: { target_major: data.target_major },
+            metadata: { field_name: 'target_major', schema_requirement: 'optional' }
+          },
+          source: {
+            agent_id: 'assessment-agent-v18',
+            extraction_method: 'gpt4o_conversational_v28',
+            source_type: 'conversation'
+          },
+          confidence: 0.85,
+          extracted_at: row.created_ts.toISOString(),
+          verified: true
+        });
+      }
+
+      if (data.gpa !== undefined) {
+        facts.push({
+          fact_id: `fact_${studentId}_gpa_${timestamp}`,
+          student_id: studentId,
+          category: UFFactCategory.ACADEMIC,
+          subcategory: 'gpa',
+          schema_target: {
+            primary_table: ProductionTable.WEEKLY_VITALS,
+            update_strategy: 'upsert'
+          },
+          data: {
+            fields: { gpa_weighted: data.gpa },
+            metadata: { field_name: 'gpa', schema_requirement: 'optional' }
+          },
+          source: {
+            agent_id: 'assessment-agent-v18',
+            extraction_method: 'gpt4o_conversational_v28',
+            source_type: 'conversation'
+          },
+          confidence: 0.90,
+          extracted_at: row.created_ts.toISOString(),
+          verified: true
+        });
+      }
+    }
+
+    return facts;
+  }
+
+  /**
+   * v34.2: Calculate graduation year from grade
+   */
+  private calculateGradYear(grade: number): number {
+    const currentYear = new Date().getFullYear();
+    const yearsUntilGrad = 12 - grade;
+    return currentYear + yearsUntilGrad;
+  }
+
+  /**
+   * v34.2: Generate handover response with schema coverage info
+   */
+  private generateHandoverResponseV2(coverage: SchemaCoverage): string {
+    return `Perfect! I've gathered the core information I need to understand your profile:
+
+✅ Grade: ${coverage.has_grade ? 'Confirmed' : ''}
+✅ High School: ${coverage.has_high_school ? 'Confirmed' : ''}
+✅ Interests: ${coverage.has_interests ? 'Confirmed' : ''}
+
+Based on your profile, I can see your authentic passion and direction. Let me hand you over to our Game Plan strategist who will create your personalized roadmap to success.
+
+Ready to see your strategic plan?`;
+  }
+
+  /**
+   * v34.2: Get latest extracted data from kb_items
+   * (Helper to convert fresh extraction into data object)
+   */
+  private async getLatestExtractedData(studentId: string): Promise<any> {
+    try {
+      const rows = await this.pool.query(`
+        SELECT edges as data
+        FROM kb_items
+        WHERE student_id = $1
+        AND source_ref = 'gpt4o_conversational_extraction_v28'
+        ORDER BY created_ts DESC
+        LIMIT 1
+      `, [studentId]);
+
+      if (rows.rows.length === 0) {
+        return {};
+      }
+
+      return rows.rows[0].data || {};
+    } catch (error) {
+      log.error('assessment.get_latest_extracted_data.error', {
+        student_id: studentId,
+        error: String(error)
+      });
+      return {};
+    }
   }
 }
