@@ -396,6 +396,27 @@ const MessageMeta = styled.div`
   gap: 12px;
 `;
 
+// v35.0: Version Banner
+const VersionBanner = styled.div`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 24px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.3px;
+
+  span {
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 18px;
+  }
+`;
+
 // v29.5: Quick Reply Bubbles Styles
 const QuickRepliesContainer = styled.div`
   display: flex;
@@ -705,8 +726,8 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
   // Use relative URLs - Vite proxy will forward /api/v26 to agent-framework backend
   const API_URL = '';
 
-  // v34.1: Component load confirmation
-  console.log('[v34.1 DELEGATION UI] MultiAgentsTabRedesigned component loaded! 🎯');
+  // v36.0: Component load confirmation
+  console.log('[v36.0 CONVERSATION INTELLIGENCE] MultiAgentsTabRedesigned component loaded! 🧠 Infinite loop prevention enabled');
 
   // Agent configurations
   const AGENT_CONFIGS = {
@@ -1223,6 +1244,11 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
   // Render main interface with agent cards and intelligence panel
   return (
     <PageContainer>
+      <VersionBanner>
+        <span>🧠</span>
+        v36.0 - Universal Conversation Intelligence (PREVENTS INFINITE LOOPS!)
+      </VersionBanner>
+
       <AgentCardsContainer>
         <AgentCardsGrid>
           {agentCards.map(card => (
@@ -1390,13 +1416,13 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
             <span style={{
               fontSize: '10px',
               fontWeight: 'bold',
-              color: '#10b981',
+              color: '#8b5cf6',
               marginLeft: '12px',
               padding: '2px 8px',
-              background: '#d1fae5',
+              background: '#ede9fe',
               borderRadius: '4px'
             }}>
-              v34.1 Delegation
+              v36.0 Conversation Intelligence
             </span>
           </IntelligencePanelTitle>
         </IntelligencePanelHeader>
