@@ -88,6 +88,7 @@ import type { IntelligenceType } from '../../intelligence/types/BaseIntelligence
 import { CanonicalFieldMapper } from '../../utils/CanonicalFieldMapper.js';
 import { AssessmentFactTracker, AssessmentProgress } from './AssessmentFactTracker.js';
 import { AssessmentQuestionGenerator } from './AssessmentQuestionGenerator.js';
+import { DynamicQuestionGenerator, QuestionGenerationContext, ResponseBubbleContext } from './DynamicQuestionGenerator.js';
 
 const log = createLogger('assessment-agent-v3-conversational-realtime');
 
@@ -183,6 +184,11 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
   private sessionHandovers: Map<string, boolean> = new Map();
 
   /**
+   * v35.0: Dynamic question generator using LLM for contextual questions
+   */
+  private dynamicQuestionGenerator: DynamicQuestionGenerator;
+
+  /**
    * Domain-specific intelligence types for Assessment Agent
    */
   protected DOMAIN_INTELLIGENCE: IntelligenceType[] = [];
@@ -190,6 +196,9 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
   constructor(factStore: FactStore, pool: Pool) {
     super('assessment-agent-v18', factStore);
     this.pool = pool;
+
+    // v35.0: Initialize dynamic question generator
+    this.dynamicQuestionGenerator = new DynamicQuestionGenerator();
 
     // Initialize Assessment intelligence types (TYPE-080, TYPE-081, TYPE-082, TYPE-083, TYPE-085, TYPE-086)
     this.initializeDomainIntelligence();
@@ -675,12 +684,15 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
         state.message_count || 0
       );
 
-      // Try to generate enhanced question using AssessmentQuestionGenerator
+      // Try to generate enhanced question using DynamicQuestionGenerator (v35.0)
       const conversationHistory = query.metadata?.conversation_history || [];
-      const enhancedQuestion = this.generateEnhancedQuestion(
+      const enhancedQuestion = await this.generateEnhancedQuestion(
         assessmentProgress,
         query.query || '',
-        conversationHistory
+        conversationHistory,
+        query.entity_id,
+        collectedData,
+        state.parent_present || false
       );
 
       if (enhancedQuestion) {
@@ -722,14 +734,24 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     // Update state in database
     await this.saveConversationState(state);
 
-    // v29.5: Generate suggested quick replies based on question context
-    const nextQuestionObj = { question: nextQuestionText, category: nextQuestionCategory, priority: nextQuestionPriority };
-    const suggestedResponses = this.generateSuggestedResponses(nextQuestionObj, collectedData);
+    // v35.0: Try dynamic LLM bubble generation first
+    let suggestedResponses = await this.generateDynamicResponseBubbles(
+      nextQuestionText,
+      collectedData,
+      query.query || ''
+    );
 
-    console.log('[v29.5_QUICK_REPLIES] Generated suggested responses:', {
+    // Fallback to keyword-based if LLM fails
+    if (suggestedResponses.length === 0) {
+      const nextQuestionObj = { question: nextQuestionText, category: nextQuestionCategory, priority: nextQuestionPriority };
+      suggestedResponses = this.generateSuggestedResponses(nextQuestionObj, collectedData);
+    }
+
+    console.log('[v35.0_DYNAMIC_BUBBLES] Generated suggested responses:', {
       question_text: nextQuestionText.substring(0, 80),
       suggested_responses: suggestedResponses,
       count: suggestedResponses.length,
+      source: suggestedResponses.length > 0 ? 'LLM' : 'keyword-based'
     });
 
     return {
@@ -1561,38 +1583,102 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
   }
 
   /**
-   * v34.3 ENHANCED ASSESSMENT: Use AssessmentQuestionGenerator for smarter question selection
-   * Integrates with existing TYPE-080 intelligence layer
+   * v35.0 DYNAMIC ASSESSMENT: Use DynamicQuestionGenerator for true LLM-driven question generation
+   * Replaces v34.3's hardcoded question selection with intelligent, contextual generation
    */
-  private generateEnhancedQuestion(
+  private async generateEnhancedQuestion(
     assessmentProgress: AssessmentProgress,
     lastStudentResponse: string,
-    conversationHistory: any[]
-  ): string | null {
+    conversationHistory: any[],
+    studentId: string,
+    collectedData: Record<string, any>,
+    parentPresent: boolean = false
+  ): Promise<string | null> {
     try {
-      // Convert conversation history to Message[] format
-      const messages = conversationHistory.map((msg: any) => ({
-        role: msg.role || 'user',
-        content: msg.content || msg.message || ''
-      }));
+      // Build context for LLM question generation
+      const context: QuestionGenerationContext = {
+        student_id: studentId,
+        current_phase: this.mapTierToPhase(assessmentProgress.next_priority_tier),
+        collected_data: collectedData,
+        missing_data_keys: this.extractMissingKeys(assessmentProgress),
+        conversation_history: conversationHistory.map((msg: any) => ({
+          role: msg.role || 'user',
+          content: msg.content || msg.message || ''
+        })),
+        last_student_response: lastStudentResponse,
+        confidence_level: assessmentProgress.overall_completion,
+        parent_present: parentPresent
+      };
 
-      // Generate next question using AssessmentQuestionGenerator
-      const nextQuestion = AssessmentQuestionGenerator.generateNextQuestion(
-        assessmentProgress,
-        lastStudentResponse,
-        messages
-      );
+      // Generate dynamic question using LLM
+      const dynamicQuestion = await this.dynamicQuestionGenerator.generateQuestion(context);
 
-      console.log('[v34.3 ENHANCED ASSESSMENT] Generated question from AssessmentQuestionGenerator:', {
-        question_preview: nextQuestion.substring(0, 80),
-        next_priority_tier: assessmentProgress.next_priority_tier,
-        estimated_remaining: assessmentProgress.estimated_remaining_questions
+      console.log('[v35.0 DYNAMIC ASSESSMENT] Generated LLM question:', {
+        question_preview: dynamicQuestion.question.substring(0, 80),
+        category: dynamicQuestion.category,
+        priority: dynamicQuestion.priority,
+        rationale: dynamicQuestion.rationale
       });
 
-      return nextQuestion;
+      return dynamicQuestion.question;
     } catch (error) {
-      console.error('[v34.3 ENHANCED ASSESSMENT] Error generating enhanced question:', error);
+      console.error('[v35.0 DYNAMIC ASSESSMENT] Error generating dynamic question:', error);
       return null; // Fallback to TYPE-080 questions
+    }
+  }
+
+  /**
+   * v35.0: Map tier to 4-phase framework
+   */
+  private mapTierToPhase(tier: string | null): 'discovery' | 'narrative' | 'strategy' | 'time' {
+    if (!tier) return 'discovery';
+    if (tier.includes('profile')) return 'discovery';
+    if (tier.includes('activity') || tier.includes('context')) return 'narrative';
+    if (tier.includes('gaps')) return 'strategy';
+    if (tier.includes('psychology')) return 'time';
+    return 'discovery';
+  }
+
+  /**
+   * v35.0: Extract missing keys from assessment progress
+   */
+  private extractMissingKeys(assessmentProgress: AssessmentProgress): string[] {
+    const missing: string[] = [];
+    for (const tierProgress of Object.values(assessmentProgress.tier_progress)) {
+      missing.push(...tierProgress.missing_critical);
+      missing.push(...tierProgress.missing_optional.slice(0, 5)); // Top 5 optional
+    }
+    return missing.slice(0, 20); // Max 20 to keep prompt size reasonable
+  }
+
+  /**
+   * v35.0 DYNAMIC BUBBLES: Generate response bubbles using LLM
+   */
+  private async generateDynamicResponseBubbles(
+    question: string,
+    collectedData: Record<string, any>,
+    lastResponse: string
+  ): Promise<string[]> {
+    try {
+      const context: ResponseBubbleContext = {
+        question,
+        collected_data: collectedData,
+        last_response: lastResponse,
+        student_profile: {
+          grade: collectedData.grade,
+          interests: collectedData.interests ? [collectedData.interests] : [],
+          activities: collectedData.current_activities ? [collectedData.current_activities] : []
+        }
+      };
+
+      const bubbles = await this.dynamicQuestionGenerator.generateResponseBubbles(context);
+
+      console.log('[v35.0 DYNAMIC BUBBLES] Generated suggestions:', bubbles);
+
+      return bubbles;
+    } catch (error) {
+      console.error('[v35.0 DYNAMIC BUBBLES] Error generating bubbles:', error);
+      return []; // Return empty array on error
     }
   }
 

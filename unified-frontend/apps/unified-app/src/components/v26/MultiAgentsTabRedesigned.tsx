@@ -1,18 +1,22 @@
 /**
- * v26.1 MultiAgents Tab - Redesigned with Intelligence Logging
+ * v35.0 MultiAgents Tab - ResponseBubbles Integration
  *
  * Features:
  * - 2-column responsive card layout (2 cards per row on desktop, 1 on mobile)
  * - Real-time intelligence logging panel showing behind-the-scenes processing
  * - Detailed flow tracing aligned with MULTIAGENT_INTELLIGENCE_FLOW_MASTER_SPEC
+ * - v31.4: LangGraph orchestration with state management & memory persistence
+ * - v35.0: Integrated ResponseBubbles for faster student interaction (60min → 15-20min)
  *
  * Created: 2025-11-01
- * Version: v26.1
+ * Updated: 2025-11-06 (v35.0 ResponseBubbles integration)
+ * Version: v35.0
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useAuth } from '../../hooks/useAuth';
+import { ResponseBubbles } from './ResponseBubbles';
 
 // ============================================================================
 // Types
@@ -471,6 +475,156 @@ const SendButton = styled.button<{ $color: string }>`
   }
 `;
 
+// v34.1: Delegation UI Components
+const DelegationContainer = styled.div`
+  margin: 16px 0;
+  padding: 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #fbbf24;
+  border-radius: 12px;
+  animation: pulseGlow 2s ease-in-out infinite;
+
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+    50% { box-shadow: 0 0 20px 5px rgba(251, 191, 36, 0.6); }
+  }
+`;
+
+const DelegationHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+`;
+
+const DelegationIcon = styled.div`
+  font-size: 24px;
+  animation: rotate 3s linear infinite;
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+`;
+
+const DelegationTitle = styled.div`
+  font-size: 15px;
+  font-weight: 700;
+  color: #92400e;
+`;
+
+const DelegationBadge = styled.span`
+  margin-left: auto;
+  padding: 4px 12px;
+  background: #fbbf24;
+  color: #78350f;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+const SpecialistCardsGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+`;
+
+const SpecialistCard = styled.div<{ $hasError?: boolean }>`
+  background: white;
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid ${props => props.$hasError ? '#ef4444' : '#22c55e'};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  animation: slideInUp 0.5s ease-out;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const SpecialistHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+`;
+
+const SpecialistName = styled.div`
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const SpecialistBadge = styled.span<{ $type: 'success' | 'error' }>`
+  padding: 3px 8px;
+  background: ${props => props.$type === 'success' ? '#22c55e' : '#ef4444'};
+  color: white;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+`;
+
+const SpecialistResponse = styled.div`
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.6;
+  max-height: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+`;
+
+const IntelligenceBadges = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+`;
+
+const IntelligenceBadge = styled.span`
+  padding: 4px 8px;
+  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  color: white;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+`;
+
+const DelegationSummary = styled.div`
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  font-size: 13px;
+  color: #78350f;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
 // Welcome screen (when no session)
 const WelcomeContainer = styled.div`
   display: flex;
@@ -544,8 +698,15 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
+  // v35.0: Response bubbles state
+  const [showBubbles, setShowBubbles] = useState<Record<string, boolean>>({});
+  const [lastMessageWithBubbles, setLastMessageWithBubbles] = useState<Record<string, string | null>>({});
+
   // Use relative URLs - Vite proxy will forward /api/v26 to agent-framework backend
   const API_URL = '';
+
+  // v34.1: Component load confirmation
+  console.log('[v34.1 DELEGATION UI] MultiAgentsTabRedesigned component loaded! 🎯');
 
   // Agent configurations
   const AGENT_CONFIGS = {
@@ -553,7 +714,7 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
     'gameplan-agent-v18': { name: 'GamePlan', emoji: '🎯', color: '#059669' },
     'execution-agent-v20': { name: 'Execution', emoji: '🚀', color: '#DC2626' },
     'awards-agent-v18': { name: 'Awards', emoji: '🏆', color: '#D97706' },
-    'programs-agent-v19': { name: 'Programs', emoji: '🎓', color: '#7C3AED' },
+    'extracurriculars-agent-v18': { name: 'Extracurriculars', emoji: '🎭', color: '#7C3AED' }, // v30.2: Renamed from Programs
     'scholarships-agent-v21': { name: 'Scholarships', emoji: '💰', color: '#0891B2' },
   };
 
@@ -561,6 +722,23 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [intelligenceLogs]);
+
+  // v35.0: Show bubbles when agent sends message with suggestions
+  useEffect(() => {
+    agentCards.forEach((card) => {
+      if (card.messages.length > 0) {
+        const lastMessage = card.messages[card.messages.length - 1];
+        if (
+          lastMessage.role === 'agent' &&
+          lastMessage.suggested_responses &&
+          lastMessage.suggested_responses.length > 0
+        ) {
+          setShowBubbles(prev => ({ ...prev, [card.agent_id]: true }));
+          setLastMessageWithBubbles(prev => ({ ...prev, [card.agent_id]: lastMessage.id }));
+        }
+      }
+    });
+  }, [agentCards]);
 
   // Add intelligence log
   const addIntelligenceLog = (level: IntelligenceLog['level'], message: string, details?: any) => {
@@ -669,6 +847,18 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /**
+   * v35.0: Handle click on response bubble
+   */
+  const handleBubbleClick = (agentId: string, response: string) => {
+    // Set the response in the input field
+    setInputValues(prev => ({ ...prev, [agentId]: response }));
+    // Hide bubbles immediately
+    setShowBubbles(prev => ({ ...prev, [agentId]: false }));
+    // Send the message
+    sendMessage(agentId);
   };
 
   // Send message to agent
@@ -820,11 +1010,38 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
         validation_score: data.validation_score,
       });
 
+      // v31.1: Display LangGraph collaboration events
+      if (data.metadata?.collaboration_events) {
+        data.metadata.collaboration_events.forEach((event: any) => {
+          addIntelligenceLog('system', event.message, {
+            event_type: event.event,
+            timestamp: event.timestamp,
+            ...event.details
+          });
+        });
+      }
+
+      // v31.1: Display orchestration info
+      if (data.metadata?.orchestration === 'langgraph' || data.metadata?.orchestration === 'langgraph_collaboration') {
+        addIntelligenceLog('system', '🔀 LangGraph Orchestration Active', {
+          version: data.metadata.version,
+          mode: data.metadata.collaboration_mode || 'simple_routing',
+          agents_executed: data.metadata.agents_executed,
+          workflow_step: data.metadata.workflow_step
+        });
+      }
+
+      // v30.1.5: Determine which agent card should receive the message
+      // If handover occurred, message goes to NEW agent, not original agent
+      const messageTargetAgent = data.a2a_handover?.handover_complete
+        ? data.a2a_handover.to_agent
+        : agentId;
+
       // Add agent response to card
       const agentMessage: Message = {
         id: data.agent_message_id,
         session_id: session.id,
-        agent_id: agentId,
+        agent_id: messageTargetAgent, // v30.1.5: Use target agent ID
         role: 'agent',
         content: data.agent_response,
         intelligence_triggered: data.intelligence_triggered,
@@ -835,10 +1052,63 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
       };
 
       setAgentCards(prev => prev.map(card =>
-        card.agent_id === agentId
+        card.agent_id === messageTargetAgent // v30.1.5: Add to target agent's card
           ? { ...card, messages: [...card.messages, agentMessage] }
           : card
       ));
+
+      // v30.2: Check for delegation (GamePlan → Specialists)
+      if (data.metadata?.delegation_started && data.metadata?.delegated_to) {
+        console.log('[FRONTEND_DELEGATION] 🔀 Delegation detected!', {
+          from: agentId,
+          delegated_to: data.metadata.delegated_to,
+        });
+
+        addIntelligenceLog('system', '🔀 Agent Delegation Started', {
+          delegating_agent: agentId,
+          specialist_agents: data.metadata.delegated_to,
+        });
+
+        // Mark delegating agent as "delegating" status
+        setAgentCards(prev => prev.map(card => {
+          if (card.agent_id === agentId) {
+            return { ...card, status: 'delegating', isActive: false };
+          }
+          // Mark specialist agents as active
+          if (data.metadata.delegated_to.includes(card.agent_id)) {
+            return { ...card, status: 'active', isActive: true };
+          }
+          return card;
+        }));
+      }
+
+      // v34.1: Check for delegation complete with specialist findings
+      if (data.metadata?.delegation_complete && data.metadata?.specialist_findings) {
+        console.log('[FRONTEND_DELEGATION] ✅ Delegation complete with findings!', {
+          agent: agentId,
+          specialists: Object.keys(data.metadata.specialist_findings),
+          findings_count: Object.keys(data.metadata.specialist_findings).length
+        });
+
+        addIntelligenceLog('synthesis', '🎯 Specialist Findings Synthesized', {
+          synthesizing_agent: agentId,
+          specialists_consulted: Object.keys(data.metadata.specialist_findings),
+          findings_count: Object.keys(data.metadata.specialist_findings).length
+        });
+
+        // Mark all specialist agents as ready
+        setAgentCards(prev => prev.map(card => {
+          // Specialists back to ready state
+          if (Object.keys(data.metadata.specialist_findings).includes(card.agent_id)) {
+            return { ...card, status: 'ready', isActive: false };
+          }
+          // Delegating agent stays active to show synthesis
+          if (card.agent_id === agentId) {
+            return { ...card, status: 'active', isActive: true };
+          }
+          return card;
+        }));
+      }
 
       // v28.0: Check for A2A handover
       if (data.a2a_handover && data.a2a_handover.handover_complete) {
@@ -1005,20 +1275,76 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
                         </MessageMeta>
                       )}
 
-                      {/* v29.5: Quick Reply Bubbles */}
-                      {msg.role === 'agent' && msg.suggested_responses && msg.suggested_responses.length > 0 && (
-                        <QuickRepliesContainer>
-                          {msg.suggested_responses.map((suggestion, idx) => (
-                            <QuickReplyBubble
-                              key={idx}
-                              onClick={() => {
-                                setInputValues(prev => ({ ...prev, [card.agent_id]: suggestion }));
-                              }}
-                            >
-                              {suggestion}
-                            </QuickReplyBubble>
-                          ))}
-                        </QuickRepliesContainer>
+                      {/* v35.0: Response Bubbles with improved UX */}
+                      {msg.role === 'agent' &&
+                       msg.suggested_responses &&
+                       msg.suggested_responses.length > 0 &&
+                       msg.id === lastMessageWithBubbles[card.agent_id] && (
+                        <ResponseBubbles
+                          suggestions={msg.suggested_responses}
+                          onBubbleClick={(response) => handleBubbleClick(card.agent_id, response)}
+                          isVisible={showBubbles[card.agent_id] || false}
+                          messageId={msg.id}
+                        />
+                      )}
+
+                      {/* v34.1: Delegation Findings Visualization */}
+                      {msg.role === 'agent' && msg.metadata?.delegation_complete && msg.metadata?.specialist_findings && (
+                        <DelegationContainer>
+                          <DelegationHeader>
+                            <DelegationIcon>🎯</DelegationIcon>
+                            <DelegationTitle>Specialist Consultation Results</DelegationTitle>
+                            <DelegationBadge>
+                              {Object.keys(msg.metadata.specialist_findings).length} Specialists
+                            </DelegationBadge>
+                          </DelegationHeader>
+
+                          <SpecialistCardsGrid>
+                            {Object.entries(msg.metadata.specialist_findings).map(([agentId, finding]: [string, any]) => (
+                              <SpecialistCard key={agentId} $hasError={!!finding.error}>
+                                <SpecialistHeader>
+                                  <SpecialistName>
+                                    {agentId === 'awards-agent-v18' && '🏆 Awards'}
+                                    {agentId === 'extracurriculars-agent-v18' && '🎭 Activities'}
+                                    {agentId === 'summer-programs-agent-v18' && '☀️ Programs'}
+                                    {agentId === 'scholarships-agent' && '💰 Scholarships'}
+                                  </SpecialistName>
+                                  <SpecialistBadge $type={finding.error ? 'error' : 'success'}>
+                                    {finding.error ? 'Error' : 'Success'}
+                                  </SpecialistBadge>
+                                </SpecialistHeader>
+
+                                {finding.error ? (
+                                  <SpecialistResponse style={{ color: '#ef4444' }}>
+                                    ❌ {finding.error}
+                                  </SpecialistResponse>
+                                ) : (
+                                  <>
+                                    <SpecialistResponse>
+                                      {finding.response || 'No response'}
+                                    </SpecialistResponse>
+                                    {finding.intelligence_triggered && finding.intelligence_triggered.length > 0 && (
+                                      <IntelligenceBadges>
+                                        {finding.intelligence_triggered.map((intel: string, idx: number) => (
+                                          <IntelligenceBadge key={idx}>{intel}</IntelligenceBadge>
+                                        ))}
+                                      </IntelligenceBadges>
+                                    )}
+                                  </>
+                                )}
+                              </SpecialistCard>
+                            ))}
+                          </SpecialistCardsGrid>
+
+                          <DelegationSummary>
+                            <span>✨</span>
+                            <span>
+                              <strong>{card.name}</strong> synthesized insights from{' '}
+                              {Object.keys(msg.metadata.specialist_findings).length} specialist{Object.keys(msg.metadata.specialist_findings).length > 1 ? 's' : ''}{' '}
+                              to create your personalized plan
+                            </span>
+                          </DelegationSummary>
+                        </DelegationContainer>
                       )}
                     </div>
                   ))
@@ -1031,7 +1357,13 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
                     type="text"
                     placeholder={`Message ${card.name} Agent...`}
                     value={inputValues[card.agent_id] || ''}
-                    onChange={(e) => setInputValues(prev => ({ ...prev, [card.agent_id]: e.target.value }))}
+                    onChange={(e) => {
+                      setInputValues(prev => ({ ...prev, [card.agent_id]: e.target.value }));
+                      // v35.0: Hide bubbles when user starts typing
+                      if (e.target.value.length > 0 && showBubbles[card.agent_id]) {
+                        setShowBubbles(prev => ({ ...prev, [card.agent_id]: false }));
+                      }
+                    }}
                     onKeyPress={(e) => e.key === 'Enter' && sendMessage(card.agent_id)}
                   />
                   <SendButton
@@ -1054,6 +1386,17 @@ export const MultiAgentsTabRedesigned: React.FC = () => {
             🔍 Intelligence Trace Logs
             <span style={{ fontSize: '11px', fontWeight: 'normal', opacity: 0.7, marginLeft: '8px' }}>
               ({intelligenceLogs.length} events)
+            </span>
+            <span style={{
+              fontSize: '10px',
+              fontWeight: 'bold',
+              color: '#10b981',
+              marginLeft: '12px',
+              padding: '2px 8px',
+              background: '#d1fae5',
+              borderRadius: '4px'
+            }}>
+              v34.1 Delegation
             </span>
           </IntelligencePanelTitle>
         </IntelligencePanelHeader>
