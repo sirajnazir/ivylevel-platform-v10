@@ -190,6 +190,16 @@ export class V26AgentWrapperReal {
     const triggered = intelligenceResponse.triggered_intelligence || [];
     const results = intelligenceResponse.intelligence_results || [];
 
+    // v31.3: Debug logging to trace metadata from agent
+    console.log('[V26_WRAPPER_DEBUG] Agent returned metadata:', {
+      has_metadata: !!agentResponse.metadata,
+      metadata_keys: agentResponse.metadata ? Object.keys(agentResponse.metadata) : [],
+      has_data_collected: !!agentResponse.metadata?.data_collected_so_far,
+      data_collected_keys: agentResponse.metadata?.data_collected_so_far
+        ? Object.keys(agentResponse.metadata.data_collected_so_far)
+        : []
+    });
+
     const v26Response: V26AgentResponse = {
       response: agentResponse.response,
       agent_id,

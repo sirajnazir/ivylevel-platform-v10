@@ -4,16 +4,17 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  root: './apps/unified-app',
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@features': path.resolve(__dirname, './src/features'),
-      '@services': path.resolve(__dirname, './src/services'),
-      '@store': path.resolve(__dirname, './src/store'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@types': path.resolve(__dirname, './src/types'),
+      '@': path.resolve(__dirname, './apps/unified-app/src'),
+      '@components': path.resolve(__dirname, './apps/unified-app/src/components'),
+      '@features': path.resolve(__dirname, './apps/unified-app/src/features'),
+      '@services': path.resolve(__dirname, './apps/unified-app/src/services'),
+      '@store': path.resolve(__dirname, './apps/unified-app/src/store'),
+      '@utils': path.resolve(__dirname, './apps/unified-app/src/utils'),
+      '@types': path.resolve(__dirname, './apps/unified-app/src/types'),
     },
   },
   server: {

@@ -28,7 +28,7 @@
  * @intelligence-type TYPE-013
  */
 
-import { BaseIntelligenceType } from '../BaseIntelligenceType';
+import { BaseIntelligenceType } from './BaseIntelligenceType.js';
 import { Fact } from '../../a2a/types';
 
 // ==================== INTERFACES ====================
@@ -151,7 +151,7 @@ interface PortfolioAudit {
 // ==================== TYPE-013 IMPLEMENTATION ====================
 
 export class ECPortfolioOptimization extends BaseIntelligenceType {
-  readonly typeId = 'TYPE-013';
+  readonly type_id = 'TYPE-013';
   readonly name = 'EC_Portfolio_Optimization';
   readonly category = 'extracurriculars';
 

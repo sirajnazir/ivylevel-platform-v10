@@ -38,6 +38,8 @@ import { FactSet } from '../../facts/FactSet.js';
 import type { Pool } from 'pg';
 import { FactCategoryMapper } from '../../facts/FactCategoryMapper.js';
 import { HandoverPayloadExtractor, type AssessmentHandoverPayload } from '../../a2a/HandoverPayloadExtractor.js';
+import { AgentDelegator, type DelegationResult } from '../../a2a/AgentDelegator.js';
+import type { AwardsSubAgentResponse, ECsSubAgentResponse } from '../../a2a/types.js';
 
 const log = createLogger('gameplan-agent-v3');
 
@@ -60,6 +62,7 @@ const log = createLogger('gameplan-agent-v3');
  */
 export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
   private pool: Pool;
+  private agentDelegator: AgentDelegator;  // v29.6: For Awards + ECs delegation
 
   /**
    * Domain-specific intelligence types for GamePlan
@@ -69,6 +72,7 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
   constructor(factStore: FactStore, pool: Pool) {
     super('gameplan-agent-v3', factStore);
     this.pool = pool;
+    this.agentDelegator = new AgentDelegator(factStore);  // v29.6: Initialize delegator
 
     // Load GamePlan intelligence types from registry
     this.initializeDomainIntelligence();
@@ -257,6 +261,8 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
    * Synthesize GamePlan response from intelligence results
    *
    * Override base implementation for GamePlan-specific formatting
+   *
+   * v29.6: Added Awards + ECs delegation for comprehensive GamePlan synthesis
    */
   protected async synthesizeResponse(
     intelligenceResults: IntelligenceResult[],
@@ -272,14 +278,52 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
       return "I don't have enough information to create your strategic plan yet. Let's complete your assessment first!";
     }
 
-    // Classify query intent
+    // v29.6: Delegate to Awards + ECs agents for specialist insights
+    // Only delegate for 'overview' intent (full GamePlan report generation)
     const intent = this.classifyIntent(query.query);
+    let delegationResult: DelegationResult | null = null;
+
+    if (intent === 'overview') {
+      console.log('[GP_v29.6_DELEGATION] 🚀 Starting Awards + ECs delegation...');
+      log.event('gameplan_agent.delegation_start', {
+        student_id: query.entity_id,
+        session_id: query.session_id,
+      });
+
+      try {
+        delegationResult = await this.agentDelegator.delegateToSpecialists(
+          query.entity_id,
+          query.session_id,
+          facts,
+          { timeout_ms: 30000, require_both: false }  // Graceful degradation
+        );
+
+        console.log('[GP_v29.6_DELEGATION] ✅ Delegation complete:', {
+          awards_success: !!delegationResult.awards_response,
+          ecs_success: !!delegationResult.ecs_response,
+          processing_time_ms: delegationResult.processing_time_ms,
+          errors: delegationResult.errors,
+        });
+
+        log.event('gameplan_agent.delegation_complete', {
+          success: delegationResult.success,
+          awards_count: delegationResult.awards_response?.top_5_awards.length || 0,
+          ecs_count: delegationResult.ecs_response?.top_10_activities.length || 0,
+          processing_time_ms: delegationResult.processing_time_ms,
+        });
+
+      } catch (error) {
+        console.error('[GP_v29.6_DELEGATION] ❌ Delegation failed:', error);
+        log.error('gameplan_agent.delegation_error', { error: String(error) });
+        // Continue without delegation data - graceful degradation
+      }
+    }
 
     // Route to appropriate synthesis handler
     let response: string;
     switch (intent) {
       case 'overview':
-        response = this.synthesizeOverviewResponse(intelligenceResults, facts);
+        response = this.synthesizeOverviewResponse(intelligenceResults, facts, delegationResult);
         break;
       case 'profile':
         response = this.synthesizeProfileResponse(intelligenceResults, facts);
@@ -340,11 +384,18 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
    * Synthesize overview response (full strategic plan)
    * v29.3.2: Added TYPE-085/TYPE-086 support for A2A handover payloads
    */
-  private synthesizeOverviewResponse(results: IntelligenceResult[], facts: FactSet): string {
-    console.log('[GP_v29.3.4_ENTRY] 🚀 synthesizeOverviewResponse CALLED!', {
+  private synthesizeOverviewResponse(
+    results: IntelligenceResult[],
+    facts: FactSet,
+    delegationResult: DelegationResult | null = null  // v29.6: Awards + ECs data
+  ): string {
+    console.log('[GP_v29.6_SYNTHESIS] 🚀 synthesizeOverviewResponse CALLED!', {
       results_count: results.length,
       results_types: results.map((r) => r.type_id),
       triggered_count: results.filter((r) => r.triggered).length,
+      has_delegation: !!delegationResult,
+      awards_count: delegationResult?.awards_response?.top_5_awards.length || 0,
+      ecs_count: delegationResult?.ecs_response?.top_10_activities.length || 0,
     });
 
     const sections: string[] = [];
@@ -507,6 +558,69 @@ export class GamePlanAgentV3 extends BaseAgentWithIntelligence {
     } else {
       // NO DATA: Show placeholder
       sections.push('*Roadmap will be generated after initial assessment*');
+    }
+
+    // v29.6: Top 5 Strategic Awards (from Awards Agent delegation)
+    if (delegationResult?.awards_response) {
+      const awardsData = delegationResult.awards_response;
+      console.log('[GP_v29.6_AWARDS] 🏆 Adding Top 5 Awards section:', {
+        count: awardsData.top_5_awards.length,
+        total_evaluated: awardsData.total_evaluated
+      });
+
+      sections.push(`\n## Top 5 Strategic Awards\n`);
+      sections.push(`*Analyzed ${awardsData.total_evaluated} awards, recommended top 5 by fit score*\n`);
+
+      awardsData.top_5_awards.forEach((award, idx) => {
+        sections.push(`\n**${idx + 1}. ${award.award_name}** (${award.tier})`);
+        sections.push(`- **Win Probability:** ${award.probability}%`);
+        sections.push(`- **Score:** ${Math.round(award.total_score)}/80 (Alignment: ${award.alignment_score}, Odds: ${award.odds_score}, Prestige: ${award.prestige_score})`);
+        sections.push(`- **Deadline:** ${award.deadline}`);
+        sections.push(`- **Why:** ${award.strategic_positioning}`);
+      });
+
+      log.event('gameplan_agent.awards_section_added', {
+        awards_count: awardsData.top_5_awards.length,
+        total_evaluated: awardsData.total_evaluated
+      });
+    }
+
+    // v29.6: Top 10 Extracurriculars (from ECs Agent delegation)
+    if (delegationResult?.ecs_response) {
+      const ecsData = delegationResult.ecs_response;
+      console.log('[GP_v29.6_ECS] 📋 Adding Top 10 ECs section:', {
+        count: ecsData.top_10_activities.length,
+        tier_distribution: ecsData.portfolio_summary.tier_distribution,
+        cookie_cutter_score: ecsData.portfolio_summary.cookie_cutter_score
+      });
+
+      sections.push(`\n## Extracurricular Portfolio Analysis\n`);
+
+      // Portfolio Summary
+      sections.push(`**Portfolio Health:**`);
+      const summary = ecsData.portfolio_summary;
+      sections.push(`- Tier Distribution: T1(${summary.tier_distribution.T1}), T2(${summary.tier_distribution.T2}), T3(${summary.tier_distribution.T3}), T4(${summary.tier_distribution.T4})`);
+      sections.push(`- Cookie-Cutter Risk: ${summary.cookie_cutter_score}/100 (${summary.cookie_cutter_score < 30 ? 'Good' : summary.cookie_cutter_score < 50 ? 'Medium' : 'High'})`);
+      sections.push(`- Narrative Alignment: ${summary.narrative_alignment.toFixed(1)}/10`);
+      sections.push(`- Trinity Score: Aptitude(${summary.trinity_score.aptitude.toFixed(1)}), Passion(${summary.trinity_score.passion.toFixed(1)}), Service(${summary.trinity_score.service.toFixed(1)})`);
+
+      sections.push(`\n**Top 10 Activities:**\n`);
+
+      ecsData.top_10_activities.forEach((activity, idx) => {
+        sections.push(`\n**${idx + 1}. ${activity.name}** (${activity.tier}, Impact: ${activity.impact_level})`);
+        sections.push(`- **Role:** ${activity.role}`);
+        sections.push(`- **Time:** ${activity.hours_per_week}h/week × ${activity.weeks_per_year} weeks`);
+        sections.push(`- **Narrative Fit:** ${activity.narrative_alignment}/10`);
+        sections.push(`- **Cookie-Cutter Risk:** ${activity.cookie_cutter_risk}`);
+        if (activity.recommendation) {
+          sections.push(`- **Recommendation:** ${activity.recommendation}`);
+        }
+      });
+
+      log.event('gameplan_agent.ecs_section_added', {
+        activities_count: ecsData.top_10_activities.length,
+        portfolio_summary: ecsData.portfolio_summary
+      });
     }
 
     // TYPE-007: Time Allocation

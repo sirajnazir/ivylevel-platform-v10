@@ -26,7 +26,7 @@
  * @intelligence-type TYPE-015
  */
 
-import { BaseIntelligenceType } from '../BaseIntelligenceType';
+import { BaseIntelligenceType } from './BaseIntelligenceType.js';
 import { Fact } from '../../a2a/types';
 
 // ==================== INTERFACES ====================
@@ -119,7 +119,7 @@ interface PortfolioImpactAssessment {
 // ==================== TYPE-015 IMPLEMENTATION ====================
 
 export class ImpactEngineering extends BaseIntelligenceType {
-  readonly typeId = 'TYPE-015';
+  readonly type_id = 'TYPE-015';
   readonly name = 'Impact_Engineering';
   readonly category = 'extracurriculars';
 

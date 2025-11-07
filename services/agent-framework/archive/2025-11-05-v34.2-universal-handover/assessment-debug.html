@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Extraction Debug UI (v31.3)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .panel-title {
+            color: #60a5fa;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .test-message {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .test-message:hover {
+            border-color: #60a5fa;
+            background: #1e293b;
+        }
+
+        .test-message.active {
+            border-color: #60a5fa;
+            background: #1e293b;
+        }
+
+        .message-text {
+            color: #e2e8f0;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .message-meta {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        button:disabled {
+            background: #475569;
+            cursor: not-allowed;
+        }
+
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .status.idle {
+            background: #334155;
+            color: #94a3b8;
+        }
+
+        .status.running {
+            background: #fbbf24;
+            color: #78350f;
+        }
+
+        .status.success {
+            background: #10b981;
+            color: #064e3b;
+        }
+
+        .status.error {
+            background: #ef4444;
+            color: #7f1d1d;
+        }
+
+        .log-panel {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .log-entry.info {
+            background: #1e293b;
+            color: #94a3b8;
+        }
+
+        .log-entry.success {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+
+        .log-entry.error {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .log-entry.extraction {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .result-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.pass {
+            background: #10b981;
+            color: #064e3b;
+        }
+
+        .badge.fail {
+            background: #ef4444;
+            color: #7f1d1d;
+        }
+
+        .data-row {
+            display: flex;
+            gap: 10px;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .data-label {
+            color: #64748b;
+            min-width: 120px;
+        }
+
+        .data-value {
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Assessment Extraction Debug UI (v31.3)</h1>
+        <p class="subtitle">Test extraction inch-by-inch with detailed logging</p>
+
+        <div class="grid">
+            <!-- Left Panel: Test Messages -->
+            <div class="panel">
+                <div class="panel-title">Test Messages</div>
+                <div id="status" class="status idle">IDLE</div>
+                <div id="testMessages"></div>
+                <button id="runAllBtn" onclick="runAllTests()">Run All Tests</button>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="panel">
+                <div class="panel-title">Test Results</div>
+                <div id="results"></div>
+            </div>
+        </div>
+
+        <!-- Full Width: Debug Logs -->
+        <div class="panel">
+            <div class="panel-title">Real-time Debug Logs</div>
+            <div id="logs" class="log-panel"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8787/api/v26';
+        const API_KEY = 'test-key';
+
+        const testMessages = [
+            { message: "10", expected: ['grade'], description: "Simple grade" },
+            { message: "I'm in 10th grade", expected: ['grade'], description: "Grade in sentence" },
+            { message: "Dublin High School", expected: ['high_school'], description: "School name" },
+            { message: "CS, Game Development", expected: ['interests'], description: "Multiple interests" },
+            { message: "I want to study Computer Science", expected: ['target_major'], description: "Major" },
+            { message: "Stanford, MIT", expected: ['target_colleges'], description: "Target schools" }
+        ];
+
+        let sessionId = null;
+        let results = [];
+
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(entry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        function setStatus(text, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = text;
+            statusDiv.className = `status ${type}`;
+        }
+
+        function renderTestMessages() {
+            const container = document.getElementById('testMessages');
+            container.innerHTML = testMessages.map((test, i) => `
+                <div class="test-message" id="test-${i}">
+                    <div class="message-text">"${test.message}"</div>
+                    <div class="message-meta">Expected: [${test.expected.join(', ')}] - ${test.description}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderResults() {
+            const container = document.getElementById('results');
+            if (results.length === 0) {
+                container.innerHTML = '<div style="color: #64748b">No results yet. Run tests to see results.</div>';
+                return;
+            }
+
+            const passed = results.filter(r => r.success).length;
+            const failed = results.length - passed;
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px; padding: 15px; background: #0f172a; border-radius: 6px;">
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">Summary</div>
+                    <div>Total: ${results.length} | Passed: ${passed} ✅ | Failed: ${failed} ❌</div>
+                    <div>Success Rate: ${((passed / results.length) * 100).toFixed(1)}%</div>
+                </div>
+                ${results.map(r => `
+                    <div class="result-card">
+                        <div class="result-header">
+                            <div style="font-weight: 600;">${r.description}</div>
+                            <div class="badge ${r.success ? 'pass' : 'fail'}">${r.success ? 'PASS' : 'FAIL'}</div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Message:</div>
+                            <div class="data-value">"${r.message}"</div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Expected:</div>
+                            <div class="data-value">[${r.expected.join(', ')}]</div>
+                        </div>
+                        <div class="data-row">
+                            <div class="data-label">Got:</div>
+                            <div class="data-value">[${r.collected.join(', ')}]</div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        async function createSession() {
+            log('Creating new session...', 'info');
+            const response = await fetch(`${API_URL}/session/start`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY
+                },
+                body: JSON.stringify({
+                    student_id: 'debug-test-ui',
+                    session_type: 'onboarding'
+                })
+            });
+
+            const data = await response.json();
+            sessionId = data.session_id;
+            log(`Session created: ${sessionId}`, 'success');
+            return sessionId;
+        }
+
+        async function sendMessage(message) {
+            log(`Sending: "${message}"`, 'extraction');
+            const response = await fetch(`${API_URL}/agents/assessment-agent-v18/message`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    student_id: 'debug-test-ui',
+                    message
+                })
+            });
+
+            const data = await response.json();
+            return data;
+        }
+
+        async function runAllTests() {
+            results = [];
+            document.getElementById('logs').innerHTML = '';
+            setStatus('RUNNING', 'running');
+            document.getElementById('runAllBtn').disabled = true;
+
+            try {
+                await createSession();
+
+                for (let i = 0; i < testMessages.length; i++) {
+                    const test = testMessages[i];
+                    const testDiv = document.getElementById(`test-${i}`);
+                    testDiv.classList.add('active');
+
+                    log(`Test ${i + 1}/${testMessages.length}: ${test.description}`, 'info');
+
+                    const response = await sendMessage(test.message);
+                    const collected = Object.keys(response.metadata?.data_collected_so_far || {});
+                    const success = test.expected.some(field => collected.includes(field));
+
+                    results.push({
+                        message: test.message,
+                        expected: test.expected,
+                        collected,
+                        success,
+                        description: test.description
+                    });
+
+                    log(`Result: ${success ? 'PASS ✅' : 'FAIL ❌'} - Got: [${collected.join(', ')}]`, success ? 'success' : 'error');
+
+                    testDiv.classList.remove('active');
+                    renderResults();
+
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+
+                setStatus('COMPLETED', 'success');
+                log('All tests completed!', 'success');
+
+            } catch (error) {
+                setStatus('ERROR', 'error');
+                log(`Error: ${error.message}`, 'error');
+            } finally {
+                document.getElementById('runAllBtn').disabled = false;
+            }
+        }
+
+        // Initialize
+        renderTestMessages();
+        renderResults();
+    </script>
+</body>
+</html>

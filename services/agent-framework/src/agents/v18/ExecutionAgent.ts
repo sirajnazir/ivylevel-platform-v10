@@ -28,6 +28,9 @@ import { AgentQuery, AgentResponse } from '../types.js';
 import { FactStore, FactSet } from '../../facts/FactStore.js';
 import { FactCategory } from '../../facts/types.js';
 import { IntelligenceType, IntelligenceResult, IntelligenceRegistry } from '../../intelligence/IntelligenceRegistry.js';
+import { createLogger } from '../../../../../packages/observability/dist/unified-logger.js';
+
+const log = createLogger('execution-agent');
 
 export class ExecutionAgent extends BaseAgentWithIntelligence {
   protected agentDomain = 'execution' as const;
@@ -66,8 +69,6 @@ export class ExecutionAgent extends BaseAgentWithIntelligence {
    * v29.8: Wired 15 domain intelligence types (100% spec-compliant)
    */
   private initializeDomainIntelligence(): void {
-    const log = require('../../../../../packages/observability/dist/unified-logger.js').createLogger('execution-agent');
-
     log.event('execution_agent.initialize_start', {
       agent_id: this.agentId,
       intelligence_types_expected: 15,

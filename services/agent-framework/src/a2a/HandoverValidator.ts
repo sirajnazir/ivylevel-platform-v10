@@ -315,6 +315,81 @@ export class HandoverValidator {
       available_facts
     ));
 
+    // ========================================================================
+    // NEW GATES 21-30: Enhanced Assessment Quality (v34.3)
+    // Raise bar to Jenny-quality comprehensive assessment
+    // ========================================================================
+
+    // Gate 21: Academic depth complete (GPA + Testing + Rigor)
+    results.push(this.checkAcademicDepth(
+      'QG21',
+      'Academic depth complete (GPA + Testing + Rigor)',
+      available_facts
+    ));
+
+    // Gate 22: Activity portfolio complete (5+ activities with details)
+    results.push(this.checkActivityPortfolio(
+      'QG22',
+      'Activity portfolio complete (5+ activities)',
+      available_facts
+    ));
+
+    // Gate 23: Leadership verification (2+ leadership positions)
+    results.push(this.checkLeadershipVerification(
+      'QG23',
+      'Leadership verification (2+ positions)',
+      available_facts
+    ));
+
+    // Gate 24: Activity-major alignment confirmed
+    results.push(this.checkActivityAlignment(
+      'QG24',
+      'Activity-major alignment confirmed',
+      available_facts
+    ));
+
+    // Gate 25: Comprehensive gap identification (academic + EC + narrative)
+    results.push(this.checkComprehensiveGaps(
+      'QG25',
+      'Comprehensive gap identification complete',
+      available_facts
+    ));
+
+    // Gate 26: Context depth (school competitiveness + resources + peers)
+    results.push(this.checkContextDepth(
+      'QG26',
+      'Context depth captured (school + resources)',
+      available_facts
+    ));
+
+    // Gate 27: Time capacity validated (schedule + bandwidth)
+    results.push(this.checkTimeCapacity(
+      'QG27',
+      'Time capacity validated (schedule + bandwidth)',
+      available_facts
+    ));
+
+    // Gate 28: Authentic interest confirmed (not parent-driven)
+    results.push(this.checkAuthenticInterest(
+      'QG28',
+      'Authentic interest confirmed (passion validation)',
+      available_facts
+    ));
+
+    // Gate 29: Differentiator identified (unique angle)
+    results.push(this.checkDifferentiator(
+      'QG29',
+      'Differentiator identified (unique positioning)',
+      available_facts
+    ));
+
+    // Gate 30: Fact count threshold (90+ facts collected)
+    results.push(this.checkFactCountThreshold(
+      'QG30',
+      'Fact count threshold met (90+ facts)',
+      available_facts
+    ));
+
     return results;
   }
 
@@ -622,6 +697,277 @@ export class HandoverValidator {
   /**
    * Get human-readable validation summary
    */
+  // ========================================================================
+  // NEW GATE IMPLEMENTATIONS (v34.3)
+  // ========================================================================
+
+  /**
+   * Gate 21: Check academic depth (GPA + Testing + Rigor)
+   */
+  private static checkAcademicDepth(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const academic_requirements = ['gpa', 'test_scores', 'ap_count', 'course_rigor'];
+    let found_count = 0;
+
+    for (const req of academic_requirements) {
+      if (this.hasFactType(available_facts, req)) {
+        found_count++;
+      }
+    }
+
+    const passed = found_count >= 3; // Need at least 3 of 4
+    const score = (found_count / academic_requirements.length) * 10;
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: `${found_count}/${academic_requirements.length} academic requirements met`
+    };
+  }
+
+  /**
+   * Gate 22: Check activity portfolio (5+ activities with details)
+   */
+  private static checkActivityPortfolio(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const activity_facts = available_facts.get(FactCategory.ACTIVITY_DATA) || [];
+    const activity_count = activity_facts.length;
+
+    // Check for detail richness
+    const has_details = activity_facts.filter(f =>
+      f.metadata?.role || f.metadata?.hours || f.metadata?.impact
+    ).length;
+
+    const passed = activity_count >= 5 && has_details >= 3;
+    const score = Math.min(10, (activity_count / 5) * (has_details / 3) * 10);
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: `${activity_count} activities, ${has_details} with detailed info`
+    };
+  }
+
+  /**
+   * Gate 23: Check leadership verification (2+ positions)
+   */
+  private static checkLeadershipVerification(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const has_leadership = this.hasFactType(available_facts, 'leadership_positions');
+    const activity_facts = available_facts.get(FactCategory.ACTIVITY_DATA) || [];
+
+    const leadership_count = activity_facts.filter(f =>
+      f.metadata?.leadership === true || f.metadata?.role?.match(/president|captain|founder|director/i)
+    ).length;
+
+    const passed = leadership_count >= 2;
+    const score = Math.min(10, (leadership_count / 2) * 10);
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: `${leadership_count} leadership positions identified`
+    };
+  }
+
+  /**
+   * Gate 24: Check activity-major alignment
+   */
+  private static checkActivityAlignment(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const has_major = this.hasFactType(available_facts, 'target_major');
+    const has_alignment = this.hasFactType(available_facts, 'activity_alignment');
+
+    const passed = has_major && has_alignment;
+    const score = (has_major ? 5 : 0) + (has_alignment ? 5 : 0);
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: passed ? 'Activities aligned with target major' : 'Alignment not confirmed'
+    };
+  }
+
+  /**
+   * Gate 25: Check comprehensive gap identification
+   */
+  private static checkComprehensiveGaps(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const gap_types = ['academic_gaps', 'ec_gaps', 'narrative_gaps', 'weak_grades', 'leadership_gaps'];
+    let found_count = 0;
+
+    for (const gap of gap_types) {
+      if (this.hasFactType(available_facts, gap)) {
+        found_count++;
+      }
+    }
+
+    const passed = found_count >= 3; // Need at least 3 gap types identified
+    const score = (found_count / gap_types.length) * 10;
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: `${found_count}/${gap_types.length} gap types identified`
+    };
+  }
+
+  /**
+   * Gate 26: Check context depth (school + resources + peers)
+   */
+  private static checkContextDepth(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const context_requirements = ['school_competitiveness', 'resource_access', 'peer_comparison', 'geographic_context'];
+    let found_count = 0;
+
+    for (const req of context_requirements) {
+      if (this.hasFactType(available_facts, req)) {
+        found_count++;
+      }
+    }
+
+    const passed = found_count >= 2; // Need at least 2 context factors
+    const score = (found_count / context_requirements.length) * 10;
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: `${found_count}/${context_requirements.length} context factors captured`
+    };
+  }
+
+  /**
+   * Gate 27: Check time capacity (schedule + bandwidth)
+   */
+  private static checkTimeCapacity(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const has_schedule = this.hasFactType(available_facts, 'time_constraints') ||
+                         this.hasFactType(available_facts, 'weekly_schedule');
+    const has_bandwidth = this.hasFactType(available_facts, 'available_bandwidth') ||
+                          this.hasFactType(available_facts, 'capacity_assessment');
+
+    const passed = has_schedule || has_bandwidth;
+    const score = (has_schedule ? 5 : 0) + (has_bandwidth ? 5 : 0);
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: passed ? 'Time capacity validated' : 'Time capacity not assessed'
+    };
+  }
+
+  /**
+   * Gate 28: Check authentic interest (not parent-driven)
+   */
+  private static checkAuthenticInterest(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const has_authenticity = this.hasFactType(available_facts, 'passion_authenticity') ||
+                             this.hasFactType(available_facts, 'genuine_interest');
+    const has_discovery = this.hasFactType(available_facts, 'major_discovery');
+    const has_exploration = this.hasFactType(available_facts, 'exploration_stage');
+
+    const authenticity_signals = (has_authenticity ? 1 : 0) + (has_discovery ? 1 : 0) + (has_exploration ? 1 : 0);
+    const passed = authenticity_signals >= 1;
+    const score = Math.min(10, authenticity_signals * 3.33);
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: `${authenticity_signals} authenticity signals detected`
+    };
+  }
+
+  /**
+   * Gate 29: Check differentiator (unique positioning)
+   */
+  private static checkDifferentiator(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    const has_narrative = this.hasFactType(available_facts, 'unique_narrative');
+    const has_spike = this.hasFactType(available_facts, 'spike') ||
+                      this.hasFactType(available_facts, 'differentiator');
+    const has_identity = this.hasFactType(available_facts, 'identity_fusion');
+
+    const differentiator_count = (has_narrative ? 1 : 0) + (has_spike ? 1 : 0) + (has_identity ? 1 : 0);
+    const passed = differentiator_count >= 1;
+    const score = Math.min(10, differentiator_count * 3.33);
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: passed ? 'Unique differentiator identified' : 'No clear differentiator yet'
+    };
+  }
+
+  /**
+   * Gate 30: Check fact count threshold (90+ facts)
+   */
+  private static checkFactCountThreshold(
+    gate_id: string,
+    gate_name: string,
+    available_facts: Map<FactCategory, any[]>
+  ): QualityGateResult {
+    let total_facts = 0;
+    for (const [_, facts] of available_facts) {
+      total_facts += facts.length;
+    }
+
+    const passed = total_facts >= 90;
+    const score = Math.min(10, (total_facts / 90) * 10);
+
+    return {
+      gate_id,
+      gate_name,
+      passed,
+      score,
+      details: `${total_facts} facts collected (target: 90+)`
+    };
+  }
+
   static getValidationSummary(result: EnhancedHandoverReadiness): string {
     const lines: string[] = [];
 

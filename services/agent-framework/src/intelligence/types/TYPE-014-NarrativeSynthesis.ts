@@ -27,7 +27,7 @@
  * @intelligence-type TYPE-014
  */
 
-import { BaseIntelligenceType } from '../BaseIntelligenceType';
+import { BaseIntelligenceType } from './BaseIntelligenceType.js';
 import { Fact } from '../../a2a/types';
 
 // ==================== INTERFACES ====================
@@ -108,7 +108,7 @@ interface NarrativeSynthesisResult {
 // ==================== TYPE-014 IMPLEMENTATION ====================
 
 export class NarrativeSynthesis extends BaseIntelligenceType {
-  readonly typeId = 'TYPE-014';
+  readonly type_id = 'TYPE-014';
   readonly name = 'Narrative_Synthesis';
   readonly category = 'extracurriculars';
 

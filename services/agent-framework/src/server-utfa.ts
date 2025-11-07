@@ -64,6 +64,7 @@ import { createV26MultiAgentsRouter } from './routes/v26-multiagents.js'; // v26
 import { assertIndexParity } from './retrieval/pinecone.js';
 import { CFG } from './config/env.js';
 import authRouter from './routes/auth.js';
+import debugRouter from './routes/debug.js'; // v36.0 Diagnostic
 import { AgentRegistry } from './agents/registry.js';
 import { scheduleQuarterlyReviewJob } from './cron/quarterly-review-job.js';
 import { initConversationMemory } from './agents/shared/ConversationMemory.js'; // v36.0
@@ -485,6 +486,12 @@ const port = process.env.PORT || 8787;
     const v26Router = createV26MultiAgentsRouter(pool, agentRegistry);
     app.use('/api/v26', v26Router);
     console.log('[BOOT] v26.0 MultiAgents routes mounted at /api/v26');
+
+    // Mount Debug Routes (v36.0 Diagnostic)
+    if (process.env.NODE_ENV !== 'production') {
+      app.use('/debug', debugRouter);
+      console.log('[BOOT] 🔬 Debug routes mounted: /debug/trace/:session_id');
+    }
 
     // Schedule Quarterly Review Cron Job (v18.0)
     console.log('[BOOT] Scheduling Quarterly Review Cron Job...');

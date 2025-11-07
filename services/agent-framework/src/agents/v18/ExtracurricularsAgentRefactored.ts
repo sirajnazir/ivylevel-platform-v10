@@ -25,7 +25,9 @@ import { FactCategory, FactSet, Fact } from '../../facts/types';
 import { FactStore } from '../../facts/FactStore';
 import { IntelligenceType } from '../../intelligence/types/BaseIntelligenceType.js';
 import { IntelligenceRegistry } from '../../intelligence/IntelligenceRegistry.js';
-import { log } from '../../utils/logger.js';
+import { createLogger } from '../../../../../packages/observability/dist/unified-logger.js';
+
+const log = createLogger('extracurriculars-agent-v18');
 
 // ============================================================================
 // Types & Interfaces

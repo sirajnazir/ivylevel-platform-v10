@@ -95,6 +95,20 @@ export interface WorkflowState {
     handover_to?: string;
     handover_reason?: string;
     data_package?: Record<string, any>;
+
+    // v34.0: Additional handover/delegation fields
+    previous_agent?: string;          // Track previous agent for handover reporting
+    next_agent?: string;              // Next agent (before handover completes)
+    handover_id?: string;             // Unique handover ID for tracking
+    delegation_pending?: boolean;     // Delegation in progress
+    delegation_targets?: string[];    // Target specialist agents
+    delegation_complete?: boolean;    // Delegation finished
+    specialist_findings?: Record<string, any>;  // Results from specialist agents
+    escalation_pending?: boolean;     // Human escalation needed
+    escalation_reason?: string;       // Why escalation triggered
+
+    // v34.1: Delegation feedback turn marker
+    is_delegation_feedback_turn?: boolean;  // Flag to differentiate feedback turn from normal turn
   };
 
   // ============================================================================
@@ -104,6 +118,9 @@ export interface WorkflowState {
   current_metadata?: Record<string, any>;
   current_intelligence_triggered?: string[];
   current_confidence?: number;
+
+  // v34.0: Agent completion signals
+  current_signals?: any;  // AgentCompletionSignals (avoiding circular import)
 
   // ============================================================================
   // ERROR HANDLING & RETRY

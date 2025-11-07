@@ -344,17 +344,25 @@ What would you like to focus on this week?`;
    * Send message to specific agent and get response
    */
   router.post('/agents/:agentId/message', withRateLimit, withApiKey, async (req: Request, res: Response) => {
+    console.log('[MESSAGE_ROUTE] ========== REQUEST RECEIVED ==========');
+    console.log('[MESSAGE_ROUTE] agentId:', req.params.agentId);
+    console.log('[MESSAGE_ROUTE] body keys:', Object.keys(req.body || {}));
+
     try {
       const { agentId } = req.params;
       const { session_id, message, student_id } = req.body;
 
+      console.log('[MESSAGE_ROUTE] Extracted params:', { agentId, session_id, student_id, message_length: message?.length });
+
       if (!session_id || !message || !student_id) {
+        console.log('[MESSAGE_ROUTE] Missing required fields!');
         return res.status(400).json({
           error: 'Missing required fields',
           message: 'session_id, message, and student_id are required',
         });
       }
 
+      console.log('[MESSAGE_ROUTE] All required fields present');
       logger.event('v26.agent.message', { agent_id: agentId, session_id, student_id });
 
       // Get session to retrieve clone student_id (session already stores clone ID)
@@ -372,11 +380,11 @@ What would you like to focus on this week?`;
 
       const cloneStudentId = sessionResult.rows[0].student_id; // Already the clone ID!
 
-      console.log('[V31.4_MESSAGE] Using clone student ID from session:', {
+      console.log(`[${orchestratorVersion}_MESSAGE] Using clone student ID from session:`, {
         session_id,
         clone_student_id: cloneStudentId,
         real_student_id_from_frontend: student_id,
-        orchestration: 'langgraph_v31.4'
+        orchestration: orchestratorVersion
       });
 
       // Save user message
@@ -392,14 +400,15 @@ What would you like to focus on this week?`;
       // v31.4: Single orchestration path through LangGraph
       const startTime = Date.now();
 
-      console.log('[V31.4_ROUTE] About to call orchestrator.handleMessage:', {
+      console.log(`[${orchestratorVersion}_ROUTE] About to call orchestrator.handleMessage:`, {
+        orchestrator_version: orchestratorVersion,
         session_id,
         cloneStudentId,
         agentId,
         message_preview: message.substring(0, 50)
       });
 
-      logger.event('v31.orchestrator.invoke', {
+      logger.event(`${orchestratorVersion}.orchestrator.invoke`, {
         session_id,
         student_id: cloneStudentId,
         agent_id: agentId,

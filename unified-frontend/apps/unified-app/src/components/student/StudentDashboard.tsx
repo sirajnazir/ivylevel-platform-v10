@@ -401,6 +401,11 @@ export function StudentDashboard() {
   console.log('📍 Current URL:', window.location.pathname);
 
   const [activeTab, setActiveTab] = React.useState('assessment');
+
+  // v34.1: Debug tab changes
+  React.useEffect(() => {
+    console.log('[v34.1 DEBUG] Active tab changed to:', activeTab);
+  }, [activeTab]);
   const [gamePlanData, setGamePlanData] = React.useState(null);
   const [preparationData, setPreparationData] = React.useState(null);
   const [applicationData, setApplicationData] = React.useState(null);
@@ -979,6 +984,7 @@ export function StudentDashboard() {
         );
 
       case 'multiagents':
+        console.log('[v34.1 DEBUG] Rendering MultiAgentsTabRedesigned component');
         return (
           <div style={{ padding: '0', maxWidth: '100%', margin: '0' }}>
             <MultiAgentsTabRedesigned />

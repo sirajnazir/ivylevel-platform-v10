@@ -2175,7 +2175,9 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
 
     try {
       // v36.0 STEP 1: Detect frustration BEFORE extraction
-      const conversationHistoryArray = conversationHistory.split('\n').filter(line => line.trim());
+      const conversationHistoryArray = typeof conversationHistory === 'string'
+        ? conversationHistory.split('\n').filter(line => line.trim())
+        : [];
       const frustrationAnalysis = this.detectFrustration(userMessage, conversationHistoryArray);
 
       if (frustrationAnalysis.is_frustrated) {

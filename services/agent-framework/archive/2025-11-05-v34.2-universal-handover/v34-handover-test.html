@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>v34 Assessment → GamePlan Handover Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .test-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .status-box.success {
+            border-left-color: #4caf50;
+            background: #e8f5e9;
+        }
+
+        .status-box.error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+
+        .status-box.warning {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .response-area {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+
+        .message.user {
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+
+        .message.agent {
+            background: #f3e5f5;
+            border-left: 3px solid #9c27b0;
+        }
+
+        .message.system {
+            background: #fff3e0;
+            border-left: 3px solid #ff9800;
+            font-style: italic;
+        }
+
+        .metadata {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+
+        .metadata pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .test-sequence {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .step.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .step.complete {
+            background: #4caf50;
+            color: white;
+        }
+
+        .arrow {
+            color: #999;
+            font-size: 20px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 v34 Handover Test UI</h1>
+            <p class="subtitle">Test Assessment → GamePlan handover with schema coverage detection</p>
+        </div>
+
+        <div class="test-panel">
+            <h2 style="margin-bottom: 20px; color: #333;">Test Sequence</h2>
+
+            <div class="test-sequence" id="sequence">
+                <div class="step" data-step="1">1. Start Session</div>
+                <div class="arrow">→</div>
+                <div class="step" data-step="2">2. Send Grade</div>
+                <div class="arrow">→</div>
+                <div class="step" data-step="3">3. Send School</div>
+                <div class="arrow">→</div>
+                <div class="step" data-step="4">4. Send Interests</div>
+                <div class="arrow">→</div>
+                <div class="step" data-step="5">5. Handover!</div>
+            </div>
+
+            <div class="button-grid">
+                <button id="startSession" onclick="startSession()">🎬 Start New Session</button>
+                <button id="sendGrade" onclick="sendMessage('I am in 11th grade')" disabled>📚 Send Grade</button>
+                <button id="sendSchool" onclick="sendMessage('Evergreen Valley High School')" disabled>🏫 Send School</button>
+                <button id="sendInterests" onclick="sendMessage('Computer Science & AI')" disabled>💡 Send Interests</button>
+            </div>
+
+            <div id="status" class="status-box" style="display:none;">
+                <strong id="statusTitle">Status:</strong>
+                <div id="statusMessage"></div>
+            </div>
+
+            <div class="response-area" id="chatArea">
+                <div class="message system">
+                    Click "Start New Session" to begin the handover test.
+                </div>
+            </div>
+
+            <div class="metadata" id="metadata" style="display:none;">
+                <strong style="color: #ffeb3b;">Metadata:</strong>
+                <pre id="metadataContent"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = null;
+        let messageCount = 0;
+        let currentStep = 0;
+
+        const API_BASE = 'http://localhost:8787/api/v26';
+        const API_KEY = 'test-key';
+        const STUDENT_ID = 'huda-2025';
+
+        function updateStep(step) {
+            currentStep = step;
+            document.querySelectorAll('.step').forEach((el, idx) => {
+                const stepNum = idx / 2 + 1; // Account for arrows
+                if (Math.floor(idx / 2) < currentStep) {
+                    el.classList.add('complete');
+                    el.classList.remove('active');
+                } else if (Math.floor(idx / 2) === currentStep) {
+                    el.classList.add('active');
+                    el.classList.remove('complete');
+                } else {
+                    el.classList.remove('active', 'complete');
+                }
+            });
+        }
+
+        function showStatus(type, title, message) {
+            const statusBox = document.getElementById('status');
+            const statusTitle = document.getElementById('statusTitle');
+            const statusMessage = document.getElementById('statusMessage');
+
+            statusBox.className = 'status-box ' + type;
+            statusBox.style.display = 'block';
+            statusTitle.textContent = title + ':';
+            statusMessage.textContent = message;
+        }
+
+        function addMessage(type, content, metadata = null) {
+            const chatArea = document.getElementById('chatArea');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + type;
+            msgDiv.textContent = content;
+            chatArea.appendChild(msgDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            if (metadata) {
+                const metadataDiv = document.getElementById('metadata');
+                const metadataContent = document.getElementById('metadataContent');
+                metadataDiv.style.display = 'block';
+                metadataContent.textContent = JSON.stringify(metadata, null, 2);
+            }
+        }
+
+        async function startSession() {
+            try {
+                showStatus('', 'Starting Session', 'Creating new multiagent session...');
+                document.getElementById('startSession').disabled = true;
+                updateStep(0);
+
+                const response = await fetch(`${API_BASE}/session/start`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        student_id: STUDENT_ID,
+                        session_type: 'onboarding'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.session_id) {
+                    sessionId = data.session_id;
+                    messageCount = 0;
+                    showStatus('success', 'Session Started', `Session ID: ${sessionId}`);
+                    addMessage('system', `✅ Session created! Current agent: ${data.current_agent}`);
+
+                    // Enable next button
+                    document.getElementById('sendGrade').disabled = false;
+                    updateStep(1);
+                } else {
+                    showStatus('error', 'Error', 'Failed to create session');
+                }
+
+            } catch (error) {
+                showStatus('error', 'Error', error.message);
+                document.getElementById('startSession').disabled = false;
+            }
+        }
+
+        async function sendMessage(message) {
+            if (!sessionId) {
+                showStatus('error', 'Error', 'No active session. Please start a session first.');
+                return;
+            }
+
+            try {
+                messageCount++;
+                const buttonId = message.includes('grade') ? 'sendGrade' :
+                               message.includes('School') ? 'sendSchool' : 'sendInterests';
+                document.getElementById(buttonId).disabled = true;
+
+                addMessage('user', message);
+                showStatus('', 'Sending', `Sending message ${messageCount}...`);
+
+                const response = await fetch(`${API_BASE}/agents/assessment-agent-v18/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        student_id: STUDENT_ID,
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.agent_response) {
+                    addMessage('agent', data.agent_response, data.metadata);
+
+                    // Check for handover
+                    if (data.a2a_handover && data.a2a_handover.handover_complete) {
+                        showStatus('success', '🎉 HANDOVER DETECTED!',
+                            `Assessment → ${data.a2a_handover.to_agent}`);
+                        updateStep(4);
+                        addMessage('system', `🎉 HANDOVER COMPLETE! From: ${data.a2a_handover.from_agent} → To: ${data.a2a_handover.to_agent}`);
+                    } else {
+                        // Check schema coverage from _internal_signals (if available)
+                        const signals = data.metadata?._internal_signals;
+                        if (signals && signals.schema_coverage) {
+                            const coverage = signals.schema_coverage;
+                            showStatus('warning', 'Schema Coverage',
+                                `Required: ${coverage.metrics.required_complete}/${coverage.metrics.required_total}`);
+                        } else {
+                            // Fallback: check data_collected_so_far for progress
+                            const collected = data.metadata?.data_collected_so_far || {};
+                            const hasGrade = collected.grade !== undefined;
+                            const hasSchool = collected.high_school !== undefined;
+                            const hasInterests = collected.interests !== undefined;
+
+                            const count = [hasGrade, hasSchool, hasInterests].filter(Boolean).length;
+                            showStatus('', 'Progress', `Collected ${count}/3 required fields`);
+                        }
+
+                        // Enable next button based on message count
+                        if (messageCount === 1) {
+                            document.getElementById('sendSchool').disabled = false;
+                            updateStep(2);
+                        } else if (messageCount === 2) {
+                            document.getElementById('sendInterests').disabled = false;
+                            updateStep(3);
+                        } else if (messageCount === 3) {
+                            // After 3rd message, check if handover should have happened
+                            updateStep(4);
+                            showStatus('warning', 'Note', 'All 3 fields sent - handover should be detected');
+                        }
+                    }
+                } else {
+                    showStatus('error', 'Error', 'No response from agent');
+                }
+
+            } catch (error) {
+                showStatus('error', 'Error', error.message);
+            }
+        }
+    </script>
+</body>
+</html>

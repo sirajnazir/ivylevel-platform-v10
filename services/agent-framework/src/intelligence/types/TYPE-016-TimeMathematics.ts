@@ -25,7 +25,7 @@
  * @intelligence-type TYPE-016
  */
 
-import { BaseIntelligenceType } from '../BaseIntelligenceType';
+import { BaseIntelligenceType } from './BaseIntelligenceType.js';
 import { Fact } from '../../a2a/types';
 
 // ==================== INTERFACES ====================
@@ -90,7 +90,7 @@ interface PortfolioTimeAssessment {
 // ==================== TYPE-016 IMPLEMENTATION ====================
 
 export class TimeMathematics extends BaseIntelligenceType {
-  readonly typeId = 'TYPE-016';
+  readonly type_id = 'TYPE-016';
   readonly name = 'Time_Mathematics';
   readonly category = 'extracurriculars';
 

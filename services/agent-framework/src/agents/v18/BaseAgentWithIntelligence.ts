@@ -41,6 +41,7 @@ import { CanonicalFieldMapper } from '../shared/CanonicalFieldMapper.js';
 import { QuestionDeduplicationEngine, type QuestionAnalysis } from '../shared/QuestionDeduplicationEngine.js';
 import { FrustrationDetector, type FrustrationAnalysis } from '../shared/FrustrationDetector.js';
 import { ConversationIntelligenceConfig } from '../shared/ConversationIntelligenceConfig.js';
+import { ConversationTracer } from '../shared/ConversationTracer.js'; // v36.0 Diagnostic
 
 const log = createLogger('base-agent-intelligence');
 
@@ -609,6 +610,11 @@ export abstract class BaseAgentWithIntelligence {
     reason: string;
     alternative_suggested?: string;
   }> {
+    // v36.0 DIAGNOSTIC: Trace validation start
+    ConversationTracer.trace('QUESTION_VALIDATION_STARTED', this.agentId, sessionId, {
+      question: proposedQuestion.substring(0, 80),
+    });
+
     log.event(`${this.agentId}.validate_question`, {
       session_id: sessionId,
       question: proposedQuestion.substring(0, 60),
@@ -663,6 +669,12 @@ export abstract class BaseAgentWithIntelligence {
       // Allow but log warning
     }
 
+    // v36.0 DIAGNOSTIC: Trace validation complete
+    ConversationTracer.trace('QUESTION_VALIDATION_COMPLETE', this.agentId, sessionId, {
+      should_ask: true,
+      reason: 'Question is valid and non-repetitive',
+    });
+
     return {
       should_ask: true,
       reason: 'Question is valid and non-repetitive',
@@ -676,9 +688,22 @@ export abstract class BaseAgentWithIntelligence {
     userResponse: string,
     conversationHistory: string[] = []
   ): FrustrationAnalysis {
+    // v36.0 DIAGNOSTIC: Trace frustration check
+    ConversationTracer.trace('FRUSTRATION_CHECK', this.agentId, 'session', {
+      user_response: userResponse.substring(0, 50),
+      history_length: conversationHistory.length,
+    });
+
     const analysis = FrustrationDetector.analyze(userResponse, conversationHistory);
 
     if (analysis.is_frustrated) {
+      // v36.0 DIAGNOSTIC: Trace frustration detected
+      ConversationTracer.trace('FRUSTRATION_DETECTED', this.agentId, 'session', {
+        level: analysis.frustration_level,
+        signals: analysis.signals_detected,
+        action: analysis.suggested_action,
+      });
+
       this.log.event({
         msg: `[v36.0] Frustration detected in user response`,
         event: `${this.agentId}.frustration_detected`,
@@ -697,11 +722,21 @@ export abstract class BaseAgentWithIntelligence {
   protected normalizeExtractedFields(
     rawData: Record<string, any>
   ): Record<string, any> {
+    // v36.0 DIAGNOSTIC: Trace normalization start
+    ConversationTracer.trace('FIELD_NORMALIZATION_STARTED', this.agentId, 'session', {
+      raw_fields: Object.keys(rawData),
+    });
+
     log.event(`${this.agentId}.normalize_fields`, {
       raw_fields: Object.keys(rawData),
     });
 
     const normalized = CanonicalFieldMapper.normalizeFields(rawData);
+
+    // v36.0 DIAGNOSTIC: Trace normalization complete
+    ConversationTracer.trace('FIELD_NORMALIZATION_COMPLETE', this.agentId, 'session', {
+      canonical_fields: Object.keys(normalized),
+    });
 
     log.event(`${this.agentId}.normalize_fields_complete`, {
       canonical_fields: Object.keys(normalized),
@@ -720,6 +755,12 @@ export abstract class BaseAgentWithIntelligence {
     userResponse: string,
     extractedData: Record<string, any>
   ): Promise<void> {
+    // v36.0 DIAGNOSTIC: Trace memory update start
+    ConversationTracer.trace('MEMORY_UPDATE_STARTED', this.agentId, sessionId, {
+      question: question.substring(0, 60),
+      extracted_fields: Object.keys(extractedData),
+    });
+
     log.event(`${this.agentId}.update_conversation_memory`, {
       session_id: sessionId,
     });
@@ -732,6 +773,11 @@ export abstract class BaseAgentWithIntelligence {
       userResponse,
       extractedData
     );
+
+    // v36.0 DIAGNOSTIC: Trace memory update complete
+    ConversationTracer.trace('MEMORY_UPDATE_COMPLETE', this.agentId, sessionId, {
+      success: true,
+    });
 
     log.event(`${this.agentId}.conversation_memory_updated`, {
       session_id: sessionId,

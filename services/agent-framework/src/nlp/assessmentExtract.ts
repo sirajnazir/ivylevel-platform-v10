@@ -12,7 +12,16 @@
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Lazy initialize OpenAI client to ensure env vars are loaded first
+let openai: OpenAI | null = null;
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    console.log('[OPENAI_KEY_DEBUG] Initializing OpenAI client with key ending:', apiKey?.slice(-4));
+    openai = new OpenAI({ apiKey });
+  }
+  return openai;
+}
 
 // ============================================================================
 // Assessment Data Schema (Zod-like, matching our database)
@@ -246,7 +255,8 @@ export async function extractAssessmentDataGPT(
       content: extractionPrompt
     });
 
-    const response = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    const response = await client.chat.completions.create({
       model: "gpt-4o", // Latest GPT-4o with function calling support
       messages,
       tools: EXTRACTION_TOOLS,
@@ -478,7 +488,8 @@ Data collected so far:
       }
     ];
 
-    const response = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    const response = await client.chat.completions.create({
       model: "gpt-4o",
       messages,
       tools: ENGAGEMENT_ANALYSIS_TOOLS,

@@ -27,7 +27,7 @@
  * @intelligence-type TYPE-019
  */
 
-import { BaseIntelligenceType } from '../BaseIntelligenceType';
+import { BaseIntelligenceType } from './BaseIntelligenceType.js';
 import { Fact } from '../../a2a/types';
 
 // ==================== INTERFACES ====================
@@ -117,7 +117,7 @@ interface PortfolioFormalizationAssessment {
 // ==================== TYPE-019 IMPLEMENTATION ====================
 
 export class FormalizationLadder extends BaseIntelligenceType {
-  readonly typeId = 'TYPE-019';
+  readonly type_id = 'TYPE-019';
   readonly name = 'Formalization_Ladder';
   readonly category = 'extracurriculars';
 
