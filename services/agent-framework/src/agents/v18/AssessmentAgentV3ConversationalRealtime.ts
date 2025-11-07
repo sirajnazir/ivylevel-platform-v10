@@ -375,8 +375,35 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     console.log('[V26.5_REALTIME] 🤖 STEP 2: Extracting data using GPT-4o (NO REGEX)...');
     const conversationHistory = query.metadata?.conversation_history || '';
     const lastQuestion = state.last_question || ''; // v28.2: Pass last question for context
-    await this.extractAndStoreFacts(query.entity_id, query.query, conversationHistory, lastQuestion);
+
+    // v36.0: Extract with conversation intelligence
+    const extractionResult = await this.extractAndStoreFacts(
+      query.entity_id,
+      query.query,
+      conversationHistory,
+      lastQuestion,
+      sessionId
+    );
     console.log('[V26.5_REALTIME] ✅ GPT-4o extraction complete');
+
+    // v36.0: Check if we should skip topic due to frustration
+    if (extractionResult.shouldSkipTopic) {
+      console.log('[v36.0] ⚠️ Skipping topic due to high frustration - generating apology');
+      const frustrationApology = this.generateFrustrationApology({
+        is_frustrated: true,
+        frustration_level: 'high',
+        signals_detected: ['high_frustration'],
+        suggested_action: 'skip_topic'
+      });
+
+      return {
+        response_text: frustrationApology,
+        intelligence_trace: [],
+        facts_collected: [],
+        should_handover: false,
+        handover_context: undefined,
+      };
+    }
 
     // CRITICAL: Wait a moment to ensure database write is fully committed
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -1620,6 +1647,22 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
         rationale: dynamicQuestion.rationale
       });
 
+      // v36.0: Validate question to prevent repetition
+      const validation = await this.validateQuestion(
+        'session_id_placeholder', // Will be fixed when session context flows through
+        studentId,
+        dynamicQuestion.question
+      );
+
+      if (!validation.should_ask) {
+        console.log('[v36.0 QUESTION VALIDATION] ⚠️ Question blocked:', validation.reason);
+        // Try to suggest a different topic
+        const nextTopic = this.suggestNextTopic();
+        console.log('[v36.0 QUESTION VALIDATION] Suggesting alternative topic:', nextTopic);
+        return null; // Fall back to TYPE-080 questions
+      }
+
+      console.log('[v36.0 QUESTION VALIDATION] ✅ Question validated');
       return dynamicQuestion.question;
     } catch (error) {
       console.error('[v35.0 DYNAMIC ASSESSMENT] Error generating dynamic question:', error);
@@ -2113,13 +2156,15 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
   /**
    * Extract and store facts using GPT-4o (reuse from parent)
    * v28.2: Now accepts last_question for context-aware extraction
+   * v36.0: Added conversation intelligence (frustration, deduplication, field normalization)
    */
   async extractAndStoreFacts(
     studentId: string,
     userMessage: string,
     conversationHistory: string,
-    lastQuestion: string = ''
-  ): Promise<void> {
+    lastQuestion: string = '',
+    sessionId: string = 'no-session'
+  ): Promise<{ shouldSkipTopic: boolean }> {
     // v31.3: Deep trace logging temporarily disabled due to module path issues
     // Will use console.log for now to test OpenAI API key fix
 
@@ -2129,6 +2174,22 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
     console.log('[EXTRACT_GPT4O] Last question:', lastQuestion);
 
     try {
+      // v36.0 STEP 1: Detect frustration BEFORE extraction
+      const conversationHistoryArray = conversationHistory.split('\n').filter(line => line.trim());
+      const frustrationAnalysis = this.detectFrustration(userMessage, conversationHistoryArray);
+
+      if (frustrationAnalysis.is_frustrated) {
+        console.log(`[v36.0 FRUSTRATION] Detected ${frustrationAnalysis.frustration_level} frustration`);
+        console.log(`[v36.0 FRUSTRATION] Signals: ${frustrationAnalysis.signals_detected.join(', ')}`);
+        console.log(`[v36.0 FRUSTRATION] Suggested action: ${frustrationAnalysis.suggested_action}`);
+
+        // If frustration is high, skip extraction entirely
+        if (frustrationAnalysis.suggested_action === 'skip_topic' || frustrationAnalysis.suggested_action === 'end_session') {
+          console.log('[v36.0 FRUSTRATION] ⚠️ Skipping extraction due to high frustration');
+          return { shouldSkipTopic: true };
+        }
+      }
+
       const rawExtractedData = await extractAssessmentDataGPT(userMessage, conversationHistory, lastQuestion);
 
       console.log('[EXTRACT_GPT4O] Raw extracted data:', JSON.stringify(rawExtractedData, null, 2));
@@ -2137,12 +2198,22 @@ export class AssessmentAgentV3ConversationalRealtime extends BaseAgentWithIntell
 
       console.log('[EXTRACT_GPT4O] Validated data:', JSON.stringify(extractedData, null, 2));
 
-      if (Object.keys(extractedData).length > 0) {
-        await this.storeExtractedFacts(studentId, extractedData);
-        console.log(`[EXTRACT_GPT4O] ✅ Stored ${Object.keys(extractedData).length} data points`);
+      // v36.0 STEP 2: Normalize extracted fields to canonical names
+      const normalizedData = this.normalizeExtractedFields(extractedData);
+      console.log('[v36.0 NORMALIZATION] Normalized data:', JSON.stringify(normalizedData, null, 2));
+
+      if (Object.keys(normalizedData).length > 0) {
+        await this.storeExtractedFacts(studentId, normalizedData);
+        console.log(`[EXTRACT_GPT4O] ✅ Stored ${Object.keys(normalizedData).length} data points`);
+
+        // v36.0 STEP 3: Update conversation memory
+        await this.updateConversationMemory(sessionId, lastQuestion, userMessage, normalizedData);
+        console.log('[v36.0 MEMORY] ✅ Updated conversation memory');
       } else {
         console.log('[EXTRACT_GPT4O] ⚠️ No data extracted from user message');
       }
+
+      return { shouldSkipTopic: false };
     } catch (error) {
       console.error('[EXTRACT_GPT4O] ❌ ERROR:', error);
       throw error;

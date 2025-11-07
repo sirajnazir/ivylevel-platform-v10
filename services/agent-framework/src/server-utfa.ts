@@ -1,16 +1,44 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { readFileSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Debug: Show what paths we're loading
+const localEnvPath = path.resolve(__dirname, '../.env.local');
+const rootEnvPath = path.resolve(__dirname, '../../../.env');
+console.log('[ENV_DEBUG] Loading .env.local from:', localEnvPath);
+console.log('[ENV_DEBUG] Loading root .env from:', rootEnvPath);
+
 // Load from agent-framework/.env.local first, then root .env as fallback
-dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: localEnvPath, override: false });
+console.log('[ENV_DEBUG] After .env.local, OPENAI_API_KEY ends with:', process.env.OPENAI_API_KEY?.slice(-4));
+
+dotenv.config({ path: rootEnvPath, override: false });
+console.log('[ENV_DEBUG] After root .env, OPENAI_API_KEY ends with:', process.env.OPENAI_API_KEY?.slice(-4));
+
+// FORCE OVERRIDE: Read the correct API key directly from .env.local and set it
+// This MUST happen before any imports that initialize OpenAI clients
+const envLocalContent = readFileSync(localEnvPath, 'utf8');
+const match = envLocalContent.match(/OPENAI_API_KEY=(.+)/);
+if (match) {
+  process.env.OPENAI_API_KEY = match[1].trim();
+  console.log('[ENV_DEBUG] ✅ FORCE OVERRIDE: Set OPENAI_API_KEY to end with:', process.env.OPENAI_API_KEY?.slice(-4));
+} else {
+  console.log('[ENV_DEBUG] ❌ FORCE OVERRIDE FAILED: Could not find OPENAI_API_KEY in .env.local');
+}
 
 // Override with correct index
 process.env.PINECONE_INDEX = 'jenny-v3-3072-093025';
 process.env.SERVICE_NAME = 'agent-framework-utfa';
+
+// ============================================================================
+// IMPORTANT: All environment variables MUST be set BEFORE these imports
+// because some modules (like assessmentExtract.ts) initialize OpenAI clients
+// at module load time using process.env.OPENAI_API_KEY
+// ============================================================================
 
 import express from 'express';
 import { agentChat } from './orchestrator/agentChat-utfa.js';
@@ -38,6 +66,7 @@ import { CFG } from './config/env.js';
 import authRouter from './routes/auth.js';
 import { AgentRegistry } from './agents/registry.js';
 import { scheduleQuarterlyReviewJob } from './cron/quarterly-review-job.js';
+import { initConversationMemory } from './agents/shared/ConversationMemory.js'; // v36.0
 
 const app = express();
 
@@ -445,6 +474,11 @@ const port = process.env.PORT || 8787;
     const agentRegistry = AgentRegistry.getInstance();
     await agentRegistry.initialize(pool);
     console.log('[BOOT] Agent Registry initialized successfully');
+
+    // Initialize Conversation Memory (v36.0 - Universal conversation intelligence)
+    console.log('[BOOT] Initializing Conversation Memory (v36.0)...');
+    initConversationMemory(pool);
+    console.log('[BOOT] Conversation Memory initialized successfully');
 
     // Mount v26.0 MultiAgents routes (requires AgentRegistry)
     console.log('[BOOT] Mounting v26.0 MultiAgents routes...');

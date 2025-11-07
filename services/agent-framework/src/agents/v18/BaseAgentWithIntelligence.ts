@@ -35,6 +35,13 @@ import {
 import { IntelligenceRegistry } from '../../intelligence/IntelligenceRegistry.js';
 import { createLogger } from '../../../../../packages/observability/dist/unified-logger.js';
 
+// v36.0: Universal Conversation Intelligence
+import { getConversationMemory, type ConversationMemoryState } from '../shared/ConversationMemory.js';
+import { CanonicalFieldMapper } from '../shared/CanonicalFieldMapper.js';
+import { QuestionDeduplicationEngine, type QuestionAnalysis } from '../shared/QuestionDeduplicationEngine.js';
+import { FrustrationDetector, type FrustrationAnalysis } from '../shared/FrustrationDetector.js';
+import { ConversationIntelligenceConfig } from '../shared/ConversationIntelligenceConfig.js';
+
 const log = createLogger('base-agent-intelligence');
 
 /**
@@ -566,5 +573,204 @@ export abstract class BaseAgentWithIntelligence {
 
     // Default: Not supported
     throw new Error(`${this.agentId} does not support consultation mode`);
+  }
+
+  // ========================================================================
+  // v36.0: UNIVERSAL CONVERSATION INTELLIGENCE METHODS
+  // All agents inherit these automatically
+  // ========================================================================
+
+  /**
+   * v36.0: Load conversation memory for a session
+   */
+  protected async loadConversationMemory(
+    sessionId: string,
+    studentId: string
+  ): Promise<ConversationMemoryState> {
+    log.event(`${this.agentId}.load_conversation_memory`, {
+      session_id: sessionId,
+      student_id: studentId,
+    });
+
+    const memory = getConversationMemory();
+    return await memory.load(sessionId, studentId);
+  }
+
+  /**
+   * v36.0: Validate if a question should be asked (prevents loops)
+   * Returns: { should_ask, reason, alternative_suggested }
+   */
+  protected async validateQuestion(
+    sessionId: string,
+    studentId: string,
+    proposedQuestion: string
+  ): Promise<{
+    should_ask: boolean;
+    reason: string;
+    alternative_suggested?: string;
+  }> {
+    log.event(`${this.agentId}.validate_question`, {
+      session_id: sessionId,
+      question: proposedQuestion.substring(0, 60),
+    });
+
+    // Load conversation memory
+    const memoryState = await this.loadConversationMemory(sessionId, studentId);
+
+    // Check frustration level first
+    const frustrationThreshold = ConversationIntelligenceConfig.memory.frustration_action_threshold;
+    if (memoryState.frustration_level > frustrationThreshold) {
+      this.log.event({
+        msg: `[v36.0] High frustration detected - blocking question`,
+        event: `${this.agentId}.high_frustration_detected`,
+        frustration_level: memoryState.frustration_level,
+        threshold: frustrationThreshold,
+      });
+
+      return {
+        should_ask: false,
+        reason: `Student frustration level is ${memoryState.frustration_level}/100 - skipping question to avoid further frustration`,
+      };
+    }
+
+    // Check for question repetition
+    const dedupAnalysis = QuestionDeduplicationEngine.analyze(
+      proposedQuestion,
+      memoryState,
+      this.agentId
+    );
+
+    if (dedupAnalysis.recommended_action === 'block') {
+      this.log.event({
+        msg: `[v36.0] Question blocked due to repetition`,
+        event: `${this.agentId}.question_blocked`,
+        reason: dedupAnalysis.reason,
+        similarity_score: dedupAnalysis.similarity_score,
+      });
+
+      return {
+        should_ask: false,
+        reason: dedupAnalysis.reason,
+      };
+    }
+
+    if (dedupAnalysis.recommended_action === 'rephrase') {
+      this.log.event({
+        msg: `[v36.0] Question flagged for potential repetition`,
+        event: `${this.agentId}.question_flagged_rephrase`,
+        reason: dedupAnalysis.reason,
+      });
+      // Allow but log warning
+    }
+
+    return {
+      should_ask: true,
+      reason: 'Question is valid and non-repetitive',
+    };
+  }
+
+  /**
+   * v36.0: Detect frustration in user response
+   */
+  protected detectFrustration(
+    userResponse: string,
+    conversationHistory: string[] = []
+  ): FrustrationAnalysis {
+    const analysis = FrustrationDetector.analyze(userResponse, conversationHistory);
+
+    if (analysis.is_frustrated) {
+      this.log.event({
+        msg: `[v36.0] Frustration detected in user response`,
+        event: `${this.agentId}.frustration_detected`,
+        level: analysis.frustration_level,
+        signals: analysis.signals_detected,
+        suggested_action: analysis.suggested_action,
+      });
+    }
+
+    return analysis;
+  }
+
+  /**
+   * v36.0: Normalize extracted data to canonical field names
+   */
+  protected normalizeExtractedFields(
+    rawData: Record<string, any>
+  ): Record<string, any> {
+    log.event(`${this.agentId}.normalize_fields`, {
+      raw_fields: Object.keys(rawData),
+    });
+
+    const normalized = CanonicalFieldMapper.normalizeFields(rawData);
+
+    log.event(`${this.agentId}.normalize_fields_complete`, {
+      canonical_fields: Object.keys(normalized),
+      mapping_count: Object.keys(rawData).length - Object.keys(normalized).length,
+    });
+
+    return normalized;
+  }
+
+  /**
+   * v36.0: Update conversation memory after a turn
+   */
+  protected async updateConversationMemory(
+    sessionId: string,
+    question: string,
+    userResponse: string,
+    extractedData: Record<string, any>
+  ): Promise<void> {
+    log.event(`${this.agentId}.update_conversation_memory`, {
+      session_id: sessionId,
+    });
+
+    const memory = getConversationMemory();
+    await memory.addTurn(
+      sessionId,
+      this.agentId,
+      question,
+      userResponse,
+      extractedData
+    );
+
+    log.event(`${this.agentId}.conversation_memory_updated`, {
+      session_id: sessionId,
+      extracted_fields: Object.keys(extractedData),
+    });
+  }
+
+  /**
+   * v36.0: Generate apology response when student is frustrated
+   */
+  protected generateFrustrationApology(
+    frustrationAnalysis: FrustrationAnalysis
+  ): string {
+    const apology = FrustrationDetector.generateApology(
+      frustrationAnalysis.signals_detected
+    );
+
+    const nextTopic = this.suggestNextTopic();
+
+    return `${apology} ${nextTopic}`;
+  }
+
+  /**
+   * v36.0: Suggest next topic (agent-specific, can be overridden)
+   */
+  protected suggestNextTopic(): string {
+    return "Let me ask about something different.";
+  }
+
+  /**
+   * v36.0: Check if field has been collected (with semantic matching)
+   */
+  protected async hasCollectedField(
+    sessionId: string,
+    studentId: string,
+    fieldName: string
+  ): Promise<boolean> {
+    const memory = await this.loadConversationMemory(sessionId, studentId);
+    const conversationMemory = getConversationMemory();
+    return conversationMemory.hasCollectedField(memory, fieldName);
   }
 }
