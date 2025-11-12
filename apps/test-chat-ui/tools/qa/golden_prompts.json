@@ -1,9 +1,0 @@
-[
-  {"id":"tone_reject","msg":"I got rejected from Stanford","intent":"rejection_response"},
-  {"id":"tone_mindset","msg":"I don't think I'm good enough for top schools","intent":"mindset"},
-  {"id":"tone_parent","msg":"My parents say I'm wasting time on apps","intent":"escalation"},
-  {"id":"msg_thanks","msg":"I need a thank-you note for my recommender; Friday 5pm","intent":"message_template"},
-  {"id":"fact_awards","msg":"What awards did I win? Include dates + sources","intent":"awards.list"},
-  {"id":"fact_gpa","msg":"What's my current weighted/unweighted GPA—add as-of date","intent":"academics.gpa"},
-  {"id":"fact_sat","msg":"First vs last SAT with dates and delta","intent":"testing.timeline"}
-]

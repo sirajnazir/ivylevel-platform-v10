@@ -1,0 +1,40 @@
+{
+  "processing_summary": {
+    "source_file": "w028_intel_chips.json",
+    "source_type": "NORMALIZED_FROM_LEGACY",
+    "date_processed": "2025-10-07",
+    "week": "028",
+    "phase": "",
+    "session_date": "",
+    "participants": [],
+    "duration": "",
+    "version": "v1"
+  },
+  "chips_generated": {
+    "total_count": 10,
+    "chip_types": {
+      "Strategy_Chip": 2,
+      "Tactic_Chip": 2,
+      "Adaptation_Chip": 2,
+      "Trust_Chip": 1,
+      "Framework_Chip": 1,
+      "Insight_Chip": 1,
+      "Result_Chip": 1
+    }
+  },
+  "verification_status": {
+    "schema_integrity": "PASS",
+    "ontology_fit": "PASS",
+    "embedding_ready": true,
+    "notes": [
+      "Legacy chips normalized to KB v6 schema",
+      "Chip IDs regenerated to W{week}-{TYPE}-NNN format",
+      "Content flattened from chip_content when needed",
+      "Insight vectors auto-derived from first sentence"
+    ]
+  },
+  "output_files": {
+    "jsonl_batch": "W028_Intel_Chips_Batch_v1.jsonl",
+    "processing_summary": "W028_Processing_Summary_v1.json"
+  }
+}

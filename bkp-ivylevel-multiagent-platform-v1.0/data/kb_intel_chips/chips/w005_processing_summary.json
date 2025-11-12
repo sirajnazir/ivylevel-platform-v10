@@ -1,0 +1,165 @@
+{
+  "processing_summary": {
+    "source_file": "2023-07-07_W005_P1-FOUNDATION_TRANS-INTEL_NavianceSchoolDataAnalysisandmultiProjec.json",
+    "source_type": "EXTRACT",
+    "date_processed": "2025-10-05",
+    "week": "005", 
+    "phase": "P1-FOUNDATION",
+    "phase_enum": "FOUNDATION",
+    "session_date": "2023-07-07",
+    "participants": ["Jenny Duan", "Huda", "Siraj (Dad)"],
+    "duration": "58:44",
+    "version": "v1",
+    "note": "Naviance deep dive with parent, film club success, multi-project management"
+  },
+  
+  "chips_generated": {
+    "total_count": 10,
+    "chip_types": {
+      "Insight_Chip": 1,
+      "Strategy_Chip": 1,
+      "Tactic_Chip": 1,
+      "Trust_Chip": 1,
+      "Adaptation_Chip": 1,
+      "Framework_Chip": 1,
+      "Result_Chip": 1,
+      "Channel_Chip": 1,
+      "Relatability_Chip": 1,
+      "Silver_Bullet_Chip": 1
+    },
+    "scoring_methodology": {
+      "quality_score": "Human-equivalent quality rating (0-1 scale) based on signal density and actionability",
+      "confidence_score": "Embedding confidence based on clarity and completeness of extracted intelligence (0-1 scale)",
+      "average_quality_score": 0.93,
+      "average_confidence_score": 0.91
+    }
+  },
+  
+  "key_discoveries": {
+    "diagnostic": {
+      "naviance_reality": "2/36 Stanford, 10/147 Berkeley, 11/140 UCLA admits",
+      "film_club_explosion": "70 members first day with incentives",
+      "folklift_struggle": "Muslim businesses informal/non-responsive",
+      "sat_status": "1430 practice test, needs more than solo practice",
+      "qr_code_hack": "Student independently discovered counselor access"
+    },
+    "strategic": {
+      "competitive_reframe": "Non-competitive school = easier to stand out",
+      "gpa_urgency": "Need 4.38-4.5 for Stanford, 4.7 for Berkeley",
+      "congressional_precedent": "2021 winner from school → Stanford",
+      "diversity_preservation": "Muslim > Indian for underrepresentation value",
+      "big_fish_positioning": "Become THE exceptional student for endorsement"
+    },
+    "tactical": {
+      "naviance_mining": "Advanced search → school → middle 50% data",
+      "incentive_formula": "Candy + raffle + positions = 120 members",
+      "geographic_expansion": "Mountain House → Dublin/Tracy → East Bay",
+      "facebook_broadcast": "Community groups vs cold outreach",
+      "immediate_actions": "Henna interview, 3 businesses, dev log, Instagram"
+    },
+    "silver_bullets": {
+      "naviance_revelation": "School data creates concrete goals",
+      "geographic_expansion": "Systematic radius increase",
+      "incentive_ladder": "Multi-level signup motivation",
+      "stanford_precedent": "Proof of pathway possibility",
+      "qr_code_discovery": "Student system hacking",
+      "facebook_broadcast": "Attract vs chase strategy",
+      "competitive_reframe": "Weakness becomes advantage"
+    }
+  },
+  
+  "project_portfolio_status": {
+    "empowering_ai": "Nonprofit with curriculum, needs web developer",
+    "congressional_app": "Wildfire tracker, basics by Sept, due Nov 15",
+    "film_club": "70 members, president role, virtual adaptation",
+    "folklift": "Pivoting demographics, geographic expansion",
+    "game_dev": "Ada Lovelace character development",
+    "youtube": "Dev logs with storytelling emphasis",
+    "complexity_level": "Managing 6 concurrent projects with delegation emerging"
+  },
+  
+  "longitudinal_themes": {
+    "continued_from_w001_w004": [
+      "stanford_positioning",
+      "muslim_identity_as_strength",
+      "time_optimization",
+      "community_service_integration",
+      "parent_collaboration"
+    ],
+    "evolved_in_w005": [
+      "competitive_positioning_concrete",
+      "data_driven_decisions",
+      "delegation_emerging",
+      "geographic_solutions",
+      "precedent_identification"
+    ],
+    "new_in_w005": [
+      "naviance_intelligence",
+      "school_hierarchy_navigation",
+      "incentive_systems",
+      "broadcast_vs_outreach",
+      "student_system_hacking"
+    ]
+  },
+  
+  "family_dynamics_evolution": {
+    "dad_engagement": "Fully activated through data revelation",
+    "shared_urgency": "Naviance creates family understanding",
+    "regret_processing": "'Biggest mistake' addressed with hope",
+    "business_partnership": "Post-session strategy discussion",
+    "unified_front": "Family learning together through data"
+  },
+  
+  "verification_status": {
+    "schema_integrity": "PASS",
+    "ontology_fit": "PASS",
+    "embedding_ready": "PASS",
+    "analytics_metadata": "PASS",
+    "all_chips_valid": true,
+    "natural_language_verified": true,
+    "no_json_blobs": true,
+    "insight_vector_optimization": true,
+    "cross_validation": "PASS",
+    "notes": [
+      "W005 introduces data-driven urgency through Naviance",
+      "Seven silver bullets discovered including student's own QR hack",
+      "Film club success validates leadership positioning",
+      "Parent fully engaged as strategic partner"
+    ]
+  },
+  
+  "output_files": {
+    "jsonl_batch": "W005_Intel_Chips_Batch_v1.jsonl",
+    "processing_summary": "W005_Processing_Summary_v1.json",
+    "chip_count": 10,
+    "total_content_words": 1298,
+    "average_words_per_chip": 130,
+    "average_insight_vector_chars": 150,
+    "file_naming_pattern": "W{week}_Intel_Chips_Batch_v{version}.jsonl"
+  },
+  
+  "metrics_for_kb_index": {
+    "target_semantic_similarity": 0.70,
+    "target_retrieval_precision": 0.80,
+    "current_quality_baseline": 0.93,
+    "embedding_confidence_baseline": 0.91,
+    "cross_linking_themes": 24,
+    "ready_for_production": true
+  },
+  
+  "week_over_week_progression": {
+    "w004_to_w005": {
+      "time_gap": "11 days between sessions",
+      "execution_level": "Planning → Implementation with results",
+      "complexity": "Strategy → Managing 6 concurrent projects",
+      "student_agency": "Following guidance → Independent discoveries",
+      "parent_role": "Informed → Fully activated partner"
+    },
+    "cumulative_wins": {
+      "film_club": "0 → 70 members",
+      "sat_progress": "1360 → 1430",
+      "school_intel": "Unknown → Complete Naviance analysis",
+      "projects": "Ideas → Active execution on 6 fronts"
+    }
+  }
+}

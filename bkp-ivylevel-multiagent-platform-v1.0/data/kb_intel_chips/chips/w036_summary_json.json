@@ -1,0 +1,58 @@
+{
+  "processing_summary": {
+    "source_file": "2024-03-02_W036_P2-BUILDING_TRANS-INTEL_TeacherRecommendationCrisisandschoolRela.json",
+    "source_type": "EXTRACT",
+    "date_processed": "2025-10-06",
+    "week": "036",
+    "phase": "P2-BUILDING",
+    "phase_enum": "BUILDING",
+    "session_date": "2024-03-02",
+    "participants": ["Jenny Duan", "Huda"],
+    "duration": "50:42",
+    "version": "v1",
+    "note": "Teacher recommendation crisis - 5 emails ignored, counselor relationship damaged, systematic repair strategies developed"
+  },
+  
+  "chips_generated": {
+    "total_count": 10,
+    "silver_bullets": 7,
+    "average_quality_score": 0.95,
+    "average_confidence_score": 0.93
+  },
+  
+  "key_discoveries": {
+    "teacher_crisis": "5 emails ignored, no response, recommendation overload",
+    "counselor_damaged": "'Oh you're Huda right?' - negative tone, Week 31 consequences visible",
+    "teacher_slacking": "English teacher hasn't started Common App, late February",
+    "popular_kid_isolation": "Don't know their names - teacher recognition limited",
+    "mental_health_campaign": "May awareness month - admin collaboration opportunity",
+    "linkedin_practice_need": "Message 10 strangers - adult conversation skill building",
+    "front_desk_strategic": "Befriend gatekeepers for calendar intelligence"
+  },
+  
+  "silver_bullets": {
+    "gift_reset_protocol": "Monday potted plants + cards repair email fatigue",
+    "teacher_rotation_system": "3 sophomore teachers - prevent burnout",
+    "front_desk_alliance": "Gatekeeper access for calendar intelligence",
+    "linkedin_adult_practice": "10 strangers no agenda - awkward phase necessary",
+    "mental_health_leadership": "May campaign - admin collaboration visibility",
+    "popular_kid_integration": "Learn names - teacher recognition depends on peer visibility",
+    "personal_vulnerability_strategy": "Share struggles with counselor - empathy creation"
+  },
+  
+  "output_files": {
+    "jsonl_batch": "W036_Intel_Chips_Batch_v1.jsonl",
+    "processing_summary": "W036_Processing_Summary_v1.json",
+    "chip_count": 10,
+    "total_content_words": 1598
+  },
+  
+  "week_over_week_progression": {
+    "w035_to_w036": {
+      "time_gap": "4 days",
+      "crisis_emergence": "Teacher recommendation system breakdown",
+      "counselor_status": "Relationship damage from Week 31 still visible",
+      "systematic_solutions": "7 silver bullets for comprehensive repair"
+    }
+  }
+}

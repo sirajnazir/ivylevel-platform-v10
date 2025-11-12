@@ -1,0 +1,45 @@
+{
+  "validation_metadata": {
+    "timestamp": "2025-10-07T06:38:35.921143Z",
+    "validator_version": "1.0.0",
+    "schema_version": "6.0",
+    "chips_directory": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips",
+    "chip_category": "iMessage"
+  },
+  "summary": {
+    "total_files": 2,
+    "total_chips": 40,
+    "valid_chips": 40,
+    "invalid_chips": 0,
+    "validation_pass_rate": 100.0,
+    "files_passed": 2,
+    "files_failed": 0,
+    "files_errored": 0
+  },
+  "files": [
+    {
+      "filename": "iMessage_Intel_Chips_Batch_v1.jsonl",
+      "file_path": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v1.jsonl",
+      "status": "PASS",
+      "total_chips": 12,
+      "valid_chips": 12,
+      "invalid_chips": 0,
+      "errors": []
+    },
+    {
+      "filename": "iMessage_Intel_Chips_Batch_v2.jsonl",
+      "file_path": "/Users/snazir/ivylevel-platform-v10/data/kb_intel_chips/imsg-chips/iMessage_Intel_Chips_Batch_v2.jsonl",
+      "status": "PASS",
+      "total_chips": 28,
+      "valid_chips": 28,
+      "invalid_chips": 0,
+      "errors": []
+    }
+  ],
+  "embedding_readiness": {
+    "ready_for_embedding": true,
+    "target_index": "jenny-v3-3072-093025",
+    "embedding_model": "text-embedding-3-large",
+    "suggested_namespace": "KBv6_iMessage_2025-10-07_v1.0"
+  }
+}

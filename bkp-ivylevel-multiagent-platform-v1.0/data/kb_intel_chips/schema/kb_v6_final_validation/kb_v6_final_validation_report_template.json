@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KB v6 Final Validation Report",
+  "description": "Comprehensive validation report for all KB v6 Intel Chips (Weeks 1-93) after fixes applied to weeks 24, 27, 28",
+  "type": "object",
+  "properties": {
+    "validation_metadata": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of validation run"
+        },
+        "validator_version": {
+          "type": "string",
+          "description": "Version of validation script used"
+        },
+        "schema_version": {
+          "type": "string",
+          "const": "6.0",
+          "description": "KB schema version validated against"
+        },
+        "chips_directory": {
+          "type": "string",
+          "description": "Absolute path to chips directory validated"
+        },
+        "total_files_discovered": {
+          "type": "integer",
+          "description": "Total .json/.jsonl files found in chips directory"
+        }
+      },
+      "required": ["timestamp", "schema_version", "chips_directory", "total_files_discovered"]
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_files": { "type": "integer" },
+        "total_chips": { "type": "integer" },
+        "valid_chips": { "type": "integer" },
+        "invalid_chips": { "type": "integer" },
+        "validation_pass_rate": { "type": "number", "minimum": 0, "maximum": 100 },
+        "files_passed": { "type": "integer" },
+        "files_failed": { "type": "integer" },
+        "files_errored": { "type": "integer" }
+      }
+    },
+    "week_coverage": {
+      "type": "object",
+      "properties": {
+        "weeks_present": { "type": "array", "items": { "type": "integer" } },
+        "weeks_missing": { "type": "array", "items": { "type": "integer" } },
+        "total_weeks_expected": { "type": "integer", "const": 93 },
+        "total_weeks_present": { "type": "integer" },
+        "coverage_percentage": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "embedding_readiness": {
+      "type": "object",
+      "properties": {
+        "ready_for_embedding": { "type": "boolean" },
+        "target_namespace": { "type": "string", "const": "kb_v8_e3l" },
+        "target_index": { "type": "string", "const": "jenny-v3-3072-093025" },
+        "embedding_model": { "type": "string", "const": "text-embedding-3-large" }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "version": "v1.0",
+  "created": "2025-10-07T07:17:09.852107Z",
+  "situation_tags": [
+    "deadline_crunch",
+    "parent_pushback",
+    "confidence_reset",
+    "recommender_outreach",
+    "blocker_unresponsive",
+    "time_management",
+    "scope_creep",
+    "application_clarification",
+    "health_crisis",
+    "schedule_conflict",
+    "offer_evaluation",
+    "scholarship_strategy",
+    "logistics_followup",
+    "essay_block",
+    "testing_strategy",
+    "interview_prep"
+  ],
+  "notes": "Use one primary situation_tag per chip; add 'secondary_situations':[] in metadata if needed."
+}

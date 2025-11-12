@@ -1,0 +1,45 @@
+{
+  "namespace": "KBv6_Assessment_EXAMPLE",
+  "queries": [
+    {
+      "id": "q1",
+      "text": "168-hour framework only 2 hours left each day",
+      "expect": [
+        "FRAMEWORK",
+        "ASSESS"
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Film plus CS digital storyteller identity",
+      "expect": [
+        "STRATEGY",
+        "ASSESS"
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "Challenge question skip program save weeks",
+      "expect": [
+        "SILVER",
+        "ASSESS"
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Portfolio architecture interconnect projects service layer",
+      "expect": [
+        "FRAMEWORK",
+        "GAMEPLAN"
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "30 states coverage small business stories proof deliverables",
+      "expect": [
+        "TACTIC",
+        "GAMEPLAN"
+      ]
+    }
+  ]
+}

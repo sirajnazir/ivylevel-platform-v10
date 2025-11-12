@@ -1,0 +1,55 @@
+{
+  "processing_summary": {
+    "source_file": "2024-03-05_W037_P2-BUILDING_TRANS-INTEL_PostGiftTeacherRelationsandreaganAward.json",
+    "source_type": "EXTRACT",
+    "date_processed": "2025-10-06",
+    "week": "037",
+    "phase": "P2-BUILDING",
+    "phase_enum": "BUILDING",
+    "session_date": "2024-03-05",
+    "participants": ["Jenny Duan", "Huda"],
+    "duration": "47:28",
+    "version": "v1",
+    "note": "Gift strategy validation successful, Reagan Award discovery every nominee wins, recommender-program matching strategy"
+  },
+  "chips_generated": {
+    "total_count": 10,
+    "silver_bullets": 7,
+    "average_quality_score": 0.95,
+    "average_confidence_score": 0.93
+  },
+  "key_discoveries": {
+    "gift_strategy_success": "CS teacher 'really appreciative didn't have to', counselor smiling thanked multiple times",
+    "reagan_award": "Every nominated student wins, low barrier high prestige, nominator principal/VP, April 5 deadline",
+    "sat_progress": "1490 practice (780M, 710RW), March 20 test approaching",
+    "recommender_matching": "CS teacher for CS programs, history teacher for humanities",
+    "vice_principal_alternative": "Principal complex, VP easier accessible",
+    "fact_sheet_efficiency": "Pre-written content simplifies teacher work",
+    "reciprocal_nomination": "Nominate teachers for NCWIT educator award",
+    "parent_witness": "Both parents present observing transformation"
+  },
+  "silver_bullets": {
+    "guaranteed_win_strategy": "Reagan Award nomination equals winning",
+    "recommender_program_matching": "Align teacher expertise with program focus",
+    "vice_principal_pivot": "VP alternative when principal complex",
+    "fact_sheet_template": "Pre-write content for copy-paste efficiency",
+    "reciprocal_nomination_strategy": "Nominate teachers builds goodwill",
+    "linkedin_reconnaissance": "Research without revealing knowledge",
+    "parent_witness_strategy": "Both parents present validates coaching value"
+  },
+  "output_files": {
+    "jsonl_batch": "W037_Intel_Chips_Batch_v1.jsonl",
+    "processing_summary": "W037_Processing_Summary_v1.json",
+    "chip_count": 10,
+    "total_content_words": 1632
+  },
+  "week_over_week_progression": {
+    "w036_to_w037": {
+      "time_gap": "3 days",
+      "gift_strategy": "Implemented and validated successful",
+      "award_discovery": "Reagan Award guaranteed win identified",
+      "relationship_status": "CS teacher and counselor positive response",
+      "sat_preparation": "1490 practice validated"
+    }
+  }
+}

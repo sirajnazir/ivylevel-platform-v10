@@ -1,0 +1,621 @@
+{
+  "kind": "APP-DOC",
+  "items": [
+    {
+      "id": "huda-final-college-list-and-decisions#0",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Northwestern University\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "Northwestern University",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#1",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UC Irvine\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "UC Irvine",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#2",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UC San Diego\",\"decision\":\"Waitlisted\"}",
+      "entries": [
+        {
+          "college": "UC San Diego",
+          "decision": "Waitlisted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#3",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Carnegie Mellon University\",\"decision\":\"Waitlisted\"}",
+      "entries": [
+        {
+          "college": "Carnegie Mellon University",
+          "decision": "Waitlisted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#4",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"University of Pennsylvania\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "University of Pennsylvania",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#5",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"New York University\",\"decision\":\"Waitlisted\"}",
+      "entries": [
+        {
+          "college": "New York University",
+          "decision": "Waitlisted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#6",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Northeastern University\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "Northeastern University",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#7",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"MIT\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "MIT",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#8",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"University of Southern California\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "University of Southern California",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#9",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Stanford University\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "Stanford University",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#10",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UNC Chapel Hill\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "UNC Chapel Hill",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#11",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Georgia Tech\",\"decision\":\"Waitlisted\"}",
+      "entries": [
+        {
+          "college": "Georgia Tech",
+          "decision": "Waitlisted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#12",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Barnard University\",\"decision\":\"Waitlisted\"}",
+      "entries": [
+        {
+          "college": "Barnard University",
+          "decision": "Waitlisted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#13",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UC Davis\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "UC Davis",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#14",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UT Austin\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "UT Austin",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#15",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Harvard\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "Harvard",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#16",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Brown\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "Brown",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#17",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Cornell\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "Cornell",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#18",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Yale\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "Yale",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#19",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Columbia\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "Columbia",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#20",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Duke\",\"decision\":\"Rejected\"}",
+      "entries": [
+        {
+          "college": "Duke",
+          "decision": "Rejected"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#21",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UIUC\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "UIUC",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#22",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UC Berkeley\",\"decision\":\"Waitlisted\"}",
+      "entries": [
+        {
+          "college": "UC Berkeley",
+          "decision": "Waitlisted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#23",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UC Riverside\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "UC Riverside",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#24",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UC Santa Cruz\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "UC Santa Cruz",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#25",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"UC Los Angeles\",\"decision\":\"Waitlisted\"}",
+      "entries": [
+        {
+          "college": "UC Los Angeles",
+          "decision": "Waitlisted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#26",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"Cal Poly SLO\",\"decision\":\"Waitlisted\"}",
+      "entries": [
+        {
+          "college": "Cal Poly SLO",
+          "decision": "Waitlisted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    },
+    {
+      "id": "huda-final-college-list-and-decisions#27",
+      "name": "huda-final-college-list-and-decisions",
+      "path": "/Users/snazir/ivylevel-platform-v10/data/raw/jenny-huda/09-Raw-ApplicationDocs/huda-final-college-list-and-decisions.xlsx",
+      "kind": "APP-DOC",
+      "week": null,
+      "phase": null,
+      "date": null,
+      "studentId": "huda",
+      "text": "{\"college\":\"SJSU\",\"decision\":\"Accepted\"}",
+      "entries": [
+        {
+          "college": "SJSU",
+          "decision": "Accepted"
+        }
+      ],
+      "segments": [],
+      "meta": {
+        "source_ext": "xlsx",
+        "round": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "processing_summary": {
+    "source_file": "2024-02-26_W035_P2-BUILDING_TRANS-INTEL_InitiativeUpdatesNcwitPublicityandfinanc.json",
+    "source_type": "EXTRACT",
+    "date_processed": "2025-10-06",
+    "week": "035",
+    "phase": "P2-BUILDING",
+    "phase_enum": "BUILDING",
+    "session_date": "2024-02-26",
+    "participants": ["Jenny Duan", "Huda"],
+    "duration": "42:36",
+    "version": "v1",
+    "note": "Bootcamp recovery success, financial aid discovery dad startup low income, NCWIT publicity amplification strategy"
+  },
+  
+  "chips_generated": {
+    "total_count": 10,
+    "chip_types": {
+      "Insight_Chip": 1,
+      "Strategy_Chip": 1,
+      "Tactic_Chip": 1,
+      "Trust_Chip": 1,
+      "Adaptation_Chip": 1,
+      "Framework_Chip": 1,
+      "Result_Chip": 1,
+      "Channel_Chip": 1,
+      "Relatability_Chip": 1,
+      "Silver_Bullet_Chip": 1
+    },
+    "scoring_methodology": {
+      "quality_score": "Human-equivalent quality rating (0-1 scale)",
+      "confidence_score": "Embedding confidence based on clarity",
+      "average_quality_score": 0.94,
+      "average_confidence_score": 0.92
+    }
+  },
+  
+  "key_discoveries": {
+    "bootcamp_success": "4-5 kids attended, shark game loved, screen recording captured",
+    "financial_revelation": "Dad startup = technically low income = full ride programs eligible",
+    "ncwit_publicity": "Multi-channel strategy: principal, newsletter, community paper, college orgs",
+    "activity_gap": "Current 7, need 10 total - 3 more needed",
+    "principal_relationship": "Likes but not loves yet - needs cultivation",
+    "nicholas_stalled": "Encode Justice connection needs direct DM reminder",
+    "recommendation_audit": "History teacher 'mid but sufficient' - honest assessment"
+  },
+  
+  "silver_bullets": {
+    "amplification_strategy": "DM 10+ college women computing orgs for reshares",
+    "principal_relationship_protocol": "30-minute no-agenda meeting builds capital",
+    "financial_positioning_pivot": "Low income status opens full ride programs",
+    "publicity_pressure_accountability": "Dad visibility desire creates family momentum",
+    "direct_ask_protocol": "Established connections skip buildup",
+    "insider_tea_strategy": "Share organizational dysfunction shows trust depth",
+    "recommendation_quality_audit": "Honest assessment manages expectations"
+  },
+  
+  "output_files": {
+    "jsonl_batch": "W035_Intel_Chips_Batch_v1.jsonl",
+    "processing_summary": "W035_Processing_Summary_v1.json",
+    "chip_count": 10,
+    "total_content_words": 1456,
+    "average_words_per_chip": 146
+  },
+  
+  "week_over_week_progression": {
+    "w034_to_w035": {
+      "time_gap": "5 days",
+      "bootcamp_status": "0 attendees → 4-5 attendees (success!)",
+      "financial_discovery": "Full ride eligibility identified",
+      "publicity_strategy": "Multi-channel NCWIT amplification",
+      "relationship_assessment": "Principal needs cultivation"
+    }
+  }
+}

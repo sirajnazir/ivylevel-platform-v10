@@ -1,6 +1,0 @@
-{
-  "models": {
-    "composer_base": "gpt-4o-mini-2024-07-18",
-    "jenny_v8_adapter": "ft:gpt-4o-mini-2024-07-18:personal:v8-prod:CO8TAkWg"
-  }
-}

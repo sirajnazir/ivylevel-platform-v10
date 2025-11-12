@@ -1,0 +1,173 @@
+{
+  "processing_metadata": {
+    "batch_id": "W027_BATCH_20240116",
+    "processing_date": "2024-10-06",
+    "session_week": "027",
+    "session_date": "2024-01-16",
+    "processor_version": "3.0",
+    "extraction_method": "structured_intelligence_mining"
+  },
+  
+  "session_summary": {
+    "title": "Notre Dame Leadership Seminar Application & Strategic Planning",
+    "duration": "~48 minutes",
+    "participants": ["Jenny Duan", "Huda"],
+    "session_focus": "Notre Dame essays, USC vs Stanford EA decision, senior course planning",
+    "context": "6 days before Notre Dame deadline (Jan 22)",
+    "unique_elements": "Strategic 'fake woke' permission for Catholic school audience"
+  },
+  
+  "chips_generated": {
+    "total_count": 10,
+    "by_type": {
+      "strategic": 4,
+      "tactical": 2,
+      "diagnostic": 1,
+      "adaptive": 1,
+      "relationship": 1,
+      "systems": 1,
+      "outcome": 1
+    },
+    "silver_bullets": 4,
+    "quality_distribution": {
+      "score_10": 1,
+      "score_9": 2,
+      "score_8": 6,
+      "score_7": 1
+    }
+  },
+  
+  "key_patterns_identified": [
+    {
+      "pattern_name": "Strategic Wokeness Calibration",
+      "description": "Permission to write strategically for specific audiences",
+      "example": "it's okay to be a little bit fake woke... they'll eat it up",
+      "impact": "Authentic message with strategic framing"
+    },
+    {
+      "pattern_name": "System Externalization Technique",
+      "description": "Critique structures not individuals",
+      "example": "don't put blame on white people. Just say it's the system",
+      "impact": "Avoid alienating readers while addressing issues"
+    },
+    {
+      "pattern_name": "Merit Over Prestige Pivot",
+      "description": "Financial opportunity prioritized over rankings",
+      "example": "USC EA chosen for scholarships over Stanford REA",
+      "impact": "Practical decision-making modeled"
+    },
+    {
+      "pattern_name": "Senior Year Reality Check",
+      "description": "Strategic deprioritization after acceptance",
+      "example": "don't have to take any AP test... maintain grades for one semester",
+      "impact": "Permission to be strategic with effort"
+    }
+  ],
+  
+  "intelligence_categories": {
+    "strategic_intelligence": {
+      "items": ["EA strategy pivot", "Test submission logic", "Senior year planning", "Application timing"],
+      "key_discovery": "USC merit scholarships > Stanford prestige"
+    },
+    "tactical_intelligence": {
+      "items": ["Essay systemic framing", "Activity rebranding"],
+      "key_discovery": "Externalize critique to systems for safety"
+    },
+    "adaptive_intelligence": {
+      "items": ["Fake woke calibration"],
+      "key_discovery": "Audience-specific messaging acceptable"
+    },
+    "relationship_intelligence": {
+      "items": ["Jenny's vulnerability sharing"],
+      "key_discovery": "Imperfection modeling reduces pressure"
+    },
+    "outcome_intelligence": {
+      "items": ["Measurable progress tracking"],
+      "key_discovery": "150 plays on Synthoria achieved"
+    }
+  },
+  
+  "session_outcomes": {
+    "decisions_made": [
+      "USC Early Action over Stanford REA",
+      "AP Lit confirmed for senior year",
+      "Submit 1440 SAT to Notre Dame",
+      "Economic disparity essay focus chosen"
+    ],
+    "metrics_achieved": {
+      "synthoria_plays": 150,
+      "notre_dame_completion": "80%",
+      "activities_finalized": 7,
+      "days_until_deadline": 6
+    },
+    "strategic_pivots": [
+      "Stanford REA → USC EA",
+      "Investment essay → Economic disparity",
+      "Folklift story → Minority business focus",
+      "Test optional consideration → Submit anyway"
+    ]
+  },
+  
+  "jenny_techniques_observed": [
+    "Vulnerability through essay sharing",
+    "System externalization framing",
+    "Strategic wokeness permission",
+    "Merit scholarship prioritization",
+    "Asynchronous support offering"
+  ],
+  
+  "silver_bullets_identified": [
+    {
+      "chip_id": "W027-001",
+      "title": "USC Over Stanford Strategic Decision",
+      "why_silver": "Complete reversal of prestige-first thinking"
+    },
+    {
+      "chip_id": "W027-002",
+      "title": "Economic Disparity Systemic Framing",
+      "why_silver": "Safety technique for sensitive topics"
+    },
+    {
+      "chip_id": "W027-003",
+      "title": "Strategic Wokeness Permission",
+      "why_silver": "Permission to adapt message to audience"
+    },
+    {
+      "chip_id": "W027-005",
+      "title": "AP Test Strategic Deprioritization",
+      "why_silver": "Reality check about senior year effort"
+    }
+  ],
+  
+  "hidden_techniques": [
+    {
+      "name": "The Low Score Submission Logic",
+      "description": "Submit below-average scores when 'strongly encouraged'",
+      "reasoning": "Not submitting signals worse than actual score"
+    },
+    {
+      "name": "The Educational Platform Rebrand",
+      "description": "Social media → Educational advocacy platform",
+      "purpose": "Elevate perceived academic value"
+    },
+    {
+      "name": "The Geographic Priority Shift",
+      "description": "Proximity increasingly valued over prestige",
+      "evidence": "I realize how important it is to be closer to home"
+    }
+  ],
+  
+  "extraction_notes": {
+    "unique_elements": "Jenny shares own 'not good' essay for vulnerability",
+    "strategic_depth": "Multiple layers of strategic thinking in single session",
+    "cultural_navigation": "Careful handling of race/economics for Catholic audience",
+    "support_continuity": "text me when done for immediate review"
+  },
+  
+  "verification_status": {
+    "chips_verified": true,
+    "patterns_confirmed": true,
+    "outcomes_documented": true,
+    "quality_threshold_met": true
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Batch Summary Schema",
+  "type": "object",
+  "properties": {
+    "processing_summary": {
+      "type": "object"
+    },
+    "chips_generated": {
+      "type": "object"
+    },
+    "key_discoveries": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "processing_summary",
+    "chips_generated"
+  ]
+}

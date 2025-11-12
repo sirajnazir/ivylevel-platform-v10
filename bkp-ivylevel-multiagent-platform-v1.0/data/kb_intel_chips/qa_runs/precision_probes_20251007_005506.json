@@ -1,0 +1,399 @@
+{
+  "timestamp": "2025-10-07 00:55:06",
+  "total_probes": 9,
+  "top1_pass_count": 5,
+  "top3_pass_count": 2,
+  "top1_pass_rate": 0.5555555555555556,
+  "top3_pass_rate": 0.2222222222222222,
+  "pass_criteria": {
+    "top1_threshold": 0.7,
+    "top3_threshold": 1.0,
+    "top1_pass": false,
+    "top3_pass": false
+  },
+  "probes": [
+    {
+      "query": "168-hour framework time audit only 2 hours left",
+      "expected_types": [
+        "FRAMEWORK",
+        "SILVER"
+      ],
+      "namespace": "sessions",
+      "top1_score": 0.519546568,
+      "top1_type": "",
+      "top3_types": [
+        "",
+        "",
+        ""
+      ],
+      "top1_pass": true,
+      "top3_pass": false,
+      "hits": [
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.519546568,
+          "type": "",
+          "chip_id": "W002-SILVER-001",
+          "week": 2.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.475765258,
+          "type": "",
+          "chip_id": "W007-FRAMEWORK-001",
+          "week": 7.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.470380813,
+          "type": "",
+          "chip_id": "W001-FRAMEWORK-001",
+          "week": 1.0,
+          "content_preview": ""
+        }
+      ]
+    },
+    {
+      "query": "Naviance scattergram acceptance history",
+      "expected_types": [
+        "INSIGHT",
+        "TACTIC"
+      ],
+      "namespace": "sessions",
+      "top1_score": 0.519672453,
+      "top1_type": "",
+      "top3_types": [
+        "",
+        "",
+        ""
+      ],
+      "top1_pass": true,
+      "top3_pass": false,
+      "hits": [
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.519672453,
+          "type": "",
+          "chip_id": "W005-INSIGHT-001",
+          "week": 5.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.45624733,
+          "type": "",
+          "chip_id": "W065-INSIGHT-001",
+          "week": 65.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.448467284,
+          "type": "",
+          "chip_id": "W065-TACTIC-001",
+          "week": 65.0,
+          "content_preview": ""
+        }
+      ]
+    },
+    {
+      "query": "let colleges reject you don't reject yourself",
+      "expected_types": [
+        "TRUST"
+      ],
+      "namespace": "sessions",
+      "top1_score": 0.439846039,
+      "top1_type": "",
+      "top3_types": [
+        "",
+        "",
+        ""
+      ],
+      "top1_pass": false,
+      "top3_pass": false,
+      "hits": [
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.439846039,
+          "type": "",
+          "chip_id": "W041-TRUST-001",
+          "week": 41.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.397081375,
+          "type": "",
+          "chip_id": "W038-STRATEGY-001",
+          "week": 38.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.397060394,
+          "type": "",
+          "chip_id": "W058-RELATABILITY-001",
+          "week": 58.0,
+          "content_preview": ""
+        }
+      ]
+    },
+    {
+      "query": "teacher gift strategy thank-you card",
+      "expected_types": [
+        "TRUST",
+        "TACTIC",
+        "STRATEGY"
+      ],
+      "namespace": "sessions",
+      "top1_score": 0.502145827,
+      "top1_type": "",
+      "top3_types": [
+        "",
+        "",
+        ""
+      ],
+      "top1_pass": true,
+      "top3_pass": false,
+      "hits": [
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.502145827,
+          "type": "",
+          "chip_id": "W031-STRATEGY-001",
+          "week": 31.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.469770432,
+          "type": "",
+          "chip_id": "W037-TRUST-001",
+          "week": 37.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.466016769,
+          "type": "",
+          "chip_id": "W037-RELATABILITY-001",
+          "week": 37.0,
+          "content_preview": ""
+        }
+      ]
+    },
+    {
+      "query": "Stanford REA vs USC strategy",
+      "expected_types": [
+        "STRATEGY"
+      ],
+      "namespace": "sessions",
+      "top1_score": 0.741352141,
+      "top1_type": "",
+      "top3_types": [
+        "",
+        "",
+        ""
+      ],
+      "top1_pass": true,
+      "top3_pass": false,
+      "hits": [
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.741352141,
+          "type": "",
+          "chip_id": "W027-STRATEGY-001",
+          "week": 27.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.668439865,
+          "type": "",
+          "chip_id": "W054-STRATEGY-001",
+          "week": 54.0,
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_2025-10-06_v1.0",
+          "score": 0.646165848,
+          "type": "",
+          "chip_id": "W054-ADAPTATION-001",
+          "week": 54.0,
+          "content_preview": ""
+        }
+      ]
+    },
+    {
+      "query": "deadline crunch escalation after no response",
+      "expected_types": [
+        "Escalation_Pattern_Chip",
+        "Micro_Tactic_Chip"
+      ],
+      "namespace": "imsg",
+      "top1_score": 0.518186629,
+      "top1_type": "Micro_Tactic_Chip",
+      "top3_types": [
+        "Micro_Tactic_Chip",
+        "Escalation_Pattern_Chip",
+        "Micro_Tactic_Chip"
+      ],
+      "top1_pass": true,
+      "top3_pass": true,
+      "hits": [
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.518186629,
+          "type": "Micro_Tactic_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.405912429,
+          "type": "Escalation_Pattern_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.372808486,
+          "type": "Micro_Tactic_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        }
+      ]
+    },
+    {
+      "query": "confidence reset tone cues after setback",
+      "expected_types": [
+        "Tone_Cue_Chip"
+      ],
+      "namespace": "imsg",
+      "top1_score": 0.434753418,
+      "top1_type": "Message_Template_Chip",
+      "top3_types": [
+        "Message_Template_Chip",
+        "Micro_Tactic_Chip",
+        "Message_Template_Chip"
+      ],
+      "top1_pass": false,
+      "top3_pass": false,
+      "hits": [
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.434753418,
+          "type": "Message_Template_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.401109725,
+          "type": "Micro_Tactic_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.369024277,
+          "type": "Message_Template_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        }
+      ]
+    },
+    {
+      "query": "thank you note template",
+      "expected_types": [
+        "Message_Template_Chip"
+      ],
+      "namespace": "imsg",
+      "top1_score": 0.464609176,
+      "top1_type": "Message_Template_Chip",
+      "top3_types": [
+        "Message_Template_Chip",
+        "Message_Template_Chip",
+        "Message_Template_Chip"
+      ],
+      "top1_pass": false,
+      "top3_pass": true,
+      "hits": [
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.464609176,
+          "type": "Message_Template_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.445512801,
+          "type": "Message_Template_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.437734604,
+          "type": "Message_Template_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        }
+      ]
+    },
+    {
+      "query": "48 hour turnaround case",
+      "expected_types": [
+        "Turnaround_Case_Chip"
+      ],
+      "namespace": "imsg",
+      "top1_score": 0.304973602,
+      "top1_type": "Micro_Tactic_Chip",
+      "top3_types": [
+        "Micro_Tactic_Chip",
+        "Micro_Tactic_Chip",
+        "Micro_Tactic_Chip"
+      ],
+      "top1_pass": false,
+      "top3_pass": false,
+      "hits": [
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.304973602,
+          "type": "Micro_Tactic_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.29778862,
+          "type": "Micro_Tactic_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        },
+        {
+          "namespace": "KBv6_iMessage_2025-10-07_v1.0",
+          "score": 0.291204453,
+          "type": "Micro_Tactic_Chip",
+          "chip_id": "",
+          "week": "IMSG",
+          "content_preview": ""
+        }
+      ]
+    }
+  ]
+}

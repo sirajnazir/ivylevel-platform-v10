@@ -1,0 +1,72 @@
+{
+  "processing_summary": {
+    "source_file": "2024-02-21_W034_P2-BUILDING_TRANS-INTEL_CmuEssaysFinalizationandnationalLeadersh.json",
+    "source_type": "EXTRACT",
+    "date_processed": "2025-10-06",
+    "week": "034",
+    "phase": "P2-BUILDING",
+    "phase_enum": "BUILDING",
+    "session_date": "2024-02-21",
+    "participants": ["Jenny Duan", "Huda"],
+    "duration": "49:35",
+    "version": "v1",
+    "note": "Bootcamp failure recovery, national org positioning, partnership dissolution, essay sensory contrast opening"
+  },
+  
+  "chips_generated": {
+    "total_count": 10,
+    "chip_types": {
+      "Insight_Chip": 1,
+      "Strategy_Chip": 1,
+      "Tactic_Chip": 1,
+      "Trust_Chip": 1,
+      "Adaptation_Chip": 1,
+      "Framework_Chip": 1,
+      "Result_Chip": 1,
+      "Channel_Chip": 1,
+      "Relatability_Chip": 1,
+      "Silver_Bullet_Chip": 1
+    },
+    "scoring_methodology": {
+      "quality_score": "Human-equivalent quality rating (0-1 scale)",
+      "confidence_score": "Embedding confidence based on clarity",
+      "average_quality_score": 0.94,
+      "average_confidence_score": 0.92
+    }
+  },
+  
+  "key_discoveries": {
+    "bootcamp_failure": "6 signups, 0 attendees",
+    "partnership_zero_value": "Ended collaboration bringing no results",
+    "national_org_too_senior": "Advisory boards have C-suite executives",
+    "essay_sensory_opening": "Manure smell creates immediate immersion",
+    "attendance_psychology": "Checkbox commitment secured 6 new signups",
+    "local_reactivation": "Mountain House Youth dormant membership"
+  },
+  
+  "silver_bullets": {
+    "attendance_penalty_psychology": "Checkbox without actual penalty works",
+    "partnership_dissolution": "End drains decisively",
+    "national_org_reality_check": "Youth boards > advisory boards",
+    "sensory_contrast_opening": "Physical details > generic statements",
+    "multiple_initiative_resilience": "Portfolio prevents single point failure",
+    "local_leadership_activation": "Reactivate dormant memberships"
+  },
+  
+  "output_files": {
+    "jsonl_batch": "W034_Intel_Chips_Batch_v1.jsonl",
+    "processing_summary": "W034_Processing_Summary_v1.json",
+    "chip_count": 10,
+    "total_content_words": 1523,
+    "average_words_per_chip": 152
+  },
+  
+  "week_over_week_progression": {
+    "w033_to_w034": {
+      "time_gap": "11 days",
+      "focus_shift": "Essay expansion → Failure recovery + positioning",
+      "setback_management": "Bootcamp no-shows handled systematically",
+      "partnership_clarity": "Unproductive collaboration ended"
+    }
+  }
+}
